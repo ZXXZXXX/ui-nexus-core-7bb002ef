@@ -12,8 +12,12 @@ import {
   Footprints,
   Home,
   PackageCheck,
+  Filter,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { EmptyState } from "@/components/empty-state";
 import { useRole, canVisit, canDiagnose, canExecute } from "@/lib/mobile-role";
 
@@ -238,6 +242,12 @@ function TaskListPage() {
 
   if (selTypes.size > 0) list = list.filter((o) => selTypes.has(o.type));
   if (selBarns.size > 0) list = list.filter((o) => selBarns.has(o.barn));
+
+  const filterCount = selTypes.size + selBarns.size;
+  const filterSummary =
+    filterCount === 0
+      ? "筛选"
+      : [...Array.from(selTypes), ...Array.from(selBarns)].join(" / ");
 
   if (tab === "执行中") list = list.filter((o) => o.status === "进行中");
   else if (tab !== "全部") list = list.filter((o) => o.status === tab);
