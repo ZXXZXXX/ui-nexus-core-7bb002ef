@@ -563,13 +563,13 @@ function HomePage() {
                   </div>
                   <div className="mt-4 flex items-center gap-2">
                     <span
-                      className="inline-flex items-center gap-0.5 h-[22px] px-1.5 rounded-md text-caption font-medium tabular-nums"
-                      style={{ background: trendTone, color: trendText }}
+                      className="inline-flex items-center gap-0.5 h-[22px] px-1.5 rounded-md text-caption font-medium tabular-nums bg-white/18 text-white"
                     >
-                      <TrendIcon trend={k.trend} className={neutral ? "text-white/70" : undefined} />
+                      <TrendIcon trend={k.trend} className="text-white/90" />
                       {k.delta}
                     </span>
-                    <span className="text-caption text-white/65">较上月</span>
+                    <span className="text-caption text-white/70">较上月</span>
+
                   </div>
                 </div>
               </Card>
