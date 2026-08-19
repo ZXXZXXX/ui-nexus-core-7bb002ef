@@ -138,7 +138,7 @@ function StackedBars({
               onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
             }`}
           >
-            <div className="w-[120px] shrink-0">
+            <div className="w-[100px] shrink-0">
               <div className="text-body-sm text-foreground truncate">{r.key}</div>
               <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
             </div>
@@ -153,13 +153,13 @@ function StackedBars({
                   />
                 ))}
               </div>
-              <div className="mt-1 flex flex-nowrap items-center gap-2 text-caption text-text-tertiary tabular-nums">
+              <div className="mt-1 flex flex-nowrap items-center gap-1 text-caption text-text-tertiary tabular-nums">
                 <span className="whitespace-nowrap">0-30 {r.pp30n} 头 ({r.pp30}%)</span>
                 <span className="whitespace-nowrap">0-60 {r.pp60n} 头 ({r.pp60}%)</span>
                 <span className="whitespace-nowrap">0-90 {r.pp90n} 头 ({r.pp90}%)</span>
               </div>
             </div>
-            <span className="ml-3 text-body-sm tabular-nums text-foreground whitespace-nowrap">{r.pp90n} 头</span>
+            <span className="ml-2 text-body-sm tabular-nums text-foreground whitespace-nowrap">{r.pp90n} 头</span>
           </button>
         );
       })}
