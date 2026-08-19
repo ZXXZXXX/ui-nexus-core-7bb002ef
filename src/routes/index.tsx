@@ -458,11 +458,6 @@ function HomePage() {
         {/* 报表口径切换 */}
         <div>
           <h3 className="text-section-title text-foreground">数据看板</h3>
-          <p className="text-caption text-text-tertiary mt-0.5">
-            当前视角：{scopeOptions.find((o) => o.key === scope)?.label} ·{" "}
-            {scopeOptions.find((o) => o.key === scope)?.desc}
-            {levels.length > 1 && <> · 统计口径：{levelMeta[level].label}</>}
-          </p>
         </div>
 
         {/* 数量级分层：集团级 > 区域级 > 牧场级 */}
