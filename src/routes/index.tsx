@@ -92,6 +92,17 @@ const metricCards: MetricCard[] = [
   { topic: "免疫完成率", label: "（最近一次）疫苗完成率", value: "93.1", unit: "%", trend: "up", delta: "+2.3 %", icon: Syringe, anchor: "topic-vaccine", good: true },
 ];
 
+/** 集团管理者视角下的指标卡口径覆盖 */
+const groupCardOverride: Record<string, Partial<MetricCard>> = {
+  "topic-herd": { topic: "总存栏数", label: "（至今日）集团总存栏", value: "29500", unit: "头", delta: "+286 头", trend: "up", good: true },
+  "topic-calving": { topic: "早产/产犊数", label: "（本月）早产 / 产犊数", value: "47 / 1186", unit: "头", delta: "-8 头", trend: "down", good: true },
+  "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: "344", unit: "头", delta: "-21 头", trend: "down", good: true },
+  "topic-disease": { topic: "治愈/发病数", label: "（本月）治愈 / 发病头次", value: "742 / 812", unit: "头次", delta: "+1.6 %", trend: "up", good: true },
+  "topic-drug": { topic: "总药费支出", label: "（本月）集团总药费", value: "122.1", unit: "万元", delta: "+4.3 %", trend: "up", good: false, absolute: false },
+  "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: "4.4", unit: "天", delta: "-0.3 天", trend: "down", good: true, absolute: false },
+};
+
+
 
 
 type WorkOrderType = "disease" | "vaccine" | "deworm" | "hoof" | "postpartum" | "drying" | "general";
