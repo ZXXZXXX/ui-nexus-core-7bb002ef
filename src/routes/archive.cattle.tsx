@@ -60,6 +60,7 @@ const healthToProfile: Record<Health, CattleProfile["health"]> = {
   健康: "健康",
   观察中: "观察中",
   治疗中: "治疗中",
+  死淘: "死淘",
 };
 
 function toProfile(c: Cow): CattleProfile {
