@@ -89,7 +89,7 @@ const farmRows = GROUP_FARMS.map((f) => agg(`${f.region} · ${f.farm}`, f.base, 
 
 const wan = (n: number) => `${(n / 10000).toFixed(1)} 万`;
 
-/* ---------------- 二、产后淘汰率排名（分组柱形 + 下钻） ---------------- */
+/* ---------------- 二、产后淘汰率排名（竖直排布：区域/牧场竖向列表 + 横向条形） ---------------- */
 
 const BUCKETS = [
   { key: "pp30", n: "pp30n", label: "0-30 天", color: "var(--brand)" },
@@ -97,7 +97,7 @@ const BUCKETS = [
   { key: "pp90", n: "pp90n", label: "0-90 天", color: "var(--state-warning)" },
 ] as const;
 
-function GroupedBars({
+function VerticalBars({
   rows,
   onPick,
 }: {
@@ -105,46 +105,44 @@ function GroupedBars({
   onPick?: (r: Row) => void;
 }) {
   const max = Math.max(...rows.flatMap((r) => [r.pp30, r.pp60, r.pp90]), 1);
-  const H = 200;
   return (
-    <div className="w-full overflow-x-auto">
-      <div className="min-w-[520px]">
-        <div className="flex items-end gap-6" style={{ height: H }}>
-          {rows.map((r) => (
-            <button
-              key={r.key}
-              type="button"
-              onClick={() => onPick?.(r)}
-              className={`flex-1 min-w-0 h-full flex items-end justify-center gap-2 rounded-lg px-2 transition-colors ${
-                onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
-              }`}
-            >
-              {BUCKETS.map((b) => {
-                const rate = r[b.key] as number;
-                const cnt = r[b.n] as number;
-                return (
-                  <div key={b.key} className="flex-1 max-w-[46px] flex flex-col items-center justify-end gap-1">
-                    <span className="text-caption tabular-nums text-foreground whitespace-nowrap">{rate}%</span>
-                    <span className="text-caption tabular-nums text-text-tertiary whitespace-nowrap">{cnt} 头</span>
+    <div className="space-y-3">
+      {rows.map((r) => (
+        <button
+          key={r.key}
+          type="button"
+          onClick={() => onPick?.(r)}
+          className={`w-full grid grid-cols-[minmax(0,1fr)_minmax(140px,180px)] items-center gap-3 rounded-lg px-2 py-2 transition-colors text-left ${
+            onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
+          }`}
+        >
+          <div className="min-w-0">
+            <div className="text-body-sm text-foreground truncate">{r.key}</div>
+            <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
+          </div>
+          <div className="flex items-center gap-2">
+            {BUCKETS.map((b) => {
+              const rate = r[b.key] as number;
+              const cnt = r[b.n] as number;
+              return (
+                <div key={b.key} className="flex-1 min-w-0 flex flex-col items-center gap-1">
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-body-sm tabular-nums text-foreground">{rate}%</span>
+                    <span className="text-caption tabular-nums text-text-tertiary">({cnt})</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-surface-subtle overflow-hidden">
                     <div
-                      className="w-full rounded-t-md"
-                      style={{ height: `${Math.max((rate / max) * (H - 64), 4)}px`, background: b.color }}
+                      className="h-full rounded-full"
+                      style={{ width: `${Math.max((rate / max) * 100, 4)}%`, background: b.color }}
                     />
                   </div>
-                );
-              })}
-            </button>
-          ))}
-        </div>
-        <div className="mt-2 flex gap-6 border-t border-border pt-2">
-          {rows.map((r) => (
-            <div key={r.key} className="flex-1 min-w-0 text-center">
-              <div className="text-body-sm text-foreground truncate">{r.key}</div>
-              <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
-            </div>
-          ))}
-        </div>
-      </div>
+                  <span className="text-caption text-text-tertiary whitespace-nowrap">{b.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </button>
+      ))}
     </div>
   );
 }
@@ -190,7 +188,7 @@ function PostpartumRankSection() {
       <p className="text-body-sm text-text-secondary mb-4">
         {region ? "该区域下各牧场产后淘汰率对比" : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
-      <GroupedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      <VerticalBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
     </SectionCard>
   );
 }
@@ -541,8 +539,10 @@ function PanoramaSection() {
 export function GroupExecSection() {
   return (
     <div className="space-y-6">
-      <PostpartumRankSection />
-      <DrugTrendSection />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+        <PostpartumRankSection />
+        <DrugTrendSection />
+      </div>
       <PanoramaSection />
     </div>
   );
