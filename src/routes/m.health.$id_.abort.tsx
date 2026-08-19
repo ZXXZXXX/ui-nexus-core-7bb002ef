@@ -5,6 +5,7 @@ import { Camera, X } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
+import { ConfirmAbortDialog } from "@/components/m/confirm-abort-dialog";
 import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
 
 export const Route = createFileRoute("/m/health/$id_/abort")({
