@@ -539,8 +539,10 @@ function PanoramaSection() {
 export function GroupExecSection() {
   return (
     <div className="space-y-6">
-      <PostpartumRankSection />
-      <DrugTrendSection />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+        <PostpartumRankSection />
+        <DrugTrendSection />
+      </div>
       <PanoramaSection />
     </div>
   );
