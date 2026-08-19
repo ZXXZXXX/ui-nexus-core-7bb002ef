@@ -120,6 +120,7 @@ function StackedBars({
   rows: Row[];
   onPick?: (r: Row) => void;
 }) {
+  const [hover, setHover] = useState<{ key: string; x: number; y: number } | null>(null);
   const max = Math.max(...rows.map((r) => r.pp90n), 1);
   return (
     <div className="table w-full">
@@ -143,33 +144,62 @@ function StackedBars({
             }}
             className={`table-row transition-colors ${onPick ? "cursor-pointer hover:bg-surface-subtle" : "cursor-default"}`}
           >
-            <div className="table-cell whitespace-nowrap py-2 pr-1 align-middle">
+            <div className="table-cell whitespace-nowrap py-2.5 pr-3 align-middle">
               <div className="text-body-sm text-foreground truncate">{r.key}</div>
               <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
             </div>
-            <div className="table-cell w-full align-middle py-2">
-              <div className="relative h-4 w-full rounded-md overflow-hidden">
+            <div className="table-cell w-full align-middle py-2.5">
+              <div
+                className="relative h-4 w-full rounded-md overflow-hidden"
+                onMouseMove={(e) => {
+                  const box = e.currentTarget.getBoundingClientRect();
+                  setHover({ key: r.key, x: e.clientX - box.left, y: e.clientY - box.top });
+                }}
+                onMouseLeave={() => setHover(null)}
+              >
                 {layers.map((s) => (
                   <div
                     key={s.label}
-                    title={`${s.label} ${s.cnt} 头，淘汰率 ${s.rate}%`}
                     className="absolute top-0 left-0 h-full rounded-md"
                     style={{ width: `${(s.cnt / max) * 100}%`, background: s.color }}
                   />
                 ))}
               </div>
-              <div className="mt-1 w-full flex flex-nowrap items-center gap-2 text-caption text-text-tertiary tabular-nums">
-                <span className="whitespace-nowrap">0-30 {r.pp30n} 头 ({r.pp30}%)</span>
-                <span className="whitespace-nowrap">0-60 {r.pp60n} 头 ({r.pp60}%)</span>
-                <span className="whitespace-nowrap">0-90 {r.pp90n} 头 ({r.pp90}%)</span>
-              </div>
             </div>
-            <div className="table-cell whitespace-nowrap pl-2 py-2 align-middle text-right">
+            <div className="table-cell whitespace-nowrap pl-3 py-2.5 align-middle text-right">
               <span className="text-body-sm tabular-nums text-foreground">{r.pp90n} 头</span>
             </div>
           </div>
         );
       })}
+      {hover && (
+        <div
+          className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-lg border border-border bg-card px-3 py-2 shadow-card whitespace-nowrap"
+          style={{ left: hover.x, top: hover.y - 8 }}
+        >
+          <div className="text-caption text-foreground mb-1">{hover.key}</div>
+          <div className="space-y-0.5">
+            {[
+              { label: "0-30 天", color: BUCKETS[0].color, rate: null, cnt: null },
+              { label: "0-60 天", color: BUCKETS[1].color, rate: null, cnt: null },
+              { label: "0-90 天", color: BUCKETS[2].color, rate: null, cnt: null },
+            ].map((b) => {
+              const row = rows.find((r) => r.key === hover.key);
+              if (!row) return null;
+              const cnt =
+                b.label === "0-30 天" ? row.pp30n : b.label === "0-60 天" ? row.pp60n : row.pp90n;
+              const rate =
+                b.label === "0-30 天" ? row.pp30 : b.label === "0-60 天" ? row.pp60 : row.pp90;
+              return (
+                <div key={b.label} className="flex items-center gap-2 text-caption text-text-secondary">
+                  <span className="h-2 w-2 rounded-sm" style={{ background: b.color }} />
+                  <span className="tabular-nums">{b.label} {cnt} 头 ({rate}%)</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
