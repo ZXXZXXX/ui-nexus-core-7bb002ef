@@ -229,11 +229,12 @@ const notifToneColor: Record<NotifTone, string> = {
 };
 
 
-function TrendIcon({ trend }: { trend: string }) {
-  if (trend === "up") return <TrendingUp className="h-3 w-3" />;
-  if (trend === "down") return <TrendingDown className="h-3 w-3" />;
-  return <Minus className="h-3 w-3" />;
+function TrendIcon({ trend, className }: { trend: string; className?: string }) {
+  if (trend === "up") return <TrendingUp className={cn("h-3 w-3", className)} />;
+  if (trend === "down") return <TrendingDown className={cn("h-3 w-3", className)} />;
+  return <Minus className={cn("h-3 w-3", className)} />;
 }
+
 
 
 
