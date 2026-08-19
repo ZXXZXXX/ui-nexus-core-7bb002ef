@@ -122,7 +122,7 @@ function StackedBars({
 }) {
   const max = Math.max(...rows.map((r) => r.pp90n), 1);
   return (
-    <div className="space-y-3">
+    <div className="table w-full">
       {rows.map((r) => {
         const layers = [
           { label: "0-90 天", color: BUCKETS[2].color, rate: r.pp90, cnt: r.pp90n },
@@ -130,19 +130,24 @@ function StackedBars({
           { label: "0-30 天", color: BUCKETS[0].color, rate: r.pp30, cnt: r.pp30n },
         ];
         return (
-          <button
+          <div
             key={r.key}
-            type="button"
+            role={onPick ? "button" : undefined}
+            tabIndex={onPick ? 0 : undefined}
             onClick={() => onPick?.(r)}
-            className={`w-full flex items-center gap-1 rounded-lg px-2 py-1.5 transition-colors text-left ${
-              onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
-            }`}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onPick?.(r);
+              }
+            }}
+            className={`table-row transition-colors ${onPick ? "cursor-pointer hover:bg-surface-subtle" : "cursor-default"}`}
           >
-            <div className="w-[90px] shrink-0">
+            <div className="table-cell whitespace-nowrap py-2 pr-1 align-middle">
               <div className="text-body-sm text-foreground truncate">{r.key}</div>
               <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="table-cell w-full align-middle py-2">
               <div className="relative h-4 w-full rounded-md overflow-hidden">
                 {layers.map((s) => (
                   <div
@@ -159,8 +164,10 @@ function StackedBars({
                 <span className="whitespace-nowrap">0-90 {r.pp90n} 头 ({r.pp90}%)</span>
               </div>
             </div>
-            <span className="ml-2 text-body-sm tabular-nums text-foreground whitespace-nowrap">{r.pp90n} 头</span>
-          </button>
+            <div className="table-cell whitespace-nowrap pl-2 py-2 align-middle text-right">
+              <span className="text-body-sm tabular-nums text-foreground">{r.pp90n} 头</span>
+            </div>
+          </div>
         );
       })}
     </div>
