@@ -1246,24 +1246,7 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
 
 
 
-      {status === "已终止" ? (
-        <div className="rounded-xl bg-card border border-border p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-body-sm font-medium inline-flex items-center gap-1.5 text-foreground">
-              <AlertTriangle className="h-4 w-4 text-[#EF4445]" />
-              工单终止
-            </div>
-            <span className="tag tag-danger">已终止</span>
-
-          </div>
-          <div className="space-y-2">
-            <Field label="终止原因" value="牛只死亡，停止后续治疗" />
-            <Field label="是否转栏" value="否" />
-            <Field label="终止时间" value="2026-05-13 18:24" />
-            <Field label="操作人" value={<PersonChip name="李雨晴" />} />
-          </div>
-        </div>
-      ) : isPlatformIssued || !id.startsWith("WO-") ? null : (() => {
+      {isPlatformIssued || !id.startsWith("WO-") ? null : (() => {
         const isAutoArchived = autoArchivedOrders.has(id);
         const reviewPhase: DayPhase = reviewDone || status === "已完成" ? "done" : reviewActive ? "active" : "pending";
         const isReviewDone = reviewPhase === "done";
