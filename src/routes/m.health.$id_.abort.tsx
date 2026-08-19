@@ -5,6 +5,7 @@ import { Camera, X } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
+import { ConfirmAbortDialog } from "@/components/m/confirm-abort-dialog";
 import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
 
 export const Route = createFileRoute("/m/health/$id_/abort")({
@@ -29,6 +30,7 @@ function AbortPage() {
   const [needTransfer, setNeedTransfer] = useState(false);
   const [transferTo, setTransferTo] = useState("");
   const [confirmTransferOpen, setConfirmTransferOpen] = useState(false);
+  const [confirmAbortOpen, setConfirmAbortOpen] = useState(false);
 
   const [photoFront, setPhotoFront] = useState<number | null>(null);
   const [photoLeft, setPhotoLeft] = useState<number | null>(null);
@@ -49,6 +51,11 @@ function AbortPage() {
       (photoFront !== null && photoLeft !== null && photoRight !== null));
 
   const submit = () => {
+    setConfirmAbortOpen(true);
+  };
+
+  const handleAbortConfirm = () => {
+    setConfirmAbortOpen(false);
     if (needTransfer) {
       setConfirmTransferOpen(true);
       return;
@@ -139,6 +146,14 @@ function AbortPage() {
           确认终止
         </button>
       </div>
+
+      <ConfirmAbortDialog
+        open={confirmAbortOpen}
+        orderId={id}
+        reason={reason === "其他" ? other : reason}
+        onCancel={() => setConfirmAbortOpen(false)}
+        onConfirm={handleAbortConfirm}
+      />
 
       <ConfirmTransferDialog
         open={confirmTransferOpen}
