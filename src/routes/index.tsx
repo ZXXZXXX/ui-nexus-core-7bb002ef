@@ -382,18 +382,19 @@ function HomePage() {
               <div className="mt-3 grid grid-cols-3 gap-2.5">
                 {scope === "group" ? (
                   [
-                    { key: "牧场总数", count: farmCountSummary.total, icon: Building2 },
-                    { key: "普通牧场", count: farmCountSummary.ordinary, icon: Building2 },
-                    { key: "有机牧场", count: farmCountSummary.organic, icon: Leaf },
+                    { key: "牧场总数", count: farmCountSummary.total, icon: Building2, gradient: "var(--gradient-brand)", shadow: "var(--brand)" },
+                    { key: "普通牧场", count: farmCountSummary.ordinary, icon: Building2, gradient: "linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)", shadow: "#3B82F6" },
+                    { key: "有机牧场", count: farmCountSummary.organic, icon: Leaf, gradient: "linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%)", shadow: "#F59E0B" },
                   ].map((a) => {
                     const Icon = a.icon;
                     return (
                       <button
                         key={a.key}
                         type="button"
-                        className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105 bg-gradient-brand"
+                        className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105"
                         style={{
-                          boxShadow: "0 10px 22px -14px color-mix(in oklab, var(--brand) 90%, transparent)",
+                          background: a.gradient,
+                          boxShadow: `0 10px 22px -14px color-mix(in oklab, ${a.shadow} 90%, transparent)`,
                         }}
                       >
                         <Icon
