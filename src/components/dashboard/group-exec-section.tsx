@@ -412,7 +412,7 @@ function PanoramaSection() {
       </p>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1040px] text-body-sm">
+        <table className="w-full min-w-[1300px] text-body-sm">
           <thead>
             <tr className="text-caption text-text-tertiary">
               <th className="text-left font-normal py-2 w-12">序号</th>
