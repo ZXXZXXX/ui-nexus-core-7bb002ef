@@ -472,47 +472,37 @@ function PanoramaSection() {
     setSort((prev) => ({ key, dir: prev.key === key && prev.dir === "desc" ? "asc" : "desc" }));
   };
 
+  const fmt = (r: (typeof rows)[number], key: SortKey) => {
+    switch (key) {
+      case "name":
+        return r.key;
+      case "sick":
+      case "cure":
+      case "pp30":
+      case "pp60":
+      case "pp90":
+      case "pretermRate":
+        return `${r[key]}%`;
+      default:
+        return r[key];
+    }
+  };
+
   const exportCsv = () => {
-    const head = [
-      "序号",
-      region ? "牧场名称" : "区域名称",
-      "死亡数",
-      "淘汰数",
-      "发病率",
-      "治愈率",
-      "平均诊疗天数",
-      "总药费",
-      "头均药费",
-      "产后0～30天淘汰率",
-      "0～60天淘汰率",
-      "0～90天淘汰率",
-      "早产率",
-    ];
-    const body = rows.map((r, i) => [
-      i + 1,
-      r.key,
-      r.death,
-      r.cull,
-      `${r.sick}%`,
-      `${r.cure}%`,
-      r.treatmentDays,
-      r.drugFee,
-      r.perHead,
-      `${r.pp30}%`,
-      `${r.pp60}%`,
-      `${r.pp90}%`,
-      `${r.pretermRate}%`,
-    ]);
+    // 仅导出当前视图（当前层级 + 当前排序）的数据
+    const head = ["序号", ...COLUMNS.map((c) => (c.key === "name" ? (region ? "牧场名称" : "区域名称") : c.label))];
+    const body = rows.map((r, i) => [i + 1, ...COLUMNS.map((c) => fmt(r, c.key))]);
     const csv =
       "\uFEFF" + [head, ...body].map((line) => line.map((c) => `"${c}"`).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `关键指标排行_${region ?? "区域排名"}.csv`;
+    a.download = `关键指标排行_${region ?? "区域排名"}_${rows.length}条.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success("报表已导出");
+    toast.success(`已导出当前视图 ${rows.length} 条数据`);
   };
+
 
   return (
     <SectionCard
