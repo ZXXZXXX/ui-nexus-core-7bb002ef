@@ -382,7 +382,7 @@ function PanoramaSection() {
   return (
     <SectionCard
       id="topic-panorama"
-      title="区域 & 牧场全景指标对标排行"
+      title="区域 / 牧场关键指标排行"
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
