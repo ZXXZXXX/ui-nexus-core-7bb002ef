@@ -9,7 +9,7 @@ export const Route = createFileRoute("/m/search")({
   component: SearchPage,
 });
 
-type CowStatus = "健康" | "观察中" | "治疗中" | "异常";
+type CowStatus = "健康" | "观察中" | "治疗中" | "异常" | "死淘";
 type Cow = { id: string; barnIdx: number; penIdx: number; status: CowStatus };
 
 const statusTone: Record<CowStatus, string> = {
@@ -17,9 +17,10 @@ const statusTone: Record<CowStatus, string> = {
   观察中: "tag tag-warning",
   治疗中: "tag tag-info",
   异常: "tag tag-danger",
+  死淘: "tag tag-muted",
 };
 
-const STATUSES: CowStatus[] = ["健康", "健康", "健康", "健康", "健康", "观察中", "治疗中", "异常"];
+const STATUSES: CowStatus[] = ["健康", "健康", "健康", "健康", "健康", "观察中", "治疗中", "异常", "死淘"];
 const BARN_COUNT = 8;
 const PEN_PER_BARN = 4;
 const COWS_PER_PEN = 100;

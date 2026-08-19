@@ -55,7 +55,7 @@ function AnimalDetailPage() {
     sex: "母",
     type: "哺乳牛",
     ageDays: 1218,
-    health: "健康" as "健康" | "观察中" | "异常" | "治疗中",
+    health: "健康" as "健康" | "观察中" | "异常" | "治疗中" | "死淘",
     withdrawalDays: 3,
     withdrawalUntil: "2026-05-28",
     lactationDays: 168,
@@ -150,7 +150,9 @@ function AnimalDetailPage() {
               <div className="shrink-0 inline-flex items-center gap-1.5">
                 <span
                   className={`h-6 px-2 rounded-full inline-flex items-center gap-1 text-[11px] font-semibold ${
-                    a.health === "异常"
+                    a.health === "死淘"
+                      ? "bg-[#F0F2F4] text-[#64748B]"
+                      : a.health === "异常"
                       ? "bg-[#FFE4E1] text-[#D9534F]"
                       : a.health === "观察中"
                       ? "bg-[#FFF7E6] text-[#B8860B]"
