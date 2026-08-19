@@ -544,10 +544,11 @@ function HomePage() {
                 }}
                 className="relative overflow-hidden border-0 p-5 rounded-2xl transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
                 style={{
-                  background: `linear-gradient(135deg, color-mix(in oklab, ${tone} 95%, black 5%), color-mix(in oklab, ${tone} 76%, white 12%))`,
-                  boxShadow: `0 12px 26px -14px color-mix(in oklab, ${tone} 75%, transparent)`,
+                  background: `linear-gradient(135deg, color-mix(in oklab, ${tone} 90%, black 10%), color-mix(in oklab, ${tone} 72%, white 6%))`,
+                  boxShadow: `0 12px 26px -14px color-mix(in oklab, ${tone} 70%, transparent)`,
                 }}
               >
+
                 <k.icon
                   aria-hidden
                   className="pointer-events-none absolute -right-2 -bottom-2 h-20 w-20 text-white/15"
