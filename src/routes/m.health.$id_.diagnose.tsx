@@ -35,6 +35,7 @@ import { TagPicker } from "@/components/m/tag-picker";
 import { DiseasePicker } from "@/components/disease-picker";
 import { Switch } from "@/components/ui/switch";
 import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
+import { CowProfileCard } from "@/components/m/cow-profile-card";
 
 
 
@@ -947,6 +948,14 @@ function DiagnosePage() {
             <span className="text-text-tertiary">·</span>
             <span className="font-mono text-text-secondary">{earTagLabel}</span>
           </div>
+        </div>
+
+        {/* 牛只基础信息卡片 */}
+        <div className="px-4 pt-3">
+          <CowProfileCard
+            cowId={earTagLabel.replace(/^#/, "")}
+            barn={isPostpartum ? "产房 1 号" : isDrying ? "干奶牛舍" : "病牛舍"}
+          />
         </div>
 
         {/* 顶部提示 */}
