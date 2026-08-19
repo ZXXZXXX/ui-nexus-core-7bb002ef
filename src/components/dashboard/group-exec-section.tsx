@@ -153,12 +153,13 @@ function StackedBars({
                 ))}
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-3 text-caption text-text-tertiary tabular-nums">
-                <span>0-30 {r.pp30}% ({r.pp30n})</span>
-                <span>0-60 {r.pp60}% ({r.pp60n})</span>
-                <span>0-90 {r.pp90}% ({r.pp90n})</span>
+                <span>0-30 {r.pp30n} 头 ({r.pp30}%)</span>
+                <span>0-60 {r.pp60n} 头 ({r.pp60}%)</span>
+                <span>0-90 {r.pp90n} 头 ({r.pp90}%)</span>
               </div>
             </div>
-            <span className="text-body-sm tabular-nums text-foreground">{r.pp90}%</span>
+            <span className="text-body-sm tabular-nums text-foreground">{r.pp90n} 头</span>
+
           </button>
         );
       })}
@@ -173,7 +174,7 @@ function PostpartumRankSection() {
     const list = region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
       : [...regionRows];
-    return list.sort((a, b) => b.pp90 - a.pp90);
+    return list.sort((a, b) => b.pp90n - a.pp90n);
   }, [region]);
 
   return (
