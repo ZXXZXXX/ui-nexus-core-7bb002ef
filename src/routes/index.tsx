@@ -28,7 +28,7 @@ import { ExecFocusSection } from "@/components/dashboard/exec-focus-section";
 import { GroupExecSection } from "@/components/dashboard/group-exec-section";
 
 
-import { ViewSettingsSheet } from "@/components/dashboard/view-settings-sheet";
+
 import { useDashboardView, useTopicOrder, scopeOptions, useDataLevel, levelMeta, scaleValue } from "@/lib/dashboard-view";
 import { LevelSwitch } from "@/components/dashboard/level-switch";
 
@@ -456,16 +456,13 @@ function HomePage() {
 
 
         {/* 报表口径切换 */}
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-          <div className="min-w-0">
-            <h3 className="text-section-title text-foreground">数据看板</h3>
-            <p className="text-caption text-text-tertiary mt-0.5">
-              当前视角：{scopeOptions.find((o) => o.key === scope)?.label} ·{" "}
-              {scopeOptions.find((o) => o.key === scope)?.desc}
-              {levels.length > 1 && <> · 统计口径：{levelMeta[level].label}</>}
-            </p>
-          </div>
-          <ViewSettingsSheet />
+        <div>
+          <h3 className="text-section-title text-foreground">数据看板</h3>
+          <p className="text-caption text-text-tertiary mt-0.5">
+            当前视角：{scopeOptions.find((o) => o.key === scope)?.label} ·{" "}
+            {scopeOptions.find((o) => o.key === scope)?.desc}
+            {levels.length > 1 && <> · 统计口径：{levelMeta[level].label}</>}
+          </p>
         </div>
 
         {/* 数量级分层：集团级 > 区域级 > 牧场级 */}
@@ -548,7 +545,7 @@ function HomePage() {
           })}
         </div>
 
-        {/* 专题区：顺序由「看板视角设置」中的排序决定，半宽专题自动两两并排 */}
+        {/* 专题区：按默认顺序渲染，半宽专题自动两两并排 */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
           {topicOrder.map((key) => {
             if (key === "ops" && scope !== "region" && scope !== "group" && scope !== "farm-out") return null;
