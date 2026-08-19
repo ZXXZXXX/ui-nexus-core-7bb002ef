@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { BarChart3, Layers, Download, ChevronLeft, AlertTriangle } from "lucide-react";
+import { BarChart3, Layers, Download, ChevronLeft, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard, PeriodTabs } from "./charts";
 
