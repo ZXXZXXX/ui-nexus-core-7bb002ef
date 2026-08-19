@@ -432,7 +432,6 @@ function PanoramaSection() {
           </thead>
           <tbody>
             {rows.map((r, i) => {
-              const g = gradeOf(r);
               const risky = r.pp30 >= 5;
               const over = r.budgetDelta > 5;
               return (
