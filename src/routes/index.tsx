@@ -104,6 +104,17 @@ const groupCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: "4.4", unit: "天", delta: "-0.3 天", trend: "down", good: true, absolute: false },
 };
 
+/** 集团视角额外指标卡：牧场数量（首）、头均药费（末） */
+const groupLeadCard: MetricCard = {
+  topic: "牧场数量", label: "（至今日）集团牧场数量", value: "7", unit: "个", trend: "flat", delta: "0 个",
+  icon: Building2, anchor: "topic-panorama", good: true,
+};
+const groupTailCard: MetricCard = {
+  topic: "头均药费", label: "（本月）头均用药费用", value: "41.4", unit: "元/头", trend: "up", delta: "+3.1 %",
+  icon: Pill, anchor: "topic-panorama", good: false,
+};
+
+
 
 
 
