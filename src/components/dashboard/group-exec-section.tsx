@@ -120,7 +120,17 @@ function StackedBars({
   rows: Row[];
   onPick?: (r: Row) => void;
 }) {
-  const [hover, setHover] = useState<{ key: string; x: number; y: number } | null>(null);
+  const [hover, setHover] = useState<{
+    key: string;
+    clientX: number;
+    clientY: number;
+    pp30: number;
+    pp60: number;
+    pp90: number;
+    pp30n: number;
+    pp60n: number;
+    pp90n: number;
+  } | null>(null);
   const max = Math.max(...rows.map((r) => r.pp90n), 1);
   return (
     <div className="table w-full">
@@ -152,8 +162,17 @@ function StackedBars({
               <div
                 className="relative h-4 w-full rounded-md overflow-hidden"
                 onMouseMove={(e) => {
-                  const box = e.currentTarget.getBoundingClientRect();
-                  setHover({ key: r.key, x: e.clientX - box.left, y: e.clientY - box.top });
+                  setHover({
+                    key: r.key,
+                    clientX: e.clientX,
+                    clientY: e.clientY,
+                    pp30: r.pp30,
+                    pp60: r.pp60,
+                    pp90: r.pp90,
+                    pp30n: r.pp30n,
+                    pp60n: r.pp60n,
+                    pp90n: r.pp90n,
+                  });
                 }}
                 onMouseLeave={() => setHover(null)}
               >
@@ -175,28 +194,20 @@ function StackedBars({
       {hover && (
         <div
           className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-lg border border-border bg-card px-3 py-2 shadow-card whitespace-nowrap"
-          style={{ left: hover.x, top: hover.y - 8 }}
+          style={{ left: hover.clientX, top: hover.clientY - 12 }}
         >
           <div className="text-caption text-foreground mb-1">{hover.key}</div>
           <div className="space-y-0.5">
             {[
-              { label: "0-30 天", color: BUCKETS[0].color, rate: null, cnt: null },
-              { label: "0-60 天", color: BUCKETS[1].color, rate: null, cnt: null },
-              { label: "0-90 天", color: BUCKETS[2].color, rate: null, cnt: null },
-            ].map((b) => {
-              const row = rows.find((r) => r.key === hover.key);
-              if (!row) return null;
-              const cnt =
-                b.label === "0-30 天" ? row.pp30n : b.label === "0-60 天" ? row.pp60n : row.pp90n;
-              const rate =
-                b.label === "0-30 天" ? row.pp30 : b.label === "0-60 天" ? row.pp60 : row.pp90;
-              return (
-                <div key={b.label} className="flex items-center gap-2 text-caption text-text-secondary">
-                  <span className="h-2 w-2 rounded-sm" style={{ background: b.color }} />
-                  <span className="tabular-nums">{b.label} {cnt} 头 ({rate}%)</span>
-                </div>
-              );
-            })}
+              { label: "0-30 天", color: BUCKETS[0].color, cnt: hover.pp30n, rate: hover.pp30 },
+              { label: "0-60 天", color: BUCKETS[1].color, cnt: hover.pp60n, rate: hover.pp60 },
+              { label: "0-90 天", color: BUCKETS[2].color, cnt: hover.pp90n, rate: hover.pp90 },
+            ].map((b) => (
+              <div key={b.label} className="flex items-center gap-2 text-caption text-text-secondary">
+                <span className="h-2 w-2 rounded-sm" style={{ background: b.color }} />
+                <span className="tabular-nums">{b.label} {b.cnt} 头 ({b.rate}%)</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
