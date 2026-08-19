@@ -18,7 +18,7 @@ import { useRole } from "@/lib/mobile-role";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/m/health/$id_/review")({
-  head: () => ({ meta: [{ title: "复查 · 奇点智牧" }] }),
+  head: () => ({ meta: [{ title: "复查记录 · 奇点智牧" }] }),
   component: ReviewPage,
 });
 
@@ -71,7 +71,7 @@ function ReviewPage() {
           </span>
           <div className="text-body font-medium text-foreground">仅兽医可执行复查</div>
           <p className="text-body-sm text-text-tertiary mt-2 max-w-[260px]">
-            处方执行完毕后，本工单需由兽医进行复查验收。当前角色无权限。
+            处方执行完毕后，本工单需由兽医进行复查记录。当前角色无权限。
           </p>
         </div>
       </MobileShell>
@@ -124,7 +124,7 @@ function ReviewPage() {
   };
 
   return (
-    <MobileShell title="复查验收" back hideTabBar>
+    <MobileShell title="复查记录" back hideTabBar>
       <div className="pb-28">
         <div className="px-4 pt-3 pb-2">
           <div className="text-caption text-text-tertiary inline-flex items-center gap-1">
