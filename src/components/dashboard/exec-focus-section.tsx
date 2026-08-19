@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Crosshair, Trophy, ClipboardCheck } from "lucide-react";
+import { Crosshair, ClipboardCheck } from "lucide-react";
 import { SectionCard, MiniStat, BarList, PeriodTabs } from "./charts";
 
 /* ---------------- 数据（牧场为最小口径，区域由牧场汇总） ---------------- */
