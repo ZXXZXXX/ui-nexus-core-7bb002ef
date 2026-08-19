@@ -469,11 +469,29 @@ function TaskDetailPage() {
                     ? "观察期内未发起复诊上报，请助理已治愈并关闭工单。"
                     : "观察期内若发现异常，可通过健康上报发起复诊。"}
                 </div>
-              </div>
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
+        {o.status === "已终止" && (
+          <div className="mt-2 rounded-lg bg-[#FFF1F0] border border-[#FFCCC7] p-3 space-y-1.5">
+            <div className="flex items-center justify-between">
+              <div className="text-body-sm font-medium inline-flex items-center gap-1.5 text-[#CF1322]">
+                <AlertTriangle className="h-4 w-4" />
+                工单终止
+              </div>
+              <span className="tag tag-danger">已终止</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+              <Field label="终止原因" value="牛只死亡，停止后续治疗" />
+              <Field label="是否转栏" value="否" />
+              <Field label="终止时间" value="2026-05-13 18:24" />
+              <Field label="操作人" value={<PersonChip name="李雨晴" />} />
+            </div>
+          </div>
+        )}
+
+      </div>
 
 
 
@@ -1246,24 +1264,7 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
 
 
 
-      {status === "已终止" ? (
-        <div className="rounded-xl bg-card border border-border p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-body-sm font-medium inline-flex items-center gap-1.5 text-foreground">
-              <AlertTriangle className="h-4 w-4 text-[#EF4445]" />
-              工单终止
-            </div>
-            <span className="tag tag-danger">已终止</span>
-
-          </div>
-          <div className="space-y-2">
-            <Field label="终止原因" value="牛只死亡，停止后续治疗" />
-            <Field label="是否转栏" value="否" />
-            <Field label="终止时间" value="2026-05-13 18:24" />
-            <Field label="操作人" value={<PersonChip name="李雨晴" />} />
-          </div>
-        </div>
-      ) : isPlatformIssued || !id.startsWith("WO-") ? null : (() => {
+      {isPlatformIssued || !id.startsWith("WO-") ? null : (() => {
         const isAutoArchived = autoArchivedOrders.has(id);
         const reviewPhase: DayPhase = reviewDone || status === "已完成" ? "done" : reviewActive ? "active" : "pending";
         const isReviewDone = reviewPhase === "done";
