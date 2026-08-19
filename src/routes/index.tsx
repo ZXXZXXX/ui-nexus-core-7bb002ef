@@ -529,16 +529,16 @@ function HomePage() {
             const isDown = k.trend === "down";
             const isGood = k.good;
             const neutral = !isUp && !isDown;
-            const chipBg = neutral
-              ? "var(--bg-surface-subtle)"
+            const trendTone = neutral
+              ? "white"
               : isGood
-              ? "color-mix(in oklab, var(--state-success) 16%, transparent)"
-              : "color-mix(in oklab, var(--state-danger) 14%, transparent)";
-            const chipColor = neutral
-              ? "var(--text-secondary)"
+                ? "#E7F9E8"
+                : "#FFEBEB";
+            const trendText = neutral
+              ? "white"
               : isGood
-              ? "var(--state-success)"
-              : "var(--state-danger)";
+                ? "#1A7A2A"
+                : "#B91C1C";
 
             return (
               <Card
@@ -552,42 +552,41 @@ function HomePage() {
                     scrollToTopic(k.anchor);
                   }
                 }}
-                className="relative border-border bg-card p-5 rounded-2xl shadow-card transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
+                className="relative overflow-hidden border-0 p-5 rounded-2xl transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
+                style={{
+                  background: `linear-gradient(135deg, color-mix(in oklab, ${tone} 95%, black 5%), color-mix(in oklab, ${tone} 76%, white 12%))`,
+                  boxShadow: `0 12px 26px -14px color-mix(in oklab, ${tone} 75%, transparent)`,
+                }}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-caption text-text-tertiary truncate">{k.topic}</p>
+                <k.icon
+                  aria-hidden
+                  className="pointer-events-none absolute -right-2 -bottom-2 h-20 w-20 text-white/15"
+                  strokeWidth={1.6}
+                />
+                <div className="relative">
+                  <p className="text-caption font-medium text-white/85 truncate">{k.topic}</p>
+                  <div className="mt-2 flex items-baseline gap-1.5">
+                    <span className="tabular-nums font-semibold leading-none text-white" style={{ fontSize: "28px" }}>
+                      {scaleCardValue(k)}
+                    </span>
+                    <span className="text-body-sm text-white/75">{k.unit}</span>
                   </div>
-                  <div
-                    className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0"
-                    style={{
-                      background: `color-mix(in oklab, ${tone} 14%, transparent)`,
-                      color: tone,
-                    }}
-                  >
-                    <k.icon className="h-4 w-4" strokeWidth={2} />
+                  <div className="mt-4 flex items-center gap-2">
+                    <span
+                      className="inline-flex items-center gap-0.5 h-[22px] px-1.5 rounded-md text-caption font-medium tabular-nums"
+                      style={{ background: trendTone, color: trendText }}
+                    >
+                      <TrendIcon trend={k.trend} className={neutral ? "text-white/70" : undefined} />
+                      {k.delta}
+                    </span>
+                    <span className="text-caption text-white/65">较上月</span>
                   </div>
-                </div>
-                <div className="mt-2 flex items-baseline gap-1.5">
-                  <span className="tabular-nums font-semibold leading-none text-foreground" style={{ fontSize: "26px" }}>
-                    {scaleCardValue(k)}
-                  </span>
-                  <span className="text-body-sm text-text-tertiary">{k.unit}</span>
-                </div>
-                <div className="mt-4 flex items-center gap-2">
-                  <span
-                    className="inline-flex items-center gap-0.5 h-[22px] px-1.5 rounded-md text-caption font-medium tabular-nums"
-                    style={{ background: chipBg, color: chipColor }}
-                  >
-                    <TrendIcon trend={k.trend} />
-                    {k.delta}
-                  </span>
-                  <span className="text-caption text-text-tertiary">较上月</span>
                 </div>
               </Card>
             );
           })}
         </div>
+
 
         {/* 专题区：按默认顺序渲染，半宽专题自动两两并排 */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
