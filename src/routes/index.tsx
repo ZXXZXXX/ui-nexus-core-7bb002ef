@@ -264,7 +264,7 @@ function HomePage() {
           .map((part) => scaleValue(Number(part.trim().replace(/,/g, "")), factor).toLocaleString())
           .join(" / ")
       : c.value;
-  const visibleCards = metricCards
+  const baseCards = metricCards
     .map((c) => (scope === "group" ? { ...c, ...groupCardOverride[c.anchor] } : c))
 
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
@@ -273,6 +273,8 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[a.anchor]) -
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
+  const visibleCards =
+    scope === "group" ? [groupLeadCard, ...baseCards, groupTailCard] : baseCards;
 
 
   const scrollToTopic = (id: string) => {
