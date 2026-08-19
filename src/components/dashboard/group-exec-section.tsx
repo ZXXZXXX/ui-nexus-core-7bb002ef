@@ -57,6 +57,8 @@ type Row = {
   perHead: number;
   drugFee: number;
   budgetDelta: number;
+  treatmentDays: number;
+  pretermRate: number;
 };
 
 function agg(key: string, sub: string, rows: GroupFarm[]): Row {
@@ -81,6 +83,8 @@ function agg(key: string, sub: string, rows: GroupFarm[]): Row {
     perHead: Number((sum((r) => r.drugFee) / herd).toFixed(1)),
     drugFee: sum((r) => r.drugFee),
     budgetDelta: w((r) => r.budgetDelta),
+    treatmentDays: w((r) => r.treatmentDays),
+    pretermRate: Number(((sum((r) => r.preterm) / (sum((r) => r.calving) || 1)) * 100).toFixed(1)),
   };
 }
 
