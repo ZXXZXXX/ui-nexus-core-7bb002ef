@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
-import { BarChart3, Layers, Download, ChevronLeft, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
-import { SectionCard, PeriodTabs } from "./charts";
+import { BarChart3, ChevronLeft } from "lucide-react";
+import { SectionCard } from "./charts";
 
 /* ---------------- 数据：牧场为最小口径 ---------------- */
 
