@@ -18,12 +18,13 @@ export const Route = createFileRoute("/m/pens/$id")({
   component: PenDetailPage,
 });
 
-type CowStatus = "健康" | "观察中" | "治疗中" | "异常";
+type CowStatus = "健康" | "观察中" | "治疗中" | "异常" | "死淘";
 const statusTone: Record<CowStatus, string> = {
   健康: "tag tag-success",
   观察中: "tag tag-warning",
   治疗中: "tag tag-info",
   异常: "tag tag-danger",
+  死淘: "tag tag-muted",
 };
 
 const PEN_PER_BARN = 4;

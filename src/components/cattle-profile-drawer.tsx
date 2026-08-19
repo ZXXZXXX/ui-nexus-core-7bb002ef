@@ -40,7 +40,7 @@ export type CattleProfile = {
   sex: string;
   type: string;
   ageDays: number;
-  health: "健康" | "观察中" | "异常" | "治疗中";
+  health: "健康" | "观察中" | "异常" | "治疗中" | "死淘";
   withdrawalDays: number;
   withdrawalUntil: string;
   lactationDays: number;
@@ -93,7 +93,9 @@ export function CattleProfileDrawer({
 
 
   const healthCls =
-    health === "异常"
+    health === "死淘"
+      ? "bg-[#F0F2F4] text-[#64748B]"
+      : health === "异常"
       ? "bg-[#FFE4E1] text-[#D9534F]"
       : health === "观察中"
         ? "bg-[#FFF7E6] text-[#B8860B]"

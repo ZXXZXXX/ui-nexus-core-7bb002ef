@@ -15,7 +15,7 @@ export const Route = createFileRoute("/archive/cattle")({
   component: CattlePage,
 });
 
-type Health = "健康" | "观察中" | "治疗中";
+type Health = "健康" | "观察中" | "治疗中" | "死淘";
 type Cow = {
   id: string;
   ear: string;
@@ -38,7 +38,13 @@ const cattle: Cow[] = [
 
 
 function healthTag(h: Health) {
-  return h === "健康" ? "tag tag-success" : h === "观察中" ? "tag tag-warning" : "tag tag-danger";
+  return h === "健康"
+    ? "tag tag-success"
+    : h === "观察中"
+      ? "tag tag-warning"
+      : h === "死淘"
+        ? "tag tag-muted"
+        : "tag tag-danger";
 }
 
 

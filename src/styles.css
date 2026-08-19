@@ -286,6 +286,7 @@
   .tag-brand    { background-color: var(--brand-subtle); color: var(--brand); }
   .tag-outline  { background-color: transparent; color: var(--text-secondary); box-shadow: inset 0 0 0 1px var(--border-default); font-weight: 500; }
   .tag-pink     { background-color: #FDECF3; color: #D6467F; }
+  .tag-muted    { background-color: #F0F2F4; color: #64748B; }
 
 
 
