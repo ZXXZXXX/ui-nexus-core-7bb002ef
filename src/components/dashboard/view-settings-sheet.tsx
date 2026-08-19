@@ -16,7 +16,6 @@ import {
   moveTopic,
   resetScopeConfig,
   useDashboardView,
-  type ReportScope,
   type TopicKey,
 } from "@/lib/dashboard-view";
 
