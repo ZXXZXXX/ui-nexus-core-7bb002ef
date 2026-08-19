@@ -363,54 +363,91 @@ function HomePage() {
               </div>
             </div>
 
-            {/* 2 · 预警 */}
+            {/* 2 · 预警 / 集团视角牧场统计 */}
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
-                <span className="text-caption text-text-tertiary">实时预警</span>
-                <button
-                  type="button"
-                  onClick={() => scrollToTopic("topic-alert")}
-                  className="text-caption text-[var(--brand)] hover:underline"
-                >
-                  查看预警详情 →
-                </button>
+                <span className="text-caption text-text-tertiary">
+                  {scope === "group" ? "牧场分布" : "实时预警"}
+                </span>
+                {scope !== "group" && (
+                  <button
+                    type="button"
+                    onClick={() => scrollToTopic("topic-alert")}
+                    className="text-caption text-[var(--brand)] hover:underline"
+                  >
+                    查看预警详情 →
+                  </button>
+                )}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2.5">
-                {alertCounts.map((a, i) => {
-                  const tone = ["--state-danger", "--state-alert", "--brand"][i % 3];
-                  const Icon = [PackageMinus, Beef, Activity][i % 3];
-                  return (
-                    <button
-                      key={a.key}
-                      type="button"
-                      onClick={() => scrollToTopic("topic-alert")}
-                      className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105"
-                      style={{
-                        background: `linear-gradient(140deg, color-mix(in oklab, var(${tone}) 92%, black 4%), color-mix(in oklab, var(${tone}) 72%, white 12%))`,
-                        boxShadow: `0 10px 22px -14px color-mix(in oklab, var(${tone}) 90%, transparent)`,
-                      }}
-                    >
-                      <Icon
-                        aria-hidden
-                        className="pointer-events-none absolute -right-2 -bottom-2 h-12 w-12 text-white/20"
-                        strokeWidth={1.8}
-                      />
-                      <span className="relative block text-caption font-medium text-white/85 whitespace-nowrap">
-                        {a.key}
-                      </span>
-                      <span className="relative mt-1 flex items-baseline gap-1">
-                        <span className="text-[30px] leading-none font-semibold tabular-nums text-white">
-                          {a.count}
+                {scope === "group" ? (
+                  [
+                    { key: "牧场总数", count: farmCountSummary.total, tone: "--brand", icon: Building2 },
+                    { key: "普通牧场", count: farmCountSummary.ordinary, tone: "--effect-ai-cyan", icon: Building2 },
+                    { key: "有机牧场", count: farmCountSummary.organic, tone: "--state-success", icon: Leaf },
+                  ].map((a) => {
+                    const Icon = a.icon;
+                    return (
+                      <button
+                        key={a.key}
+                        type="button"
+                        className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105"
+                        style={{
+                          background: `linear-gradient(140deg, color-mix(in oklab, var(${a.tone}) 92%, black 4%), color-mix(in oklab, var(${a.tone}) 72%, white 12%))`,
+                          boxShadow: `0 10px 22px -14px color-mix(in oklab, var(${a.tone}) 90%, transparent)`,
+                        }}
+                      >
+                        <Icon
+                          aria-hidden
+                          className="pointer-events-none absolute -right-2 -bottom-2 h-12 w-12 text-white/20"
+                          strokeWidth={1.8}
+                        />
+                        <span className="relative block text-caption font-medium text-white/85 whitespace-nowrap">
+                          {a.key}
                         </span>
-                        <span className="text-caption text-white/80">项</span>
-                      </span>
-                    </button>
-                  );
-                })}
+                        <span className="relative mt-1 flex items-baseline gap-1">
+                          <span className="text-[30px] leading-none font-semibold tabular-nums text-white">
+                            {a.count}
+                          </span>
+                          <span className="text-caption text-white/80">个</span>
+                        </span>
+                      </button>
+                    );
+                  })
+                ) : (
+                  alertCounts.map((a, i) => {
+                    const tone = ["--state-danger", "--state-alert", "--brand"][i % 3];
+                    const Icon = [PackageMinus, Beef, Activity][i % 3];
+                    return (
+                      <button
+                        key={a.key}
+                        type="button"
+                        onClick={() => scrollToTopic("topic-alert")}
+                        className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105"
+                        style={{
+                          background: `linear-gradient(140deg, color-mix(in oklab, var(${tone}) 92%, black 4%), color-mix(in oklab, var(${tone}) 72%, white 12%))`,
+                          boxShadow: `0 10px 22px -14px color-mix(in oklab, var(${tone}) 90%, transparent)`,
+                        }}
+                      >
+                        <Icon
+                          aria-hidden
+                          className="pointer-events-none absolute -right-2 -bottom-2 h-12 w-12 text-white/20"
+                          strokeWidth={1.8}
+                        />
+                        <span className="relative block text-caption font-medium text-white/85 whitespace-nowrap">
+                          {a.key}
+                        </span>
+                        <span className="relative mt-1 flex items-baseline gap-1">
+                          <span className="text-[30px] leading-none font-semibold tabular-nums text-white">
+                            {a.count}
+                          </span>
+                          <span className="text-caption text-white/80">项</span>
+                        </span>
+                      </button>
+                    );
+                  })
+                )}
               </div>
-
-
-
             </div>
 
             {/* 3 · 出勤 */}
