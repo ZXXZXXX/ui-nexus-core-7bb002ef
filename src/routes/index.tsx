@@ -250,6 +250,8 @@ function HomePage() {
           .join(" / ")
       : c.value;
   const visibleCards = metricCards
+    .map((c) => (scope === "group" ? { ...c, ...groupCardOverride[c.anchor] } : c))
+
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
       (a, b) =>
