@@ -18,3 +18,36 @@ export function getOrderEarTagLabel(id: string): string {
   return "#01-24-2381";
 
 }
+
+export type ActiveOrderOption = {
+  id: string;
+  type: string;
+  event: string;
+  status: "待诊断" | "进行中";
+  who: string;
+  barn: string;
+};
+
+// 同一牛只上其他仍在「待诊断 / 执行中」的工单（用于异常终止-已转交其他工单）
+const activeOrdersByEar: Record<string, ActiveOrderOption[]> = {
+  "#01-24-2381": [
+    { id: "HF-0711", type: "修蹄", event: "蹄底溃疡 · 清创引流", status: "进行中", who: "外部·张师傅", barn: "病牛舍" },
+    { id: "WO-2391", type: "疾病治疗", event: "产道创伤 · 复诊待诊断", status: "待诊断", who: "—", barn: "产房 1 号" },
+  ],
+  "#01-24-2270": [
+    { id: "WO-2299", type: "疾病治疗", event: "产后子宫炎 · 处方 1 疗程第 2 天", status: "进行中", who: "李雨晴", barn: "病牛舍" },
+  ],
+  "#01-24-2298": [
+    { id: "HF-0705", type: "修蹄", event: "蹄底溃疡 · 清创引流", status: "进行中", who: "外部·张师傅", barn: "病牛舍" },
+  ],
+  "#01-24-2150": [
+    { id: "WO-2372", type: "疾病治疗", event: "跛行复查 · 待诊断", status: "待诊断", who: "—", barn: "病牛舍" },
+  ],
+  "#01-24-2710": [
+    { id: "PP-2510", type: "产后护理", event: "产后检查 · 第 4/14 天", status: "进行中", who: "周凯", barn: "产房 1 号" },
+  ],
+};
+
+export function getActiveOrdersForEar(ear: string, excludeId?: string): ActiveOrderOption[] {
+  return (activeOrdersByEar[ear] ?? []).filter((o) => o.id !== excludeId);
+}
