@@ -203,7 +203,17 @@ function TaskListPage() {
         : "全部";
   const [tab, setTab] = useState<(typeof tabs)[number]["key"]>(initialTab);
   const [q, setQ] = useState("");
+  const [selTypes, setSelTypes] = useState<Set<string>>(new Set());
+  const [selBarns, setSelBarns] = useState<Set<string>>(new Set());
+  const [filterOpen, setFilterOpen] = useState(false);
+  const toggleIn = (set: Set<string>, v: string) => {
+    const next = new Set(set);
+    if (next.has(v)) next.delete(v);
+    else next.add(v);
+    return next;
+  };
   const typeFilter = search.type;
+
 
   // 列表仅展示工单卡片：排除领取（取物）和损耗（物资）
   let list: Task[] = tasks.filter((t) => t.kind !== "损耗");
