@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { BarChart3, Layers, Download, ChevronLeft, AlertTriangle } from "lucide-react";
+import { BarChart3, Layers, Download, ChevronLeft, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard, PeriodTabs } from "./charts";
 
@@ -407,15 +407,70 @@ function DrugTrendSection() {
 
 /* ---------------- 四、全景指标对标排行 ---------------- */
 
+type SortKey =
+  | "name"
+  | "death"
+  | "cull"
+  | "sick"
+  | "cure"
+  | "treatmentDays"
+  | "drugFee"
+  | "perHead"
+  | "pp30"
+  | "pp60"
+  | "pp90"
+  | "pretermRate";
+
+type SortDir = "asc" | "desc";
+
+const COLUMNS: { key: SortKey; label: string; align: "left" | "right" }[] = [
+  { key: "name", label: "区域名称", align: "left" },
+  { key: "death", label: "死亡数", align: "right" },
+  { key: "cull", label: "淘汰数", align: "right" },
+  { key: "sick", label: "发病率", align: "right" },
+  { key: "cure", label: "治愈率", align: "right" },
+  { key: "treatmentDays", label: "平均诊疗天数", align: "right" },
+  { key: "drugFee", label: "总药费", align: "right" },
+  { key: "perHead", label: "头均药费", align: "right" },
+  { key: "pp30", label: "产后0～30天淘汰率", align: "right" },
+  { key: "pp60", label: "0～60天淘汰率", align: "right" },
+  { key: "pp90", label: "0～90天淘汰率", align: "right" },
+  { key: "pretermRate", label: "早产率", align: "right" },
+];
+
+function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
+  if (!active) return <ArrowUpDown className="h-3 w-3 text-text-tertiary opacity-60" />;
+  return dir === "asc" ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />;
+}
 
 function PanoramaSection() {
   const [region, setRegion] = useState<string | null>(null);
-  const rows = useMemo(() => {
-    const list = region
+  const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "pp30", dir: "asc" });
+
+  const baseRows = useMemo(() => {
+    return region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
       : [...regionRows];
-    return list.sort((a, b) => a.pp30 - b.pp30);
   }, [region]);
+
+  const rows = useMemo(() => {
+    const list = [...baseRows];
+    const { key, dir } = sort;
+    const mult = dir === "asc" ? 1 : -1;
+    list.sort((a, b) => {
+      if (key === "name") {
+        return mult * a.key.localeCompare(b.key, "zh-CN");
+      }
+      const av = a[key] as number;
+      const bv = b[key] as number;
+      return mult * (av - bv);
+    });
+    return list;
+  }, [baseRows, sort]);
+
+  const onSort = (key: SortKey) => {
+    setSort((prev) => ({ key, dir: prev.key === key && prev.dir === "desc" ? "asc" : "desc" }));
+  };
 
   const exportCsv = () => {
     const head = [
@@ -499,18 +554,18 @@ function PanoramaSection() {
           <thead>
             <tr className="text-caption text-text-tertiary">
               <th className="text-left font-normal py-2 w-12">序号</th>
-              <th className="text-left font-normal py-2">{region ? "牧场名称" : "区域名称"}</th>
-              <th className="text-right font-normal py-2">死亡数</th>
-              <th className="text-right font-normal py-2">淘汰数</th>
-              <th className="text-right font-normal py-2">发病率</th>
-              <th className="text-right font-normal py-2">治愈率</th>
-              <th className="text-right font-normal py-2">平均诊疗天数</th>
-              <th className="text-right font-normal py-2">总药费</th>
-              <th className="text-right font-normal py-2">头均药费</th>
-              <th className="text-right font-normal py-2">产后0～30天淘汰率</th>
-              <th className="text-right font-normal py-2">0～60天淘汰率</th>
-              <th className="text-right font-normal py-2">0～90天淘汰率</th>
-              <th className="text-right font-normal py-2">早产率</th>
+              {COLUMNS.map((c) => (
+                <th
+                  key={c.key}
+                  className={`font-normal py-2 ${c.align === "left" ? "text-left" : "text-right"} ${c.key === "name" ? "" : "cursor-pointer hover:text-foreground"}`}
+                  onClick={c.key === "name" ? undefined : () => onSort(c.key)}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    {c.key === "name" ? (region ? "牧场名称" : "区域名称") : c.label}
+                    {c.key !== "name" && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
+                  </span>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
