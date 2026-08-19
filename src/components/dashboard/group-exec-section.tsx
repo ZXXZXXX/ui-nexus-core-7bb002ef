@@ -31,13 +31,13 @@ export type GroupFarm = {
 };
 
 export const GROUP_FARMS: GroupFarm[] = [
-  { farm: "1号牧场", base: "齐齐哈尔基地", region: "东北大区", herd: 5200, death: 8, cull: 24, pp30: 1.8, pp60: 2.9, pp90: 3.6, pp30n: 18, pp60n: 29, pp90n: 36, sick: 6.2, cure: 95.1, perHead: 29.4, drugFee: 153_000, budgetDelta: -12 },
-  { farm: "2号牧场", base: "大庆基地", region: "东北大区", herd: 4800, death: 11, cull: 27, pp30: 2.4, pp60: 3.6, pp90: 4.5, pp30n: 22, pp60n: 33, pp90n: 41, sick: 7.5, cure: 93.0, perHead: 34.1, drugFee: 164_000, budgetDelta: -5 },
-  { farm: "3号牧场", base: "绥化基地", region: "东北大区", herd: 4500, death: 13, cull: 33, pp30: 2.9, pp60: 4.2, pp90: 5.3, pp30n: 25, pp60n: 36, pp90n: 46, sick: 8.8, cure: 92.4, perHead: 39.5, drugFee: 178_000, budgetDelta: 0 },
-  { farm: "1号牧场", base: "武威基地", region: "西北大区", herd: 4100, death: 16, cull: 40, pp30: 3.5, pp60: 5.1, pp90: 6.4, pp30n: 28, pp60n: 41, pp90n: 51, sick: 9.8, cure: 91.2, perHead: 48.0, drugFee: 197_000, budgetDelta: 8 },
-  { farm: "2号牧场", base: "金昌基地", region: "西北大区", herd: 3600, death: 14, cull: 35, pp30: 3.1, pp60: 4.7, pp90: 5.9, pp30n: 23, pp60n: 35, pp90n: 44, sick: 9.1, cure: 91.9, perHead: 44.2, drugFee: 159_000, budgetDelta: 3 },
-  { farm: "2号牧场", base: "张家口基地", region: "华北大区", herd: 3900, death: 24, cull: 48, pp30: 5.4, pp60: 7.2, pp90: 8.6, pp30n: 42, pp60n: 56, pp90n: 67, sick: 12.4, cure: 87.5, perHead: 54.2, drugFee: 211_000, budgetDelta: 28 },
-  { farm: "1号牧场", base: "保定基地", region: "华北大区", herd: 3400, death: 15, cull: 36, pp30: 3.8, pp60: 5.4, pp90: 6.7, pp30n: 26, pp60n: 37, pp90n: 46, sick: 10.2, cure: 90.4, perHead: 46.8, drugFee: 159_000, budgetDelta: 11 },
+  { farm: "1号牧场", base: "齐齐哈尔基地", region: "东北大区", herd: 5200, death: 8, cull: 24, pp30: 1.8, pp60: 2.9, pp90: 3.6, pp30n: 18, pp60n: 29, pp90n: 36, sick: 6.2, cure: 95.1, perHead: 29.4, drugFee: 153_000, budgetDelta: -12, treatmentDays: 3.4, calving: 198, preterm: 7 },
+  { farm: "2号牧场", base: "大庆基地", region: "东北大区", herd: 4800, death: 11, cull: 27, pp30: 2.4, pp60: 3.6, pp90: 4.5, pp30n: 22, pp60n: 33, pp90n: 41, sick: 7.5, cure: 93.0, perHead: 34.1, drugFee: 164_000, budgetDelta: -5, treatmentDays: 3.8, calving: 182, preterm: 9 },
+  { farm: "3号牧场", base: "绥化基地", region: "东北大区", herd: 4500, death: 13, cull: 33, pp30: 2.9, pp60: 4.2, pp90: 5.3, pp30n: 25, pp60n: 36, pp90n: 46, sick: 8.8, cure: 92.4, perHead: 39.5, drugFee: 178_000, budgetDelta: 0, treatmentDays: 4.2, calving: 170, preterm: 11 },
+  { farm: "1号牧场", base: "武威基地", region: "西北大区", herd: 4100, death: 16, cull: 40, pp30: 3.5, pp60: 5.1, pp90: 6.4, pp30n: 28, pp60n: 41, pp90n: 51, sick: 9.8, cure: 91.2, perHead: 48.0, drugFee: 197_000, budgetDelta: 8, treatmentDays: 4.6, calving: 156, preterm: 14 },
+  { farm: "2号牧场", base: "金昌基地", region: "西北大区", herd: 3600, death: 14, cull: 35, pp30: 3.1, pp60: 4.7, pp90: 5.9, pp30n: 23, pp60n: 35, pp90n: 44, sick: 9.1, cure: 91.9, perHead: 44.2, drugFee: 159_000, budgetDelta: 3, treatmentDays: 4.4, calving: 138, preterm: 12 },
+  { farm: "2号牧场", base: "张家口基地", region: "华北大区", herd: 3900, death: 24, cull: 48, pp30: 5.4, pp60: 7.2, pp90: 8.6, pp30n: 42, pp60n: 56, pp90n: 67, sick: 12.4, cure: 87.5, perHead: 54.2, drugFee: 211_000, budgetDelta: 28, treatmentDays: 5.2, calving: 148, preterm: 16 },
+  { farm: "1号牧场", base: "保定基地", region: "华北大区", herd: 3400, death: 15, cull: 36, pp30: 3.8, pp60: 5.4, pp90: 6.7, pp30n: 26, pp60n: 37, pp90n: 46, sick: 10.2, cure: 90.4, perHead: 46.8, drugFee: 159_000, budgetDelta: 11, treatmentDays: 4.8, calving: 130, preterm: 10 },
 ];
 
 type Row = {
