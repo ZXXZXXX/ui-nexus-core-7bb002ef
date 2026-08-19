@@ -53,6 +53,8 @@ import {
   PackageMinus,
   Activity,
   AlertTriangle,
+  Building2,
+
 
 } from "lucide-react";
 
@@ -103,6 +105,17 @@ const groupCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-drug": { topic: "总药费支出", label: "（本月）集团总药费", value: "122.1", unit: "万元", delta: "+4.3 %", trend: "up", good: false, absolute: false },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: "4.4", unit: "天", delta: "-0.3 天", trend: "down", good: true, absolute: false },
 };
+
+/** 集团视角额外指标卡：牧场数量（首）、头均药费（末） */
+const groupLeadCard: MetricCard = {
+  topic: "牧场数量", label: "（至今日）集团牧场数量", value: "7", unit: "个", trend: "flat", delta: "0 个",
+  icon: Building2, anchor: "topic-panorama", good: true,
+};
+const groupTailCard: MetricCard = {
+  topic: "头均药费", label: "（本月）头均用药费用", value: "41.4", unit: "元/头", trend: "up", delta: "+3.1 %",
+  icon: Pill, anchor: "topic-panorama", good: false,
+};
+
 
 
 
@@ -251,7 +264,7 @@ function HomePage() {
           .map((part) => scaleValue(Number(part.trim().replace(/,/g, "")), factor).toLocaleString())
           .join(" / ")
       : c.value;
-  const visibleCards = metricCards
+  const baseCards = metricCards
     .map((c) => (scope === "group" ? { ...c, ...groupCardOverride[c.anchor] } : c))
 
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
@@ -260,6 +273,8 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[a.anchor]) -
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
+  const visibleCards =
+    scope === "group" ? [groupLeadCard, ...baseCards, groupTailCard] : baseCards;
 
 
   const scrollToTopic = (id: string) => {
@@ -533,6 +548,8 @@ function HomePage() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
           {topicOrder.map((key) => {
             if (key === "ops" && scope !== "region" && scope !== "group" && scope !== "farm-out") return null;
+            // 集团视角：不展示产犊 / 死淘 / 疾病 / 药品专题
+            if (scope === "group" && ["calving", "culling", "disease", "drug"].includes(key)) return null;
             const full = key === "drug" || key === "alert" || key === "ops";
             const node =
               key === "herd" ? (
@@ -559,16 +576,14 @@ function HomePage() {
                 </div>
               ) : key === "alert" ? (
                 <AlertSection />
+              ) : scope === "group" ? (
+                <GroupExecSection />
               ) : (
                 <div className="space-y-6">
-                  <ExecFocusSection
-                    level={scope === "group" ? "group" : scope === "region" ? "region" : "farm"}
-                  />
-                  {scope === "group" && <GroupExecSection />}
-                  {scope !== "farm-out" && (
-                    <OpsSection level={scope === "group" ? "group" : "region"} />
-                  )}
+                  <ExecFocusSection level={scope === "region" ? "region" : "farm"} />
+                  {scope !== "farm-out" && <OpsSection level="region" />}
                 </div>
+
               );
 
 
