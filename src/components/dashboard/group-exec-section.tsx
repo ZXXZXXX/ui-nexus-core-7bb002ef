@@ -111,14 +111,14 @@ function StackedBars({
   rows: Row[];
   onPick?: (r: Row) => void;
 }) {
-  const max = Math.max(...rows.map((r) => r.pp90), 1);
+  const max = Math.max(...rows.map((r) => r.pp90n), 1);
   return (
     <div className="space-y-3">
       {rows.map((r) => {
         const segs = [
-          { label: "0-30 天", color: BUCKETS[0].color, val: r.pp30, cnt: r.pp30n },
-          { label: "0-60 天", color: BUCKETS[1].color, val: Math.max(r.pp60 - r.pp30, 0), cnt: Math.max(r.pp60n - r.pp30n, 0) },
-          { label: "0-90 天", color: BUCKETS[2].color, val: Math.max(r.pp90 - r.pp60, 0), cnt: Math.max(r.pp90n - r.pp60n, 0) },
+          { label: "0-30 天", color: BUCKETS[0].color, rate: r.pp30, cnt: r.pp30n, inc: r.pp30n },
+          { label: "0-60 天", color: BUCKETS[1].color, rate: r.pp60, cnt: r.pp60n, inc: Math.max(r.pp60n - r.pp30n, 0) },
+          { label: "0-90 天", color: BUCKETS[2].color, rate: r.pp90, cnt: r.pp90n, inc: Math.max(r.pp90n - r.pp60n, 0) },
         ];
         return (
           <button
@@ -138,15 +138,15 @@ function StackedBars({
                 {segs.map((s) => (
                   <div
                     key={s.label}
-                    title={`${s.label} +${s.val.toFixed(1)}%（${s.cnt} 头）`}
-                    style={{ width: `${(s.val / max) * 100}%`, background: s.color }}
+                    title={`${s.label} ${s.cnt} 头，淘汰率 ${s.rate}%`}
+                    style={{ width: `${(s.inc / max) * 100}%`, background: s.color }}
                   />
                 ))}
               </div>
-              <div className="mt-1 flex items-center gap-3 text-caption text-text-tertiary tabular-nums">
-                <span>0-30 {r.pp30}%（{r.pp30n}）</span>
-                <span>0-60 {r.pp60}%（{r.pp60n}）</span>
-                <span>0-90 {r.pp90}%（{r.pp90n}）</span>
+              <div className="mt-1 flex flex-wrap items-center gap-3 text-caption text-text-tertiary tabular-nums">
+                <span>0-30 {r.pp30}% ({r.pp30n})</span>
+                <span>0-60 {r.pp60}% ({r.pp60n})</span>
+                <span>0-90 {r.pp90}% ({r.pp90n})</span>
               </div>
             </div>
             <span className="text-body-sm tabular-nums text-foreground">{r.pp90}%</span>
