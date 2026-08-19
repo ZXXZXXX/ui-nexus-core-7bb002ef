@@ -328,20 +328,20 @@ function gradeOf(r: Row): Grade {
   return { label: "达标", tone: "var(--text-secondary)" };
 }
 
-const DIMS = ["牧场排名", "区域汇总排名"];
-
 function PanoramaSection() {
-  const [dim, setDim] = useState(DIMS[0]);
-  const rows = useMemo(
-    () => [...(dim === DIMS[0] ? farmRows : regionRows)].sort((a, b) => a.pp30 - b.pp30),
-    [dim],
-  );
+  const [region, setRegion] = useState<string | null>(null);
+  const rows = useMemo(() => {
+    const list = region
+      ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
+      : [...regionRows];
+    return list.sort((a, b) => a.pp30 - b.pp30);
+  }, [region]);
 
   const exportCsv = () => {
     const head = [
       "排名",
-      dim === DIMS[0] ? "区域/牧场" : "区域",
-      "基地",
+      region ? "牧场" : "区域",
+      region ? "基地" : "牧场数",
       "存栏数",
       "死亡数",
       "淘汰数",
@@ -373,7 +373,7 @@ function PanoramaSection() {
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `全景指标对标排行_${dim}.csv`;
+    a.download = `关键指标排行_${region ?? "区域排名"}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("报表已导出");
@@ -383,10 +383,20 @@ function PanoramaSection() {
     <SectionCard
       id="topic-panorama"
       title="区域 / 牧场关键指标排行"
+      desc={region ? `${region} · 牧场排名` : "区域排名"}
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          <PeriodTabs value={dim} onChange={setDim} options={DIMS} />
+          {region && (
+            <button
+              type="button"
+              onClick={() => setRegion(null)}
+              className="inline-flex items-center gap-1 text-caption text-primary hover:underline"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+              返回区域
+            </button>
+          )}
           <button
             type="button"
             onClick={exportCsv}
@@ -399,8 +409,11 @@ function PanoramaSection() {
       }
     >
       <p className="text-body-sm text-text-secondary mb-4">
-        支持按死淘、药费超支额、产后淘汰率横向对比下属牧场运营质量
+        {region
+          ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
+          : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
+
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1040px] text-body-sm">
           <thead>
