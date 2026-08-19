@@ -206,11 +206,11 @@ function PostpartumRankSection() {
 
 /* ---------------- 三、药费趋势（柱形 + 折线组合） ---------------- */
 
-const MONTHS = ["6月", "7月", "8月", "9月", "10月", "11月", "12月", "1月", "2月", "3月", "4月", "5月"];
-const TOTAL_FEE = [96.4, 101.2, 108.6, 99.3, 94.8, 102.5, 118.7, 124.3, 106.1, 98.7, 105.4, 112.8]; // 万元
-const PER_HEAD = [31.2, 32.5, 34.8, 31.9, 30.4, 32.8, 37.6, 39.2, 34.1, 31.6, 33.7, 36.1]; // 元/头
+const ALL_MONTHS = ["6月", "7月", "8月", "9月", "10月", "11月", "12月", "1月", "2月", "3月", "4月", "5月"];
+const ALL_TOTAL_FEE = [96.4, 101.2, 108.6, 99.3, 94.8, 102.5, 118.7, 124.3, 106.1, 98.7, 105.4, 112.8]; // 万元
+const ALL_PER_HEAD = [31.2, 32.5, 34.8, 31.9, 30.4, 32.8, 37.6, 39.2, 34.1, 31.6, 33.7, 36.1]; // 元/头
 
-function DrugComboChart() {
+function DrugComboChart({ months, totalFee, perHead }: { months: string[]; totalFee: number[]; perHead: number[] }) {
   const [hover, setHover] = useState<number | null>(null);
   const W = 900;
   const H = 260;
@@ -220,14 +220,14 @@ function DrugComboChart() {
   const padB = 32;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
-  const maxBar = Math.max(...TOTAL_FEE) * 1.15;
-  const maxLine = Math.max(...PER_HEAD) * 1.25;
-  const minLine = Math.min(...PER_HEAD) * 0.7;
-  const step = iw / MONTHS.length;
+  const maxBar = Math.max(...totalFee) * 1.15;
+  const maxLine = Math.max(...perHead) * 1.25;
+  const minLine = Math.min(...perHead) * 0.7;
+  const step = iw / months.length;
   const bw = Math.min(30, step * 0.5);
   const cx = (i: number) => padL + step * i + step / 2;
   const ly = (v: number) => padT + ih - ((v - minLine) / (maxLine - minLine)) * ih;
-  const path = PER_HEAD.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
+  const path = perHead.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
 
   return (
     <div className="w-full overflow-x-auto">
@@ -244,8 +244,8 @@ function DrugComboChart() {
               strokeWidth="1"
             />
           ))}
-          {MONTHS.map((m, i) => {
-            const h = (TOTAL_FEE[i] / maxBar) * ih;
+          {months.map((m, i) => {
+            const h = (totalFee[i] / maxBar) * ih;
             const active = hover === i;
             return (
               <g key={m}>
@@ -274,7 +274,7 @@ function DrugComboChart() {
             );
           })}
           <path d={path} fill="none" stroke="var(--effect-ai-purple)" strokeWidth="2.5" strokeLinejoin="round" />
-          {PER_HEAD.map((v, i) => (
+          {perHead.map((v, i) => (
             <circle key={i} cx={cx(i)} cy={ly(v)} r={hover === i ? 5 : 3.5} fill="var(--effect-ai-purple)" />
           ))}
           <text x={padL - 8} y={padT + 4} textAnchor="end" fontSize="11" fill="var(--text-tertiary)">
@@ -289,10 +289,10 @@ function DrugComboChart() {
             className="pointer-events-none absolute -translate-x-1/2 -translate-y-full rounded-lg border border-border bg-card px-3 py-2 shadow-card whitespace-nowrap"
             style={{ left: `${((cx(hover) / W) * 100).toFixed(2)}%`, top: 24 }}
           >
-            <div className="text-caption text-text-tertiary">{MONTHS[hover]}</div>
-            <div className="text-body-sm text-foreground tabular-nums">总药费 {TOTAL_FEE[hover]} 万元</div>
+            <div className="text-caption text-text-tertiary">{months[hover]}</div>
+            <div className="text-body-sm text-foreground tabular-nums">总药费 {totalFee[hover]} 万元</div>
             <div className="text-body-sm tabular-nums" style={{ color: "var(--effect-ai-purple)" }}>
-              单头药费 {PER_HEAD[hover]} 元/头
+              单头药费 {perHead[hover]} 元/头
             </div>
           </div>
         )}
@@ -302,11 +302,16 @@ function DrugComboChart() {
 }
 
 function DrugTrendSection() {
+  const [period, setPeriod] = useState("近 6 个月");
+  const months = useMemo(() => (period === "近 6 个月" ? ALL_MONTHS.slice(-6) : ALL_MONTHS), [period]);
+  const totalFee = useMemo(() => (period === "近 6 个月" ? ALL_TOTAL_FEE.slice(-6) : ALL_TOTAL_FEE), [period]);
+  const perHead = useMemo(() => (period === "近 6 个月" ? ALL_PER_HEAD.slice(-6) : ALL_PER_HEAD), [period]);
+
   return (
     <SectionCard
       id="topic-drug-trend"
       title="药费支出趋势"
-      desc="近 1 年"
+      desc={period}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
@@ -318,10 +323,15 @@ function DrugTrendSection() {
             <span className="h-0.5 w-4 rounded-full" style={{ background: "var(--effect-ai-purple)" }} />
             单头药费
           </span>
+          <PeriodTabs
+            value={period}
+            onChange={setPeriod}
+            options={["近 6 个月", "近 1 年"]}
+          />
         </div>
       }
     >
-      <DrugComboChart />
+      <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} />
     </SectionCard>
   );
 }
