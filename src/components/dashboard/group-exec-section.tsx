@@ -419,7 +419,7 @@ function PanoramaSection() {
           <thead>
             <tr className="text-caption text-text-tertiary">
               <th className="text-left font-normal py-2 w-12">排名</th>
-              <th className="text-left font-normal py-2">{dim === DIMS[0] ? "区域 / 牧场名称" : "区域名称"}</th>
+              <th className="text-left font-normal py-2">{region ? "牧场名称" : "区域名称"}</th>
               <th className="text-right font-normal py-2">存栏数</th>
               <th className="text-right font-normal py-2">死淘总数 (死亡/淘汰)</th>
               <th className="text-right font-normal py-2">产后0-30d淘汰率</th>
