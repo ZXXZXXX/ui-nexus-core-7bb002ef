@@ -6,7 +6,7 @@ import { MobileShell } from "@/components/mobile-shell";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
 import { ConfirmAbortDialog } from "@/components/m/confirm-abort-dialog";
-import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
+import { getOrderEarTagLabel, getActiveOrdersForEar } from "@/lib/work-order-cattle";
 
 export const Route = createFileRoute("/m/health/$id_/abort")({
   head: () => ({ meta: [{ title: "异常终止 · 奇点智牧" }] }),
@@ -26,6 +26,7 @@ function AbortPage() {
   const isDisease = Boolean(search.disease);
 
   const [reason, setReason] = useState("");
+  const [transferOrder, setTransferOrder] = useState("");
   const [other, setOther] = useState("");
   const [needTransfer, setNeedTransfer] = useState(false);
   const [transferTo, setTransferTo] = useState("");
@@ -35,6 +36,10 @@ function AbortPage() {
   const [photoFront, setPhotoFront] = useState<number | null>(null);
   const [photoLeft, setPhotoLeft] = useState<number | null>(null);
   const [photoRight, setPhotoRight] = useState<number | null>(null);
+
+  const earTag = getOrderEarTagLabel(id);
+  const activeOrders = getActiveOrdersForEar(earTag, id);
+  const needTransferOrder = reason === "已转交其他工单";
 
   const needPhotos =
     isDisease && (reason === "牛只已死亡" || reason === "牛只已淘汰");
@@ -46,6 +51,7 @@ function AbortPage() {
   const canSubmit =
     !!reason &&
     (reason !== "其他" || other.trim().length > 0) &&
+    (!needTransferOrder || !!transferOrder) &&
     (!needTransfer || transferTo.trim().length > 0) &&
     (!needPhotos ||
       (photoFront !== null && photoLeft !== null && photoRight !== null));
@@ -60,7 +66,7 @@ function AbortPage() {
       setConfirmTransferOpen(true);
       return;
     }
-    toast.success("工单已终止");
+    toast.success(needTransferOrder ? `工单已终止，已转交至 ${transferOrder}` : "工单已终止");
     navigate({ to: "/m/health/$id", params: { id } });
   };
 
@@ -100,6 +106,53 @@ function AbortPage() {
               />
             )}
           </section>
+
+          {needTransferOrder && (
+            <section className="bg-card rounded-2xl border border-border p-4">
+              <div className="text-body-sm text-foreground mb-1">
+                转交至工单<span className="text-[var(--state-danger)] ml-0.5">*</span>
+              </div>
+              <div className="text-caption text-text-tertiary mb-3">
+                请选择该牛只（{earTag}）当前待诊断或执行中的工单，仅可选择 1 个
+              </div>
+              {activeOrders.length === 0 ? (
+                <div className="rounded-lg bg-surface-subtle p-3 text-caption text-text-secondary">
+                  该牛只暂无其他待诊断或执行中的工单，无法以此原因终止
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {activeOrders.map((o) => {
+                    const active = transferOrder === o.id;
+                    return (
+                      <button
+                        key={o.id}
+                        type="button"
+                        onClick={() => setTransferOrder(o.id)}
+                        className={`w-full text-left rounded-xl border p-3 transition-colors ${
+                          active
+                            ? "border-primary/50 bg-brand-subtle"
+                            : "border-border bg-card"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-body-sm text-foreground">{o.id}</span>
+                          <span className={o.status === "待诊断" ? "tag tag-warning" : "tag tag-info"}>
+                            {o.status}
+                          </span>
+                        </div>
+                        <div className="mt-1 text-caption text-text-secondary">
+                          {o.type} · {o.event}
+                        </div>
+                        <div className="mt-0.5 text-caption text-text-tertiary">
+                          责任人：{o.who} · {o.barn}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+          )}
 
           {needPhotos && (
             <section className="bg-card rounded-2xl border border-border p-4">
@@ -150,7 +203,7 @@ function AbortPage() {
       <ConfirmAbortDialog
         open={confirmAbortOpen}
         orderId={id}
-        reason={reason === "其他" ? other : reason}
+        reason={reason === "其他" ? other : needTransferOrder && transferOrder ? `已转交其他工单（${transferOrder}）` : reason}
         onCancel={() => setConfirmAbortOpen(false)}
         onConfirm={handleAbortConfirm}
       />
