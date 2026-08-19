@@ -382,19 +382,18 @@ function HomePage() {
               <div className="mt-3 grid grid-cols-3 gap-2.5">
                 {scope === "group" ? (
                   [
-                    { key: "牧场总数", count: farmCountSummary.total, tone: "--brand", icon: Building2 },
-                    { key: "普通牧场", count: farmCountSummary.ordinary, tone: "--effect-ai-cyan", icon: Building2 },
-                    { key: "有机牧场", count: farmCountSummary.organic, tone: "--state-success", icon: Leaf },
+                    { key: "牧场总数", count: farmCountSummary.total, icon: Building2 },
+                    { key: "普通牧场", count: farmCountSummary.ordinary, icon: Building2 },
+                    { key: "有机牧场", count: farmCountSummary.organic, icon: Leaf },
                   ].map((a) => {
                     const Icon = a.icon;
                     return (
                       <button
                         key={a.key}
                         type="button"
-                        className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105"
+                        className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105 bg-gradient-brand"
                         style={{
-                          background: `linear-gradient(140deg, color-mix(in oklab, var(${a.tone}) 92%, black 4%), color-mix(in oklab, var(${a.tone}) 72%, white 12%))`,
-                          boxShadow: `0 10px 22px -14px color-mix(in oklab, var(${a.tone}) 90%, transparent)`,
+                          boxShadow: "0 10px 22px -14px color-mix(in oklab, var(--brand) 90%, transparent)",
                         }}
                       >
                         <Icon
