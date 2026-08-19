@@ -38,6 +38,9 @@ export function AppHeader({ title, breadcrumb }: AppHeaderProps) {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [farmOpen, setFarmOpen] = useState(false);
+  const [scopeOpen, setScopeOpen] = useState(false);
+  const { scope } = useDashboardView();
+  const currentScope = scopeOptions.find((o) => o.key === scope) ?? scopeOptions[0];
   const currentFarm = useFarm();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const showFarmSwitcher = pathname === "/" || pathname.startsWith("/production");
