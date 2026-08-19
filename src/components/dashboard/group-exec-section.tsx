@@ -28,6 +28,7 @@ export type GroupFarm = {
   treatmentDays: number; // 平均诊疗天数
   calving: number; // 产犊数（用于计算早产率）
   preterm: number; // 早产数
+  organic?: boolean; // 是否为有机牧场
 };
 
 export const GROUP_FARMS: GroupFarm[] = [
