@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Fragment, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -229,11 +231,12 @@ const notifToneColor: Record<NotifTone, string> = {
 };
 
 
-function TrendIcon({ trend }: { trend: string }) {
-  if (trend === "up") return <TrendingUp className="h-3 w-3" />;
-  if (trend === "down") return <TrendingDown className="h-3 w-3" />;
-  return <Minus className="h-3 w-3" />;
+function TrendIcon({ trend, className }: { trend: string; className?: string }) {
+  if (trend === "up") return <TrendingUp className={cn("h-3 w-3", className)} />;
+  if (trend === "down") return <TrendingDown className={cn("h-3 w-3", className)} />;
+  return <Minus className={cn("h-3 w-3", className)} />;
 }
+
 
 
 
@@ -517,25 +520,16 @@ function HomePage() {
               "var(--brand)",
               "var(--effect-ai-cyan)",
               "var(--state-danger)",
-              "var(--state-warning)",
               "var(--effect-ai-purple)",
+              "var(--state-info)",
               "var(--brand)",
             ];
+
             const tone = tones[i % tones.length];
             const isUp = k.trend === "up";
             const isDown = k.trend === "down";
-            const isGood = k.good;
             const neutral = !isUp && !isDown;
-            const chipBg = neutral
-              ? "var(--bg-surface-subtle)"
-              : isGood
-              ? "color-mix(in oklab, var(--state-success) 16%, transparent)"
-              : "color-mix(in oklab, var(--state-danger) 14%, transparent)";
-            const chipColor = neutral
-              ? "var(--text-secondary)"
-              : isGood
-              ? "var(--state-success)"
-              : "var(--state-danger)";
+
 
             return (
               <Card
@@ -549,42 +543,42 @@ function HomePage() {
                     scrollToTopic(k.anchor);
                   }
                 }}
-                className="relative border-border bg-card p-5 rounded-2xl shadow-card transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
+                className="relative overflow-hidden border-0 p-5 rounded-2xl transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
+                style={{
+                  background: `linear-gradient(135deg, color-mix(in oklab, ${tone} 90%, black 10%), color-mix(in oklab, ${tone} 72%, white 6%))`,
+                  boxShadow: `0 12px 26px -14px color-mix(in oklab, ${tone} 70%, transparent)`,
+                }}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-caption text-text-tertiary truncate">{k.topic}</p>
+
+                <k.icon
+                  aria-hidden
+                  className="pointer-events-none absolute -right-2 -bottom-2 h-20 w-20 text-white/15"
+                  strokeWidth={1.6}
+                />
+                <div className="relative">
+                  <p className="text-caption font-medium text-white/85 truncate">{k.topic}</p>
+                  <div className="mt-2 flex items-baseline gap-1.5">
+                    <span className="tabular-nums font-semibold leading-none text-white" style={{ fontSize: "28px" }}>
+                      {scaleCardValue(k)}
+                    </span>
+                    <span className="text-body-sm text-white/75">{k.unit}</span>
                   </div>
-                  <div
-                    className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0"
-                    style={{
-                      background: `color-mix(in oklab, ${tone} 14%, transparent)`,
-                      color: tone,
-                    }}
-                  >
-                    <k.icon className="h-4 w-4" strokeWidth={2} />
+                  <div className="mt-4 flex items-center gap-2">
+                    <span
+                      className="inline-flex items-center gap-0.5 h-[22px] px-1.5 rounded-md text-caption font-medium tabular-nums bg-white/18 text-white"
+                    >
+                      <TrendIcon trend={k.trend} className="text-white/90" />
+                      {k.delta}
+                    </span>
+                    <span className="text-caption text-white/70">较上月</span>
+
                   </div>
-                </div>
-                <div className="mt-2 flex items-baseline gap-1.5">
-                  <span className="tabular-nums font-semibold leading-none text-foreground" style={{ fontSize: "26px" }}>
-                    {scaleCardValue(k)}
-                  </span>
-                  <span className="text-body-sm text-text-tertiary">{k.unit}</span>
-                </div>
-                <div className="mt-4 flex items-center gap-2">
-                  <span
-                    className="inline-flex items-center gap-0.5 h-[22px] px-1.5 rounded-md text-caption font-medium tabular-nums"
-                    style={{ background: chipBg, color: chipColor }}
-                  >
-                    <TrendIcon trend={k.trend} />
-                    {k.delta}
-                  </span>
-                  <span className="text-caption text-text-tertiary">较上月</span>
                 </div>
               </Card>
             );
           })}
         </div>
+
 
         {/* 专题区：按默认顺序渲染，半宽专题自动两两并排 */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
