@@ -435,7 +435,11 @@ function PanoramaSection() {
               const risky = r.pp30 >= 5;
               const over = r.budgetDelta > 5;
               return (
-                <tr key={r.key} className="border-t border-border">
+                <tr
+                  key={r.key}
+                  className={`border-t border-border ${region ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
+                  onClick={region ? undefined : () => setRegion(r.key)}
+                >
                   <td className="py-3">
                     <span
                       className="inline-flex h-6 w-6 items-center justify-center rounded-full text-caption tabular-nums"
