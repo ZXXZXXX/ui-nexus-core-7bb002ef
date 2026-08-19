@@ -846,6 +846,16 @@ function TodayTasksPage() {
               >
                 {inner}
               </Link>
+            ) : activeTab === "待诊断" ? (
+              <Link
+                key={t.id}
+                to="/m/health/$id"
+                params={{ id: t.id }}
+                search={{ tab: "review" as const }}
+                className={cls}
+              >
+                {inner}
+              </Link>
             ) : (
 
               <Link
@@ -857,6 +867,7 @@ function TodayTasksPage() {
                 {inner}
               </Link>
             );
+
 
           })
         )}
