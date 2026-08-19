@@ -25,7 +25,7 @@ import { WorkOrderSection } from "@/components/dashboard/workorder-section";
 import { AlertSection, alertCounts } from "@/components/dashboard/alert-section";
 import { OpsSection } from "@/components/dashboard/ops-section";
 import { ExecFocusSection } from "@/components/dashboard/exec-focus-section";
-import { GroupExecSection } from "@/components/dashboard/group-exec-section";
+import { GroupExecSection, farmCountSummary } from "@/components/dashboard/group-exec-section";
 
 
 
@@ -54,6 +54,8 @@ import {
   Activity,
   AlertTriangle,
   Building2,
+  Leaf,
+
 
 
 } from "lucide-react";
