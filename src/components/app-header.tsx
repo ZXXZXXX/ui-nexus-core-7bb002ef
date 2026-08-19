@@ -3,6 +3,7 @@ import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Bell, Building2, Users, Briefcase, LogOut, Check, ChevronDown } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { FARMS, useFarm, setFarmId } from "@/lib/farm-store";
+import { scopeOptions, setScope, useDashboardView } from "@/lib/dashboard-view";
 
 import {
   Popover,
