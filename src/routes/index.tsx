@@ -552,8 +552,8 @@ function HomePage() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
           {topicOrder.map((key) => {
             if (key === "ops" && scope !== "region" && scope !== "group" && scope !== "farm-out") return null;
-            // 集团视角：不展示产犊 / 死淘 / 疾病 / 药品专题
-            if (scope === "group" && ["calving", "culling", "disease", "drug"].includes(key)) return null;
+            // 集团视角：不展示牛群 / 产犊 / 死淘 / 疾病 / 药品 / 疫苗 / 工单专题
+            if (scope === "group" && ["herd", "calving", "culling", "disease", "drug", "vaccine", "workorder"].includes(key)) return null;
             const full = key === "drug" || key === "alert" || key === "ops";
             const node =
               key === "herd" ? (
