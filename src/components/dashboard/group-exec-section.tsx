@@ -25,6 +25,9 @@ export type GroupFarm = {
   perHead: number; // 单头牛药费 元
   drugFee: number; // 药费总支出 元
   budgetDelta: number; // 预算偏差 %（负=节约）
+  treatmentDays: number; // 平均诊疗天数
+  calving: number; // 产犊数（用于计算早产率）
+  preterm: number; // 早产数
 };
 
 export const GROUP_FARMS: GroupFarm[] = [
