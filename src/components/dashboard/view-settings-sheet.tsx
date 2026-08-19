@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings2, Check, RotateCcw, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { Settings2, RotateCcw, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -12,19 +12,17 @@ import { Switch } from "@/components/ui/switch";
 import {
   scopeOptions,
   topicMeta,
-  setScope,
   setTopicVisible,
   moveTopic,
   resetScopeConfig,
   useDashboardView,
-  type ReportScope,
   type TopicKey,
 } from "@/lib/dashboard-view";
 
 export function ViewSettingsSheet() {
   const { scope, config, order } = useDashboardView();
   const [open, setOpen] = useState(false);
-  const [editScope, setEditScope] = useState<ReportScope>(scope);
+  const editScope = scope;
 
   const current = config[editScope];
   const visibleCount = topicMeta.filter((t) => current[t.key]).length;
@@ -38,7 +36,6 @@ export function ViewSettingsSheet() {
       open={open}
       onOpenChange={(o) => {
         setOpen(o);
-        if (o) setEditScope(scope);
       }}
     >
       <SheetTrigger asChild>
@@ -55,46 +52,11 @@ export function ViewSettingsSheet() {
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
           <SheetTitle className="text-section-title">看板视角设置</SheetTitle>
           <SheetDescription className="text-caption">
-            选择当前视角，并配置该视角下各类专题的显隐
+            配置当前视角下各类专题的显隐与排序
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-          <div>
-            <p className="text-body-sm font-medium text-foreground mb-2">当前视角</p>
-            <div className="space-y-2">
-              {scopeOptions.map((o) => {
-                const active = editScope === o.key;
-                const isCurrent = scope === o.key;
-                return (
-                  <button
-                    key={o.key}
-                    type="button"
-                    onClick={() => {
-                      setEditScope(o.key);
-                      setScope(o.key);
-                    }}
-                    className={`w-full text-left rounded-xl border px-3.5 py-2.5 transition-colors ${
-                      active
-                        ? "border-primary/40 bg-brand-subtle"
-                        : "border-border bg-card hover:bg-surface-subtle"
-                    }`}
-                  >
-                    <span className="flex items-center justify-between gap-2">
-                      <span
-                        className={`text-body-sm ${active ? "text-primary font-medium" : "text-foreground"}`}
-                      >
-                        {o.label}
-                      </span>
-                      {isCurrent && <Check className="h-4 w-4 text-primary" />}
-                    </span>
-                    <span className="mt-0.5 block text-caption text-text-tertiary">{o.desc}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           <div>
             <div className="flex items-center justify-between mb-2">
               <p className="text-body-sm font-medium text-foreground">
