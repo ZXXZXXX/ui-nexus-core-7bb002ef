@@ -40,6 +40,8 @@
   --color-ai: var(--effect-ai-purple);
   --color-ai-foreground: var(--bg-surface);
   --color-ai-cyan: var(--effect-ai-cyan);
+  --color-info: var(--state-info);
+  --color-info-foreground: var(--bg-surface);
   --color-border: var(--border-default);
   --color-input: var(--border-default);
   --color-ring: var(--brand);
@@ -80,6 +82,7 @@
   --state-warning: #FFD991;
   --state-alert: #EBBF6B; /* 预警色（深色变体，可用于 icon / 文字 / 描边） */
   --state-danger: #F46A6A;
+  --state-info: #0EA5E9;
 
 
   /* Effect */
