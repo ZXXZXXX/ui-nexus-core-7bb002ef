@@ -219,8 +219,19 @@ function TaskListPage() {
   if (typeFilter) {
     list = list.filter((o) => o.type === typeFilter || (typeFilter === "疫苗免疫" && o.type === "免疫"));
   }
+
+  // 可筛选项（基于当前角色可见范围）
+  const typeOptions = Array.from(new Set(list.map((o) => o.type))).sort((a, b) => a.localeCompare(b, "zh"));
+  const barnOptions = Array.from(new Set(list.map((o) => o.barn))).sort((a, b) => a.localeCompare(b, "zh"));
+  const typeCount = (t: string) => list.filter((o) => o.type === t).length;
+  const barnCount = (b: string) => list.filter((o) => o.barn === b).length;
+
+  if (selTypes.size > 0) list = list.filter((o) => selTypes.has(o.type));
+  if (selBarns.size > 0) list = list.filter((o) => selBarns.has(o.barn));
+
   if (tab === "执行中") list = list.filter((o) => o.status === "进行中");
   else if (tab !== "全部") list = list.filter((o) => o.status === tab);
+
 
   const kw = q.trim().toLowerCase();
   if (kw) {
