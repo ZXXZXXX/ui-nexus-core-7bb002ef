@@ -59,6 +59,39 @@ export function AppHeader({ title, breadcrumb }: AppHeaderProps) {
         )}
 
         <div className="ml-auto flex items-center gap-2">
+          <Popover open={scopeOpen} onOpenChange={setScopeOpen}>
+            <PopoverTrigger asChild>
+              <button className="inline-flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-card hover:bg-surface-subtle transition-colors">
+                <Eye className="h-3.5 w-3.5 text-primary" />
+                <span className="text-body-sm text-foreground font-medium">{currentScope.label}</span>
+                <ChevronDown className="h-3.5 w-3.5 text-text-tertiary" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-72 p-0 border-border">
+              <div className="px-3 py-2 border-b border-border">
+                <div className="text-caption text-text-tertiary">切换视角 · 影响看板专题与统计口径</div>
+              </div>
+              <div className="p-1">
+                {scopeOptions.map((o) => {
+                  const active = o.key === scope;
+                  return (
+                    <button
+                      key={o.key}
+                      onClick={() => { setScope(o.key); setScopeOpen(false); }}
+                      className={`w-full flex items-start gap-2 px-2 py-2 rounded-md text-left hover:bg-surface-subtle transition-colors ${active ? "bg-brand-subtle" : ""}`}
+                    >
+                      <div className="flex-1 min-w-0 leading-tight">
+                        <div className={`text-body-sm ${active ? "text-primary font-medium" : "text-foreground"}`}>{o.label}</div>
+                        <div className="text-caption text-text-tertiary mt-0.5 truncate">{o.desc}</div>
+                      </div>
+                      {active && <Check className="h-3.5 w-3.5 text-primary mt-1 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+
           {showFarmSwitcher && (
             <Popover open={farmOpen} onOpenChange={setFarmOpen}>
               <PopoverTrigger asChild>
