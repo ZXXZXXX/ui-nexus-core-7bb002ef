@@ -30,6 +30,7 @@ function AbortPage() {
   const [needTransfer, setNeedTransfer] = useState(false);
   const [transferTo, setTransferTo] = useState("");
   const [confirmTransferOpen, setConfirmTransferOpen] = useState(false);
+  const [confirmAbortOpen, setConfirmAbortOpen] = useState(false);
 
   const [photoFront, setPhotoFront] = useState<number | null>(null);
   const [photoLeft, setPhotoLeft] = useState<number | null>(null);
@@ -50,6 +51,11 @@ function AbortPage() {
       (photoFront !== null && photoLeft !== null && photoRight !== null));
 
   const submit = () => {
+    setConfirmAbortOpen(true);
+  };
+
+  const handleAbortConfirm = () => {
+    setConfirmAbortOpen(false);
     if (needTransfer) {
       setConfirmTransferOpen(true);
       return;
@@ -140,6 +146,14 @@ function AbortPage() {
           确认终止
         </button>
       </div>
+
+      <ConfirmAbortDialog
+        open={confirmAbortOpen}
+        orderId={id}
+        reason={reason === "其他" ? other : reason}
+        onCancel={() => setConfirmAbortOpen(false)}
+        onConfirm={handleAbortConfirm}
+      />
 
       <ConfirmTransferDialog
         open={confirmTransferOpen}
