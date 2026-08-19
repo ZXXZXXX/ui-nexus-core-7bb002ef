@@ -324,14 +324,6 @@ function DrugTrendSection() {
 
 /* ---------------- 四、全景指标对标排行 ---------------- */
 
-type Grade = { label: string; tone: string };
-function gradeOf(r: Row): Grade {
-  if (r.pp30 <= 2.0 && r.perHead <= 32) return { label: "标杆领跑", tone: "var(--state-success)" };
-  if (r.pp30 >= 5 || r.budgetDelta >= 25) return { label: "重点督导", tone: "var(--state-danger)" };
-  if (r.budgetDelta > 5) return { label: "成本预警", tone: "var(--state-warning)" };
-  if (r.pp30 <= 2.6) return { label: "良好", tone: "var(--state-success)" };
-  return { label: "达标", tone: "var(--text-secondary)" };
-}
 
 function PanoramaSection() {
   const [region, setRegion] = useState<string | null>(null);
