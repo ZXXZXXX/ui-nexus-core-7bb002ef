@@ -554,12 +554,12 @@ function PanoramaSection() {
                   <td className="py-3 text-right tabular-nums">
                     <span className="text-foreground">￥{wan(r.drugFee)}</span>
                     <span
-                      className="ml-1 inline-flex items-center h-[20px] px-1.5 rounded-md text-caption"
+                      className="ml-1.5 inline-flex items-center h-[22px] px-2 rounded-full text-caption font-medium"
                       style={{
                         background: over
-                          ? "color-mix(in oklab, var(--state-danger) 12%, transparent)"
+                          ? "color-mix(in oklab, var(--state-danger) 20%, transparent)"
                           : r.budgetDelta < 0
-                          ? "color-mix(in oklab, var(--state-success) 14%, transparent)"
+                          ? "color-mix(in oklab, var(--state-success) 22%, transparent)"
                           : "var(--bg-surface-subtle)",
                         color: over
                           ? "var(--state-danger)"
