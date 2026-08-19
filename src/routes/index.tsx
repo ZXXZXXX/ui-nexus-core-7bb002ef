@@ -30,7 +30,7 @@ import { GroupExecSection } from "@/components/dashboard/group-exec-section";
 
 
 import { useDashboardView, useTopicOrder, scopeOptions, useDataLevel, levelMeta, scaleValue } from "@/lib/dashboard-view";
-import { LevelSwitch } from "@/components/dashboard/level-switch";
+
 
 
 import {
@@ -460,8 +460,6 @@ function HomePage() {
           <h3 className="text-section-title text-foreground">数据看板</h3>
         </div>
 
-        {/* 数量级分层：集团级 > 区域级 > 牧场级 */}
-        <LevelSwitch />
 
 
         {/* 数据指标卡 1-6 — 点击跳转至对应专题 */}
