@@ -153,7 +153,7 @@ function StackedBars({
                   />
                 ))}
               </div>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-caption text-text-tertiary tabular-nums">
+              <div className="mt-1 flex flex-nowrap items-center gap-3 text-caption text-text-tertiary tabular-nums">
                 <span>0-30 {r.pp30n} 头 ({r.pp30}%)</span>
                 <span>0-60 {r.pp60n} 头 ({r.pp60}%)</span>
                 <span>0-90 {r.pp90n} 头 ({r.pp90}%)</span>
