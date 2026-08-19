@@ -61,41 +61,6 @@ export function ViewSettingsSheet() {
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
           <div>
-            <p className="text-body-sm font-medium text-foreground mb-2">当前视角</p>
-            <div className="space-y-2">
-              {scopeOptions.map((o) => {
-                const active = editScope === o.key;
-                const isCurrent = scope === o.key;
-                return (
-                  <button
-                    key={o.key}
-                    type="button"
-                    onClick={() => {
-                      setEditScope(o.key);
-                      setScope(o.key);
-                    }}
-                    className={`w-full text-left rounded-xl border px-3.5 py-2.5 transition-colors ${
-                      active
-                        ? "border-primary/40 bg-brand-subtle"
-                        : "border-border bg-card hover:bg-surface-subtle"
-                    }`}
-                  >
-                    <span className="flex items-center justify-between gap-2">
-                      <span
-                        className={`text-body-sm ${active ? "text-primary font-medium" : "text-foreground"}`}
-                      >
-                        {o.label}
-                      </span>
-                      {isCurrent && <Check className="h-4 w-4 text-primary" />}
-                    </span>
-                    <span className="mt-0.5 block text-caption text-text-tertiary">{o.desc}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
             <div className="flex items-center justify-between mb-2">
               <p className="text-body-sm font-medium text-foreground">
                 专题显隐与排序
