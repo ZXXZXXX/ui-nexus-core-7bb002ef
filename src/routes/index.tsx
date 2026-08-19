@@ -274,7 +274,11 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
   const visibleCards =
-    scope === "group" ? [groupLeadCard, ...baseCards, groupTailCard] : baseCards;
+    scope === "group"
+      ? [groupLeadCard, ...baseCards, groupTailCard].filter(
+          (c) => c.topic !== "总存栏数" && c.topic !== "平均诊疗天数",
+        )
+      : baseCards;
 
 
   const scrollToTopic = (id: string) => {
