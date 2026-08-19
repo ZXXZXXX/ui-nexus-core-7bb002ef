@@ -138,7 +138,7 @@ function StackedBars({
               onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
             }`}
           >
-            <div className="w-[100px] shrink-0">
+            <div className="w-[90px] shrink-0">
               <div className="text-body-sm text-foreground truncate">{r.key}</div>
               <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
             </div>
