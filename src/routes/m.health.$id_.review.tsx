@@ -49,6 +49,7 @@ function ReviewPage() {
   const [transferTo, setTransferTo] = useState("");
   const [transferConfirmOpen, setTransferConfirmOpen] = useState(false);
   const [revisitConfirmOpen, setRevisitConfirmOpen] = useState(false);
+  const [confirmAbortOpen, setConfirmAbortOpen] = useState(false);
   const earTagLabel = getOrderEarTagLabel(id);
 
   const finalAbandonReason = abandonReason === "其他" ? abandonOther.trim() : abandonReason;
@@ -102,6 +103,19 @@ function ReviewPage() {
       toast.error("请完成必填项");
       return;
     }
+    if (verdict === "abandon") {
+      setConfirmAbortOpen(true);
+      return;
+    }
+    if (needTransfer && transferTo) {
+      setTransferConfirmOpen(true);
+      return;
+    }
+    doSubmit();
+  };
+
+  const handleAbortConfirm = () => {
+    setConfirmAbortOpen(false);
     if (needTransfer && transferTo) {
       setTransferConfirmOpen(true);
       return;
@@ -236,6 +250,14 @@ function ReviewPage() {
           <Send className="h-4 w-4" /> 提交复查结论
         </button>
       </div>
+
+      <ConfirmAbortDialog
+        open={confirmAbortOpen}
+        orderId={id}
+        reason={finalAbandonReason}
+        onCancel={() => setConfirmAbortOpen(false)}
+        onConfirm={handleAbortConfirm}
+      />
 
       <ConfirmTransferDialog
         open={transferConfirmOpen}
