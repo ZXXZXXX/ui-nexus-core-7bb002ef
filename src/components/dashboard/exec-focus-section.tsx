@@ -231,47 +231,6 @@ export function ExecFocusSection({ level }: { level: "farm" | "region" | "group"
         </div>
       </SectionCard>
 
-      {/* 排名 */}
-      <SectionCard
-        title={isGroup ? "区域 / 牧场排名" : "牧场排名"}
-        desc="单头牛药费越低越优"
-        icon={<Trophy className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      >
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {isGroup && (
-            <div>
-              <p className="text-body-sm text-text-secondary mb-3">区域排名 · 单头牛药费</p>
-              <BarList
-                data={[...byRegion]
-                  .map((r) => ({ name: r.key, value: Number((r.drugFee / r.herd).toFixed(1)) }))
-                  .sort((a, b) => a.value - b.value)}
-                unit=" 元/头"
-              />
-            </div>
-          )}
-          <div>
-            <p className="text-body-sm text-text-secondary mb-3">牧场排名 · 单头牛药费</p>
-            <BarList
-              data={[...byFarm]
-                .map((r) => ({ name: r.key, value: Number((r.drugFee / r.herd).toFixed(1)) }))
-                .sort((a, b) => a.value - b.value)}
-              unit=" 元/头"
-            />
-          </div>
-          <div>
-            <p className="text-body-sm text-text-secondary mb-3">
-              {isGroup ? "区域" : "牧场"}排名 · 死淘数（死亡 + 淘汰）
-            </p>
-            <BarList
-              data={(isGroup ? byRegion : byFarm)
-                .map((r) => ({ name: r.key, value: r.death + r.cull }))
-                .sort((a, b) => a.value - b.value)}
-              unit=" 头"
-            />
-          </div>
-        </div>
-      </SectionCard>
-
       {/* 区域视角专属：各牧场工单完工率 */}
       {!isGroup && (
         <SectionCard
