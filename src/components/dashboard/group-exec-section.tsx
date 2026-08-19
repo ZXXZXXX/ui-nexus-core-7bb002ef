@@ -374,24 +374,24 @@ function DrugTrendSection() {
       desc={period}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
-            <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
-            总药费支出
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
-            <span className="h-0.5 w-4 rounded-full" style={{ background: "var(--effect-ai-purple)" }} />
-            单头药费
-          </span>
-          <PeriodTabs
-            value={period}
-            onChange={setPeriod}
-            options={["近 6 个月", "近 1 年"]}
-          />
-        </div>
+        <PeriodTabs
+          value={period}
+          onChange={setPeriod}
+          options={["近 6 个月", "近 1 年"]}
+        />
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} />
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
+        <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
+          总药费支出
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+          <span className="h-0.5 w-4 rounded-full" style={{ background: "var(--effect-ai-purple)" }} />
+          单头药费
+        </span>
+      </div>
     </SectionCard>
   );
 }
