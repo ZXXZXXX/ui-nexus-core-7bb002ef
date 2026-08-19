@@ -346,8 +346,17 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
         </svg>
         {hover !== null && (
           <div
-            className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-border bg-card px-3 py-2 shadow-card whitespace-nowrap"
-            style={{ left: `${((cx(hover) / W) * 100).toFixed(2)}%`, top: ly(perHead[hover]) + 12 }}
+            className={`pointer-events-none absolute z-10 whitespace-nowrap rounded-lg border border-border bg-card px-3 py-2 shadow-card ${
+              hover >= months.length - 2
+                ? "-translate-x-full"
+                : hover <= 1
+                  ? "translate-x-0"
+                  : "-translate-x-1/2"
+            }`}
+            style={{
+              left: `${((cx(hover) / W) * 100).toFixed(2)}%`,
+              top: Math.min(ly(perHead[hover]) + 12, H - 88),
+            }}
           >
             <div className="text-caption text-text-tertiary">{months[hover]}</div>
             <div className="text-body-sm text-foreground tabular-nums">总药费 {totalFee[hover]} 万元</div>
