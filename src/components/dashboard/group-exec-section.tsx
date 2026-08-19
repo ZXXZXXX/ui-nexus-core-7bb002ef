@@ -104,55 +104,59 @@ const BUCKETS = [
   { key: "pp90", n: "pp90n", label: "0-90 天", color: "var(--state-warning)" },
 ] as const;
 
-function VerticalBars({
+function StackedBars({
   rows,
   onPick,
 }: {
   rows: Row[];
   onPick?: (r: Row) => void;
 }) {
-  const max = Math.max(...rows.flatMap((r) => [r.pp30, r.pp60, r.pp90]), 1);
+  const max = Math.max(...rows.map((r) => r.pp90), 1);
   return (
     <div className="space-y-3">
-      {rows.map((r) => (
-        <button
-          key={r.key}
-          type="button"
-          onClick={() => onPick?.(r)}
-          className={`w-full grid grid-cols-[minmax(0,1fr)_minmax(140px,180px)] items-center gap-3 rounded-lg px-2 py-2 transition-colors text-left ${
-            onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
-          }`}
-        >
-          <div className="min-w-0">
-            <div className="text-body-sm text-foreground truncate">{r.key}</div>
-            <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
-          </div>
-          <div className="flex items-center gap-2">
-            {BUCKETS.map((b) => {
-              const rate = r[b.key] as number;
-              const cnt = r[b.n] as number;
-              return (
-                <div key={b.key} className="flex-1 min-w-0 flex flex-col items-center gap-1">
-                  <div className="flex items-baseline gap-0.5">
-                    <span className="text-body-sm tabular-nums text-foreground">{rate}%</span>
-                    <span className="text-caption tabular-nums text-text-tertiary">({cnt})</span>
-                  </div>
-                  <div className="w-full h-2 rounded-full bg-surface-subtle overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{ width: `${Math.max((rate / max) * 100, 4)}%`, background: b.color }}
-                    />
-                  </div>
-                  <span className="text-caption text-text-tertiary whitespace-nowrap">{b.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        </button>
-      ))}
+      {rows.map((r) => {
+        const segs = [
+          { label: "0-30 天", color: BUCKETS[0].color, val: r.pp30, cnt: r.pp30n },
+          { label: "0-60 天", color: BUCKETS[1].color, val: Math.max(r.pp60 - r.pp30, 0), cnt: Math.max(r.pp60n - r.pp30n, 0) },
+          { label: "0-90 天", color: BUCKETS[2].color, val: Math.max(r.pp90 - r.pp60, 0), cnt: Math.max(r.pp90n - r.pp60n, 0) },
+        ];
+        return (
+          <button
+            key={r.key}
+            type="button"
+            onClick={() => onPick?.(r)}
+            className={`w-full grid grid-cols-[minmax(96px,140px)_minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-2 py-2 transition-colors text-left ${
+              onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
+            }`}
+          >
+            <div className="min-w-0">
+              <div className="text-body-sm text-foreground truncate">{r.key}</div>
+              <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
+            </div>
+            <div className="min-w-0">
+              <div className="flex h-4 w-full rounded-full bg-surface-subtle overflow-hidden">
+                {segs.map((s) => (
+                  <div
+                    key={s.label}
+                    title={`${s.label} +${s.val.toFixed(1)}%（${s.cnt} 头）`}
+                    style={{ width: `${(s.val / max) * 100}%`, background: s.color }}
+                  />
+                ))}
+              </div>
+              <div className="mt-1 flex items-center gap-3 text-caption text-text-tertiary tabular-nums">
+                <span>0-30 {r.pp30}%（{r.pp30n}）</span>
+                <span>0-60 {r.pp60}%（{r.pp60n}）</span>
+                <span>0-90 {r.pp90}%（{r.pp90n}）</span>
+              </div>
+            </div>
+            <span className="text-body-sm tabular-nums text-foreground">{r.pp90}%</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
+
 
 function PostpartumRankSection() {
   const [region, setRegion] = useState<string | null>(null);
@@ -195,7 +199,7 @@ function PostpartumRankSection() {
       <p className="text-body-sm text-text-secondary mb-4">
         {region ? "该区域下各牧场产后淘汰率对比" : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
-      <VerticalBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
     </SectionCard>
   );
 }
