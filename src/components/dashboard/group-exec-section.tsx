@@ -346,7 +346,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
         </svg>
         {hover !== null && (
           <div
-            className="pointer-events-none absolute z-10 rounded-lg border border-border bg-card px-3 py-2 shadow-card whitespace-nowrap"
+            className="pointer-events-none absolute z-10 -translate-x-1/2 rounded-lg border border-border bg-card px-3 py-2 shadow-card whitespace-nowrap"
             style={{ left: `${((cx(hover) / W) * 100).toFixed(2)}%`, top: ly(perHead[hover]) + 12 }}
           >
             <div className="text-caption text-text-tertiary">{months[hover]}</div>
