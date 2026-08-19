@@ -25,16 +25,19 @@ export type GroupFarm = {
   perHead: number; // 单头牛药费 元
   drugFee: number; // 药费总支出 元
   budgetDelta: number; // 预算偏差 %（负=节约）
+  treatmentDays: number; // 平均诊疗天数
+  calving: number; // 产犊数（用于计算早产率）
+  preterm: number; // 早产数
 };
 
 export const GROUP_FARMS: GroupFarm[] = [
-  { farm: "1号牧场", base: "齐齐哈尔基地", region: "东北大区", herd: 5200, death: 8, cull: 24, pp30: 1.8, pp60: 2.9, pp90: 3.6, pp30n: 18, pp60n: 29, pp90n: 36, sick: 6.2, cure: 95.1, perHead: 29.4, drugFee: 153_000, budgetDelta: -12 },
-  { farm: "2号牧场", base: "大庆基地", region: "东北大区", herd: 4800, death: 11, cull: 27, pp30: 2.4, pp60: 3.6, pp90: 4.5, pp30n: 22, pp60n: 33, pp90n: 41, sick: 7.5, cure: 93.0, perHead: 34.1, drugFee: 164_000, budgetDelta: -5 },
-  { farm: "3号牧场", base: "绥化基地", region: "东北大区", herd: 4500, death: 13, cull: 33, pp30: 2.9, pp60: 4.2, pp90: 5.3, pp30n: 25, pp60n: 36, pp90n: 46, sick: 8.8, cure: 92.4, perHead: 39.5, drugFee: 178_000, budgetDelta: 0 },
-  { farm: "1号牧场", base: "武威基地", region: "西北大区", herd: 4100, death: 16, cull: 40, pp30: 3.5, pp60: 5.1, pp90: 6.4, pp30n: 28, pp60n: 41, pp90n: 51, sick: 9.8, cure: 91.2, perHead: 48.0, drugFee: 197_000, budgetDelta: 8 },
-  { farm: "2号牧场", base: "金昌基地", region: "西北大区", herd: 3600, death: 14, cull: 35, pp30: 3.1, pp60: 4.7, pp90: 5.9, pp30n: 23, pp60n: 35, pp90n: 44, sick: 9.1, cure: 91.9, perHead: 44.2, drugFee: 159_000, budgetDelta: 3 },
-  { farm: "2号牧场", base: "张家口基地", region: "华北大区", herd: 3900, death: 24, cull: 48, pp30: 5.4, pp60: 7.2, pp90: 8.6, pp30n: 42, pp60n: 56, pp90n: 67, sick: 12.4, cure: 87.5, perHead: 54.2, drugFee: 211_000, budgetDelta: 28 },
-  { farm: "1号牧场", base: "保定基地", region: "华北大区", herd: 3400, death: 15, cull: 36, pp30: 3.8, pp60: 5.4, pp90: 6.7, pp30n: 26, pp60n: 37, pp90n: 46, sick: 10.2, cure: 90.4, perHead: 46.8, drugFee: 159_000, budgetDelta: 11 },
+  { farm: "1号牧场", base: "齐齐哈尔基地", region: "东北大区", herd: 5200, death: 8, cull: 24, pp30: 1.8, pp60: 2.9, pp90: 3.6, pp30n: 18, pp60n: 29, pp90n: 36, sick: 6.2, cure: 95.1, perHead: 29.4, drugFee: 153_000, budgetDelta: -12, treatmentDays: 3.4, calving: 198, preterm: 7 },
+  { farm: "2号牧场", base: "大庆基地", region: "东北大区", herd: 4800, death: 11, cull: 27, pp30: 2.4, pp60: 3.6, pp90: 4.5, pp30n: 22, pp60n: 33, pp90n: 41, sick: 7.5, cure: 93.0, perHead: 34.1, drugFee: 164_000, budgetDelta: -5, treatmentDays: 3.8, calving: 182, preterm: 9 },
+  { farm: "3号牧场", base: "绥化基地", region: "东北大区", herd: 4500, death: 13, cull: 33, pp30: 2.9, pp60: 4.2, pp90: 5.3, pp30n: 25, pp60n: 36, pp90n: 46, sick: 8.8, cure: 92.4, perHead: 39.5, drugFee: 178_000, budgetDelta: 0, treatmentDays: 4.2, calving: 170, preterm: 11 },
+  { farm: "1号牧场", base: "武威基地", region: "西北大区", herd: 4100, death: 16, cull: 40, pp30: 3.5, pp60: 5.1, pp90: 6.4, pp30n: 28, pp60n: 41, pp90n: 51, sick: 9.8, cure: 91.2, perHead: 48.0, drugFee: 197_000, budgetDelta: 8, treatmentDays: 4.6, calving: 156, preterm: 14 },
+  { farm: "2号牧场", base: "金昌基地", region: "西北大区", herd: 3600, death: 14, cull: 35, pp30: 3.1, pp60: 4.7, pp90: 5.9, pp30n: 23, pp60n: 35, pp90n: 44, sick: 9.1, cure: 91.9, perHead: 44.2, drugFee: 159_000, budgetDelta: 3, treatmentDays: 4.4, calving: 138, preterm: 12 },
+  { farm: "2号牧场", base: "张家口基地", region: "华北大区", herd: 3900, death: 24, cull: 48, pp30: 5.4, pp60: 7.2, pp90: 8.6, pp30n: 42, pp60n: 56, pp90n: 67, sick: 12.4, cure: 87.5, perHead: 54.2, drugFee: 211_000, budgetDelta: 28, treatmentDays: 5.2, calving: 148, preterm: 16 },
+  { farm: "1号牧场", base: "保定基地", region: "华北大区", herd: 3400, death: 15, cull: 36, pp30: 3.8, pp60: 5.4, pp90: 6.7, pp30n: 26, pp60n: 37, pp90n: 46, sick: 10.2, cure: 90.4, perHead: 46.8, drugFee: 159_000, budgetDelta: 11, treatmentDays: 4.8, calving: 130, preterm: 10 },
 ];
 
 type Row = {
@@ -54,6 +57,8 @@ type Row = {
   perHead: number;
   drugFee: number;
   budgetDelta: number;
+  treatmentDays: number;
+  pretermRate: number;
 };
 
 function agg(key: string, sub: string, rows: GroupFarm[]): Row {
@@ -78,6 +83,8 @@ function agg(key: string, sub: string, rows: GroupFarm[]): Row {
     perHead: Number((sum((r) => r.drugFee) / herd).toFixed(1)),
     drugFee: sum((r) => r.drugFee),
     budgetDelta: w((r) => r.budgetDelta),
+    treatmentDays: w((r) => r.treatmentDays),
+    pretermRate: Number(((sum((r) => r.preterm) / (sum((r) => r.calving) || 1)) * 100).toFixed(1)),
   };
 }
 
@@ -317,14 +324,6 @@ function DrugTrendSection() {
 
 /* ---------------- 四、全景指标对标排行 ---------------- */
 
-type Grade = { label: string; tone: string };
-function gradeOf(r: Row): Grade {
-  if (r.pp30 <= 2.0 && r.perHead <= 32) return { label: "标杆领跑", tone: "var(--state-success)" };
-  if (r.pp30 >= 5 || r.budgetDelta >= 25) return { label: "重点督导", tone: "var(--state-danger)" };
-  if (r.budgetDelta > 5) return { label: "成本预警", tone: "var(--state-warning)" };
-  if (r.pp30 <= 2.6) return { label: "良好", tone: "var(--state-success)" };
-  return { label: "达标", tone: "var(--text-secondary)" };
-}
 
 function PanoramaSection() {
   const [region, setRegion] = useState<string | null>(null);
@@ -337,34 +336,34 @@ function PanoramaSection() {
 
   const exportCsv = () => {
     const head = [
-      "排名",
-      region ? "牧场" : "区域",
-      region ? "基地" : "牧场数",
-      "存栏数",
+      "序号",
+      region ? "牧场名称" : "区域名称",
       "死亡数",
       "淘汰数",
-      "产后0-30d淘汰率(%)",
-      "发病率(%)",
-      "治愈率(%)",
-      "单头牛药费(元)",
-      "药费总支出(元)",
-      "预算偏差(%)",
-      "综合评级",
+      "发病率",
+      "治愈率",
+      "平均诊疗天数",
+      "总药费",
+      "头均药费",
+      "产后0～30天淘汰率",
+      "0～60天淘汰率",
+      "0～90天淘汰率",
+      "早产率",
     ];
     const body = rows.map((r, i) => [
       i + 1,
       r.key,
-      r.sub,
-      r.herd,
       r.death,
       r.cull,
-      r.pp30,
-      r.sick,
-      r.cure,
-      r.perHead,
+      `${r.sick}%`,
+      `${r.cure}%`,
+      r.treatmentDays,
       r.drugFee,
-      r.budgetDelta,
-      gradeOf(r).label,
+      r.perHead,
+      `${r.pp30}%`,
+      `${r.pp60}%`,
+      `${r.pp90}%`,
+      `${r.pretermRate}%`,
     ]);
     const csv =
       "\uFEFF" + [head, ...body].map((line) => line.map((c) => `"${c}"`).join(",")).join("\n");
@@ -413,23 +412,26 @@ function PanoramaSection() {
       </p>
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[1040px] text-body-sm">
+        <table className="w-full min-w-[1300px] text-body-sm">
           <thead>
             <tr className="text-caption text-text-tertiary">
-              <th className="text-left font-normal py-2 w-12">排名</th>
+              <th className="text-left font-normal py-2 w-12">序号</th>
               <th className="text-left font-normal py-2">{region ? "牧场名称" : "区域名称"}</th>
-              <th className="text-right font-normal py-2">存栏数</th>
-              <th className="text-right font-normal py-2">死淘总数 (死亡/淘汰)</th>
-              <th className="text-right font-normal py-2">产后0-30d淘汰率</th>
-              <th className="text-right font-normal py-2">发病率 / 治愈率</th>
-              <th className="text-right font-normal py-2">单头牛药费</th>
-              <th className="text-right font-normal py-2">药费总支出 (预算偏差)</th>
-              <th className="text-right font-normal py-2">综合评级</th>
+              <th className="text-right font-normal py-2">死亡数</th>
+              <th className="text-right font-normal py-2">淘汰数</th>
+              <th className="text-right font-normal py-2">发病率</th>
+              <th className="text-right font-normal py-2">治愈率</th>
+              <th className="text-right font-normal py-2">平均诊疗天数</th>
+              <th className="text-right font-normal py-2">总药费</th>
+              <th className="text-right font-normal py-2">头均药费</th>
+              <th className="text-right font-normal py-2">产后0～30天淘汰率</th>
+              <th className="text-right font-normal py-2">0～60天淘汰率</th>
+              <th className="text-right font-normal py-2">0～90天淘汰率</th>
+              <th className="text-right font-normal py-2">早产率</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => {
-              const g = gradeOf(r);
               const risky = r.pp30 >= 5;
               const over = r.budgetDelta > 5;
               return (
@@ -457,44 +459,17 @@ function PanoramaSection() {
                     <div className="text-foreground">{r.key}</div>
                     <div className="text-caption text-text-tertiary">{r.sub}</div>
                   </td>
-                  <td className="py-3 text-right tabular-nums text-text-secondary">
-                    {r.herd.toLocaleString()} 头
-                  </td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.death} 头</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.cull} 头</td>
+                  <td className="py-3 text-right tabular-nums text-text-secondary">{r.sick}%</td>
                   <td className="py-3 text-right tabular-nums">
-                    <div className="text-foreground">{r.death + r.cull} 头</div>
-                    <div className="text-caption text-text-tertiary">
-                      ({r.death} / {r.cull})
-                    </div>
-                  </td>
-                  <td className="py-3 text-right tabular-nums">
-                    <span
-                      className="inline-flex items-center gap-1"
-                      style={{
-                        color: risky
-                          ? "var(--state-danger)"
-                          : r.pp30 >= 3
-                          ? "var(--state-warning)"
-                          : "var(--state-success)",
-                      }}
-                    >
-                      {r.pp30}%
-                      {risky && <AlertTriangle className="h-3.5 w-3.5" />}
-                    </span>
-                  </td>
-                  <td className="py-3 text-right tabular-nums text-text-secondary">
-                    {r.sick}% /{" "}
                     <span style={{ color: r.cure >= 90 ? "var(--state-success)" : "var(--state-danger)" }}>
                       {r.cure}%
                     </span>
                   </td>
-                  <td
-                    className="py-3 text-right tabular-nums"
-                    style={{ color: r.perHead >= 48 ? "var(--state-danger)" : r.perHead >= 40 ? "var(--state-warning)" : "var(--foreground)" }}
-                  >
-                    ￥{r.perHead} /头
-                  </td>
+                  <td className="py-3 text-right tabular-nums text-text-secondary">{r.treatmentDays} 天</td>
                   <td className="py-3 text-right tabular-nums">
-                    <span className="text-foreground">￥{wan(r.drugFee)}</span>{" "}
+                    <span className="text-foreground">￥{wan(r.drugFee)}</span>
                     <span
                       className="ml-1 inline-flex items-center h-[20px] px-1.5 rounded-md text-caption"
                       style={{
@@ -513,17 +488,30 @@ function PanoramaSection() {
                       {r.budgetDelta > 0 ? `+${r.budgetDelta}% 超支` : r.budgetDelta < 0 ? `${r.budgetDelta}% 节约` : "持平预算"}
                     </span>
                   </td>
-                  <td className="py-3 text-right">
+                  <td
+                    className="py-3 text-right tabular-nums"
+                    style={{ color: r.perHead >= 48 ? "var(--state-danger)" : r.perHead >= 40 ? "var(--state-warning)" : "var(--foreground)" }}
+                  >
+                    ￥{r.perHead} /头
+                  </td>
+                  <td className="py-3 text-right tabular-nums">
                     <span
-                      className="inline-flex items-center h-[22px] px-2 rounded-md text-caption"
+                      className="inline-flex items-center gap-1"
                       style={{
-                        background: `color-mix(in oklab, ${g.tone} 12%, transparent)`,
-                        color: g.tone,
+                        color: risky
+                          ? "var(--state-danger)"
+                          : r.pp30 >= 3
+                          ? "var(--state-warning)"
+                          : "var(--state-success)",
                       }}
                     >
-                      {g.label}
+                      {r.pp30}%
+                      {risky && <AlertTriangle className="h-3.5 w-3.5" />}
                     </span>
                   </td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.pp60}%</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.pp90}%</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.pretermRate}%</td>
                 </tr>
               );
             })}
