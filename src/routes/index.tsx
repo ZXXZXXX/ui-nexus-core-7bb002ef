@@ -527,18 +527,8 @@ function HomePage() {
             const tone = tones[i % tones.length];
             const isUp = k.trend === "up";
             const isDown = k.trend === "down";
-            const isGood = k.good;
             const neutral = !isUp && !isDown;
-            const trendTone = neutral
-              ? "white"
-              : isGood
-                ? "#E7F9E8"
-                : "#FFEBEB";
-            const trendText = neutral
-              ? "white"
-              : isGood
-                ? "#1A7A2A"
-                : "#B91C1C";
+
 
             return (
               <Card
