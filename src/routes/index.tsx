@@ -277,9 +277,18 @@ function HomePage() {
     );
   const visibleCards =
     scope === "group"
-      ? [groupLeadCard, ...baseCards, groupTailCard].filter(
-          (c) => c.topic !== "总存栏数" && c.topic !== "平均诊疗天数",
-        )
+      ? (() => {
+          const map = new Map(baseCards.map((c) => [c.topic, c]));
+          const order = [
+            groupLeadCard,
+            map.get("治愈率"),
+            map.get("早产率"),
+            map.get("死淘总数"),
+            map.get("总药费支出"),
+            groupTailCard,
+          ].filter(Boolean) as MetricCard[];
+          return order;
+        })()
       : baseCards;
 
 
