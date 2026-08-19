@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { BarChart3, Layers, Download, ChevronLeft, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { BarChart3, Layers, Download, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard, PeriodTabs } from "./charts";
 
@@ -559,90 +559,44 @@ function PanoramaSection() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => {
-              const risky = r.pp30 >= 5;
-              const over = r.budgetDelta > 5;
-              return (
-                <tr
-                  key={r.key}
-                  className={`border-t border-border ${region ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
-                  onClick={region ? undefined : () => setRegion(r.key)}
-                >
-                  <td className="py-3">
-                    <span
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-full text-caption tabular-nums"
-                      style={
-                        i < 3
-                          ? {
-                              background: "color-mix(in oklab, var(--state-warning) 16%, transparent)",
-                              color: "#A35A00",
-                            }
-                          : { background: "var(--bg-surface-subtle)", color: "var(--text-tertiary)" }
-                      }
-                    >
-                      {i + 1}
-                    </span>
-                  </td>
-                  <td className="py-3">
-                    <div className="text-foreground">{r.key}</div>
-                    <div className="text-caption text-text-tertiary">{r.sub}</div>
-                  </td>
-                  <td className="py-3 text-right tabular-nums text-foreground">{r.death} 头</td>
-                  <td className="py-3 text-right tabular-nums text-foreground">{r.cull} 头</td>
-                  <td className="py-3 text-right tabular-nums text-text-secondary">{r.sick}%</td>
-                  <td className="py-3 text-right tabular-nums">
-                    <span style={{ color: r.cure >= 90 ? "var(--state-success)" : "var(--state-danger)" }}>
-                      {r.cure}%
-                    </span>
-                  </td>
-                  <td className="py-3 text-right tabular-nums text-text-secondary">{r.treatmentDays} 天</td>
-                  <td className="py-3 text-right tabular-nums">
-                    <span className="text-foreground">￥{wan(r.drugFee)}</span>
-                    <span
-                      className="ml-1.5 inline-flex items-center h-[22px] px-2 rounded-full text-caption font-medium"
-                      style={{
-                        background: over
-                          ? "color-mix(in oklab, var(--state-danger) 20%, transparent)"
-                          : r.budgetDelta < 0
-                          ? "color-mix(in oklab, var(--state-success) 22%, transparent)"
-                          : "var(--bg-surface-subtle)",
-                        color: over
-                          ? "var(--state-danger)"
-                          : r.budgetDelta < 0
-                          ? "var(--state-success)"
-                          : "var(--text-secondary)",
-                      }}
-                    >
-                      {r.budgetDelta > 0 ? `+${r.budgetDelta}% 超支` : r.budgetDelta < 0 ? `${r.budgetDelta}% 节约` : "持平预算"}
-                    </span>
-                  </td>
-                  <td
-                    className="py-3 text-right tabular-nums"
-                    style={{ color: r.perHead >= 48 ? "var(--state-danger)" : r.perHead >= 40 ? "var(--state-warning)" : "var(--foreground)" }}
+            {rows.map((r, i) => (
+              <tr
+                key={r.key}
+                className={`border-t border-border ${region ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
+                onClick={region ? undefined : () => setRegion(r.key)}
+              >
+                <td className="py-3">
+                  <span
+                    className="inline-flex h-6 w-6 items-center justify-center rounded-full text-caption tabular-nums"
+                    style={
+                      i < 3
+                        ? {
+                            background: "color-mix(in oklab, var(--state-warning) 16%, transparent)",
+                            color: "#A35A00",
+                          }
+                        : { background: "var(--bg-surface-subtle)", color: "var(--text-tertiary)" }
+                    }
                   >
-                    ￥{r.perHead} /头
-                  </td>
-                  <td className="py-3 text-right tabular-nums">
-                    <span
-                      className="inline-flex items-center gap-1"
-                      style={{
-                        color: risky
-                          ? "var(--state-danger)"
-                          : r.pp30 >= 3
-                          ? "var(--state-warning)"
-                          : "var(--state-success)",
-                      }}
-                    >
-                      {r.pp30}%
-                      {risky && <AlertTriangle className="h-3.5 w-3.5" />}
-                    </span>
-                  </td>
-                  <td className="py-3 text-right tabular-nums text-foreground">{r.pp60}%</td>
-                  <td className="py-3 text-right tabular-nums text-foreground">{r.pp90}%</td>
-                  <td className="py-3 text-right tabular-nums text-foreground">{r.pretermRate}%</td>
-                </tr>
-              );
-            })}
+                    {i + 1}
+                  </span>
+                </td>
+                <td className="py-3">
+                  <div className="text-foreground">{r.key}</div>
+                  <div className="text-caption text-text-tertiary">{r.sub}</div>
+                </td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.death} 头</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.cull} 头</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.sick}%</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.cure}%</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.treatmentDays} 天</td>
+                <td className="py-3 text-right tabular-nums text-foreground">￥{wan(r.drugFee)}</td>
+                <td className="py-3 text-right tabular-nums text-foreground">￥{r.perHead} /头</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.pp30}%</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.pp60}%</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.pp90}%</td>
+                <td className="py-3 text-right tabular-nums text-foreground">{r.pretermRate}%</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
