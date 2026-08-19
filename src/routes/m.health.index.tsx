@@ -504,6 +504,75 @@ function TaskListPage() {
             );
           })}
       </div>
+
+      <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+        <SheetContent side="bottom" className="m-scope rounded-t-2xl max-h-[80dvh] overflow-y-auto p-0">
+          <SheetHeader className="px-4 pt-4 pb-2">
+            <SheetTitle className="text-card-title">筛选</SheetTitle>
+          </SheetHeader>
+          <div className="px-4 pb-4 space-y-5">
+            <div>
+              <div className="text-body-sm text-text-secondary mb-2">工单类型</div>
+              <div className="flex flex-wrap gap-2">
+                {typeOptions.map((t) => {
+                  const on = selTypes.has(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setSelTypes((s) => toggleIn(s, t))}
+                      className={`h-8 px-3 rounded-full text-body-sm border ${
+                        on ? "border-primary bg-brand-subtle text-primary" : "border-border bg-card text-text-secondary"
+                      }`}
+                    >
+                      {t} {typeCount(t)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div>
+              <div className="text-body-sm text-text-secondary mb-2">所属牛舍</div>
+              <div className="flex flex-wrap gap-2">
+                {barnOptions.map((b) => {
+                  const on = selBarns.has(b);
+                  return (
+                    <button
+                      key={b}
+                      type="button"
+                      onClick={() => setSelBarns((s) => toggleIn(s, b))}
+                      className={`h-8 px-3 rounded-full text-body-sm border ${
+                        on ? "border-primary bg-brand-subtle text-primary" : "border-border bg-card text-text-secondary"
+                      }`}
+                    >
+                      {b} {barnCount(b)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="flex gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelTypes(new Set());
+                  setSelBarns(new Set());
+                }}
+                className="flex-1 h-11 rounded-lg border border-border bg-card text-body text-text-secondary"
+              >
+                重置
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterOpen(false)}
+                className="flex-1 h-11 rounded-lg bg-primary text-primary-foreground text-body"
+              >
+                确定
+              </button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </MobileShell>
   );
 }
