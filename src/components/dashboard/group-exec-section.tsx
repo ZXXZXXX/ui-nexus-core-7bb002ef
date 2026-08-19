@@ -468,44 +468,17 @@ function PanoramaSection() {
                     <div className="text-foreground">{r.key}</div>
                     <div className="text-caption text-text-tertiary">{r.sub}</div>
                   </td>
-                  <td className="py-3 text-right tabular-nums text-text-secondary">
-                    {r.herd.toLocaleString()} 头
-                  </td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.death} 头</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.cull} 头</td>
+                  <td className="py-3 text-right tabular-nums text-text-secondary">{r.sick}%</td>
                   <td className="py-3 text-right tabular-nums">
-                    <div className="text-foreground">{r.death + r.cull} 头</div>
-                    <div className="text-caption text-text-tertiary">
-                      ({r.death} / {r.cull})
-                    </div>
-                  </td>
-                  <td className="py-3 text-right tabular-nums">
-                    <span
-                      className="inline-flex items-center gap-1"
-                      style={{
-                        color: risky
-                          ? "var(--state-danger)"
-                          : r.pp30 >= 3
-                          ? "var(--state-warning)"
-                          : "var(--state-success)",
-                      }}
-                    >
-                      {r.pp30}%
-                      {risky && <AlertTriangle className="h-3.5 w-3.5" />}
-                    </span>
-                  </td>
-                  <td className="py-3 text-right tabular-nums text-text-secondary">
-                    {r.sick}% /{" "}
                     <span style={{ color: r.cure >= 90 ? "var(--state-success)" : "var(--state-danger)" }}>
                       {r.cure}%
                     </span>
                   </td>
-                  <td
-                    className="py-3 text-right tabular-nums"
-                    style={{ color: r.perHead >= 48 ? "var(--state-danger)" : r.perHead >= 40 ? "var(--state-warning)" : "var(--foreground)" }}
-                  >
-                    ￥{r.perHead} /头
-                  </td>
+                  <td className="py-3 text-right tabular-nums text-text-secondary">{r.treatmentDays} 天</td>
                   <td className="py-3 text-right tabular-nums">
-                    <span className="text-foreground">￥{wan(r.drugFee)}</span>{" "}
+                    <span className="text-foreground">￥{wan(r.drugFee)}</span>
                     <span
                       className="ml-1 inline-flex items-center h-[20px] px-1.5 rounded-md text-caption"
                       style={{
@@ -524,17 +497,30 @@ function PanoramaSection() {
                       {r.budgetDelta > 0 ? `+${r.budgetDelta}% 超支` : r.budgetDelta < 0 ? `${r.budgetDelta}% 节约` : "持平预算"}
                     </span>
                   </td>
-                  <td className="py-3 text-right">
+                  <td
+                    className="py-3 text-right tabular-nums"
+                    style={{ color: r.perHead >= 48 ? "var(--state-danger)" : r.perHead >= 40 ? "var(--state-warning)" : "var(--foreground)" }}
+                  >
+                    ￥{r.perHead} /头
+                  </td>
+                  <td className="py-3 text-right tabular-nums">
                     <span
-                      className="inline-flex items-center h-[22px] px-2 rounded-md text-caption"
+                      className="inline-flex items-center gap-1"
                       style={{
-                        background: `color-mix(in oklab, ${g.tone} 12%, transparent)`,
-                        color: g.tone,
+                        color: risky
+                          ? "var(--state-danger)"
+                          : r.pp30 >= 3
+                          ? "var(--state-warning)"
+                          : "var(--state-success)",
                       }}
                     >
-                      {g.label}
+                      {r.pp30}%
+                      {risky && <AlertTriangle className="h-3.5 w-3.5" />}
                     </span>
                   </td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.pp60}%</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.pp90}%</td>
+                  <td className="py-3 text-right tabular-nums text-foreground">{r.pretermRate}%</td>
                 </tr>
               );
             })}
