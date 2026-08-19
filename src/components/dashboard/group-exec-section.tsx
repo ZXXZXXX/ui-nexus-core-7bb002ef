@@ -174,7 +174,7 @@ function PostpartumRankSection() {
     const list = region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
       : [...regionRows];
-    return list.sort((a, b) => b.pp90 - a.pp90);
+    return list.sort((a, b) => b.pp90n - a.pp90n);
   }, [region]);
 
   return (
