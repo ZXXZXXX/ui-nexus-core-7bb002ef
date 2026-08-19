@@ -84,7 +84,6 @@ const REGIONS = Array.from(new Set(GROUP_FARMS.map((f) => f.region)));
 const regionRows = REGIONS.map((rg) =>
   agg(rg, `${GROUP_FARMS.filter((f) => f.region === rg).length} 个牧场`, GROUP_FARMS.filter((f) => f.region === rg)),
 );
-const farmRows = GROUP_FARMS.map((f) => agg(`${f.region} · ${f.farm}`, f.base, [f]));
 
 const wan = (n: number) => `${(n / 10000).toFixed(1)} 万`;
 
