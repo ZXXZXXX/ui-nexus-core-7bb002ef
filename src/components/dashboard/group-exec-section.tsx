@@ -124,41 +124,42 @@ function StackedBars({
   return (
     <div className="space-y-3">
       {rows.map((r) => {
-        const segs = [
-          { label: "0-30 天", color: BUCKETS[0].color, rate: r.pp30, cnt: r.pp30n, inc: r.pp30n },
-          { label: "0-60 天", color: BUCKETS[1].color, rate: r.pp60, cnt: r.pp60n, inc: Math.max(r.pp60n - r.pp30n, 0) },
-          { label: "0-90 天", color: BUCKETS[2].color, rate: r.pp90, cnt: r.pp90n, inc: Math.max(r.pp90n - r.pp60n, 0) },
+        const layers = [
+          { label: "0-90 天", color: BUCKETS[2].color, rate: r.pp90, cnt: r.pp90n },
+          { label: "0-60 天", color: BUCKETS[1].color, rate: r.pp60, cnt: r.pp60n },
+          { label: "0-30 天", color: BUCKETS[0].color, rate: r.pp30, cnt: r.pp30n },
         ];
         return (
           <button
             key={r.key}
             type="button"
             onClick={() => onPick?.(r)}
-            className={`w-full grid grid-cols-[minmax(80px,120px)_1fr_auto] items-center gap-1 rounded-lg px-2 py-1.5 transition-colors text-left ${
+            className={`w-full flex items-center gap-1 rounded-lg px-2 py-1.5 transition-colors text-left ${
               onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
             }`}
           >
-            <div className="min-w-0">
+            <div className="w-[90px] shrink-0">
               <div className="text-body-sm text-foreground truncate">{r.key}</div>
               <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
             </div>
-            <div className="min-w-0">
-              <div className="flex h-3 w-full rounded-sm overflow-hidden">
-                {segs.map((s) => (
+            <div className="flex-1 min-w-0">
+              <div className="relative h-4 w-full rounded-md overflow-hidden">
+                {layers.map((s) => (
                   <div
                     key={s.label}
                     title={`${s.label} ${s.cnt} 头，淘汰率 ${s.rate}%`}
-                    style={{ width: `${(s.inc / max) * 100}%`, background: s.color }}
+                    className="absolute top-0 left-0 h-full rounded-md"
+                    style={{ width: `${(s.cnt / max) * 100}%`, background: s.color }}
                   />
                 ))}
               </div>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-caption text-text-tertiary tabular-nums">
-                <span>0-30 {r.pp30n} 头 ({r.pp30}%)</span>
-                <span>0-60 {r.pp60n} 头 ({r.pp60}%)</span>
-                <span>0-90 {r.pp90n} 头 ({r.pp90}%)</span>
+              <div className="mt-1 w-full flex flex-nowrap items-center gap-2 text-caption text-text-tertiary tabular-nums">
+                <span className="whitespace-nowrap">0-30 {r.pp30n} 头 ({r.pp30}%)</span>
+                <span className="whitespace-nowrap">0-60 {r.pp60n} 头 ({r.pp60}%)</span>
+                <span className="whitespace-nowrap">0-90 {r.pp90n} 头 ({r.pp90}%)</span>
               </div>
             </div>
-            <span className="text-body-sm tabular-nums text-foreground whitespace-nowrap">{r.pp90n} 头</span>
+            <span className="ml-2 text-body-sm tabular-nums text-foreground whitespace-nowrap">{r.pp90n} 头</span>
           </button>
         );
       })}
