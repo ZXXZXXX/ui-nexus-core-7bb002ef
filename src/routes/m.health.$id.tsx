@@ -469,8 +469,10 @@ function TaskDetailPage() {
                     ? "观察期内未发起复诊上报，请助理已治愈并关闭工单。"
                     : "观察期内若发现异常，可通过健康上报发起复诊。"}
                 </div>
-              </div>
             </div>
+          </div>
+        )}
+
         {o.status === "已终止" && (
           <div className="mt-2 rounded-lg bg-[#FFF1F0] border border-[#FFCCC7] p-3 space-y-1.5">
             <div className="flex items-center justify-between">
