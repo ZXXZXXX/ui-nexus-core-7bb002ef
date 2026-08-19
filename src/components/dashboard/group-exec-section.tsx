@@ -393,7 +393,7 @@ function PanoramaSection() {
   return (
     <SectionCard
       id="topic-panorama"
-      title="区域 / 牧场关键指标排行"
+      title="关键指标排行"
       desc={region ? `${region} · 牧场排名` : "区域排名"}
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
