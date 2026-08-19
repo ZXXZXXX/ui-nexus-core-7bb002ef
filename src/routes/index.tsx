@@ -383,8 +383,8 @@ function HomePage() {
                 {scope === "group" ? (
                   [
                     { key: "牧场总数", count: farmCountSummary.total, icon: Building2, tone: "--brand" },
-                    { key: "普通牧场", count: farmCountSummary.ordinary, icon: Building2, tone: "--state-info" },
-                    { key: "有机牧场", count: farmCountSummary.organic, icon: Leaf, tone: "--state-alert" },
+                    { key: "普通牧场", count: farmCountSummary.ordinary, icon: Building2, tone: "--state-alert" },
+                    { key: "有机牧场", count: farmCountSummary.organic, icon: Leaf, tone: "--state-info" },
                   ].map((a) => {
                     const Icon = a.icon;
                     return (
