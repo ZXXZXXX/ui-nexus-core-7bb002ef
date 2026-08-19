@@ -134,7 +134,7 @@ function StackedBars({
             key={r.key}
             type="button"
             onClick={() => onPick?.(r)}
-            className={`w-full grid grid-cols-[minmax(96px,140px)_minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-2 py-2 transition-colors text-left ${
+            className={`w-full grid grid-cols-[minmax(80px,120px)_1fr_auto] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors text-left ${
               onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
             }`}
           >
@@ -143,7 +143,7 @@ function StackedBars({
               <div className="text-caption text-text-tertiary truncate">{r.sub}</div>
             </div>
             <div className="min-w-0">
-              <div className="flex h-4 w-full rounded-full bg-surface-subtle overflow-hidden">
+              <div className="flex h-3 w-full rounded-sm overflow-hidden">
                 {segs.map((s) => (
                   <div
                     key={s.label}
@@ -152,14 +152,13 @@ function StackedBars({
                   />
                 ))}
               </div>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-caption text-text-tertiary tabular-nums">
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-caption text-text-tertiary tabular-nums">
                 <span>0-30 {r.pp30n} 头 ({r.pp30}%)</span>
                 <span>0-60 {r.pp60n} 头 ({r.pp60}%)</span>
                 <span>0-90 {r.pp90n} 头 ({r.pp90}%)</span>
               </div>
             </div>
-            <span className="text-body-sm tabular-nums text-foreground">{r.pp90n} 头</span>
-
+            <span className="text-body-sm tabular-nums text-foreground whitespace-nowrap">{r.pp90n} 头</span>
           </button>
         );
       })}
