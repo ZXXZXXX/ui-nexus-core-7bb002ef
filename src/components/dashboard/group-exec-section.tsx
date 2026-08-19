@@ -243,25 +243,23 @@ function PostpartumRankSection() {
       }
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <div className="flex items-center gap-3">
-          <span className="text-caption text-text-secondary">
-            {region ? `${region} · 牧场排名` : "区域排名"}
-          </span>
-          <div className="hidden md:flex items-center gap-3">
-            {BUCKETS.map((b) => (
-              <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
-                <span className="h-2.5 w-2.5 rounded-sm" style={{ background: b.color }} />
-                {b.label}
-              </span>
-            ))}
-          </div>
-        </div>
+        <span className="text-caption text-text-secondary">
+          {region ? `${region} · 牧场排名` : "区域排名"}
+        </span>
       }
     >
       <p className="text-body-sm text-text-secondary mb-4">
         {region ? "该区域下各牧场产后淘汰率对比" : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
       <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
+        {BUCKETS.map((b) => (
+          <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+            <span className="h-2.5 w-2.5 rounded-sm" style={{ background: b.color }} />
+            {b.label}
+          </span>
+        ))}
+      </div>
     </SectionCard>
   );
 }
@@ -376,24 +374,24 @@ function DrugTrendSection() {
       desc={period}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
-            <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
-            总药费支出
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
-            <span className="h-0.5 w-4 rounded-full" style={{ background: "var(--effect-ai-purple)" }} />
-            单头药费
-          </span>
-          <PeriodTabs
-            value={period}
-            onChange={setPeriod}
-            options={["近 6 个月", "近 1 年"]}
-          />
-        </div>
+        <PeriodTabs
+          value={period}
+          onChange={setPeriod}
+          options={["近 6 个月", "近 1 年"]}
+        />
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} />
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
+        <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
+          总药费支出
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+          <span className="h-0.5 w-4 rounded-full" style={{ background: "var(--effect-ai-purple)" }} />
+          单头药费
+        </span>
+      </div>
     </SectionCard>
   );
 }
