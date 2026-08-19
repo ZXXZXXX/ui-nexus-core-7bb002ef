@@ -423,15 +423,19 @@ function PanoramaSection() {
         <table className="w-full min-w-[1040px] text-body-sm">
           <thead>
             <tr className="text-caption text-text-tertiary">
-              <th className="text-left font-normal py-2 w-12">排名</th>
+              <th className="text-left font-normal py-2 w-12">序号</th>
               <th className="text-left font-normal py-2">{region ? "牧场名称" : "区域名称"}</th>
-              <th className="text-right font-normal py-2">存栏数</th>
-              <th className="text-right font-normal py-2">死淘总数 (死亡/淘汰)</th>
-              <th className="text-right font-normal py-2">产后0-30d淘汰率</th>
-              <th className="text-right font-normal py-2">发病率 / 治愈率</th>
-              <th className="text-right font-normal py-2">单头牛药费</th>
-              <th className="text-right font-normal py-2">药费总支出 (预算偏差)</th>
-              <th className="text-right font-normal py-2">综合评级</th>
+              <th className="text-right font-normal py-2">死亡数</th>
+              <th className="text-right font-normal py-2">淘汰数</th>
+              <th className="text-right font-normal py-2">发病率</th>
+              <th className="text-right font-normal py-2">治愈率</th>
+              <th className="text-right font-normal py-2">平均诊疗天数</th>
+              <th className="text-right font-normal py-2">总药费</th>
+              <th className="text-right font-normal py-2">头均药费</th>
+              <th className="text-right font-normal py-2">产后0～30天淘汰率</th>
+              <th className="text-right font-normal py-2">0～60天淘汰率</th>
+              <th className="text-right font-normal py-2">0～90天淘汰率</th>
+              <th className="text-right font-normal py-2">早产率</th>
             </tr>
           </thead>
           <tbody>
