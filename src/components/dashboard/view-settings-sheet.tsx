@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Settings2, Check, RotateCcw, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
+import { Settings2, RotateCcw, ChevronUp, ChevronDown, GripVertical } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -12,7 +12,6 @@ import { Switch } from "@/components/ui/switch";
 import {
   scopeOptions,
   topicMeta,
-  setScope,
   setTopicVisible,
   moveTopic,
   resetScopeConfig,
@@ -24,7 +23,7 @@ import {
 export function ViewSettingsSheet() {
   const { scope, config, order } = useDashboardView();
   const [open, setOpen] = useState(false);
-  const [editScope, setEditScope] = useState<ReportScope>(scope);
+  const editScope = scope;
 
   const current = config[editScope];
   const visibleCount = topicMeta.filter((t) => current[t.key]).length;
@@ -38,7 +37,6 @@ export function ViewSettingsSheet() {
       open={open}
       onOpenChange={(o) => {
         setOpen(o);
-        if (o) setEditScope(scope);
       }}
     >
       <SheetTrigger asChild>
@@ -55,7 +53,7 @@ export function ViewSettingsSheet() {
         <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
           <SheetTitle className="text-section-title">看板视角设置</SheetTitle>
           <SheetDescription className="text-caption">
-            选择当前视角，并配置该视角下各类专题的显隐
+            配置当前视角下各类专题的显隐与排序
           </SheetDescription>
         </SheetHeader>
 
