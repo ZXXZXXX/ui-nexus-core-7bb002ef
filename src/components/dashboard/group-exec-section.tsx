@@ -134,7 +134,7 @@ function StackedBars({
             key={r.key}
             type="button"
             onClick={() => onPick?.(r)}
-            className={`w-full grid grid-cols-[minmax(80px,120px)_1fr_auto] items-center gap-2 rounded-lg px-2 py-1.5 transition-colors text-left ${
+            className={`w-full grid grid-cols-[minmax(80px,120px)_1fr_auto] items-center gap-1 rounded-lg px-2 py-1.5 transition-colors text-left ${
               onPick ? "hover:bg-surface-subtle cursor-pointer" : "cursor-default"
             }`}
           >
