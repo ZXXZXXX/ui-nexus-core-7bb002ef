@@ -229,10 +229,24 @@ function PostpartumRankSection() {
     <SectionCard
       id="topic-pp-rank"
       title="产后淘汰率排名"
-      desc={region ? `${region} · 牧场排名` : "区域排名"}
+      desc={
+        region ? (
+          <button
+            type="button"
+            onClick={() => setRegion(null)}
+            className="inline-flex items-center gap-1 text-caption text-primary hover:underline"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+            返回区域
+          </button>
+        ) : undefined
+      }
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
+          <span className="text-caption text-text-secondary">
+            {region ? `${region} · 牧场排名` : "区域排名"}
+          </span>
           <div className="hidden md:flex items-center gap-3">
             {BUCKETS.map((b) => (
               <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
@@ -241,16 +255,6 @@ function PostpartumRankSection() {
               </span>
             ))}
           </div>
-          {region && (
-            <button
-              type="button"
-              onClick={() => setRegion(null)}
-              className="inline-flex items-center gap-1 text-caption text-primary hover:underline"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-              返回区域
-            </button>
-          )}
         </div>
       }
     >

@@ -25,7 +25,7 @@ export function SectionCard({
   extra?: ReactNode;
   children: ReactNode;
   id?: string;
-  desc?: string;
+  desc?: ReactNode;
 }) {
   return (
     <Card id={id} className="border-border bg-card scroll-mt-24 flex flex-col">
@@ -33,7 +33,7 @@ export function SectionCard({
         <div className="flex min-w-0 items-center gap-2">
           {icon}
           <h3 className="truncate text-card-title text-foreground">{title}</h3>
-          {desc && <span className="tag tag-muted shrink-0">{desc}</span>}
+          {desc && typeof desc === "string" ? <span className="tag tag-muted shrink-0">{desc}</span> : desc}
         </div>
         {extra}
       </div>
