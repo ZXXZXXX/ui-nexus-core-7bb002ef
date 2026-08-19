@@ -199,7 +199,7 @@ function PostpartumRankSection() {
       <p className="text-body-sm text-text-secondary mb-4">
         {region ? "该区域下各牧场产后淘汰率对比" : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
-      <VerticalBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
     </SectionCard>
   );
 }
