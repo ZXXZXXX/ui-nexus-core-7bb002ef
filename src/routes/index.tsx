@@ -520,10 +520,11 @@ function HomePage() {
               "var(--brand)",
               "var(--effect-ai-cyan)",
               "var(--state-danger)",
-              "var(--state-warning)",
               "var(--effect-ai-purple)",
+              "var(--state-info)",
               "var(--brand)",
             ];
+
             const tone = tones[i % tones.length];
             const isUp = k.trend === "up";
             const isDown = k.trend === "down";
