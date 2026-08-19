@@ -35,6 +35,7 @@ import { TagPicker } from "@/components/m/tag-picker";
 import { DiseasePicker } from "@/components/disease-picker";
 import { Switch } from "@/components/ui/switch";
 import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
+import { CowProfileCard } from "@/components/m/cow-profile-card";
 
 
 
