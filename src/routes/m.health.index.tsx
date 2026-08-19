@@ -12,8 +12,12 @@ import {
   Footprints,
   Home,
   PackageCheck,
+  Filter,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { EmptyState } from "@/components/empty-state";
 import { useRole, canVisit, canDiagnose, canExecute } from "@/lib/mobile-role";
 
@@ -203,7 +207,17 @@ function TaskListPage() {
         : "全部";
   const [tab, setTab] = useState<(typeof tabs)[number]["key"]>(initialTab);
   const [q, setQ] = useState("");
+  const [selTypes, setSelTypes] = useState<Set<string>>(new Set());
+  const [selBarns, setSelBarns] = useState<Set<string>>(new Set());
+  const [filterOpen, setFilterOpen] = useState(false);
+  const toggleIn = (set: Set<string>, v: string) => {
+    const next = new Set(set);
+    if (next.has(v)) next.delete(v);
+    else next.add(v);
+    return next;
+  };
   const typeFilter = search.type;
+
 
   // 列表仅展示工单卡片：排除领取（取物）和损耗（物资）
   let list: Task[] = tasks.filter((t) => t.kind !== "损耗");
@@ -219,8 +233,25 @@ function TaskListPage() {
   if (typeFilter) {
     list = list.filter((o) => o.type === typeFilter || (typeFilter === "疫苗免疫" && o.type === "免疫"));
   }
+
+  // 可筛选项（基于当前角色可见范围）
+  const typeOptions = Array.from(new Set(list.map((o) => o.type))).sort((a, b) => a.localeCompare(b, "zh"));
+  const barnOptions = Array.from(new Set(list.map((o) => o.barn))).sort((a, b) => a.localeCompare(b, "zh"));
+  const typeCount = (t: string) => list.filter((o) => o.type === t).length;
+  const barnCount = (b: string) => list.filter((o) => o.barn === b).length;
+
+  if (selTypes.size > 0) list = list.filter((o) => selTypes.has(o.type));
+  if (selBarns.size > 0) list = list.filter((o) => selBarns.has(o.barn));
+
+  const filterCount = selTypes.size + selBarns.size;
+  const filterSummary =
+    filterCount === 0
+      ? "筛选"
+      : [...Array.from(selTypes), ...Array.from(selBarns)].join(" / ");
+
   if (tab === "执行中") list = list.filter((o) => o.status === "进行中");
   else if (tab !== "全部") list = list.filter((o) => o.status === tab);
+
 
   const kw = q.trim().toLowerCase();
   if (kw) {
@@ -250,6 +281,104 @@ function TaskListPage() {
           />
         </div>
       </div>
+
+      {/* 筛选：工单类型 / 牛舍 */}
+      <div className="px-4 mt-3">
+        <button
+          type="button"
+          onClick={() => setFilterOpen(true)}
+          className={`h-9 px-3 inline-flex items-center gap-1.5 rounded-full border text-body-sm ${
+            filterCount > 0
+              ? "border-primary bg-brand-subtle text-primary"
+              : "border-border bg-card text-text-secondary"
+          }`}
+        >
+          <Filter className="h-4 w-4 shrink-0" />
+          <span className="truncate max-w-[14rem]">{filterSummary}</span>
+          {filterCount > 0 && (
+            <span className="text-caption tabular-nums text-primary/70">{filterCount}</span>
+          )}
+          <ChevronDown className="h-4 w-4 shrink-0 opacity-60" />
+        </button>
+      </div>
+
+      <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+        <SheetContent side="bottom" hideClose className="rounded-t-2xl p-0 max-h-[85vh] flex flex-col">
+          <SheetHeader className="px-4 pt-4 pb-2 flex flex-row items-center justify-between space-y-0">
+            <SheetTitle className="text-section">筛选条件</SheetTitle>
+            <button
+              type="button"
+              onClick={() => {
+                setSelTypes(new Set());
+                setSelBarns(new Set());
+              }}
+              className="text-body-sm text-text-secondary"
+            >
+              重置
+            </button>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-4">
+            <section>
+              <div className="text-body-sm text-text-secondary mb-2">工单类型</div>
+              <div className="flex flex-wrap gap-2">
+                {typeOptions.map((t) => {
+                  const sel = selTypes.has(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setSelTypes((s) => toggleIn(s, t))}
+                      className={`h-9 px-3 rounded-full border text-body-sm ${
+                        sel ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-text-secondary"
+                      }`}
+                    >
+                      {t}
+                      <span className="ml-1 text-caption tabular-nums opacity-70">{typeCount(t)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+            <section>
+              <div className="text-body-sm text-text-secondary mb-2">所属牛舍</div>
+              <div className="space-y-2">
+                {barnOptions.map((b) => {
+                  const sel = selBarns.has(b);
+                  return (
+                    <button
+                      key={b}
+                      type="button"
+                      onClick={() => setSelBarns((s) => toggleIn(s, b))}
+                      className={`w-full min-h-10 px-3 py-2.5 flex items-center gap-3 rounded-xl border transition-colors ${
+                        sel ? "border-primary bg-primary/5" : "border-border bg-card"
+                      }`}
+                    >
+                      <span className="flex-1 text-left text-body text-foreground">{b}</span>
+                      <span className="text-body-sm tabular-nums text-text-tertiary">{barnCount(b)} 个工单</span>
+                      <span
+                        className={`h-5 w-5 rounded-md flex items-center justify-center border ${
+                          sel ? "bg-primary border-primary" : "border-border bg-card"
+                        }`}
+                      >
+                        {sel && <Check className="h-3.5 w-3.5 text-primary-foreground" strokeWidth={3} />}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          </div>
+          <div className="px-4 py-3 border-t border-border">
+            <button
+              type="button"
+              onClick={() => setFilterOpen(false)}
+              className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-body font-medium"
+            >
+              确定
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
 
       {/* 状态 Tabs */}
