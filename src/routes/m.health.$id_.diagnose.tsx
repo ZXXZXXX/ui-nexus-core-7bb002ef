@@ -950,6 +950,14 @@ function DiagnosePage() {
           </div>
         </div>
 
+        {/* 牛只基础信息卡片 */}
+        <div className="px-4 pt-3">
+          <CowProfileCard
+            cowId={earTagLabel.replace(/^#/, "")}
+            barn={isPostpartum ? "产房 1 号" : isDrying ? "干奶牛舍" : "病牛舍"}
+          />
+        </div>
+
         {/* 顶部提示 */}
         <div className="px-4 pt-2 pb-1">
           <div className="flex items-center gap-1.5 text-caption text-primary">
