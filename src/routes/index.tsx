@@ -562,11 +562,13 @@ function HomePage() {
                   <ExecFocusSection
                     level={scope === "group" ? "group" : scope === "region" ? "region" : "farm"}
                   />
+                  {scope === "group" && <GroupExecSection />}
                   {scope !== "farm-out" && (
                     <OpsSection level={scope === "group" ? "group" : "region"} />
                   )}
                 </div>
               );
+
 
             return (
               <div
