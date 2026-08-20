@@ -327,15 +327,13 @@ function HomePage() {
     isExec
       ? (() => {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
-          const order = [
-            scope === "group" ? groupLeadCard : scope === "region" ? regionLeadCard : farmOutLeadCard,
-            map.get("治愈率"),
-            map.get("早产率"),
-            map.get("死淘总数"),
-            scope === "farm-out" ? undefined : map.get("总药费支出"),
-            scope === "farm-out" ? undefined : scope === "group" ? groupTailCard : regionTailCard,
-          ].filter(Boolean) as MetricCard[];
-          return order;
+          const execOrder =
+            scope === "group"
+              ? [groupLeadCard, map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), map.get("总药费支出"), groupTailCard]
+              : scope === "region"
+                ? [regionLeadCard, map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), map.get("总药费支出"), regionTailCard]
+                : [map.get("总存栏数"), farmOutCalvingCard, farmOutLeadCard, map.get("治愈率"), map.get("早产率"), map.get("死淘总数")];
+          return execOrder.filter(Boolean) as MetricCard[];
         })()
       : baseCards;
 
