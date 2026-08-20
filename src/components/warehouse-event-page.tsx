@@ -391,55 +391,65 @@ export function WarehouseEventPage<S extends string>({
             </div>
           </div>
 
-          {advOpen && (
-            <div className="px-6 pb-4 space-y-4">
-              <div>
-                <div className="text-caption text-text-tertiary mb-2">显示列（筛选仅作用于展示中的列）</div>
-                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                  {ALL_COLS.map((c) => (
-                    <label
-                      key={c.key}
-                      className={`flex items-center gap-2 text-body-sm ${
-                        c.locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-                      }`}
-                    >
-                      <Checkbox
-                        checked={visible[c.key]}
-                        disabled={c.locked}
-                        onCheckedChange={(v) => setVisible((m) => ({ ...m, [c.key]: !!v }))}
-                      />
-                      <span>{c.label}</span>
-                    </label>
-                  ))}
+          <Sheet open={advOpen} onOpenChange={setAdvOpen}>
+            <SheetContent side="right" className="w-[380px] sm:max-w-[380px] flex flex-col p-0">
+              <SheetHeader className="px-5 py-4 border-b border-border">
+                <SheetTitle className="text-section">筛选与列设置</SheetTitle>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+                <div>
+                  <div className="text-caption text-text-tertiary mb-2">显示列（筛选仅作用于展示中的列）</div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                    {ALL_COLS.map((c) => (
+                      <label
+                        key={c.key}
+                        className={`flex items-center gap-2 text-body-sm ${
+                          c.locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                        }`}
+                      >
+                        <Checkbox
+                          checked={visible[c.key]}
+                          disabled={c.locked}
+                          onCheckedChange={(v) => setVisible((m) => ({ ...m, [c.key]: !!v }))}
+                        />
+                        <span>{c.label}</span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 border-t border-border pt-4">
-                <div>
-                  <div className="text-caption text-text-tertiary mb-1.5">操作人</div>
-                  <Select value={advOperator} onValueChange={setAdvOperator}>
-                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">全部</SelectItem>
-                      {operators.map((p) => (
-                        <SelectItem key={p} value={p}>{p}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <div className="text-caption text-text-tertiary mb-1.5">排序方向</div>
-                  <Select value={sortDir} onValueChange={(v) => setSortDir(v as "asc" | "desc")}>
-                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="desc">操作时间倒序（新 → 旧）</SelectItem>
-                      <SelectItem value="asc">操作时间正序（旧 → 新）</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-3 border-t border-border pt-4">
+                  <div>
+                    <div className="text-caption text-text-tertiary mb-1.5">操作人</div>
+                    <Select value={advOperator} onValueChange={setAdvOperator}>
+                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部</SelectItem>
+                        {operators.map((p) => (
+                          <SelectItem key={p} value={p}>{p}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <div className="text-caption text-text-tertiary mb-1.5">排序方向</div>
+                    <Select value={sortDir} onValueChange={(v) => setSortDir(v as "asc" | "desc")}>
+                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="desc">操作时间倒序（新 → 旧）</SelectItem>
+                        <SelectItem value="asc">操作时间正序（旧 → 新）</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+              <SheetFooter className="px-5 py-4 border-t border-border flex-row gap-2">
+                <Button variant="outline" className="flex-1" onClick={() => setAdvOperator("all")}>重置</Button>
+                <Button className="flex-1" onClick={() => setAdvOpen(false)}>完成</Button>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+
 
 
           <div className="overflow-x-auto border-t border-border">
