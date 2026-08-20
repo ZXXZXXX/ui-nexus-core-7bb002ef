@@ -141,6 +141,10 @@ const regionLeadCard: MetricCard = {
   topic: "发病率", label: "（本月）区域发病率", value: String(rm.sick), unit: "%", trend: "down", delta: "-0.2 pp",
   icon: Stethoscope, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "spark",
 };
+const regionDrugCard: MetricCard = {
+  topic: "头均药费", label: "（本月）区域头均用药费用", value: "38.2", unit: "元/头", trend: "up", delta: "+2.4 %",
+  icon: Pill, anchor: "topic-panorama", good: false, tone: "var(--effect-ai-purple)", visual: "spark",
+};
 const regionTailCard: MetricCard = {
   topic: "工单完成率", label: "（本月）工单完成率", value: "92.6", unit: "%", trend: "up", delta: "+1.8 pp",
   icon: ClipboardList, anchor: "topic-vet-order", good: true, tone: "var(--effect-ai-purple)", visual: "ring",
