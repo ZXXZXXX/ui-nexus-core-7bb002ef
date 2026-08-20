@@ -1,17 +1,3 @@
-function downloadCsv(rows: Row[], cols: ResultCol[], filename: string) {
-  const header = cols.map((c) => c.label);
-  const body = rows.map((r) => cols.map((c) => c.value(r).replace(/"/g, '""')));
-  const csv = [header, ...body]
-    .map((row) => row.map((c) => `"${c}"`).join(","))
-    .join("\n");
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -2069,26 +2055,9 @@ function filterRows(rows: Row[], f: Filters): Row[] {
   });
 }
 
-function downloadCsv(rows: Row[], filename: string) {
-  const header = ["工单编号", "类型", "耳号", "牧场", "牛舍", "状态", "操作人员", "疾病", "病种类别", "处方", "药品", "给药方式", "产犊方式", "犊牛结局", "创建时间", "说明"];
-  const body = rows.map((r) => [
-    r.id,
-    WO_TYPE_LABEL[r.type],
-    r.earTag,
-    r.farm,
-    r.barn,
-    STATUS_TAG[r.status]?.label || r.status,
-    r.operator,
-    r.disease,
-    r.diseaseCat,
-    r.prescription,
-    r.drug,
-    r.drugRoute,
-    r.calvingType,
-    r.calfOutcome,
-    r.createdAt,
-    r.detail.replace(/"/g, '""'),
-  ]);
+function downloadCsv(rows: Row[], cols: ResultCol[], filename: string) {
+  const header = cols.map((c) => c.label);
+  const body = rows.map((r) => cols.map((c) => c.value(r).replace(/"/g, '""')));
   const csv = [header, ...body]
     .map((row) => row.map((c) => `"${c}"`).join(","))
     .join("\n");
