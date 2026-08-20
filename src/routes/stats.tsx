@@ -1087,12 +1087,14 @@ function StatsPage() {
                   </div>
                 )}
 
-                <ChipGroup
-                  label="牛只胎次（可多选）"
-                  options={PARITY_OPTIONS}
-                  selected={filters.parities}
-                  onToggle={(v) => toggleIn("parities", v)}
-                />
+                {!filters.cattleTypes.includes("犊牛") && (
+                  <ChipGroup
+                    label="牛只胎次（可多选）"
+                    options={PARITY_OPTIONS}
+                    selected={filters.parities}
+                    onToggle={(v) => toggleIn("parities", v)}
+                  />
+                )}
 
                 <FieldBlock label="报病次数">
                   <Select value={filters.reportCount} onValueChange={(v) => set("reportCount", v)}>
