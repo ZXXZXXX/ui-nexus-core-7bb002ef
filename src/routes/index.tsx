@@ -318,6 +318,7 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
   const isExec = scope === "group" || scope === "region" || scope === "farm-out";
+  const showAttendance = !isExec || scope === "farm-out";
   const visibleCards =
     isExec
       ? (() => {
