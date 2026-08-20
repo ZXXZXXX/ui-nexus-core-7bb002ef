@@ -138,9 +138,9 @@ const groupTailCard: MetricCard = {
 const rm = regionMetrics(CURRENT_REGION);
 const regionCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-herd": { topic: "总存栏数", label: `（至今日）${CURRENT_REGION}总存栏`, value: String(rm.herd), unit: "头", delta: "+96 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
-  "topic-calving": { topic: "早产率", label: "（本月）区域早产率", value: String(rm.pretermRate), unit: "%", delta: "-0.3 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-calving": { topic: "早产率", label: "（本月）区域早产率", value: String(rm.pretermRate), unit: "%", delta: "-0.3 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: String(rm.deathCull), unit: "头", delta: "-8 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
-  "topic-disease": { topic: "治愈率", label: "（本月）区域治愈率", value: String(rm.cure), unit: "%", delta: "+1.2 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-disease": { topic: "治愈率", label: "（本月）区域治愈率", value: String(rm.cure), unit: "%", delta: "+1.2 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-drug": { topic: "总药费支出", label: "（本月）区域总药费", value: (rm.drugFee / 10000).toFixed(1), unit: "万元", delta: "+2.8 %", trend: "up", good: false, absolute: false, tone: "var(--effect-ai-purple)", visual: "spark" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(rm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
