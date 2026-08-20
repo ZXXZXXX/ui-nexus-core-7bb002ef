@@ -1516,7 +1516,7 @@ function StatsPage() {
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
                   <TableHead>模板名称</TableHead>
-                  <TableHead>分析类别</TableHead>
+                  <TableHead>维度</TableHead>
                   <TableHead className="text-right">筛选条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
                   <TableHead>创建人</TableHead>
