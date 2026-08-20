@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { BarChart3, Layers, Download, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
-import { SectionCard, PeriodTabs } from "./charts";
+import { SectionCard, PeriodTabs, LineTrend } from "./charts";
 import { WorkOrderSection } from "./workorder-section";
+import { HerdSection } from "./herd-section";
 
 /* ---------------- 数据：牧场为最小口径 ---------------- */
 
@@ -306,7 +307,20 @@ function PostpartumRankSection({ scopeRegion, scopeFarm }: { scopeRegion?: strin
             ? "该区域下各牧场产后淘汰率对比"
             : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
-      <StackedBars rows={rows} onPick={region || scopeFarm ? undefined : (r) => setRegion(r.key)} />
+      {scopeFarm ? (
+        <LineTrend
+          labels={rows.map((r) => r.key)}
+          series={[
+            { name: "0-30 天", color: BUCKETS[0]!.color, points: rows.map((r) => r.pp30) },
+            { name: "0-60 天", color: BUCKETS[1]!.color, points: rows.map((r) => r.pp60) },
+            { name: "0-90 天", color: BUCKETS[2]!.color, points: rows.map((r) => r.pp90) },
+          ]}
+          height={240}
+          unit="%"
+        />
+      ) : (
+        <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      )}
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
         {BUCKETS.map((b) => (
           <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
@@ -700,7 +714,10 @@ export function GroupExecSection({
   return (
     <div className="space-y-6">
       {scopeFarm ? (
-        <PostpartumRankSection scopeFarm={scopeFarm} />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch [&>*]:h-full">
+          <PostpartumRankSection scopeFarm={scopeFarm} />
+          <HerdSection />
+        </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
           <PostpartumRankSection scopeRegion={scopeRegion} />
