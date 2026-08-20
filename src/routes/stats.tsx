@@ -1908,11 +1908,15 @@ function ChipGroup({
   options,
   selected,
   onToggle,
+  disabledOptions = [],
+  hint,
 }: {
   label: string;
   options: string[];
   selected: string[];
   onToggle: (v: string) => void;
+  disabledOptions?: string[];
+  hint?: string;
 }) {
   return (
     <div>
@@ -1920,14 +1924,18 @@ function ChipGroup({
       <div className="flex flex-wrap gap-2">
         {options.map((o) => {
           const active = selected.includes(o);
+          const disabled = !active && disabledOptions.includes(o);
           return (
             <button
               key={o}
-              onClick={() => onToggle(o)}
+              disabled={disabled}
+              onClick={() => !disabled && onToggle(o)}
               className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-full text-body-sm border transition-colors ${
                 active
                   ? "border-primary bg-brand-subtle text-primary"
-                  : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
+                  : disabled
+                    ? "border-border bg-surface-muted text-text-tertiary cursor-not-allowed opacity-60"
+                    : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
               }`}
             >
               {o}
@@ -1936,9 +1944,11 @@ function ChipGroup({
           );
         })}
       </div>
+      {hint && <div className="text-caption text-text-tertiary mt-2">{hint}</div>}
     </div>
   );
 }
+
 
 // ============ util ============
 function countActive(f: Filters): number {
