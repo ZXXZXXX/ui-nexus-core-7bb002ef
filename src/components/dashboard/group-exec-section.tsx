@@ -707,7 +707,9 @@ export function GroupExecSection({
           <DrugTrendSection scopeRegion={scopeRegion} />
         </div>
       )}
-      {scopeRegion && !scopeFarm ? <WorkOrderSection /> : null}
+      {scopeRegion && !scopeFarm ? (
+        <WorkOrderSection farms={GROUP_FARMS.filter((f) => f.region === scopeRegion).map((f) => f.farm)} />
+      ) : null}
       <PanoramaSection scopeRegion={scopeRegion} scopeFarm={scopeFarm} />
     </div>
   );
