@@ -337,7 +337,7 @@ function HomePage() {
             scope === "group"
               ? [groupLeadCard, map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), groupTailCard, map.get("总药费支出")]
               : scope === "region"
-                ? [regionLeadCard, map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), regionDrugCard, map.get("总药费支出"), regionTailCard]
+                ? [regionLeadCard, map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), regionTailCard]
                 : [map.get("总存栏数"), farmOutCalvingCard, map.get("早产率"), farmOutLeadCard, map.get("治愈率"), map.get("死淘总数")];
           return execOrder.filter(Boolean) as MetricCard[];
         })()
