@@ -626,80 +626,97 @@ function StatsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {visibleTemplates.map((t) => (
-              <div
-                key={t.id}
-                className="group border border-border rounded-xl bg-white p-5 hover:border-primary/50 hover:shadow-[0_8px_24px_-16px_var(--brand)] transition-all flex flex-col"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-body font-medium text-foreground truncate">{t.name}</div>
-                    <div className="text-caption text-text-tertiary mt-1 line-clamp-2 min-h-[36px]">{t.desc}</div>
-                  </div>
-                  <div className="flex items-center gap-0.5 -mr-1.5 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => toggleFav(t.id)}
-                      className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-surface-subtle"
-                      aria-label="收藏"
-                    >
-                      <Star
-                        className={`h-3.5 w-3.5 ${
-                          t.favorite ? "fill-[var(--state-warning)] text-[var(--state-warning)]" : "text-text-tertiary"
-                        }`}
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeTemplate(t.id)}
-                      className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-surface-subtle"
-                      aria-label="删除模板"
-                    >
-                      <Trash2 className="h-3.5 w-3.5 text-text-tertiary" />
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {tagsFromFilters(t.filters).slice(0, 3).map((label) => (
-                    <Badge
-                      key={label}
-                      variant="secondary"
-                      className="rounded-md bg-surface-subtle text-text-secondary border-transparent font-normal"
-                    >
-                      {label}
-                    </Badge>
-                  ))}
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-text-tertiary">
-                  <span>创建人：{t.creator}</span>
-                  <span>创建时间：{t.createdAt}</span>
-                </div>
-                <div className="mt-4 pt-3 border-t border-border flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    className="h-8 flex-1 bg-primary hover:bg-[var(--brand-hover)]"
-                    onClick={() => runFilter(t.filters, t.name, "templates")}
-                  >
-                    查看结果
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-8" onClick={() => openBuilder(t)}>
-                    <Pencil className="h-3.5 w-3.5 mr-1" />
-                    编辑
-                  </Button>
-                </div>
-              </div>
-            ))}
-            {visibleTemplates.length === 0 && (
-              <div className="col-span-full border border-dashed border-border rounded-xl py-16 text-center">
-                <div className="text-body-sm text-text-tertiary">没有匹配的模板</div>
-                <Button variant="outline" className="mt-3 h-9" onClick={() => openBuilder()}>
-                  <Plus className="h-4 w-4 mr-1" />
-                  新建筛选
-                </Button>
-              </div>
-            )}
-          </div>
+          <Card className="border-border bg-white overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-surface-subtle/60">
+                  <TableHead>模板名称</TableHead>
+                  <TableHead>分析类别</TableHead>
+                  <TableHead className="text-right">筛选条件数量</TableHead>
+                  <TableHead className="text-right">使用次数</TableHead>
+                  <TableHead>创建人</TableHead>
+                  <TableHead>创建时间</TableHead>
+                  <TableHead className="text-right">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {visibleTemplates.map((t) => (
+                  <TableRow key={t.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => toggleFav(t.id)}
+                          aria-label="收藏"
+                          className="shrink-0"
+                        >
+                          <Star
+                            className={`h-3.5 w-3.5 ${
+                              t.favorite
+                                ? "fill-[var(--state-warning)] text-[var(--state-warning)]"
+                                : "text-text-tertiary"
+                            }`}
+                          />
+                        </button>
+                        <div className="min-w-0">
+                          <div className="text-body-sm font-medium text-foreground truncate">{t.name}</div>
+                          <div className="text-caption text-text-tertiary truncate max-w-[320px]">{t.desc}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
+                        style={{
+                          background: `color-mix(in oklab, ${TPL_CATEGORY_TONE[t.category]} 12%, transparent)`,
+                          color: TPL_CATEGORY_TONE[t.category],
+                        }}
+                      >
+                        {TPL_CATEGORY_LABEL[t.category]}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-body-sm">
+                      {countActive(t.filters)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
+                    <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
+                    <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.createdAt}</TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-2 text-primary"
+                        onClick={() => runFilter(t.filters, t.name, "templates")}
+                      >
+                        查看结果
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => openBuilder(t)}>
+                        <Pencil className="h-3.5 w-3.5 mr-1" />
+                        编辑
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-2 text-text-tertiary"
+                        onClick={() => removeTemplate(t.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-1" />
+                        删除
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {visibleTemplates.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="py-14 text-center text-body-sm text-text-tertiary">
+                      没有匹配的模板
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+
         </main>
         {saveDialog}
       </>
