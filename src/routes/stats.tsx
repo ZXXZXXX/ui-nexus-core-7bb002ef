@@ -1025,7 +1025,7 @@ function StatsPage() {
                         size="sm"
                         variant="ghost"
                         className="h-8 px-2 text-primary"
-                        onClick={() => runFilter(t.filters, t.name, "templates")}
+                        onClick={() => runFilter(t.filters, t.name)}
                       >
                         查看结果
                       </Button>
