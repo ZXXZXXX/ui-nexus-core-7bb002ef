@@ -687,24 +687,8 @@ export function WorkOrderPage({
     <TooltipProvider delayDuration={200}>
       <AppHeader title={title} breadcrumb={["工单管理", title]} />
       <main className="flex-1 px-6 py-6 space-y-4">
-        <div className="flex items-center justify-end gap-2 flex-wrap">
-          <Select value={role} onValueChange={(v) => setPcRole(v as PcRole)}>
-            <SelectTrigger className="h-9 w-44 text-body-sm">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="manager">{pcRoleLabel.manager}</SelectItem>
-              <SelectItem value="vet">{pcRoleLabel.vet}</SelectItem>
-              <SelectItem value="assistant">{pcRoleLabel.assistant}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            size="sm"
-            className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-          >
-            <Plus className="h-3.5 w-3.5" /> 新建工单
-          </Button>
-        </div>
+
+
 
         <Card className="border-border bg-card overflow-hidden">
           {/* 顶部工具栏 */}
