@@ -525,6 +525,11 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
 
   const rows = useMemo(() => {
     const list = [...baseRows];
+    if (scopeFarm) {
+      // 牧场外部视角：固定按最近月份排序，禁止列排序
+      const recentOrder = [...MONTH_LABELS].reverse();
+      return list.sort((a, b) => recentOrder.indexOf(a.key) - recentOrder.indexOf(b.key));
+    }
     const { key, dir } = sort;
     const mult = dir === "asc" ? 1 : -1;
     list.sort((a, b) => {
@@ -536,9 +541,10 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       return mult * (av - bv);
     });
     return list;
-  }, [baseRows, sort]);
+  }, [baseRows, sort, scopeFarm]);
 
   const onSort = (key: SortKey) => {
+    if (scopeFarm) return;
     setSort((prev) => ({ key, dir: prev.key === key && prev.dir === "desc" ? "asc" : "desc" }));
   };
 
@@ -623,12 +629,12 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
               {cols.map((c) => (
                 <th
                   key={c.key}
-                  className={`font-normal py-2 ${c.align === "left" ? "text-left" : "text-right"} ${c.key === "name" ? "" : "cursor-pointer hover:text-foreground"}`}
-                  onClick={c.key === "name" ? undefined : () => onSort(c.key)}
+                  className={`font-normal py-2 ${c.align === "left" ? "text-left" : "text-right"} ${c.key === "name" || scopeFarm ? "" : "cursor-pointer hover:text-foreground"}`}
+                  onClick={c.key === "name" || scopeFarm ? undefined : () => onSort(c.key)}
                 >
                   <span className="inline-flex items-center gap-1">
                     {c.key === "name" ? (scopeFarm ? "月份" : region ? "牧场名称" : "区域名称") : c.label}
-                    {c.key !== "name" && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
+                    {c.key !== "name" && !scopeFarm && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
                   </span>
                 </th>
               ))}
