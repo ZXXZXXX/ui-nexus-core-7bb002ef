@@ -138,6 +138,8 @@ export function ListPage<T>({
   const [visible, setVisible] = useState<string[]>(
     columns.filter((c) => !c.defaultHidden).map((c) => c.key),
   );
+  const [draftVisible, setDraftVisible] = useState<string[]>(visible);
+
 
   const shown = columns.filter((c) => visible.includes(c.key));
   const activeFilterCount = Object.values(filters).filter((v) => v && v !== "__all").length;
