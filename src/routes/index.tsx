@@ -438,7 +438,6 @@ function HomePage() {
                       { key: "有机牧场", count: fc.organic, icon: Leaf, tone: "--state-info" },
                     ].map((a) => {
                     const Icon = a.icon;
-                    const pct = a.key === "牧场总数" ? 100 : Math.round((a.count / fc.total) * 100);
                     return (
                       <button
                         key={a.key}
@@ -461,9 +460,6 @@ function HomePage() {
                               {a.count}
                             </span>
                             <span className="text-caption text-text-tertiary">个</span>
-                            <span className="ml-auto text-caption tabular-nums" style={{ color: `var(${a.tone})` }}>
-                              {pct}%
-                            </span>
                           </span>
                         </div>
                       </button>
