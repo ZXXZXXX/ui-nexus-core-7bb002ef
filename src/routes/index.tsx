@@ -28,6 +28,7 @@ import { AlertSection, alertCounts } from "@/components/dashboard/alert-section"
 import { OpsSection } from "@/components/dashboard/ops-section";
 import { ExecFocusSection } from "@/components/dashboard/exec-focus-section";
 import { GroupExecSection, farmCountSummary } from "@/components/dashboard/group-exec-section";
+import { StatVisual, type StatVisualVariant } from "@/components/stat-visual";
 
 
 
@@ -42,11 +43,7 @@ import {
   Baby,
   Pill,
   Syringe,
-  
   Stethoscope,
-  TrendingUp,
-  TrendingDown,
-  Minus,
   ChevronRight,
   Bell,
   UserPlus,
@@ -57,9 +54,6 @@ import {
   AlertTriangle,
   Building2,
   Leaf,
-
-
-
 } from "lucide-react";
 
 
