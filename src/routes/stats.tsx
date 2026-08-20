@@ -1779,61 +1779,31 @@ function StatsPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
-                  <TableHead>工单编号</TableHead>
-                  <TableHead>类型</TableHead>
-                  <TableHead>牛只耳号</TableHead>
-                  <TableHead>牧场 · 牛舍</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>操作人员</TableHead>
-                  <TableHead>疾病</TableHead>
-                  <TableHead>处方</TableHead>
-                  <TableHead>药品 · 给药</TableHead>
-                  <TableHead>产犊</TableHead>
-                  <TableHead>创建时间</TableHead>
+                  {resultCols.map((c) => (
+                    <TableHead key={c.key} className={c.num ? "text-right" : undefined}>
+                      {c.label}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredRows.map((r) => {
-                  const Icon = WO_TYPE_ICON[r.type];
-                  const s = STATUS_TAG[r.status];
-                  return (
-                    <TableRow key={r.id}>
-                      <TableCell className="font-mono text-body-sm">{r.id}</TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center gap-1.5 text-body-sm whitespace-nowrap">
-                          <Icon className="h-3.5 w-3.5 text-text-tertiary" strokeWidth={1.75} />
-                          {WO_TYPE_LABEL[r.type]}
-                        </span>
+                {filteredRows.map((r) => (
+                  <TableRow key={r.id}>
+                    {resultCols.map((c) => (
+                      <TableCell
+                        key={c.key}
+                        className={`text-body-sm whitespace-nowrap ${
+                          c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
+                        }`}
+                      >
+                        {c.value(r)}
                       </TableCell>
-                      <TableCell className="font-mono text-body-sm">{r.earTag}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.farm} · {r.barn}</TableCell>
-                      <TableCell>
-                        <span
-                          className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
-                          style={{ background: s.bg, color: s.color }}
-                        >
-                          {s.label}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-body-sm whitespace-nowrap">
-                        {r.operator}
-                        <span className="text-caption text-text-tertiary ml-1">
-                          {ROLE_OPTIONS.find((x) => x.value === r.role)?.label}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.disease}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.prescription}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.drug} · {r.drugRoute}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">
-                        {r.calvingType === "—" ? "—" : `${r.calvingType} · ${r.calfOutcome}`}
-                      </TableCell>
-                      <TableCell className="text-body-sm text-text-secondary tabular-nums whitespace-nowrap">{r.createdAt}</TableCell>
-                    </TableRow>
-                  );
-                })}
+                    ))}
+                  </TableRow>
+                ))}
                 {filteredRows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center py-10 text-text-tertiary">
+                    <TableCell colSpan={resultCols.length} className="text-center py-10 text-text-tertiary">
                       当前筛选条件下暂无数据
                     </TableCell>
                   </TableRow>
