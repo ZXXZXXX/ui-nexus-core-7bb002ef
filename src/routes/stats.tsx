@@ -1048,7 +1048,22 @@ function StatsPage() {
                   options={CATTLE_TYPES}
                   selected={filters.cattleTypes}
                   onToggle={(v) => toggleIn("cattleTypes", v)}
+                  disabledOptions={
+                    filters.parities.length > 0
+                      ? ["犊牛"]
+                      : filters.cattleTypes.includes("犊牛")
+                        ? CATTLE_TYPES.filter((t) => t !== "犊牛")
+                        : []
+                  }
+                  hint={
+                    filters.cattleTypes.includes("犊牛")
+                      ? "犊牛与成母牛群体口径不同，不可同时选择，且无胎次维度"
+                      : filters.parities.length > 0
+                        ? "已选择胎次条件，犊牛不适用"
+                        : undefined
+                  }
                 />
+
 
                 {filters.cattleTypes.includes("犊牛") && (
                   <div className="pl-3 border-l-2 border-primary/30 space-y-4">
