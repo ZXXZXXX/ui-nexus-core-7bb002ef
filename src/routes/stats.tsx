@@ -449,16 +449,19 @@ const STATUS_TAG: Record<string, { label: string; bg: string; color: string }> =
 function StatsPage() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
-  const [view, setView] = useState<"templates" | "builder" | "result">("templates");
+  const [view, setView] = useState<"templates" | "result">("templates");
   const [resultFilters, setResultFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [resultTitle, setResultTitle] = useState("筛选结果");
-  const [resultBack, setResultBack] = useState<"templates" | "builder">("templates");
+  const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [saveDesc, setSaveDesc] = useState("");
   const [saveSource, setSaveSource] = useState<Filters>(DEFAULT_FILTERS);
+  const [catOpen, setCatOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [builderCat, setBuilderCat] = useState<TplCategory>("cattle");
 
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) =>
     setFilters((f) => ({ ...f, [k]: v }));
@@ -472,18 +475,32 @@ function StatsPage() {
       };
     });
 
-  const runFilter = (f: Filters, title = "筛选结果", from: "templates" | "builder" = "templates") => {
+  const runFilter = (f: Filters, title = "筛选结果") => {
     setResultFilters(f);
     setResultTitle(title);
-    setResultBack(from);
     setView("result");
   };
 
+  /** 新建：先弹类别选择；编辑：直接进抽屉 */
   const openBuilder = (t?: Template) => {
-    setFilters(t ? { ...t.filters } : DEFAULT_FILTERS);
-    setEditingId(t?.id ?? null);
-    setView("builder");
+    if (t) {
+      setFilters({ ...t.filters });
+      setEditingId(t.id);
+      setBuilderCat(t.category);
+      setDrawerOpen(true);
+      return;
+    }
+    setCatOpen(true);
   };
+
+  const pickCategory = (c: TplCategory) => {
+    setFilters(DEFAULT_FILTERS);
+    setEditingId(null);
+    setBuilderCat(c);
+    setCatOpen(false);
+    setDrawerOpen(true);
+  };
+
 
   const openSave = (source: Filters) => {
     setSaveSource(source);
