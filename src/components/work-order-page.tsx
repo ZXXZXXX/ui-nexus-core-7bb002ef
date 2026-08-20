@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { usePcRole, setPcRole, canExamine, pcRoleLabel, type PcRole } from "@/lib/pc-role";
+import { usePcRole, canExamine } from "@/lib/pc-role";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
