@@ -1671,7 +1671,17 @@ function countActive(f: Filters): number {
   if (f.exitType !== "all") n++;
   if (f.keyword) n++;
   if (f.onlyAbnormal) n++;
-  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length;
+  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.diseaseSubs.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length;
+  const ranges: [string, string][] = [
+    [f.caseCountMin, f.caseCountMax],
+    [f.cureRateMin, f.cureRateMax],
+    [f.cullRateMin, f.cullRateMax],
+    [f.rxUsageMin, f.rxUsageMax],
+    [f.rxCureMin, f.rxCureMax],
+    [f.rxDaysMin, f.rxDaysMax],
+    [f.rxCostMin, f.rxCostMax],
+  ];
+  n += ranges.filter(([a, b]) => a !== "" || b !== "").length;
   return n;
 }
 
