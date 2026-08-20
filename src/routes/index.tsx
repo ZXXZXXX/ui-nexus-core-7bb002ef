@@ -42,6 +42,8 @@ import {
   Beef,
   Baby,
   Pill,
+  ClipboardList,
+
   Syringe,
   Stethoscope,
   ChevronRight,
