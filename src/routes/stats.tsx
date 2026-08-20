@@ -243,6 +243,39 @@ const TPL_CATEGORY_TONE: Record<TplCategory, string> = {
   staff: "var(--effect-ai-cyan)",
 };
 
+const CATEGORY_CARDS: {
+  key: TplCategory;
+  title: string;
+  desc: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+}[] = [
+  {
+    key: "cattle",
+    title: "牛只分析",
+    desc: "按牧场、牛舍、工单类型与产犊情况，分析牛只的发病、处置与产犊表现。",
+    icon: Baby,
+  },
+  {
+    key: "disease",
+    title: "疾病分析",
+    desc: "按病种类别与具体病种，统计发病分布、治疗工单与处方使用情况。",
+    icon: Stethoscope,
+  },
+  {
+    key: "drug",
+    title: "用药分析",
+    desc: "按药品、给药方式与处方方案，统计用药频次与药品消耗结构。",
+    icon: Pill,
+  },
+  {
+    key: "staff",
+    title: "人员分析",
+    desc: "按角色与操作人员，统计工作量、工单完成情况与执行效率。",
+    icon: Users,
+  },
+];
+
+
 function inferCategory(f: Filters): TplCategory {
   if (f.role !== "all" || f.operators.length) return "staff";
   if (f.drugs.length || f.drugRoute !== "all" || f.prescriptions.length) return "drug";
