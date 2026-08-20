@@ -525,6 +525,11 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
 
   const rows = useMemo(() => {
     const list = [...baseRows];
+    if (scopeFarm) {
+      // 牧场外部视角：固定按最近月份排序，禁止列排序
+      const recentOrder = [...MONTH_LABELS].reverse();
+      return list.sort((a, b) => recentOrder.indexOf(a.key) - recentOrder.indexOf(b.key));
+    }
     const { key, dir } = sort;
     const mult = dir === "asc" ? 1 : -1;
     list.sort((a, b) => {
@@ -536,9 +541,10 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       return mult * (av - bv);
     });
     return list;
-  }, [baseRows, sort]);
+  }, [baseRows, sort, scopeFarm]);
 
   const onSort = (key: SortKey) => {
+    if (scopeFarm) return;
     setSort((prev) => ({ key, dir: prev.key === key && prev.dir === "desc" ? "asc" : "desc" }));
   };
 
