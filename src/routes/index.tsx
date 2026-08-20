@@ -27,7 +27,7 @@ import { WorkOrderSection } from "@/components/dashboard/workorder-section";
 import { AlertSection, alertCounts } from "@/components/dashboard/alert-section";
 import { OpsSection } from "@/components/dashboard/ops-section";
 import { ExecFocusSection } from "@/components/dashboard/exec-focus-section";
-import { GroupExecSection, farmCountSummary } from "@/components/dashboard/group-exec-section";
+import { GroupExecSection, farmCountFor, CURRENT_REGION, regionMetrics } from "@/components/dashboard/group-exec-section";
 import { StatVisual, type StatVisualVariant } from "@/components/stat-visual";
 
 
@@ -123,6 +123,25 @@ const groupTailCard: MetricCard = {
 
 
 
+
+/** 区域管理者视角：与集团口径一致，但只统计本区域 */
+const rm = regionMetrics(CURRENT_REGION);
+const regionCardOverride: Record<string, Partial<MetricCard>> = {
+  "topic-herd": { topic: "总存栏数", label: `（至今日）${CURRENT_REGION}总存栏`, value: String(rm.herd), unit: "头", delta: "+96 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
+  "topic-calving": { topic: "早产率", label: "（本月）区域早产率", value: String(rm.pretermRate), unit: "%", delta: "-0.3 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: String(rm.deathCull), unit: "头", delta: "-8 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
+  "topic-disease": { topic: "治愈率", label: "（本月）区域治愈率", value: String(rm.cure), unit: "%", delta: "+1.2 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-drug": { topic: "总药费支出", label: "（本月）区域总药费", value: (rm.drugFee / 10000).toFixed(1), unit: "万元", delta: "+2.8 %", trend: "up", good: false, absolute: false, tone: "var(--effect-ai-purple)", visual: "spark" },
+  "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(rm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
+};
+const regionLeadCard: MetricCard = {
+  topic: "发病率", label: "（本月）区域发病率", value: String(rm.sick), unit: "%", trend: "down", delta: "-0.2 pp",
+  icon: Stethoscope, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "spark",
+};
+const regionTailCard: MetricCard = {
+  topic: "头均药费", label: "（本月）头均用药费用", value: String(rm.perHead), unit: "元/头", trend: "up", delta: "+2.1 %",
+  icon: Pill, anchor: "topic-panorama", good: false, tone: "var(--effect-ai-purple)", visual: "spark",
+};
 
 type WorkOrderType = "disease" | "vaccine" | "deworm" | "hoof" | "postpartum" | "drying" | "general";
 type PendingRequest = {
@@ -265,7 +284,13 @@ function HomePage() {
           .join(" / ")
       : c.value;
   const baseCards = metricCards
-    .map((c) => (scope === "group" ? { ...c, ...groupCardOverride[c.anchor] } : c))
+    .map((c) =>
+      scope === "group"
+        ? { ...c, ...groupCardOverride[c.anchor] }
+        : scope === "region"
+          ? { ...c, ...regionCardOverride[c.anchor] }
+          : c,
+    )
 
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
@@ -273,17 +298,18 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[a.anchor]) -
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
+  const isExec = scope === "group" || scope === "region";
   const visibleCards =
-    scope === "group"
+    isExec
       ? (() => {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const order = [
-            groupLeadCard,
+            scope === "group" ? groupLeadCard : regionLeadCard,
             map.get("治愈率"),
             map.get("早产率"),
             map.get("死淘总数"),
             map.get("总药费支出"),
-            groupTailCard,
+            scope === "group" ? groupTailCard : regionTailCard,
           ].filter(Boolean) as MetricCard[];
           return order;
         })()
@@ -374,9 +400,9 @@ function HomePage() {
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
                 <span className="text-caption text-text-tertiary">
-                  {scope === "group" ? "牧场分布" : "实时预警"}
+                  {isExec ? (scope === "group" ? "牧场分布" : `${CURRENT_REGION} · 牧场分布`) : "实时预警"}
                 </span>
-                {scope !== "group" && (
+                {!isExec && (
                   <button
                     type="button"
                     onClick={() => scrollToTopic("topic-alert")}
@@ -387,14 +413,16 @@ function HomePage() {
                 )}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2.5">
-                {scope === "group" ? (
-                  [
-                    { key: "牧场总数", count: farmCountSummary.total, icon: Building2, tone: "--brand" },
-                    { key: "普通牧场", count: farmCountSummary.ordinary, icon: Building2, tone: "--state-alert" },
-                    { key: "有机牧场", count: farmCountSummary.organic, icon: Leaf, tone: "--state-info" },
-                  ].map((a) => {
+                {isExec ? (
+                  (() => {
+                    const fc = farmCountFor(scope === "group" ? null : CURRENT_REGION);
+                    return [
+                      { key: "牧场总数", count: fc.total, icon: Building2, tone: "--brand" },
+                      { key: "普通牧场", count: fc.ordinary, icon: Building2, tone: "--state-alert" },
+                      { key: "有机牧场", count: fc.organic, icon: Leaf, tone: "--state-info" },
+                    ].map((a) => {
                     const Icon = a.icon;
-                    const pct = a.key === "牧场总数" ? 100 : Math.round((a.count / farmCountSummary.total) * 100);
+                    const pct = a.key === "牧场总数" ? 100 : Math.round((a.count / fc.total) * 100);
                     return (
                       <button
                         key={a.key}
@@ -424,7 +452,8 @@ function HomePage() {
                         </div>
                       </button>
                     );
-                  })
+                    });
+                  })()
                 ) : (
                   alertCounts.map((a, i) => {
                     const tone = ["--state-danger", "--state-alert", "--brand"][i % 3];
@@ -565,8 +594,8 @@ function HomePage() {
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
           {topicOrder.map((key) => {
             if (key === "ops" && scope !== "region" && scope !== "group" && scope !== "farm-out") return null;
-            // 集团视角：不展示牛群 / 产犊 / 死淘 / 疾病 / 药品 / 疫苗 / 工单 / 预警专题
-            if (scope === "group" && ["herd", "calving", "culling", "disease", "drug", "vaccine", "workorder", "alert"].includes(key)) return null;
+            // 集团 / 区域高管视角：不展示牛群 / 产犊 / 死淘 / 疾病 / 药品 / 疫苗 / 工单 / 预警专题
+            if (isExec && ["herd", "calving", "culling", "disease", "drug", "vaccine", "workorder", "alert"].includes(key)) return null;
             const full = key === "drug" || key === "alert" || key === "ops";
             const node =
               key === "herd" ? (
@@ -593,8 +622,8 @@ function HomePage() {
                 </div>
               ) : key === "alert" ? (
                 <AlertSection />
-              ) : scope === "group" ? (
-                <GroupExecSection />
+              ) : isExec ? (
+                <GroupExecSection scopeRegion={scope === "group" ? null : CURRENT_REGION} />
               ) : (
                 <div className="space-y-6">
                   <ExecFocusSection level={scope === "region" ? "region" : "farm"} />
