@@ -82,7 +82,7 @@ type State = {
 
 const KEY = "pc:dashboard-view";
 /** 专题结构调整后需要重置旧的显隐配置，避免历史缓存把专题全部隐藏 */
-const VERSION = 2;
+const VERSION = 3;
 const listeners = new Set<() => void>();
 let state: State = { scope: "farm-in", config: defaultConfig, order: defaultOrders, level: "farm" };
 let loaded = false;
