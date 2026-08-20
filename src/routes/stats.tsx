@@ -688,7 +688,7 @@ function StatsPage() {
   };
 
   const pickCategory = (c: TplCategory) => {
-    setFilters(DEFAULT_FILTERS);
+    setFilters(c === "staff" ? { ...DEFAULT_FILTERS, role: "vet" } : DEFAULT_FILTERS);
     setEditingId(null);
     setBuilderCat(c);
     setCatOpen(false);
