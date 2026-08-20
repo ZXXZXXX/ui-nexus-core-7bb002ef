@@ -42,6 +42,8 @@ import {
   Beef,
   Baby,
   Pill,
+  ClipboardList,
+
   Syringe,
   Stethoscope,
   ChevronRight,
@@ -139,9 +141,10 @@ const regionLeadCard: MetricCard = {
   icon: Stethoscope, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "spark",
 };
 const regionTailCard: MetricCard = {
-  topic: "头均药费", label: "（本月）头均用药费用", value: String(rm.perHead), unit: "元/头", trend: "up", delta: "+2.1 %",
-  icon: Pill, anchor: "topic-panorama", good: false, tone: "var(--effect-ai-purple)", visual: "spark",
+  topic: "工单完成率", label: "（本月）工单完成率", value: "92.6", unit: "%", trend: "up", delta: "+1.8 pp",
+  icon: ClipboardList, anchor: "topic-vet-order", good: true, tone: "var(--effect-ai-purple)", visual: "ring",
 };
+
 
 /** 牧场级外部视角：与区域口径一致，但只统计本牧场，且隐藏药费 */
 const fm = farmMetrics(CURRENT_FARM.farm, CURRENT_FARM.region);
