@@ -1197,22 +1197,18 @@ function StatsPage() {
                       selected={filters.treatDiseases}
                       onToggle={(v) => toggleIn("treatDiseases", v)}
                     />
-                    {(() => {
-                      const base =
-                        filters.treatDiseases.length > 0
-                          ? filters.treatDiseases
-                          : filters.treatDiseaseCat === "all"
-                            ? DISEASES
-                            : DISEASES_OF_CAT[filters.treatDiseaseCat] || [];
-                      const subs = Array.from(new Set(base.flatMap((d) => SUBTYPES_OF[d] || [])));
+                    {filters.treatDiseases.length > 0 && (() => {
+                      const subs = Array.from(new Set(filters.treatDiseases.flatMap((d) => SUBTYPES_OF[d] || [])));
                       if (subs.length === 0) return null;
                       return (
-                        <ChipGroup
-                          label="治疗疾病子类型（可多选）"
-                          options={subs}
-                          selected={filters.treatSubs}
-                          onToggle={(v) => toggleIn("treatSubs", v)}
-                        />
+                        <div className="pl-3 border-l-2 border-primary/30">
+                          <ChipGroup
+                            label="治疗疾病子类型（可多选）"
+                            options={subs}
+                            selected={filters.treatSubs}
+                            onToggle={(v) => toggleIn("treatSubs", v)}
+                          />
+                        </div>
                       );
                     })()}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
