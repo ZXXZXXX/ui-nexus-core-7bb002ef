@@ -227,7 +227,7 @@ const TPL_CATEGORY_LABEL: Record<TplCategory, string> = {
   cattle: "牛只",
   disease: "疾病",
   drug: "用药",
-  staff: "人员绩效",
+  staff: "人员",
 };
 
 const TPL_CATEGORY_TONE: Record<TplCategory, string> = {
