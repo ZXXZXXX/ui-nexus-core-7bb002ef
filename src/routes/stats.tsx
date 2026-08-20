@@ -39,7 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -222,10 +221,34 @@ const DEFAULT_FILTERS: Filters = {
 };
 
 // ============ Templates ============
+type TplCategory = "cattle" | "disease" | "drug" | "staff";
+
+const TPL_CATEGORY_LABEL: Record<TplCategory, string> = {
+  cattle: "牛只",
+  disease: "疾病",
+  drug: "用药",
+  staff: "人员绩效",
+};
+
+const TPL_CATEGORY_TONE: Record<TplCategory, string> = {
+  cattle: "var(--brand)",
+  disease: "var(--effect-ai-purple)",
+  drug: "var(--state-success)",
+  staff: "var(--effect-ai-cyan)",
+};
+
+function inferCategory(f: Filters): TplCategory {
+  if (f.role !== "all" || f.operators.length) return "staff";
+  if (f.drugs.length || f.drugRoute !== "all" || f.prescriptions.length) return "drug";
+  if (f.diseases.length || f.diseaseCat !== "all" || f.woTypes.includes("disease")) return "disease";
+  return "cattle";
+}
+
 type Template = {
   id: string;
   name: string;
   desc: string;
+  category: TplCategory;
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   tone: string;
   filters: Filters;
@@ -235,9 +258,11 @@ type Template = {
   createdAt: string;
 };
 
+
 const DEFAULT_TEMPLATES: Template[] = [
   {
     id: "t-disease-30d",
+    category: "disease",
     name: "近 30 天疾病治疗",
     desc: "全部牧场 · 疾病治疗工单汇总",
     icon: Stethoscope,
@@ -250,6 +275,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-mastitis",
+    category: "disease",
     name: "乳房炎病种分析",
     desc: "近 30 天 · 乳房疾病类别",
     icon: Stethoscope,
@@ -261,6 +287,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-vaccine-month",
+    category: "cattle",
     name: "本月疫苗执行",
     desc: "本月已完成的疫苗免疫工单",
     icon: Syringe,
@@ -273,6 +300,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-postpartum-highrisk",
+    category: "drug",
     name: "产后高危跟进",
     desc: "近 7 天 · 产后高危处方",
     icon: Baby,
@@ -284,6 +312,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-calving-dystocia",
+    category: "cattle",
     name: "难产产犊统计",
     desc: "近 90 天 · 难产 / 剖腹产",
     icon: Baby,
@@ -295,6 +324,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-drug-cef",
+    category: "drug",
     name: "头孢类用药统计",
     desc: "近 30 天 · 肌内注射头孢噻呋",
     icon: Pill,
@@ -311,6 +341,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-operator",
+    category: "staff",
     name: "人员工作量统计",
     desc: "近 30 天 · 按操作人员查看",
     icon: Users,
@@ -322,6 +353,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-pending-7d",
+    category: "cattle",
     name: "近 7 天未处理",
     desc: "所有类型 · 待诊断",
     icon: BarChart3,
@@ -479,6 +511,7 @@ function StatsPage() {
       {
         id: `t-${Date.now()}`,
         name: saveName.trim(),
+        category: inferCategory(saveSource),
         desc: saveDesc.trim() || describeFilters(saveSource),
         icon: BarChart3,
         tone: "var(--brand)",
@@ -592,80 +625,97 @@ function StatsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {visibleTemplates.map((t) => (
-              <div
-                key={t.id}
-                className="group border border-border rounded-xl bg-white p-5 hover:border-primary/50 hover:shadow-[0_8px_24px_-16px_var(--brand)] transition-all flex flex-col"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="text-body font-medium text-foreground truncate">{t.name}</div>
-                    <div className="text-caption text-text-tertiary mt-1 line-clamp-2 min-h-[36px]">{t.desc}</div>
-                  </div>
-                  <div className="flex items-center gap-0.5 -mr-1.5 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => toggleFav(t.id)}
-                      className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-surface-subtle"
-                      aria-label="收藏"
-                    >
-                      <Star
-                        className={`h-3.5 w-3.5 ${
-                          t.favorite ? "fill-[var(--state-warning)] text-[var(--state-warning)]" : "text-text-tertiary"
-                        }`}
-                      />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeTemplate(t.id)}
-                      className="h-7 w-7 inline-flex items-center justify-center rounded-md hover:bg-surface-subtle"
-                      aria-label="删除模板"
-                    >
-                      <Trash2 className="h-3.5 w-3.5 text-text-tertiary" />
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {tagsFromFilters(t.filters).slice(0, 3).map((label) => (
-                    <Badge
-                      key={label}
-                      variant="secondary"
-                      className="rounded-md bg-surface-subtle text-text-secondary border-transparent font-normal"
-                    >
-                      {label}
-                    </Badge>
-                  ))}
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-text-tertiary">
-                  <span>创建人：{t.creator}</span>
-                  <span>创建时间：{t.createdAt}</span>
-                </div>
-                <div className="mt-4 pt-3 border-t border-border flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    className="h-8 flex-1 bg-primary hover:bg-[var(--brand-hover)]"
-                    onClick={() => runFilter(t.filters, t.name, "templates")}
-                  >
-                    查看结果
-                  </Button>
-                  <Button size="sm" variant="outline" className="h-8" onClick={() => openBuilder(t)}>
-                    <Pencil className="h-3.5 w-3.5 mr-1" />
-                    编辑
-                  </Button>
-                </div>
-              </div>
-            ))}
-            {visibleTemplates.length === 0 && (
-              <div className="col-span-full border border-dashed border-border rounded-xl py-16 text-center">
-                <div className="text-body-sm text-text-tertiary">没有匹配的模板</div>
-                <Button variant="outline" className="mt-3 h-9" onClick={() => openBuilder()}>
-                  <Plus className="h-4 w-4 mr-1" />
-                  新建筛选
-                </Button>
-              </div>
-            )}
-          </div>
+          <Card className="border-border bg-white overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-surface-subtle/60">
+                  <TableHead>模板名称</TableHead>
+                  <TableHead>分析类别</TableHead>
+                  <TableHead className="text-right">筛选条件数量</TableHead>
+                  <TableHead className="text-right">使用次数</TableHead>
+                  <TableHead>创建人</TableHead>
+                  <TableHead>创建时间</TableHead>
+                  <TableHead className="text-right">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {visibleTemplates.map((t) => (
+                  <TableRow key={t.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2 min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => toggleFav(t.id)}
+                          aria-label="收藏"
+                          className="shrink-0"
+                        >
+                          <Star
+                            className={`h-3.5 w-3.5 ${
+                              t.favorite
+                                ? "fill-[var(--state-warning)] text-[var(--state-warning)]"
+                                : "text-text-tertiary"
+                            }`}
+                          />
+                        </button>
+                        <div className="min-w-0">
+                          <div className="text-body-sm font-medium text-foreground truncate">{t.name}</div>
+                          <div className="text-caption text-text-tertiary truncate max-w-[320px]">{t.desc}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
+                        style={{
+                          background: `color-mix(in oklab, ${TPL_CATEGORY_TONE[t.category]} 12%, transparent)`,
+                          color: TPL_CATEGORY_TONE[t.category],
+                        }}
+                      >
+                        {TPL_CATEGORY_LABEL[t.category]}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-body-sm">
+                      {countActive(t.filters)}
+                    </TableCell>
+                    <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
+                    <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
+                    <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.createdAt}</TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-2 text-primary"
+                        onClick={() => runFilter(t.filters, t.name, "templates")}
+                      >
+                        查看结果
+                      </Button>
+                      <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => openBuilder(t)}>
+                        <Pencil className="h-3.5 w-3.5 mr-1" />
+                        编辑
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-8 px-2 text-text-tertiary"
+                        onClick={() => removeTemplate(t.id)}
+                      >
+                        <Trash2 className="h-3.5 w-3.5 mr-1" />
+                        删除
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {visibleTemplates.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="py-14 text-center text-body-sm text-text-tertiary">
+                      没有匹配的模板
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+
         </main>
         {saveDialog}
       </>
@@ -1186,25 +1236,6 @@ function describeFilters(f: Filters): string {
   if (f.drugRoute !== "all") parts.push(f.drugRoute);
   if (f.keyword) parts.push(`关键词「${f.keyword}」`);
   return parts.filter(Boolean).join(" · ");
-}
-
-function tagsFromFilters(f: Filters): string[] {
-  const tags: string[] = [];
-  tags.push(DATE_PRESETS.find((d) => d.value === f.dateRange)?.label || "");
-  if (f.region !== "all") tags.push(f.region);
-  if (f.farms.length) tags.push(f.farms.length === 1 ? f.farms[0] : `牧场 ${f.farms.length} 个`);
-  if (f.barns.length) tags.push(f.barns.length === 1 ? f.barns[0] : `牛舍 ${f.barns.length} 个`);
-  if (f.role !== "all") tags.push(ROLE_OPTIONS.find((d) => d.value === f.role)?.label || "");
-  if (f.diseaseCat !== "all") tags.push(f.diseaseCat);
-  if (f.diseases.length) tags.push(f.diseases.length === 1 ? f.diseases[0] : `病种 ${f.diseases.length} 项`);
-  if (f.prescriptions.length) tags.push(f.prescriptions.length === 1 ? f.prescriptions[0] : `处方 ${f.prescriptions.length} 项`);
-  if (f.woTypes.length === 1) tags.push(WO_TYPE_LABEL[f.woTypes[0]]);
-  else if (f.woTypes.length > 1) tags.push(`工单 ${f.woTypes.length} 类`);
-  if (f.status !== "all") tags.push(STATUS_OPTIONS.find((s) => s.value === f.status)?.label || "");
-  if (f.calvingTypes.length) tags.push(f.calvingTypes.length === 1 ? f.calvingTypes[0] : `产犊 ${f.calvingTypes.length} 项`);
-  if (f.drugs.length) tags.push(f.drugs.length === 1 ? f.drugs[0] : `药品 ${f.drugs.length} 项`);
-  if (f.drugRoute !== "all") tags.push(f.drugRoute);
-  return tags.filter(Boolean);
 }
 
 function filterRows(rows: Row[], f: Filters): Row[] {
