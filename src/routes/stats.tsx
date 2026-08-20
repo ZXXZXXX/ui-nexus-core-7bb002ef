@@ -47,6 +47,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
   Table,
   TableBody,
   TableCell,
@@ -236,6 +242,39 @@ const TPL_CATEGORY_TONE: Record<TplCategory, string> = {
   drug: "var(--state-success)",
   staff: "var(--effect-ai-cyan)",
 };
+
+const CATEGORY_CARDS: {
+  key: TplCategory;
+  title: string;
+  desc: string;
+  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+}[] = [
+  {
+    key: "cattle",
+    title: "牛只分析",
+    desc: "按牧场、牛舍、工单类型与产犊情况，分析牛只的发病、处置与产犊表现。",
+    icon: Baby,
+  },
+  {
+    key: "disease",
+    title: "疾病分析",
+    desc: "按病种类别与具体病种，统计发病分布、治疗工单与处方使用情况。",
+    icon: Stethoscope,
+  },
+  {
+    key: "drug",
+    title: "用药分析",
+    desc: "按药品、给药方式与处方方案，统计用药频次与药品消耗结构。",
+    icon: Pill,
+  },
+  {
+    key: "staff",
+    title: "人员分析",
+    desc: "按角色与操作人员，统计工作量、工单完成情况与执行效率。",
+    icon: Users,
+  },
+];
+
 
 function inferCategory(f: Filters): TplCategory {
   if (f.role !== "all" || f.operators.length) return "staff";
@@ -449,16 +488,19 @@ const STATUS_TAG: Record<string, { label: string; bg: string; color: string }> =
 function StatsPage() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
-  const [view, setView] = useState<"templates" | "builder" | "result">("templates");
+  const [view, setView] = useState<"templates" | "result">("templates");
   const [resultFilters, setResultFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [resultTitle, setResultTitle] = useState("筛选结果");
-  const [resultBack, setResultBack] = useState<"templates" | "builder">("templates");
+  const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [saveDesc, setSaveDesc] = useState("");
   const [saveSource, setSaveSource] = useState<Filters>(DEFAULT_FILTERS);
+  const [catOpen, setCatOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [builderCat, setBuilderCat] = useState<TplCategory>("cattle");
 
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) =>
     setFilters((f) => ({ ...f, [k]: v }));
@@ -472,18 +514,32 @@ function StatsPage() {
       };
     });
 
-  const runFilter = (f: Filters, title = "筛选结果", from: "templates" | "builder" = "templates") => {
+  const runFilter = (f: Filters, title = "筛选结果") => {
     setResultFilters(f);
     setResultTitle(title);
-    setResultBack(from);
     setView("result");
   };
 
+  /** 新建：先弹类别选择；编辑：直接进抽屉 */
   const openBuilder = (t?: Template) => {
-    setFilters(t ? { ...t.filters } : DEFAULT_FILTERS);
-    setEditingId(t?.id ?? null);
-    setView("builder");
+    if (t) {
+      setFilters({ ...t.filters });
+      setEditingId(t.id);
+      setBuilderCat(t.category);
+      setDrawerOpen(true);
+      return;
+    }
+    setCatOpen(true);
   };
+
+  const pickCategory = (c: TplCategory) => {
+    setFilters(DEFAULT_FILTERS);
+    setEditingId(null);
+    setBuilderCat(c);
+    setCatOpen(false);
+    setDrawerOpen(true);
+  };
+
 
   const openSave = (source: Filters) => {
     setSaveSource(source);
@@ -511,7 +567,7 @@ function StatsPage() {
       {
         id: `t-${Date.now()}`,
         name: saveName.trim(),
-        category: inferCategory(saveSource),
+        category: builderCat ?? inferCategory(saveSource),
         desc: saveDesc.trim() || describeFilters(saveSource),
         icon: BarChart3,
         tone: "var(--brand)",
@@ -595,6 +651,329 @@ function StatsPage() {
       </DialogContent>
     </Dialog>
   );
+
+  const catDialog = (
+    <Dialog open={catOpen} onOpenChange={setCatOpen}>
+      <DialogContent className="bg-white sm:max-w-[720px]">
+        <DialogHeader>
+          <DialogTitle>选择分析类别</DialogTitle>
+        </DialogHeader>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {CATEGORY_CARDS.map((c) => {
+            const Icon = c.icon;
+            return (
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => pickCategory(c.key)}
+                className="text-left p-4 rounded-xl border border-border bg-white hover:border-primary hover:bg-brand-subtle/40 transition-colors"
+              >
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span
+                    className="h-7 w-7 rounded-md inline-flex items-center justify-center shrink-0"
+                    style={{
+                      background: `color-mix(in oklab, ${TPL_CATEGORY_TONE[c.key]} 14%, transparent)`,
+                      color: TPL_CATEGORY_TONE[c.key],
+                    }}
+                  >
+                    <Icon className="h-4 w-4" strokeWidth={1.75} />
+                  </span>
+                  <span className="text-body font-medium text-foreground">{c.title}</span>
+                </div>
+                <div className="text-caption text-text-tertiary leading-5">{c.desc}</div>
+              </button>
+            );
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
+  const cat = builderCat ?? "cattle";
+  const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug") => {
+    if (d === "farm") return true;
+    if (cat === "cattle") return d === "order" || d === "calving";
+    if (cat === "disease") return d === "disease" || d === "order" || d === "prescription";
+    if (cat === "drug") return d === "drug" || d === "prescription";
+    return d === "staff" || d === "order";
+  };
+
+  const builderDrawer = (
+    <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+      <SheetContent side="right" className="bg-white w-full sm:max-w-[760px] p-0 flex flex-col">
+        <SheetHeader className="px-6 py-4 border-b border-border">
+          <SheetTitle>
+            {editingTemplate ? `编辑模板：${editingTemplate.name}` : `新建筛选 · ${TPL_CATEGORY_LABEL[cat]}分析`}
+          </SheetTitle>
+          <div className="text-caption text-text-tertiary mt-0.5">
+            {CATEGORY_CARDS.find((c) => c.key === cat)?.desc}
+          </div>
+        </SheetHeader>
+
+        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          <div className="flex items-center justify-end">
+            {activeCount > 0 && (
+              <button
+                onClick={() => setFilters(DEFAULT_FILTERS)}
+                className="text-caption text-text-tertiary hover:text-foreground inline-flex items-center gap-1"
+              >
+                <X className="h-3 w-3" /> 清空条件（{activeCount}）
+              </button>
+            )}
+          </div>
+
+          {/* 时间维度 */}
+          <Dimension icon={CalendarDays} title="时间维度" tone="var(--brand)">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FieldBlock label="时间范围">
+                <Select value={filters.dateRange} onValueChange={(v) => set("dateRange", v)}>
+                  <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {DATE_PRESETS.map((d) => (
+                      <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FieldBlock>
+              {filters.dateRange === "custom" && (
+                <>
+                  <FieldBlock label="开始日期">
+                    <Input type="date" value={filters.dateStart} onChange={(e) => set("dateStart", e.target.value)} className="h-9 bg-white" />
+                  </FieldBlock>
+                  <FieldBlock label="结束日期">
+                    <Input type="date" value={filters.dateEnd} onChange={(e) => set("dateEnd", e.target.value)} className="h-9 bg-white" />
+                  </FieldBlock>
+                </>
+              )}
+              <FieldBlock label="关键词（耳号 / 编号）">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
+                  <Input
+                    value={filters.keyword}
+                    onChange={(e) => set("keyword", e.target.value)}
+                    placeholder="输入关键词"
+                    className="h-9 pl-8 bg-white"
+                  />
+                </div>
+              </FieldBlock>
+            </div>
+          </Dimension>
+
+          {/* 牧场维度 */}
+          {showDim("farm") && (
+            <Dimension icon={Building2} title="牧场维度" tone="var(--effect-ai-purple)">
+              <div className="space-y-4">
+                <FieldBlock label="区域">
+                  <Select value={filters.region} onValueChange={(v) => set("region", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {REGION_OPTIONS.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+                <ChipGroup
+                  label="牧场（可多选）"
+                  options={
+                    filters.region === "all"
+                      ? FARM_NAMES
+                      : FARM_NAMES.filter((n) => REGION_OF[n] === filters.region)
+                  }
+                  selected={filters.farms}
+                  onToggle={(v) => toggleIn("farms", v)}
+                />
+                <ChipGroup
+                  label="牛舍（可多选）"
+                  options={BARN_NAMES}
+                  selected={filters.barns}
+                  onToggle={(v) => toggleIn("barns", v)}
+                />
+              </div>
+            </Dimension>
+          )}
+
+          {/* 操作人员维度 */}
+          {showDim("staff") && (
+            <Dimension icon={Users} title="操作人员维度" tone="var(--effect-ai-cyan)">
+              <div className="space-y-4">
+                <FieldBlock label="角色">
+                  <Select value={filters.role} onValueChange={(v) => set("role", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {ROLE_OPTIONS.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+                <ChipGroup
+                  label="操作人员（可多选）"
+                  options={OPERATORS}
+                  selected={filters.operators}
+                  onToggle={(v) => toggleIn("operators", v)}
+                />
+              </div>
+            </Dimension>
+          )}
+
+          {/* 疾病维度 */}
+          {showDim("disease") && (
+            <Dimension icon={Stethoscope} title="疾病维度" tone="var(--state-danger)">
+              <div className="space-y-4">
+                <FieldBlock label="病种类别">
+                  <Select value={filters.diseaseCat} onValueChange={(v) => set("diseaseCat", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {DISEASE_CATS.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+                <ChipGroup
+                  label="具体病种（可多选）"
+                  options={DISEASES}
+                  selected={filters.diseases}
+                  onToggle={(v) => toggleIn("diseases", v)}
+                />
+              </div>
+            </Dimension>
+          )}
+
+          {/* 处方维度 */}
+          {showDim("prescription") && (
+            <Dimension icon={FileText} title="处方维度" tone="var(--effect-ai-purple)">
+              <ChipGroup
+                label="处方方案（可多选）"
+                options={PRESCRIPTIONS}
+                selected={filters.prescriptions}
+                onToggle={(v) => toggleIn("prescriptions", v)}
+              />
+            </Dimension>
+          )}
+
+          {/* 工单维度 */}
+          {showDim("order") && (
+            <Dimension icon={ClipboardList} title="工单维度" tone="var(--state-warning)">
+              <div className="space-y-4">
+                <FieldBlock label="工单状态">
+                  <Select value={filters.status} onValueChange={(v) => set("status", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STATUS_OPTIONS.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+                <div>
+                  <div className="text-body-sm text-text-secondary mb-2">工单类型（可多选）</div>
+                  <div className="flex flex-wrap gap-2">
+                    {(Object.keys(WO_TYPE_LABEL) as WorkOrderType[]).map((t) => {
+                      const active = filters.woTypes.includes(t);
+                      const Icon = WO_TYPE_ICON[t];
+                      return (
+                        <button
+                          key={t}
+                          onClick={() => toggleIn("woTypes", t)}
+                          className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-full text-body-sm border transition-colors ${
+                            active
+                              ? "border-primary bg-brand-subtle text-primary"
+                              : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
+                          }`}
+                        >
+                          <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                          {WO_TYPE_LABEL[t]}
+                          {active && <Check className="h-3 w-3" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </Dimension>
+          )}
+
+          {/* 产犊维度 */}
+          {showDim("calving") && (
+            <Dimension icon={Baby} title="产犊维度" tone="var(--effect-ai-purple)">
+              <div className="space-y-4">
+                <FieldBlock label="犊牛结局">
+                  <Select value={filters.calfOutcome} onValueChange={(v) => set("calfOutcome", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {CALF_OUTCOMES.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+                <ChipGroup
+                  label="产犊方式（可多选）"
+                  options={CALVING_TYPES}
+                  selected={filters.calvingTypes}
+                  onToggle={(v) => toggleIn("calvingTypes", v)}
+                />
+              </div>
+            </Dimension>
+          )}
+
+          {/* 药品维度 */}
+          {showDim("drug") && (
+            <Dimension icon={Pill} title="药品维度" tone="var(--state-success)">
+              <div className="space-y-4">
+                <FieldBlock label="给药方式">
+                  <Select value={filters.drugRoute} onValueChange={(v) => set("drugRoute", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {DRUG_ROUTES.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+                <ChipGroup
+                  label="药品（可多选）"
+                  options={DRUGS}
+                  selected={filters.drugs}
+                  onToggle={(v) => toggleIn("drugs", v)}
+                />
+              </div>
+            </Dimension>
+          )}
+        </div>
+
+        <div className="border-t border-border px-6 py-4 flex items-center gap-3 bg-white">
+          <Button
+            className="h-10 px-5 bg-primary hover:bg-[var(--brand-hover)]"
+            onClick={() => {
+              setDrawerOpen(false);
+              runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`);
+            }}
+          >
+            <Filter className="h-4 w-4 mr-1.5" />
+            查看筛选结果
+          </Button>
+          {editingId ? (
+            <Button variant="outline" className="h-10 px-5" onClick={() => { saveEdits(); setDrawerOpen(false); }}>
+              <Save className="h-4 w-4 mr-1.5" />
+              保存模板修改
+            </Button>
+          ) : (
+            <Button variant="outline" className="h-10 px-5" onClick={() => openSave(filters)}>
+              <Save className="h-4 w-4 mr-1.5" />
+              保存为模板
+            </Button>
+          )}
+          <Button variant="ghost" className="h-10 px-5 ml-auto" onClick={() => setDrawerOpen(false)}>
+            取消
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+
 
   if (view === "templates") {
     return (
@@ -685,7 +1064,7 @@ function StatsPage() {
                         size="sm"
                         variant="ghost"
                         className="h-8 px-2 text-primary"
-                        onClick={() => runFilter(t.filters, t.name, "templates")}
+                        onClick={() => runFilter(t.filters, t.name)}
                       >
                         查看结果
                       </Button>
@@ -718,6 +1097,8 @@ function StatsPage() {
 
         </main>
         {saveDialog}
+        {catDialog}
+        {builderDrawer}
       </>
     );
   }
@@ -751,7 +1132,8 @@ function StatsPage() {
                 onClick={() => {
                   setFilters(resultFilters);
                   setEditingId(null);
-                  setView("builder");
+                  setBuilderCat(inferCategory(resultFilters));
+                  setDrawerOpen(true);
                 }}
               >
                 <Filter className="h-3.5 w-3.5 mr-1" />
@@ -844,283 +1226,15 @@ function StatsPage() {
           </Card>
         </main>
         {saveDialog}
+        {catDialog}
+        {builderDrawer}
       </>
     );
   }
 
-  return (
-    <>
-      <AppHeader
-        title="统计分析"
-        breadcrumb={["首页", "统计分析", editingTemplate ? editingTemplate.name : "新建筛选"]}
-      />
-      <main className="flex-1 px-6 py-6 space-y-5 bg-white">
-        <Button variant="outline" size="sm" className="h-9" onClick={() => setView("templates")}>
-          <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-          返回模板
-        </Button>
-        {/* 高级筛选 */}
-        <Card className="border-border bg-white p-6">
-          <div className="flex items-center justify-between mb-5 gap-4">
-            <div>
-              <div className="text-card-title font-medium text-foreground">
-                {editingTemplate ? `编辑模板：${editingTemplate.name}` : "新建筛选"}
-              </div>
-              <div className="text-caption text-text-tertiary mt-0.5">
-                支持时间、操作人员、疾病、处方、工单、产犊、药品七个维度组合筛选，可保存为模板复用
-              </div>
-            </div>
-
-            {activeCount > 0 && (
-              <button
-                onClick={() => setFilters(DEFAULT_FILTERS)}
-                className="text-caption text-text-tertiary hover:text-foreground inline-flex items-center gap-1 shrink-0"
-              >
-                <X className="h-3 w-3" /> 清空条件（{activeCount}）
-              </button>
-            )}
-          </div>
-
-          <div className="space-y-6">
-            {/* 时间维度 */}
-            <Dimension icon={CalendarDays} title="时间维度" tone="var(--brand)">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <FieldBlock label="时间范围">
-                  <Select value={filters.dateRange} onValueChange={(v) => set("dateRange", v)}>
-                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {DATE_PRESETS.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-                {filters.dateRange === "custom" && (
-                  <>
-                    <FieldBlock label="开始日期">
-                      <Input type="date" value={filters.dateStart} onChange={(e) => set("dateStart", e.target.value)} className="h-9 bg-white" />
-                    </FieldBlock>
-                    <FieldBlock label="结束日期">
-                      <Input type="date" value={filters.dateEnd} onChange={(e) => set("dateEnd", e.target.value)} className="h-9 bg-white" />
-                    </FieldBlock>
-                  </>
-                )}
-                <FieldBlock label="关键词（耳号 / 编号）">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
-                    <Input
-                      value={filters.keyword}
-                      onChange={(e) => set("keyword", e.target.value)}
-                      placeholder="输入关键词"
-                      className="h-9 pl-8 bg-white"
-                    />
-                  </div>
-                </FieldBlock>
-              </div>
-            </Dimension>
-
-            {/* 牧场维度 */}
-            <Dimension icon={Building2} title="牧场维度" tone="var(--effect-ai-purple)">
-              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
-                <FieldBlock label="区域">
-                  <Select value={filters.region} onValueChange={(v) => set("region", v)}>
-                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {REGION_OPTIONS.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-                <div className="space-y-4">
-                  <ChipGroup
-                    label="牧场（可多选）"
-                    options={
-                      filters.region === "all"
-                        ? FARM_NAMES
-                        : FARM_NAMES.filter((n) => REGION_OF[n] === filters.region)
-                    }
-                    selected={filters.farms}
-                    onToggle={(v) => toggleIn("farms", v)}
-                  />
-                  <ChipGroup
-                    label="牛舍（可多选）"
-                    options={BARN_NAMES}
-                    selected={filters.barns}
-                    onToggle={(v) => toggleIn("barns", v)}
-                  />
-                </div>
-              </div>
-            </Dimension>
-
-            {/* 操作人员维度 */}
-            <Dimension icon={Users} title="操作人员维度" tone="var(--effect-ai-cyan)">
-              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
-                <FieldBlock label="角色">
-                  <Select value={filters.role} onValueChange={(v) => set("role", v)}>
-                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {ROLE_OPTIONS.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-                <ChipGroup
-                  label="操作人员（可多选）"
-                  options={OPERATORS}
-                  selected={filters.operators}
-                  onToggle={(v) => toggleIn("operators", v)}
-                />
-              </div>
-            </Dimension>
-
-            {/* 疾病维度 */}
-            <Dimension icon={Stethoscope} title="疾病维度" tone="var(--state-danger)">
-              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
-                <FieldBlock label="病种类别">
-                  <Select value={filters.diseaseCat} onValueChange={(v) => set("diseaseCat", v)}>
-                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {DISEASE_CATS.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-                <ChipGroup
-                  label="具体病种（可多选）"
-                  options={DISEASES}
-                  selected={filters.diseases}
-                  onToggle={(v) => toggleIn("diseases", v)}
-                />
-              </div>
-            </Dimension>
-
-            {/* 处方维度 */}
-            <Dimension icon={FileText} title="处方维度" tone="var(--effect-ai-purple)">
-              <ChipGroup
-                label="处方方案（可多选）"
-                options={PRESCRIPTIONS}
-                selected={filters.prescriptions}
-                onToggle={(v) => toggleIn("prescriptions", v)}
-              />
-            </Dimension>
-
-            {/* 工单维度 */}
-            <Dimension icon={ClipboardList} title="工单维度" tone="var(--state-warning)">
-              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
-                <FieldBlock label="工单状态">
-                  <Select value={filters.status} onValueChange={(v) => set("status", v)}>
-                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {STATUS_OPTIONS.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-                <div>
-                  <div className="text-body-sm text-text-secondary mb-2">工单类型（可多选）</div>
-                  <div className="flex flex-wrap gap-2">
-                    {(Object.keys(WO_TYPE_LABEL) as WorkOrderType[]).map((t) => {
-                      const active = filters.woTypes.includes(t);
-                      const Icon = WO_TYPE_ICON[t];
-                      return (
-                        <button
-                          key={t}
-                          onClick={() => toggleIn("woTypes", t)}
-                          className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-full text-body-sm border transition-colors ${
-                            active
-                              ? "border-primary bg-brand-subtle text-primary"
-                              : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
-                          }`}
-                        >
-                          <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-                          {WO_TYPE_LABEL[t]}
-                          {active && <Check className="h-3 w-3" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </Dimension>
-
-            {/* 产犊维度 */}
-            <Dimension icon={Baby} title="产犊维度" tone="var(--effect-ai-purple)">
-              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
-                <FieldBlock label="犊牛结局">
-                  <Select value={filters.calfOutcome} onValueChange={(v) => set("calfOutcome", v)}>
-                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {CALF_OUTCOMES.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-                <ChipGroup
-                  label="产犊方式（可多选）"
-                  options={CALVING_TYPES}
-                  selected={filters.calvingTypes}
-                  onToggle={(v) => toggleIn("calvingTypes", v)}
-                />
-              </div>
-            </Dimension>
-
-            {/* 药品维度 */}
-            <Dimension icon={Pill} title="药品维度" tone="var(--state-success)">
-              <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-4">
-                <FieldBlock label="给药方式">
-                  <Select value={filters.drugRoute} onValueChange={(v) => set("drugRoute", v)}>
-                    <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {DRUG_ROUTES.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
-                <ChipGroup
-                  label="药品（可多选）"
-                  options={DRUGS}
-                  selected={filters.drugs}
-                  onToggle={(v) => toggleIn("drugs", v)}
-                />
-              </div>
-            </Dimension>
-          </div>
-
-          <div className="mt-6 flex items-center gap-3 pt-5 border-t border-border flex-wrap">
-            <Button
-              className="h-10 px-5 bg-primary hover:bg-[var(--brand-hover)]"
-              onClick={() => runFilter(filters, editingTemplate ? editingTemplate.name : "自定义筛选结果", "builder")}
-            >
-              <Filter className="h-4 w-4 mr-1.5" />
-              查看筛选结果
-            </Button>
-            {editingId ? (
-              <Button variant="outline" className="h-10 px-5" onClick={saveEdits}>
-                <Save className="h-4 w-4 mr-1.5" />
-                保存模板修改
-              </Button>
-            ) : (
-              <Button variant="outline" className="h-10 px-5" onClick={() => openSave(filters)}>
-                <Save className="h-4 w-4 mr-1.5" />
-                保存为模板
-              </Button>
-            )}
-            <div className="ml-auto text-caption text-text-tertiary max-w-[60%] text-right">
-              当前条件：{describeFilters(filters)}
-            </div>
-          </div>
-        </Card>
-      </main>
-      {saveDialog}
-    </>
-  );
+  return null;
 }
+
 
 
 // ============ small components ============
