@@ -14,6 +14,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import grasslandHero from "@/assets/grassland-hero.png";
 import { SHIFT_STAFF } from "@/lib/assignee-store";
@@ -104,9 +111,9 @@ const metricCards: MetricCard[] = [
 /** 集团管理者视角下的指标卡口径覆盖 */
 const groupCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-herd": { topic: "总存栏数", label: "（至今日）集团总存栏", value: "29500", unit: "头", delta: "+286 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
-  "topic-calving": { topic: "早产率", label: "（本月）早产率", value: "3.96", unit: "%", delta: "-0.4 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-calving": { topic: "早产率", label: "（本月）早产率", value: "3.96", unit: "%", delta: "-0.4 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: "344", unit: "头", delta: "-21 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
-  "topic-disease": { topic: "治愈率", label: "（本月）治愈率", value: "91.4", unit: "%", delta: "+1.6 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-disease": { topic: "治愈率", label: "（本月）治愈率", value: "91.4", unit: "%", delta: "+1.6 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-drug": { topic: "总药费支出", label: "（本月）集团总药费", value: "122.1", unit: "万元", delta: "+4.3 %", trend: "up", good: false, absolute: false, tone: "var(--effect-ai-purple)", visual: "spark" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: "4.4", unit: "天", delta: "-0.3 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
@@ -131,9 +138,9 @@ const groupTailCard: MetricCard = {
 const rm = regionMetrics(CURRENT_REGION);
 const regionCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-herd": { topic: "总存栏数", label: `（至今日）${CURRENT_REGION}总存栏`, value: String(rm.herd), unit: "头", delta: "+96 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
-  "topic-calving": { topic: "早产率", label: "（本月）区域早产率", value: String(rm.pretermRate), unit: "%", delta: "-0.3 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-calving": { topic: "早产率", label: "（本月）区域早产率", value: String(rm.pretermRate), unit: "%", delta: "-0.3 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: String(rm.deathCull), unit: "头", delta: "-8 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
-  "topic-disease": { topic: "治愈率", label: "（本月）区域治愈率", value: String(rm.cure), unit: "%", delta: "+1.2 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-disease": { topic: "治愈率", label: "（本月）区域治愈率", value: String(rm.cure), unit: "%", delta: "+1.2 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-drug": { topic: "总药费支出", label: "（本月）区域总药费", value: (rm.drugFee / 10000).toFixed(1), unit: "万元", delta: "+2.8 %", trend: "up", good: false, absolute: false, tone: "var(--effect-ai-purple)", visual: "spark" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(rm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
@@ -151,9 +158,9 @@ const regionTailCard: MetricCard = {
 const fm = farmMetrics(CURRENT_FARM.farm, CURRENT_FARM.region);
 const farmOutCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-herd": { topic: "总存栏数", label: "（至今日）本牧场存栏", value: String(fm.herd), unit: "头", delta: "+42 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
-  "topic-calving": { topic: "早产率", label: "（本月）本牧场早产率", value: String(fm.pretermRate), unit: "%", delta: "-0.2 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-calving": { topic: "早产率", label: "（本月）本牧场早产率", value: String(fm.pretermRate), unit: "%", delta: "-0.2 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: String(fm.deathCull), unit: "头", delta: "-3 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
-  "topic-disease": { topic: "治愈率", label: "（本月）本牧场治愈率", value: String(fm.cure), unit: "%", delta: "+0.8 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-disease": { topic: "治愈率", label: "（本月）本牧场治愈率", value: String(fm.cure), unit: "%", delta: "+0.8 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(fm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
 const farmOutLeadCard: MetricCard = {
@@ -283,6 +290,7 @@ function HomePage() {
   const [activeRequest, setActiveRequest] = useState<PendingRequest | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [attendanceOpen, setAttendanceOpen] = useState(false);
+  const [timeScope, setTimeScope] = useState<"today" | "month" | "quarter" | "year">("month");
   const alertsRef = useRef<HTMLDivElement | null>(null);
 
   const { scope, config } = useDashboardView();
@@ -299,13 +307,42 @@ function HomePage() {
     "topic-workorder": "workorder",
   };
   const { factor, level, levels } = useDataLevel();
+
+  /** 根据时间维度调整绝对数量指标的数值；存量/比率指标保持不变 */
+  const timeFactor =
+    timeScope === "today" ? 1 / 30 : timeScope === "quarter" ? 3 : timeScope === "year" ? 12 : 1;
+  const timePrefix: Record<typeof timeScope, string> = {
+    today: "（今日）",
+    month: "（本月）",
+    quarter: "（本季度）",
+    year: "（本年）",
+  };
+
   const scaleCardValue = (c: MetricCard) =>
     c.absolute
       ? c.value
           .split("/")
-          .map((part) => scaleValue(Number(part.trim().replace(/,/g, "")), factor).toLocaleString())
+          .map((part) => {
+            const raw = Number(part.trim().replace(/,/g, ""));
+            // 存栏类为存量，不随时间维度缩放；其余绝对量按时间维度缩放
+            const isStock = c.topic.includes("存栏") || c.label.includes("存栏");
+            return scaleValue(isStock ? raw : raw * timeFactor, isStock ? 1 : factor).toLocaleString();
+          })
           .join(" / ")
       : c.value;
+
+  const formatMetricLabel = (c: MetricCard) => {
+    // 时点/存量指标与最近完成类指标不随时间维度切换改变口径
+    if (c.label.includes("至今日") || c.label.includes("最近一次")) return c.label;
+    return c.label.replace(/（今日|本月|本季度|本年）/, timePrefix[timeScope]);
+  };
+
+  const applyTimeScope = (c: MetricCard) => ({
+    ...c,
+    label: formatMetricLabel(c),
+    value: String(scaleCardValue(c)),
+  });
+
   const baseCards = metricCards
     .map((c) =>
       scope === "group"
@@ -316,7 +353,7 @@ function HomePage() {
             ? { ...c, ...farmOutCardOverride[c.anchor] }
             : c,
     )
-
+    .map(applyTimeScope)
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
       (a, b) =>
@@ -331,14 +368,13 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? [groupLeadCard, map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), groupTailCard, map.get("总药费支出")]
+              ? [applyTimeScope(groupLeadCard), map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), applyTimeScope(groupTailCard), map.get("总药费支出")]
               : scope === "region"
-                ? [regionLeadCard, map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), regionTailCard]
-                : [map.get("总存栏数"), farmOutCalvingCard, map.get("早产率"), farmOutLeadCard, map.get("治愈率"), map.get("死淘总数")];
+                ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
+                : [map.get("总存栏数"), applyTimeScope(farmOutCalvingCard), map.get("早产率"), applyTimeScope(farmOutLeadCard), map.get("治愈率"), map.get("死淘总数")];
           return execOrder.filter(Boolean) as MetricCard[];
         })()
       : baseCards;
-
 
   const scrollToTopic = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -604,7 +640,7 @@ function HomePage() {
                           className="tabular-nums font-semibold leading-none"
                           style={{ fontSize: "28px", color: k.tone }}
                         >
-                          {scaleCardValue(k)}
+                          {k.value}
                         </span>
                         <span className="text-body-sm text-text-tertiary">{k.unit}</span>
                       </div>
@@ -685,19 +721,39 @@ function HomePage() {
           }
 
           const region = scope === "region" ? CURRENT_REGION : null;
-          const Frame = ({ title, children }: { title: string; children: ReactNode }) => (
+          const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
             <section>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="h-4 w-1 rounded-full bg-primary" />
-                <h3 className="text-section-title text-foreground">{title}</h3>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-1 rounded-full bg-primary" />
+                  <h3 className="text-section-title text-foreground">{title}</h3>
+                </div>
+                {extra}
               </div>
               {children}
             </section>
           );
 
+          const timeSelector = (
+            <Select
+              value={timeScope}
+              onValueChange={(v) => setTimeScope(v as typeof timeScope)}
+            >
+              <SelectTrigger className="h-8 w-[120px] border-border bg-card text-body-sm text-text-primary">
+                <SelectValue placeholder="选择时间" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">今日</SelectItem>
+                <SelectItem value="month">本月</SelectItem>
+                <SelectItem value="quarter">本季度</SelectItem>
+                <SelectItem value="year">本年</SelectItem>
+              </SelectContent>
+            </Select>
+          );
+
           return (
             <div className="space-y-6">
-              <Frame title="数据概览">{cardsGrid}</Frame>
+              <Frame title="数据概览" extra={timeSelector}>{cardsGrid}</Frame>
               <Frame title="数据看板">
                 <GroupExecSection scopeRegion={region} part="charts" />
               </Frame>
