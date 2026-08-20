@@ -567,7 +567,7 @@ function StatsPage() {
       {
         id: `t-${Date.now()}`,
         name: saveName.trim(),
-        category: inferCategory(saveSource),
+        category: builderCat ?? inferCategory(saveSource),
         desc: saveDesc.trim() || describeFilters(saveSource),
         icon: BarChart3,
         tone: "var(--brand)",
