@@ -482,7 +482,11 @@ export function WorkOrderPage({
     const kw = keyword.trim().toLowerCase();
     const list = orders
       .filter((o) => !deletedIds.includes(o.id))
-      .filter((o) => inRange(o.createdAt, range))
+      .filter((o) => {
+        const v = dateField === "createdAt" ? o.createdAt : dateField === "reviewedAt" ? o.reviewedAt : o.executedAt;
+        if (range !== "all" && !v) return false;
+        return inRange(v ?? "", range);
+      })
       .filter((o) =>
         kw
           ? [o.id, o.target, o.event, o.proposer]
@@ -511,7 +515,7 @@ export function WorkOrderPage({
             : parseTime(b.executedAt);
       return sortDir === "asc" ? va - vb : vb - va;
     });
-  }, [orders, active, range, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
+  }, [orders, active, range, dateField, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
 
   const leftFrozenKeys: ColKey[] = ["id"];
   const rightFrozenKeys: ColKey[] = ["action"];
