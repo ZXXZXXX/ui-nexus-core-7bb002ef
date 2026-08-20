@@ -331,8 +331,17 @@ function HomePage() {
           .join(" / ")
       : c.value;
 
-  const formatMetricLabel = (c: MetricCard) =>
-    c.label.replace(/（今日|本月|本季度|本年|至今日|最近一次）/, timeScope === "today" ? "（今日）" : timeScope === "month" ? "（本月）" : timeScope === "quarter" ? "（本季度）" : "（本年）");
+  const formatMetricLabel = (c: MetricCard) => {
+    // 时点/存量指标与最近完成类指标不随时间维度切换改变口径
+    if (c.label.includes("至今日") || c.label.includes("最近一次")) return c.label;
+    return c.label.replace(/（今日|本月|本季度|本年）/, timePrefix[timeScope]);
+  };
+
+  const applyTimeScope = (c: MetricCard) => ({
+    ...c,
+    label: formatMetricLabel(c),
+    value: c.absolute && timeScope !== "month" ? String(scaleCardValue(c)) : c.value,
+  });
 
   const baseCards = metricCards
     .map((c) =>
@@ -344,12 +353,7 @@ function HomePage() {
             ? { ...c, ...farmOutCardOverride[c.anchor] }
             : c,
     )
-    .map((c) => ({
-      ...c,
-      label: formatMetricLabel(c),
-      // 绝对量指标按时间维度缩放，并同步调整 delta 展示（演示数据）
-      value: c.absolute && timeScope !== "month" ? String(scaleCardValue(c)) : c.value,
-    }))
+    .map(applyTimeScope)
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
       (a, b) =>
@@ -364,10 +368,10 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? [groupLeadCard, map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), groupTailCard, map.get("总药费支出")]
+              ? [applyTimeScope(groupLeadCard), map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), applyTimeScope(groupTailCard), map.get("总药费支出")]
               : scope === "region"
-                ? [regionLeadCard, map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), regionTailCard]
-                : [map.get("总存栏数"), farmOutCalvingCard, map.get("早产率"), farmOutLeadCard, map.get("治愈率"), map.get("死淘总数")];
+                ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
+                : [map.get("总存栏数"), applyTimeScope(farmOutCalvingCard), map.get("早产率"), applyTimeScope(farmOutLeadCard), map.get("治愈率"), map.get("死淘总数")];
           return execOrder.filter(Boolean) as MetricCard[];
         })()
       : baseCards;
