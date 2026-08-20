@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { AppHeader } from "@/components/app-header";
 
@@ -685,7 +685,7 @@ function HomePage() {
           }
 
           const region = scope === "region" ? CURRENT_REGION : null;
-          const Frame = ({ title, children }: { title: string; children: React.ReactNode }) => (
+          const Frame = ({ title, children }: { title: string; children: ReactNode }) => (
             <section className="rounded-2xl border border-border bg-card p-5">
               <div className="flex items-center gap-2 mb-4">
                 <span className="h-4 w-1 rounded-full bg-primary" />
