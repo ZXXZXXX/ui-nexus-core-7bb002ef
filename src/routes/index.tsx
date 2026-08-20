@@ -158,9 +158,9 @@ const regionTailCard: MetricCard = {
 const fm = farmMetrics(CURRENT_FARM.farm, CURRENT_FARM.region);
 const farmOutCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-herd": { topic: "总存栏数", label: "（至今日）本牧场存栏", value: String(fm.herd), unit: "头", delta: "+42 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
-  "topic-calving": { topic: "早产率", label: "（本月）本牧场早产率", value: String(fm.pretermRate), unit: "%", delta: "-0.2 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-calving": { topic: "早产率", label: "（本月）本牧场早产率", value: String(fm.pretermRate), unit: "%", delta: "-0.2 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: String(fm.deathCull), unit: "头", delta: "-3 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
-  "topic-disease": { topic: "治愈率", label: "（本月）本牧场治愈率", value: String(fm.cure), unit: "%", delta: "+0.8 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-disease": { topic: "治愈率", label: "（本月）本牧场治愈率", value: String(fm.cure), unit: "%", delta: "+0.8 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(fm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
 const farmOutLeadCard: MetricCard = {
