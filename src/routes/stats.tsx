@@ -1539,6 +1539,48 @@ function StatsPage() {
 
 
 // ============ small components ============
+function RangeField({
+  label,
+  unit,
+  min,
+  max,
+  onMin,
+  onMax,
+}: {
+  label: string;
+  unit: string;
+  min: string;
+  max: string;
+  onMin: (v: string) => void;
+  onMax: (v: string) => void;
+}) {
+  return (
+    <div>
+      <Label className="text-body-sm text-text-secondary mb-1.5 block">{label}</Label>
+      <div className="flex items-center gap-2">
+        <Input
+          type="number"
+          inputMode="decimal"
+          value={min}
+          onChange={(e) => onMin(e.target.value)}
+          placeholder="最小"
+          className="h-9 bg-white"
+        />
+        <span className="text-text-tertiary text-body-sm shrink-0">~</span>
+        <Input
+          type="number"
+          inputMode="decimal"
+          value={max}
+          onChange={(e) => onMax(e.target.value)}
+          placeholder="最大"
+          className="h-9 bg-white"
+        />
+        <span className="text-caption text-text-tertiary shrink-0 w-6">{unit}</span>
+      </div>
+    </div>
+  );
+}
+
 function FieldBlock({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
