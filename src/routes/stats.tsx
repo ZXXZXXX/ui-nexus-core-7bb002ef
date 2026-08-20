@@ -632,12 +632,6 @@ const ROWS: Row[] = Array.from({ length: 36 }).map((_, i) => {
   };
 });
 
-const STATUS_TAG: Record<string, { label: string; bg: string; color: string }> = {
-  pending: { label: "待诊断", bg: "#FFF7ED", color: "#C2410C" },
-  executing: { label: "待执行", bg: "#EFF6FF", color: "#1D4ED8" },
-  done: { label: "已完成", bg: "#EFFBF1", color: "#00A14F" },
-  aborted: { label: "已终止", bg: "#F1F5F9", color: "#475569" },
-};
 
 // ============ 结果列：仅展示所选维度下的可筛选字段 ============
 type ResultCol = { key: string; label: string; num?: boolean; value: (r: Row) => string };
