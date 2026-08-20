@@ -318,6 +318,7 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
   const isExec = scope === "group" || scope === "region" || scope === "farm-out";
+  const showAttendance = !isExec || scope === "farm-out";
   const visibleCards =
     isExec
       ? (() => {
@@ -393,7 +394,13 @@ function HomePage() {
       <main className="flex-1 px-6 py-6 space-y-5">
         {/* Hero greeting — 三分栏数据条 */}
         <Card className="relative overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-[0_18px_50px_-32px_color-mix(in_oklab,var(--brand)_60%,transparent)]">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(340px,1.3fr)] divide-y lg:divide-y-0 lg:divide-x divide-border">
+          <div
+            className={`grid grid-cols-1 divide-y divide-border lg:divide-y-0 lg:divide-x ${
+              showAttendance
+                ? "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(340px,1.3fr)]"
+                : "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)]"
+            }`}
+          >
             {/* 1 · 问候 */}
             <div className="relative overflow-hidden px-5 py-4">
               <img
@@ -505,44 +512,48 @@ function HomePage() {
               </div>
             </div>
 
-            {/* 3 · 出勤 */}
-            <div className="flex flex-col justify-between px-5 py-4">
-              <div className="flex items-center justify-between">
-                <span className="text-caption text-text-tertiary">今日到岗</span>
-                <button
-                  type="button"
-                  onClick={() => setAttendanceOpen(true)}
-                  className="text-caption text-[var(--brand)] hover:underline"
-                >
-                  出勤明细 →
-                </button>
-              </div>
-              <div className="mt-3 grid grid-cols-[auto_repeat(3,minmax(0,1fr))] items-center gap-x-3 gap-y-1.5">
-                <span />
-                {["已签", "未签", "请假"].map((t) => (
-                  <span key={t} className="text-center text-caption text-text-tertiary">
-                    {t}
-                  </span>
-                ))}
-                {[
-                  { label: "上午场", signed: 6, absent: 1, leave: 1 },
-                  { label: "下午场", signed: 5, absent: 2, leave: 1 },
-                ].map((s) => (
-                  <Fragment key={s.label}>
-                    <span className="text-caption text-text-secondary whitespace-nowrap">{s.label}</span>
-                    <span className="text-center text-card-title font-medium tabular-nums text-text-primary">
-                      {s.signed}
-                    </span>
-                    <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-danger)]">
-                      {s.absent}
-                    </span>
-                    <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-alert)]">
-                      {s.leave}
-                    </span>
-                  </Fragment>
-                ))}
-              </div>
-            </div>
+            {showAttendance && (
+              <>
+                {/* 3 · 出勤 */}
+                <div className="flex flex-col justify-between px-5 py-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-caption text-text-tertiary">今日到岗</span>
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceOpen(true)}
+                      className="text-caption text-[var(--brand)] hover:underline"
+                    >
+                      出勤明细 →
+                    </button>
+                  </div>
+                  <div className="mt-3 grid grid-cols-[auto_repeat(3,minmax(0,1fr))] items-center gap-x-3 gap-y-1.5">
+                    <span />
+                    {["已签", "未签", "请假"].map((t) => (
+                      <span key={t} className="text-center text-caption text-text-tertiary">
+                        {t}
+                      </span>
+                    ))}
+                    {[
+                      { label: "上午场", signed: 6, absent: 1, leave: 1 },
+                      { label: "下午场", signed: 5, absent: 2, leave: 1 },
+                    ].map((s) => (
+                      <Fragment key={s.label}>
+                        <span className="text-caption text-text-secondary whitespace-nowrap">{s.label}</span>
+                        <span className="text-center text-card-title font-medium tabular-nums text-text-primary">
+                          {s.signed}
+                        </span>
+                        <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-danger)]">
+                          {s.absent}
+                        </span>
+                        <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-alert)]">
+                          {s.leave}
+                        </span>
+                      </Fragment>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </Card>
 
