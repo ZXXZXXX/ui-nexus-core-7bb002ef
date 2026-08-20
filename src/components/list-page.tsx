@@ -361,21 +361,42 @@ export function ListPage<T>({
         </div>
       </main>
 
-      {/* advanced filter */}
+      {/* filter + column settings */}
       <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
         <SheetContent side="right" className="w-[380px] sm:max-w-[380px] flex flex-col p-0">
           <SheetHeader className="px-5 py-4 border-b border-border">
-            <SheetTitle className="text-section">高级筛选</SheetTitle>
+            <SheetTitle className="text-section">筛选与列设置</SheetTitle>
+            <p className="text-caption text-text-tertiary">
+              勾选需要展示的列，并对展示中的列设置筛选条件
+            </p>
           </SheetHeader>
-          <div className="flex-1 overflow-auto px-5 py-4 space-y-4">
-            {columns
-              .filter((c) => c.filter !== "none")
-              .map((c) => {
-                const type = c.filter ?? "text";
-                return (
-                  <div key={c.key} className="space-y-1.5">
-                    <Label className="text-body-sm text-text-secondary">{c.label}</Label>
-                    {type === "select" ? (
+          <div className="flex-1 overflow-auto px-5 py-4 space-y-3">
+            {columns.map((c) => {
+              const type = c.filter ?? "text";
+              const on = draftVisible.includes(c.key);
+              return (
+                <div
+                  key={c.key}
+                  className={`rounded-md border border-border p-3 space-y-2 ${on ? "" : "bg-surface-subtle"}`}
+                >
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox
+                      checked={on}
+                      disabled={c.required}
+                      onCheckedChange={(v) =>
+                        setDraftVisible((prev) =>
+                          v
+                            ? columns
+                                .filter((x) => prev.includes(x.key) || x.key === c.key)
+                                .map((x) => x.key)
+                            : prev.filter((k) => k !== c.key),
+                        )
+                      }
+                    />
+                    <span className="text-body-sm text-foreground">{c.label}</span>
+                  </label>
+                  {on && type !== "none" && (
+                    type === "select" ? (
                       <Select
                         value={draft[c.key] || "__all"}
                         onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}
@@ -401,31 +422,41 @@ export function ListPage<T>({
                         placeholder={type === "date" ? "如 2026-05" : `包含…`}
                         className="h-9 text-body-sm"
                       />
-                    )}
-                  </div>
-                );
-              })}
+                    )
+                  )}
+                </div>
+              );
+            })}
           </div>
           <SheetFooter className="px-5 py-4 border-t border-border flex-row gap-2">
             <Button
               variant="outline"
               className="flex-1 h-9 text-body-sm font-normal"
-              onClick={() => setDraft({})}
+              onClick={() => {
+                setDraft({});
+                setDraftVisible(columns.filter((c) => !c.defaultHidden).map((c) => c.key));
+              }}
             >
               重置
             </Button>
             <Button
               className="flex-1 h-9 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
               onClick={() => {
-                setFilters(draft);
+                const next: Record<string, string> = {};
+                for (const [k, v] of Object.entries(draft)) {
+                  if (draftVisible.includes(k)) next[k] = v;
+                }
+                setFilters(next);
+                setVisible(draftVisible);
                 setFilterOpen(false);
               }}
             >
-              应用筛选
+              应用
             </Button>
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
     </>
   );
 }
