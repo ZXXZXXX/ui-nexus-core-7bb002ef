@@ -40,7 +40,7 @@ function base(overrides: Partial<TopicVisibility> = {}): TopicVisibility {
 }
 
 export const defaultConfig: Record<ReportScope, TopicVisibility> = {
-  "farm-in": base({ ops: false }),
+  "farm-in": base({ ops: false, culling: false }),
   "farm-out": base({ drug: false, workorder: false, alert: false, ops: true }),
   region: base(),
   group: base(),
@@ -51,7 +51,7 @@ export type TopicOrder = TopicKey[];
 export const defaultOrder: TopicOrder = topicMeta.map((t) => t.key);
 
 export const defaultOrders: Record<ReportScope, TopicOrder> = {
-  "farm-in": [...defaultOrder],
+  "farm-in": ["herd", "calving", "vaccine", "disease", "drug", "workorder", "culling", "alert", "ops"],
   "farm-out": [...defaultOrder],
   region: [...defaultOrder],
   group: [...defaultOrder],
@@ -82,7 +82,7 @@ type State = {
 
 const KEY = "pc:dashboard-view";
 /** 专题结构调整后需要重置旧的显隐配置，避免历史缓存把专题全部隐藏 */
-const VERSION = 2;
+const VERSION = 3;
 const listeners = new Set<() => void>();
 let state: State = { scope: "farm-in", config: defaultConfig, order: defaultOrders, level: "farm" };
 let loaded = false;
