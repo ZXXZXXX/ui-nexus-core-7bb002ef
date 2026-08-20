@@ -639,6 +639,95 @@ const STATUS_TAG: Record<string, { label: string; bg: string; color: string }> =
   aborted: { label: "已终止", bg: "#F1F5F9", color: "#475569" },
 };
 
+// ============ 结果列：仅展示所选维度下的可筛选字段 ============
+type ResultCol = { key: string; label: string; num?: boolean; value: (r: Row) => string };
+
+function seedNum(seed: string, min: number, max: number) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return min + (h % (max - min + 1));
+}
+const pickOf = <T,>(seed: string, list: T[]): T => list[seedNum(seed, 0, list.length - 1)];
+
+function resultColumns(cat: TplCategory, f: Filters): ResultCol[] {
+  const cols: ResultCol[] = [];
+  if (cat === "cattle") {
+    const isCalf = (r: Row) => r.barn.startsWith("犊牛");
+    cols.push(
+      { key: "earTag", label: "牛只耳号", value: (r) => r.earTag },
+      { key: "cattleType", label: "牛只类型", value: (r) => (isCalf(r) ? "犊牛" : pickOf(r.id + "ct", ["育成牛", "青年牛", "泌乳牛", "干奶牛"])) },
+      { key: "parity", label: "牛只胎次", num: true, value: (r) => (isCalf(r) ? "—" : `${seedNum(r.id + "p", 1, 5)} 胎`) },
+      { key: "reportCount", label: "报病次数", num: true, value: (r) => String(seedNum(r.id + "rc", 0, 6)) },
+      { key: "cowStatus", label: "当前状态", value: (r) => pickOf(r.id + "cs", COW_STATUSES) },
+    );
+    if (f.cattleTypes.includes("犊牛")) {
+      cols.push(
+        { key: "calfSex", label: "性别", value: (r) => pickOf(r.id + "sex", ["母", "公"]) },
+        { key: "birthWeight", label: "出生体重", num: true, value: (r) => `${seedNum(r.id + "bw", 32, 48)} kg` },
+        { key: "calfKeep", label: "留养情况", value: (r) => pickOf(r.id + "kp", ["留养", "不留养"]) },
+      );
+    }
+    if (f.cowStatuses.includes("死淘") || f.exitType !== "all") {
+      cols.push({ key: "exitType", label: "离场类型", value: (r) => pickOf(r.id + "ex", ["死亡", "淘汰", "转场"]) });
+    }
+    cols.push({ key: "createdAt", label: "统计时间", value: (r) => r.createdAt });
+    return cols;
+  }
+  if (cat === "disease") {
+    return [
+      { key: "diseaseCat", label: "疾病类型", value: (r) => (r.diseaseCat === "—" ? pickOf(r.id + "dc", Object.keys(DISEASES_OF_CAT)) : r.diseaseCat) },
+      { key: "disease", label: "疾病名称", value: (r) => (r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease) },
+      { key: "sub", label: "疾病子类型", value: (r) => { const d = r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease; return pickOf(r.id + "sb", SUBTYPES_OF[d] ?? ["常规"]); } },
+      { key: "caseCount", label: "发病头数", num: true, value: (r) => String(seedNum(r.id + "cc", 3, 68)) },
+      { key: "cureRate", label: "治愈率", num: true, value: (r) => `${seedNum(r.id + "cr", 62, 98)}%` },
+      { key: "cullRate", label: "死淘率", num: true, value: (r) => `${seedNum(r.id + "kr", 0, 12)}%` },
+      { key: "rx", label: "处方", value: (r) => r.prescription },
+      { key: "rxUsage", label: "处方使用率", num: true, value: (r) => `${seedNum(r.id + "ru", 15, 90)}%` },
+      { key: "rxCure", label: "处方治愈率", num: true, value: (r) => `${seedNum(r.id + "rk", 55, 97)}%` },
+      { key: "rxDays", label: "平均诊疗天数", num: true, value: (r) => `${seedNum(r.id + "rd", 2, 9)} 天` },
+      { key: "rxCost", label: "处方药费", num: true, value: (r) => `¥${seedNum(r.id + "rf", 40, 460)}` },
+    ];
+  }
+  if (cat === "drug") {
+    return [
+      { key: "drug", label: "药品名称", value: (r) => r.drug },
+      { key: "drugType", label: "药品类型", value: (r) => pickOf(r.id + "dt", DRUG_TYPES) },
+      { key: "usage", label: "使用量", num: true, value: (r) => `${seedNum(r.id + "us", 5, 320)} 支` },
+    ];
+  }
+  // staff
+  const perf = f.perfTypes.length ? f.perfTypes : PERF_TYPES;
+  cols.push(
+    { key: "farm", label: "牧场", value: (r) => r.farm },
+    { key: "operator", label: "姓名", value: (r) => r.operator },
+    { key: "role", label: "角色", value: () => "兽医" },
+    { key: "perf", label: "绩效类型", value: () => perf.join(" / ") },
+  );
+  if (perf.includes("治疗")) {
+    cols.push(
+      { key: "tCat", label: "治疗疾病类型", value: (r) => (r.diseaseCat === "—" ? pickOf(r.id + "dc", Object.keys(DISEASES_OF_CAT)) : r.diseaseCat) },
+      { key: "tDisease", label: "治疗疾病名称", value: (r) => (r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease) },
+      { key: "tSub", label: "治疗疾病子类型", value: (r) => { const d = r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease; return pickOf(r.id + "sb", SUBTYPES_OF[d] ?? ["常规"]); } },
+      { key: "tDays", label: "平均疗程", num: true, value: (r) => `${seedNum(r.id + "td", 2, 10)} 天` },
+      { key: "tRxUsage", label: "处方使用率", num: true, value: (r) => `${seedNum(r.id + "pu", 10, 92)}%` },
+      { key: "tRxCure", label: "处方治愈率", num: true, value: (r) => `${seedNum(r.id + "pc", 55, 98)}%` },
+      { key: "tSpecial", label: "特殊药品使用次数", num: true, value: (r) => String(seedNum(r.id + "sp", 0, 14)) },
+    );
+  }
+  if (perf.includes("接生")) {
+    cols.push({ key: "survival", label: "存活率", num: true, value: (r) => `${seedNum(r.id + "sv", 78, 100)}%` });
+  }
+  if (perf.includes("工单")) {
+    cols.push(
+      { key: "woType", label: "工单类型", value: (r) => WO_TYPE_LABEL[r.type] },
+      { key: "woDone", label: "完成次数", num: true, value: (r) => String(seedNum(r.id + "wd", 2, 60)) },
+      { key: "woOver", label: "逾期次数", num: true, value: (r) => String(seedNum(r.id + "wo", 0, 9)) },
+    );
+  }
+  return cols;
+}
+
+
 // ============ Page ============
 function StatsPage() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
