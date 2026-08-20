@@ -844,6 +844,8 @@ function StatsPage() {
           </Card>
         </main>
         {saveDialog}
+        {catDialog}
+        {builderDrawer}
       </>
     );
   }
