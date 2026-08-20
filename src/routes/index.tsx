@@ -290,6 +290,7 @@ function HomePage() {
   const [activeRequest, setActiveRequest] = useState<PendingRequest | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [attendanceOpen, setAttendanceOpen] = useState(false);
+  const [timeScope, setTimeScope] = useState<"today" | "month" | "quarter" | "year">("month");
   const alertsRef = useRef<HTMLDivElement | null>(null);
 
   const { scope, config } = useDashboardView();
@@ -306,13 +307,33 @@ function HomePage() {
     "topic-workorder": "workorder",
   };
   const { factor, level, levels } = useDataLevel();
+
+  /** 根据时间维度调整绝对数量指标的数值；存量/比率指标保持不变 */
+  const timeFactor =
+    timeScope === "today" ? 1 / 30 : timeScope === "quarter" ? 3 : timeScope === "year" ? 12 : 1;
+  const timePrefix: Record<typeof timeScope, string> = {
+    today: "（今日）",
+    month: "（本月）",
+    quarter: "（本季度）",
+    year: "（本年）",
+  };
+
   const scaleCardValue = (c: MetricCard) =>
     c.absolute
       ? c.value
           .split("/")
-          .map((part) => scaleValue(Number(part.trim().replace(/,/g, "")), factor).toLocaleString())
+          .map((part) => {
+            const raw = Number(part.trim().replace(/,/g, ""));
+            // 存栏类为存量，不随时间维度缩放；其余绝对量按时间维度缩放
+            const isStock = c.topic.includes("存栏") || c.label.includes("存栏");
+            return scaleValue(isStock ? raw : raw * timeFactor, isStock ? 1 : factor).toLocaleString();
+          })
           .join(" / ")
       : c.value;
+
+  const formatMetricLabel = (c: MetricCard) =>
+    c.label.replace(/（今日|本月|本季度|本年|至今日|最近一次）/, timeScope === "today" ? "（今日）" : timeScope === "month" ? "（本月）" : timeScope === "quarter" ? "（本季度）" : "（本年）");
+
   const baseCards = metricCards
     .map((c) =>
       scope === "group"
@@ -323,7 +344,12 @@ function HomePage() {
             ? { ...c, ...farmOutCardOverride[c.anchor] }
             : c,
     )
-
+    .map((c) => ({
+      ...c,
+      label: formatMetricLabel(c),
+      // 绝对量指标按时间维度缩放，并同步调整 delta 展示（演示数据）
+      value: c.absolute && timeScope !== "month" ? String(scaleCardValue(c)) : c.value,
+    }))
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
       (a, b) =>
@@ -345,7 +371,6 @@ function HomePage() {
           return execOrder.filter(Boolean) as MetricCard[];
         })()
       : baseCards;
-
 
   const scrollToTopic = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
