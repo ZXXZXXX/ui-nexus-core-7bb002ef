@@ -340,7 +340,7 @@ function HomePage() {
   const applyTimeScope = (c: MetricCard) => ({
     ...c,
     label: formatMetricLabel(c),
-    value: c.absolute && timeScope !== "month" ? String(scaleCardValue(c)) : c.value,
+    value: String(scaleCardValue(c)),
   });
 
   const baseCards = metricCards
@@ -640,7 +640,7 @@ function HomePage() {
                           className="tabular-nums font-semibold leading-none"
                           style={{ fontSize: "28px", color: k.tone }}
                         >
-                          {scaleCardValue(k)}
+                          {k.value}
                         </span>
                         <span className="text-body-sm text-text-tertiary">{k.unit}</span>
                       </div>
