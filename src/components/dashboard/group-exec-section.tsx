@@ -715,8 +715,8 @@ export function GroupExecSection({
     <div className="space-y-6">
       {scopeFarm ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch [&>*]:h-full">
-          <PostpartumRankSection scopeFarm={scopeFarm} />
           <HerdSection />
+          <PostpartumRankSection scopeFarm={scopeFarm} />
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
