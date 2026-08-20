@@ -19,7 +19,7 @@ import {
   Check,
   Plus,
   Building2,
-
+  MoreHorizontal,
   CalendarDays,
   Users,
   ClipboardList,
@@ -1076,12 +1076,12 @@ function StatsPage() {
                         查看结果
                       </Button>
                       <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => openBuilder(t)}>
-                        编辑模板
+                        编辑
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button size="sm" variant="ghost" className="h-8 px-2 text-text-tertiary">
-                            更多
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-text-tertiary">
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
