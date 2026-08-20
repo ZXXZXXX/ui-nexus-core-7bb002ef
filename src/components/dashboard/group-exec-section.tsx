@@ -877,6 +877,7 @@ export function farmMetrics(farmName: string, region: string) {
   const f = GROUP_FARMS.find((x) => x.farm === farmName && x.region === region) ?? GROUP_FARMS[0];
   return {
     herd: f.herd,
+    calving: f.calving,
     pretermRate: Number(((f.preterm / (f.calving || 1)) * 100).toFixed(1)),
     deathCull: f.death + f.cull,
     sick: f.sick,
