@@ -710,10 +710,17 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
 export function GroupExecSection({
   scopeRegion,
   scopeFarm,
-}: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null } = {}) {
+  part = "all",
+}: {
+  scopeRegion?: string | null;
+  scopeFarm?: { farm: string; region: string } | null;
+  part?: "all" | "charts" | "rank";
+} = {}) {
+  const showCharts = part === "all" || part === "charts";
+  const showRank = part === "all" || part === "rank";
   return (
     <div className="space-y-6">
-      {scopeFarm ? (
+      {showCharts && (scopeFarm ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch [&>*]:h-full">
           <HerdSection />
           <PostpartumRankSection scopeFarm={scopeFarm} />
@@ -723,14 +730,15 @@ export function GroupExecSection({
           <PostpartumRankSection scopeRegion={scopeRegion} />
           <DrugTrendSection scopeRegion={scopeRegion} />
         </div>
-      )}
-      {scopeRegion && !scopeFarm ? (
+      ))}
+      {showCharts && scopeRegion && !scopeFarm ? (
         <WorkOrderSection farms={GROUP_FARMS.filter((f) => f.region === scopeRegion).map((f) => f.farm)} />
       ) : null}
-      <PanoramaSection scopeRegion={scopeRegion} scopeFarm={scopeFarm} />
+      {showRank && <PanoramaSection scopeRegion={scopeRegion} scopeFarm={scopeFarm} />}
     </div>
   );
 }
+
 
 
 /** 集团视角指标卡数据 */
