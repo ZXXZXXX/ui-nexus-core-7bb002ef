@@ -1038,7 +1038,6 @@ function StatsPage() {
                         </button>
                         <div className="min-w-0">
                           <div className="text-body-sm font-medium text-foreground truncate">{t.name}</div>
-                          <div className="text-caption text-text-tertiary truncate max-w-[320px]">{t.desc}</div>
                         </div>
                       </div>
                     </TableCell>
