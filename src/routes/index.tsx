@@ -512,44 +512,48 @@ function HomePage() {
               </div>
             </div>
 
-            {/* 3 · 出勤 */}
-            <div className="flex flex-col justify-between px-5 py-4">
-              <div className="flex items-center justify-between">
-                <span className="text-caption text-text-tertiary">今日到岗</span>
-                <button
-                  type="button"
-                  onClick={() => setAttendanceOpen(true)}
-                  className="text-caption text-[var(--brand)] hover:underline"
-                >
-                  出勤明细 →
-                </button>
-              </div>
-              <div className="mt-3 grid grid-cols-[auto_repeat(3,minmax(0,1fr))] items-center gap-x-3 gap-y-1.5">
-                <span />
-                {["已签", "未签", "请假"].map((t) => (
-                  <span key={t} className="text-center text-caption text-text-tertiary">
-                    {t}
-                  </span>
-                ))}
-                {[
-                  { label: "上午场", signed: 6, absent: 1, leave: 1 },
-                  { label: "下午场", signed: 5, absent: 2, leave: 1 },
-                ].map((s) => (
-                  <Fragment key={s.label}>
-                    <span className="text-caption text-text-secondary whitespace-nowrap">{s.label}</span>
-                    <span className="text-center text-card-title font-medium tabular-nums text-text-primary">
-                      {s.signed}
-                    </span>
-                    <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-danger)]">
-                      {s.absent}
-                    </span>
-                    <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-alert)]">
-                      {s.leave}
-                    </span>
-                  </Fragment>
-                ))}
-              </div>
-            </div>
+            {showAttendance && (
+              <>
+                {/* 3 · 出勤 */}
+                <div className="flex flex-col justify-between px-5 py-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-caption text-text-tertiary">今日到岗</span>
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceOpen(true)}
+                      className="text-caption text-[var(--brand)] hover:underline"
+                    >
+                      出勤明细 →
+                    </button>
+                  </div>
+                  <div className="mt-3 grid grid-cols-[auto_repeat(3,minmax(0,1fr))] items-center gap-x-3 gap-y-1.5">
+                    <span />
+                    {["已签", "未签", "请假"].map((t) => (
+                      <span key={t} className="text-center text-caption text-text-tertiary">
+                        {t}
+                      </span>
+                    ))}
+                    {[
+                      { label: "上午场", signed: 6, absent: 1, leave: 1 },
+                      { label: "下午场", signed: 5, absent: 2, leave: 1 },
+                    ].map((s) => (
+                      <Fragment key={s.label}>
+                        <span className="text-caption text-text-secondary whitespace-nowrap">{s.label}</span>
+                        <span className="text-center text-card-title font-medium tabular-nums text-text-primary">
+                          {s.signed}
+                        </span>
+                        <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-danger)]">
+                          {s.absent}
+                        </span>
+                        <span className="text-center text-card-title font-medium tabular-nums text-[var(--state-alert)]">
+                          {s.leave}
+                        </span>
+                      </Fragment>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </Card>
 
