@@ -1699,6 +1699,21 @@ function describeFilters(f: Filters): string {
   if (f.operators.length) parts.push(`人员 ${f.operators.join("、")}`);
   if (f.diseaseCat !== "all") parts.push(f.diseaseCat);
   if (f.diseases.length) parts.push(`病种 ${f.diseases.join("、")}`);
+  if (f.diseaseSubs.length) parts.push(`子类型 ${f.diseaseSubs.join("、")}`);
+  {
+    const rangeLabels: [string, string, string, string][] = [
+      ["发病头数", f.caseCountMin, f.caseCountMax, "头"],
+      ["治愈率", f.cureRateMin, f.cureRateMax, "%"],
+      ["死淘率", f.cullRateMin, f.cullRateMax, "%"],
+      ["处方使用率", f.rxUsageMin, f.rxUsageMax, "%"],
+      ["处方治愈率", f.rxCureMin, f.rxCureMax, "%"],
+      ["平均诊疗天数", f.rxDaysMin, f.rxDaysMax, "天"],
+      ["处方药费", f.rxCostMin, f.rxCostMax, "元"],
+    ];
+    rangeLabels.forEach(([label, a, b, u]) => {
+      if (a !== "" || b !== "") parts.push(`${label} ${a || "不限"}~${b || "不限"}${u}`);
+    });
+  }
   if (f.prescriptions.length) parts.push(`处方 ${f.prescriptions.join("、")}`);
   parts.push(f.woTypes.length ? f.woTypes.map((t) => WO_TYPE_LABEL[t]).join("、") : "全部工单类型");
   if (f.status !== "all") parts.push(STATUS_OPTIONS.find((s) => s.value === f.status)?.label || "");
