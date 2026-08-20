@@ -590,13 +590,11 @@ function StatsPage() {
   };
 
   const toggleFreeze = (id: string) => {
+    const nextFrozen = !(templates.find((t) => t.id === id)?.frozen);
     setTemplates((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, frozen: !t.frozen } : t,
-      ),
+      prev.map((t) => (t.id === id ? { ...t, frozen: nextFrozen } : t)),
     );
-    const t = templates.find((x) => x.id === id);
-    toast.success(t?.frozen ? "模板已解冻" : "模板已冻结");
+    toast.success(nextFrozen ? "模板已冻结" : "模板已解冻");
   };
 
   const toggleFav = (id: string) => {
