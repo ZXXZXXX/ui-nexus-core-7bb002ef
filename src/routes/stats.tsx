@@ -1830,6 +1830,45 @@ function StatsPage() {
 
 
 // ============ small components ============
+/** 预置区间选项：value 形如 "min|max"，空串表示不限 */
+const RANGE_PRESETS: Record<string, { value: string; label: string }[]> = {
+  "%": [
+    { value: "|", label: "不限" },
+    { value: "|60", label: "低于 60%" },
+    { value: "60|80", label: "60% ~ 80%" },
+    { value: "80|90", label: "80% ~ 90%" },
+    { value: "90|", label: "90% 以上" },
+  ],
+  天: [
+    { value: "|", label: "不限" },
+    { value: "|3", label: "3 天以内" },
+    { value: "3|7", label: "3 ~ 7 天" },
+    { value: "7|14", label: "7 ~ 14 天" },
+    { value: "14|", label: "14 天以上" },
+  ],
+  次: [
+    { value: "|", label: "不限" },
+    { value: "|5", label: "5 次以内" },
+    { value: "5|10", label: "5 ~ 10 次" },
+    { value: "10|20", label: "10 ~ 20 次" },
+    { value: "20|", label: "20 次以上" },
+  ],
+  头: [
+    { value: "|", label: "不限" },
+    { value: "|10", label: "10 头以内" },
+    { value: "10|50", label: "10 ~ 50 头" },
+    { value: "50|100", label: "50 ~ 100 头" },
+    { value: "100|", label: "100 头以上" },
+  ],
+  元: [
+    { value: "|", label: "不限" },
+    { value: "|100", label: "100 元以内" },
+    { value: "100|300", label: "100 ~ 300 元" },
+    { value: "300|600", label: "300 ~ 600 元" },
+    { value: "600|", label: "600 元以上" },
+  ],
+};
+
 function RangeField({
   label,
   unit,
@@ -1845,32 +1884,31 @@ function RangeField({
   onMin: (v: string) => void;
   onMax: (v: string) => void;
 }) {
+  const presets = RANGE_PRESETS[unit] ?? RANGE_PRESETS["次"];
+  const current = `${min}|${max}`;
+  const value = presets.some((p) => p.value === current) ? current : "|";
   return (
     <div>
       <Label className="text-body-sm text-text-secondary mb-1.5 block">{label}</Label>
-      <div className="flex items-center gap-2">
-        <Input
-          type="number"
-          inputMode="decimal"
-          value={min}
-          onChange={(e) => onMin(e.target.value)}
-          placeholder="最小"
-          className="h-9 bg-white"
-        />
-        <span className="text-text-tertiary text-body-sm shrink-0">~</span>
-        <Input
-          type="number"
-          inputMode="decimal"
-          value={max}
-          onChange={(e) => onMax(e.target.value)}
-          placeholder="最大"
-          className="h-9 bg-white"
-        />
-        <span className="text-caption text-text-tertiary shrink-0 w-6">{unit}</span>
-      </div>
+      <Select
+        value={value}
+        onValueChange={(v) => {
+          const [lo, hi] = v.split("|");
+          onMin(lo);
+          onMax(hi);
+        }}
+      >
+        <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+        <SelectContent>
+          {presets.map((p) => (
+            <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }
+
 
 function FieldBlock({ label, children }: { label: string; children: React.ReactNode }) {
   return (
