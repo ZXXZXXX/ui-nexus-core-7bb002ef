@@ -751,7 +751,8 @@ function StatsPage() {
                 onClick={() => {
                   setFilters(resultFilters);
                   setEditingId(null);
-                  setView("builder");
+                  setBuilderCat(inferCategory(resultFilters));
+                  setDrawerOpen(true);
                 }}
               >
                 <Filter className="h-3.5 w-3.5 mr-1" />
