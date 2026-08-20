@@ -249,6 +249,22 @@ type Filters = {
   // 疾病维度
   diseases: string[];
   diseaseCat: string;
+  diseaseSubs: string[];
+  // 疾病指标区间（min/max，空表示不限）
+  caseCountMin: string;
+  caseCountMax: string;
+  cureRateMin: string;
+  cureRateMax: string;
+  cullRateMin: string;
+  cullRateMax: string;
+  rxUsageMin: string;
+  rxUsageMax: string;
+  rxCureMin: string;
+  rxCureMax: string;
+  rxDaysMin: string;
+  rxDaysMax: string;
+  rxCostMin: string;
+  rxCostMax: string;
   // 处方维度
   prescriptions: string[];
   // 工单维度
