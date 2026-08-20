@@ -626,7 +626,7 @@ function HomePage() {
                 <GroupExecSection scopeRegion={scope === "group" ? null : CURRENT_REGION} />
               ) : (
                 <div className="space-y-6">
-                  <ExecFocusSection level={scope === "region" ? "region" : "farm"} />
+                  <ExecFocusSection level="farm" />
                   {scope !== "farm-out" && <OpsSection level="region" />}
                 </div>
 
