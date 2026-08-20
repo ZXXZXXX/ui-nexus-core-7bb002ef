@@ -1027,7 +1027,7 @@ function StatsPage() {
           {showDim("disease") && (
             <Dimension icon={Stethoscope} title="疾病维度" tone="var(--state-danger)">
               <div className="space-y-4">
-                <FieldBlock label="病种类别">
+                <FieldBlock label="疾病类型">
                   <Select value={filters.diseaseCat} onValueChange={(v) => set("diseaseCat", v)}>
                     <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -1037,13 +1037,104 @@ function StatsPage() {
                     </SelectContent>
                   </Select>
                 </FieldBlock>
+
                 <ChipGroup
-                  label="具体病种（可多选）"
-                  options={DISEASES}
+                  label="疾病名称（可多选）"
+                  options={
+                    filters.diseaseCat === "all"
+                      ? DISEASES
+                      : DISEASES_OF_CAT[filters.diseaseCat] || []
+                  }
                   selected={filters.diseases}
                   onToggle={(v) => toggleIn("diseases", v)}
                 />
+
+                {(() => {
+                  const base =
+                    filters.diseases.length > 0
+                      ? filters.diseases
+                      : filters.diseaseCat === "all"
+                        ? DISEASES
+                        : DISEASES_OF_CAT[filters.diseaseCat] || [];
+                  const subs = Array.from(
+                    new Set(base.flatMap((d) => SUBTYPES_OF[d] || [])),
+                  );
+                  if (subs.length === 0) return null;
+                  return (
+                    <div className="pl-3 border-l-2 border-primary/30">
+                      <ChipGroup
+                        label="疾病子类型（可多选）"
+                        options={subs}
+                        selected={filters.diseaseSubs}
+                        onToggle={(v) => toggleIn("diseaseSubs", v)}
+                      />
+                    </div>
+                  );
+                })()}
+
+                <div className="pt-1 space-y-3">
+                  <div className="text-body-sm text-text-secondary">指标区间（留空表示不限）</div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <RangeField
+                      label="发病头数"
+                      unit="头"
+                      min={filters.caseCountMin}
+                      max={filters.caseCountMax}
+                      onMin={(v) => set("caseCountMin", v)}
+                      onMax={(v) => set("caseCountMax", v)}
+                    />
+                    <RangeField
+                      label="治愈率"
+                      unit="%"
+                      min={filters.cureRateMin}
+                      max={filters.cureRateMax}
+                      onMin={(v) => set("cureRateMin", v)}
+                      onMax={(v) => set("cureRateMax", v)}
+                    />
+                    <RangeField
+                      label="死淘率"
+                      unit="%"
+                      min={filters.cullRateMin}
+                      max={filters.cullRateMax}
+                      onMin={(v) => set("cullRateMin", v)}
+                      onMax={(v) => set("cullRateMax", v)}
+                    />
+                    <RangeField
+                      label="各处方使用率"
+                      unit="%"
+                      min={filters.rxUsageMin}
+                      max={filters.rxUsageMax}
+                      onMin={(v) => set("rxUsageMin", v)}
+                      onMax={(v) => set("rxUsageMax", v)}
+                    />
+                    <RangeField
+                      label="各处方治愈率"
+                      unit="%"
+                      min={filters.rxCureMin}
+                      max={filters.rxCureMax}
+                      onMin={(v) => set("rxCureMin", v)}
+                      onMax={(v) => set("rxCureMax", v)}
+                    />
+                    <RangeField
+                      label="各处方平均诊疗天数"
+                      unit="天"
+                      min={filters.rxDaysMin}
+                      max={filters.rxDaysMax}
+                      onMin={(v) => set("rxDaysMin", v)}
+                      onMax={(v) => set("rxDaysMax", v)}
+                    />
+                    <RangeField
+                      label="各处方药费"
+                      unit="元"
+                      min={filters.rxCostMin}
+                      max={filters.rxCostMax}
+                      onMin={(v) => set("rxCostMin", v)}
+                      onMax={(v) => set("rxCostMax", v)}
+                    />
+                  </div>
+                </div>
               </div>
+
             </Dimension>
           )}
 
