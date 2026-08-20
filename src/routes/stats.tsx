@@ -1070,17 +1070,17 @@ function StatsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 px-2 text-primary"
+                        className="h-8 px-2 text-primary hover:bg-transparent hover:font-semibold"
                         onClick={() => runFilter(t.filters, t.name)}
                       >
                         查看结果
                       </Button>
-                      <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => openBuilder(t)}>
+                      <Button size="sm" variant="ghost" className="h-8 px-2 hover:bg-transparent hover:font-semibold hover:text-text-primary" onClick={() => openBuilder(t)}>
                         编辑
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-text-tertiary">
+                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-text-tertiary hover:bg-transparent hover:text-text-primary">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
