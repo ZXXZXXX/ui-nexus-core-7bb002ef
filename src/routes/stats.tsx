@@ -172,6 +172,15 @@ const DRUG_ROUTES = [
   { value: "口服", label: "口服" },
 ];
 const DRUG_TYPES = ["抗生素", "消炎药", "止痛药", "体液补充剂", "驱虫药", "激素类", "其他"];
+const DRUGS_OF_TYPE: Record<string, string[]> = {
+  抗生素: ["精制盐酸头孢噻呋注射液"],
+  消炎药: ["氟尼新葡甲胺注射液"],
+  止痛药: [],
+  体液补充剂: ["复方氯化钠注射液", "20% 葡萄糖注射液"],
+  驱虫药: ["伊维菌素注射液"],
+  激素类: [],
+  其他: ["产后灌注"],
+};
 const CALVING_TYPES = ["顺产", "轻度助产", "难产", "剖腹产"];
 const CALF_OUTCOMES = [
   { value: "all", label: "全部犊牛结局" },
@@ -1038,8 +1047,29 @@ function StatsPage() {
                   label="牛只类型（可多选）"
                   options={CATTLE_TYPES}
                   selected={filters.cattleTypes}
-                  onToggle={(v) => toggleIn("cattleTypes", v)}
+                  onToggle={(v) => {
+                    if (v === "犊牛" && !filters.cattleTypes.includes("犊牛")) {
+                      setFilters((p) => ({ ...p, cattleTypes: ["犊牛"], parities: [] }));
+                      return;
+                    }
+                    toggleIn("cattleTypes", v);
+                  }}
+                  disabledOptions={
+                    filters.parities.length > 0
+                      ? ["犊牛"]
+                      : filters.cattleTypes.includes("犊牛")
+                        ? CATTLE_TYPES.filter((t) => t !== "犊牛")
+                        : []
+                  }
+                  hint={
+                    filters.cattleTypes.includes("犊牛")
+                      ? "犊牛与成母牛群体口径不同，不可同时选择，且无胎次维度"
+                      : filters.parities.length > 0
+                        ? "已选择胎次条件，犊牛不适用"
+                        : undefined
+                  }
                 />
+
 
                 {filters.cattleTypes.includes("犊牛") && (
                   <div className="pl-3 border-l-2 border-primary/30 space-y-4">
@@ -1078,12 +1108,14 @@ function StatsPage() {
                   </div>
                 )}
 
-                <ChipGroup
-                  label="牛只胎次（可多选）"
-                  options={PARITY_OPTIONS}
-                  selected={filters.parities}
-                  onToggle={(v) => toggleIn("parities", v)}
-                />
+                {!filters.cattleTypes.includes("犊牛") && (
+                  <ChipGroup
+                    label="牛只胎次（可多选）"
+                    options={PARITY_OPTIONS}
+                    selected={filters.parities}
+                    onToggle={(v) => toggleIn("parities", v)}
+                  />
+                )}
 
                 <FieldBlock label="报病次数">
                   <Select value={filters.reportCount} onValueChange={(v) => set("reportCount", v)}>
@@ -1171,22 +1203,18 @@ function StatsPage() {
                       selected={filters.treatDiseases}
                       onToggle={(v) => toggleIn("treatDiseases", v)}
                     />
-                    {(() => {
-                      const base =
-                        filters.treatDiseases.length > 0
-                          ? filters.treatDiseases
-                          : filters.treatDiseaseCat === "all"
-                            ? DISEASES
-                            : DISEASES_OF_CAT[filters.treatDiseaseCat] || [];
-                      const subs = Array.from(new Set(base.flatMap((d) => SUBTYPES_OF[d] || [])));
+                    {filters.treatDiseases.length > 0 && (() => {
+                      const subs = Array.from(new Set(filters.treatDiseases.flatMap((d) => SUBTYPES_OF[d] || [])));
                       if (subs.length === 0) return null;
                       return (
-                        <ChipGroup
-                          label="治疗疾病子类型（可多选）"
-                          options={subs}
-                          selected={filters.treatSubs}
-                          onToggle={(v) => toggleIn("treatSubs", v)}
-                        />
+                        <div className="pl-3 border-l-2 border-primary/30">
+                          <ChipGroup
+                            label="治疗疾病子类型（可多选）"
+                            options={subs}
+                            selected={filters.treatSubs}
+                            onToggle={(v) => toggleIn("treatSubs", v)}
+                          />
+                        </div>
                       );
                     })()}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1322,15 +1350,9 @@ function StatsPage() {
                   onToggle={(v) => toggleIn("diseases", v)}
                 />
 
-                {(() => {
-                  const base =
-                    filters.diseases.length > 0
-                      ? filters.diseases
-                      : filters.diseaseCat === "all"
-                        ? DISEASES
-                        : DISEASES_OF_CAT[filters.diseaseCat] || [];
+                {filters.diseases.length > 0 && (() => {
                   const subs = Array.from(
-                    new Set(base.flatMap((d) => SUBTYPES_OF[d] || [])),
+                    new Set(filters.diseases.flatMap((d) => SUBTYPES_OF[d] || [])),
                   );
                   if (subs.length === 0) return null;
                   return (
@@ -1509,12 +1531,22 @@ function StatsPage() {
                   selected={filters.drugTypes}
                   onToggle={(v) => toggleIn("drugTypes", v)}
                 />
-                <ChipGroup
-                  label="药品（可多选）"
-                  options={DRUGS}
-                  selected={filters.drugs}
-                  onToggle={(v) => toggleIn("drugs", v)}
-                />
+                {filters.drugTypes.length > 0 && (() => {
+                  const list = Array.from(
+                    new Set(filters.drugTypes.flatMap((t) => DRUGS_OF_TYPE[t] || [])),
+                  );
+                  if (list.length === 0) return null;
+                  return (
+                    <div className="pl-3 border-l-2 border-primary/30">
+                      <ChipGroup
+                        label="药品（可多选）"
+                        options={list}
+                        selected={filters.drugs}
+                        onToggle={(v) => toggleIn("drugs", v)}
+                      />
+                    </div>
+                  );
+                })()}
                 <div className="pt-1">
                   <RangeField
                     label="使用量"
@@ -1882,11 +1914,15 @@ function ChipGroup({
   options,
   selected,
   onToggle,
+  disabledOptions = [],
+  hint,
 }: {
   label: string;
   options: string[];
   selected: string[];
   onToggle: (v: string) => void;
+  disabledOptions?: string[];
+  hint?: string;
 }) {
   return (
     <div>
@@ -1894,14 +1930,18 @@ function ChipGroup({
       <div className="flex flex-wrap gap-2">
         {options.map((o) => {
           const active = selected.includes(o);
+          const disabled = !active && disabledOptions.includes(o);
           return (
             <button
               key={o}
-              onClick={() => onToggle(o)}
+              disabled={disabled}
+              onClick={() => !disabled && onToggle(o)}
               className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-full text-body-sm border transition-colors ${
                 active
                   ? "border-primary bg-brand-subtle text-primary"
-                  : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
+                  : disabled
+                    ? "border-border bg-surface-muted text-text-tertiary cursor-not-allowed opacity-60"
+                    : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
               }`}
             >
               {o}
@@ -1910,9 +1950,11 @@ function ChipGroup({
           );
         })}
       </div>
+      {hint && <div className="text-caption text-text-tertiary mt-2">{hint}</div>}
     </div>
   );
 }
+
 
 // ============ util ============
 function countActive(f: Filters): number {
