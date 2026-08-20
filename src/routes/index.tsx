@@ -394,7 +394,13 @@ function HomePage() {
       <main className="flex-1 px-6 py-6 space-y-5">
         {/* Hero greeting — 三分栏数据条 */}
         <Card className="relative overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-[0_18px_50px_-32px_color-mix(in_oklab,var(--brand)_60%,transparent)]">
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(340px,1.3fr)] divide-y lg:divide-y-0 lg:divide-x divide-border">
+          <div
+            className={`grid grid-cols-1 divide-y divide-border lg:divide-y-0 lg:divide-x ${
+              showAttendance
+                ? "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(340px,1.3fr)]"
+                : "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)]"
+            }`}
+          >
             {/* 1 · 问候 */}
             <div className="relative overflow-hidden px-5 py-4">
               <img
