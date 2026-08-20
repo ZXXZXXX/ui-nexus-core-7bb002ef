@@ -1348,15 +1348,9 @@ function StatsPage() {
                   onToggle={(v) => toggleIn("diseases", v)}
                 />
 
-                {(() => {
-                  const base =
-                    filters.diseases.length > 0
-                      ? filters.diseases
-                      : filters.diseaseCat === "all"
-                        ? DISEASES
-                        : DISEASES_OF_CAT[filters.diseaseCat] || [];
+                {filters.diseases.length > 0 && (() => {
                   const subs = Array.from(
-                    new Set(base.flatMap((d) => SUBTYPES_OF[d] || [])),
+                    new Set(filters.diseases.flatMap((d) => SUBTYPES_OF[d] || [])),
                   );
                   if (subs.length === 0) return null;
                   return (
