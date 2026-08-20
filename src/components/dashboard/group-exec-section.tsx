@@ -526,17 +526,15 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 }
 
 function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null }) {
-  const [drill, setDrill] = useState<string | null>(null);
-  const region = scopeRegion ?? drill;
-  const setRegion = scopeRegion || scopeFarm ? () => {} : setDrill;
+  const [viewMode, setViewMode] = useState<"region" | "farm">("region");
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "pp30", dir: "asc" });
 
   const baseRows = useMemo(() => {
     if (scopeFarm) return farmMonthlyRows(scopeFarm.farm, scopeFarm.region);
-    return region
-      ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
-      : [...regionRows];
-  }, [region, scopeFarm]);
+    if (scopeRegion) return GROUP_FARMS.filter((f) => f.region === scopeRegion).map((f) => agg(f.farm, f.base, [f]));
+    if (viewMode === "farm") return [...farmRows];
+    return [...regionRows];
+  }, [scopeRegion, scopeFarm, viewMode]);
 
   const rows = useMemo(() => {
     const list = [...baseRows];
@@ -584,7 +582,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
 
   const exportCsv = () => {
     // 仅导出当前视图（当前层级 + 当前排序）的数据
-    const nameLabel = scopeFarm ? "月份" : region ? "牧场名称" : "区域名称";
+    const nameLabel = scopeFarm ? "月份" : scopeRegion || viewMode === "farm" ? "牧场名称" : "区域名称";
     const head = ["序号", ...cols.map((c) => (c.key === "name" ? nameLabel : c.label))];
     const body = rows.map((r, i) => [i + 1, ...cols.map((c) => fmt(r, c.key))]);
     const csv =
@@ -592,7 +590,14 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${scopeFarm ? `关键指标统计_${scopeFarm.farm}` : `关键指标排行_${region ?? "区域排名"}`}_${rows.length}条.csv`;
+    const rankLabel = scopeFarm
+      ? `统计_${scopeFarm.farm}`
+      : scopeRegion
+        ? `排行_${scopeRegion}`
+        : viewMode === "farm"
+          ? "按牧场排行"
+          : "按区域排行";
+    a.download = `${scopeFarm ? "关键指标统计" : "关键指标排行"}_${rankLabel}_${rows.length}条.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`已导出当前视图 ${rows.length} 条数据`);
@@ -603,19 +608,39 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
     <SectionCard
       id="topic-panorama"
       title={scopeFarm ? "关键指标统计" : "关键指标排行"}
-      desc={scopeFarm ? `${scopeFarm.farm} · 近 12 个月` : region ? `${region} · 牧场排名` : "区域排名"}
+      desc={
+        scopeFarm
+          ? `${scopeFarm.farm} · 近 12 个月`
+          : scopeRegion
+            ? `${scopeRegion} · 牧场排名`
+            : viewMode === "farm"
+              ? "全部牧场排名"
+              : "区域排名"
+      }
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          {region && !scopeRegion && !scopeFarm && (
-            <button
-              type="button"
-              onClick={() => setRegion(null)}
-              className="inline-flex items-center gap-1 text-caption text-primary hover:underline"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-              返回区域
-            </button>
+          {!scopeRegion && !scopeFarm && (
+            <div className="inline-flex items-center rounded-full border border-border bg-surface-subtle p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode("region")}
+                className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                  viewMode === "region" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+                }`}
+              >
+                按区域排行
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("farm")}
+                className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                  viewMode === "farm" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+                }`}
+              >
+                按牧场排行
+              </button>
+            </div>
           )}
           <button
             type="button"
@@ -631,9 +656,11 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       <p className="text-body-sm text-text-secondary mb-4">
         {scopeFarm
           ? "本牧场近 12 个月各项关键指标统计"
-          : region
+          : scopeRegion
             ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
-            : "点击某区域可下钻查看该区域下所有牧场排名"}
+            : viewMode === "farm"
+              ? "集团下所有牧场按死淘、药费、产后淘汰率横向对比"
+              : "集团下各区域按死淘、药费、产后淘汰率横向对比"}
       </p>
 
       <div className="overflow-x-auto">
@@ -648,7 +675,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
                   onClick={c.key === "name" || scopeFarm ? undefined : () => onSort(c.key)}
                 >
                   <span className="inline-flex items-center gap-1">
-                    {c.key === "name" ? (scopeFarm ? "月份" : region ? "牧场名称" : "区域名称") : c.label}
+                    {c.key === "name" ? (scopeFarm ? "月份" : scopeRegion || viewMode === "farm" ? "牧场名称" : "区域名称") : c.label}
                     {c.key !== "name" && !scopeFarm && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
                   </span>
                 </th>
@@ -657,11 +684,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
           </thead>
           <tbody>
             {rows.map((r, i) => (
-              <tr
-                key={r.key}
-                className={`border-t border-border ${region || scopeFarm ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
-                onClick={region || scopeFarm ? undefined : () => setRegion(r.key)}
-              >
+              <tr key={r.key} className="border-t border-border">
                 <td className="py-3">
                   <span
                     className="inline-flex h-6 w-6 items-center justify-center rounded-full text-caption tabular-nums"
