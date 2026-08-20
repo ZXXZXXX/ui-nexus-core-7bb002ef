@@ -646,7 +646,7 @@ function HomePage() {
               ) : (
                 <div className="space-y-6">
                   <ExecFocusSection level="farm" />
-                  {scope !== "farm-out" && <OpsSection level="region" />}
+                  <OpsSection level="region" />
                 </div>
 
               );
