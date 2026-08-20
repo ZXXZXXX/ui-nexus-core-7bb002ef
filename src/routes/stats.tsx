@@ -853,6 +853,99 @@ function StatsPage() {
             </Dimension>
           )}
 
+          {/* 牛只维度 */}
+          {showDim("cattle") && (
+            <Dimension icon={Beef} title="牛只维度" tone="var(--brand)">
+              <div className="space-y-4">
+                <ChipGroup
+                  label="牛只类型（可多选）"
+                  options={CATTLE_TYPES}
+                  selected={filters.cattleTypes}
+                  onToggle={(v) => toggleIn("cattleTypes", v)}
+                />
+
+                {filters.cattleTypes.includes("犊牛") && (
+                  <div className="pl-3 border-l-2 border-primary/30 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FieldBlock label="性别">
+                        <Select value={filters.calfSex} onValueChange={(v) => set("calfSex", v)}>
+                          <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {CALF_SEX_OPTIONS.map((d) => (
+                              <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldBlock>
+                      <FieldBlock label="出生体重">
+                        <Select value={filters.calfWeight} onValueChange={(v) => set("calfWeight", v)}>
+                          <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {CALF_WEIGHT_OPTIONS.map((d) => (
+                              <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldBlock>
+                      <FieldBlock label="留养情况">
+                        <Select value={filters.calfKeep} onValueChange={(v) => set("calfKeep", v)}>
+                          <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {CALF_KEEP_OPTIONS.map((d) => (
+                              <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldBlock>
+                    </div>
+                  </div>
+                )}
+
+                <ChipGroup
+                  label="牛只胎次（可多选）"
+                  options={PARITY_OPTIONS}
+                  selected={filters.parities}
+                  onToggle={(v) => toggleIn("parities", v)}
+                />
+
+                <FieldBlock label="报病次数">
+                  <Select value={filters.reportCount} onValueChange={(v) => set("reportCount", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {REPORT_COUNT_OPTIONS.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+
+                <ChipGroup
+                  label="当前状态（可多选）"
+                  options={COW_STATUSES}
+                  selected={filters.cowStatuses}
+                  onToggle={(v) => toggleIn("cowStatuses", v)}
+                />
+
+                {filters.cowStatuses.includes("死淘") && (
+                  <div className="pl-3 border-l-2 border-primary/30">
+                    <FieldBlock label="离场类型">
+                      <Select value={filters.exitType} onValueChange={(v) => set("exitType", v)}>
+                        <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {EXIT_TYPE_OPTIONS.map((d) => (
+                            <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FieldBlock>
+                  </div>
+                )}
+              </div>
+            </Dimension>
+          )}
+
+
+
           {/* 操作人员维度 */}
           {showDim("staff") && (
             <Dimension icon={Users} title="操作人员维度" tone="var(--effect-ai-cyan)">
