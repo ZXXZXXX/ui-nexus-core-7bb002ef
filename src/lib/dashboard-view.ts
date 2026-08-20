@@ -124,7 +124,7 @@ function load(): State {
 
 function persist() {
   try {
-    localStorage.setItem(KEY, JSON.stringify(state));
+    localStorage.setItem(KEY, JSON.stringify({ ...state, v: VERSION }));
   } catch {}
   listeners.forEach((fn) => fn());
 }
