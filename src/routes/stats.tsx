@@ -144,6 +144,7 @@ const DATE_PRESETS = [
 
 /** 维度取值字典 */
 const OPERATORS = ["王强", "李峰", "陈明", "赵霞", "周乐言"];
+const PERF_TYPES = ["治疗", "接生", "工单"];
 const ROLE_OPTIONS = [
   { value: "all", label: "全部角色" },
   { value: "vet", label: "兽医" },
@@ -247,6 +248,25 @@ type Filters = {
   // 操作人员维度
   operators: string[];
   role: string;
+  // 人员绩效
+  perfTypes: string[];
+  treatDiseaseCat: string;
+  treatDiseases: string[];
+  treatSubs: string[];
+  treatDaysMin: string;
+  treatDaysMax: string;
+  perfRxUsageMin: string;
+  perfRxUsageMax: string;
+  perfRxCureMin: string;
+  perfRxCureMax: string;
+  specialDrugMin: string;
+  specialDrugMax: string;
+  survivalMin: string;
+  survivalMax: string;
+  woDoneMin: string;
+  woDoneMax: string;
+  woOverdueMin: string;
+  woOverdueMax: string;
   // 疾病维度
   diseases: string[];
   diseaseCat: string;
@@ -303,6 +323,24 @@ const DEFAULT_FILTERS: Filters = {
   barns: [],
   operators: [],
   role: "all",
+  perfTypes: [],
+  treatDiseaseCat: "all",
+  treatDiseases: [],
+  treatSubs: [],
+  treatDaysMin: "",
+  treatDaysMax: "",
+  perfRxUsageMin: "",
+  perfRxUsageMax: "",
+  perfRxCureMin: "",
+  perfRxCureMax: "",
+  specialDrugMin: "",
+  specialDrugMax: "",
+  survivalMin: "",
+  survivalMax: "",
+  woDoneMin: "",
+  woDoneMax: "",
+  woOverdueMin: "",
+  woOverdueMax: "",
   diseases: [],
   diseaseCat: "all",
   diseaseSubs: [],
@@ -815,7 +853,7 @@ function StatsPage() {
     if (cat === "cattle") return d === "cattle" || d === "order" || d === "calving";
     if (cat === "disease") return d === "disease" || d === "order" || d === "prescription";
     if (cat === "drug") return d === "drug" || d === "prescription";
-    return d === "staff" || d === "order";
+    return d === "staff";
   };
 
   const builderDrawer = (
@@ -1008,24 +1046,173 @@ function StatsPage() {
 
           {/* 操作人员维度 */}
           {showDim("staff") && (
-            <Dimension icon={Users} title="操作人员维度" tone="var(--effect-ai-cyan)">
+            <Dimension icon={Users} title="人员维度" tone="var(--effect-ai-cyan)">
               <div className="space-y-4">
-                <FieldBlock label="角色">
-                  <Select value={filters.role} onValueChange={(v) => set("role", v)}>
+                <FieldBlock label="角色（当前仅支持兽医）">
+                  <Select value="vet" onValueChange={(v) => set("role", v)}>
                     <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {ROLE_OPTIONS.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
+                      <SelectItem value="vet">兽医</SelectItem>
                     </SelectContent>
                   </Select>
                 </FieldBlock>
                 <ChipGroup
-                  label="操作人员（可多选）"
+                  label="人员（可多选）"
                   options={OPERATORS}
                   selected={filters.operators}
                   onToggle={(v) => toggleIn("operators", v)}
                 />
+                <ChipGroup
+                  label="绩效类型（可多选）"
+                  options={PERF_TYPES}
+                  selected={filters.perfTypes}
+                  onToggle={(v) => toggleIn("perfTypes", v)}
+                />
+
+                {filters.perfTypes.includes("治疗") && (
+                  <div className="pl-3 border-l-2 border-primary/30 space-y-4">
+                    <div className="text-body-sm text-text-secondary">治疗绩效</div>
+                    <FieldBlock label="治疗疾病类型">
+                      <Select value={filters.treatDiseaseCat} onValueChange={(v) => set("treatDiseaseCat", v)}>
+                        <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {DISEASE_CATS.map((d) => (
+                            <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FieldBlock>
+                    <ChipGroup
+                      label="治疗疾病名称（可多选）"
+                      options={
+                        filters.treatDiseaseCat === "all"
+                          ? DISEASES
+                          : DISEASES_OF_CAT[filters.treatDiseaseCat] || []
+                      }
+                      selected={filters.treatDiseases}
+                      onToggle={(v) => toggleIn("treatDiseases", v)}
+                    />
+                    {(() => {
+                      const base =
+                        filters.treatDiseases.length > 0
+                          ? filters.treatDiseases
+                          : filters.treatDiseaseCat === "all"
+                            ? DISEASES
+                            : DISEASES_OF_CAT[filters.treatDiseaseCat] || [];
+                      const subs = Array.from(new Set(base.flatMap((d) => SUBTYPES_OF[d] || [])));
+                      if (subs.length === 0) return null;
+                      return (
+                        <ChipGroup
+                          label="治疗疾病子类型（可多选）"
+                          options={subs}
+                          selected={filters.treatSubs}
+                          onToggle={(v) => toggleIn("treatSubs", v)}
+                        />
+                      );
+                    })()}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <RangeField
+                        label="治疗疾病平均疗程"
+                        unit="天"
+                        min={filters.treatDaysMin}
+                        max={filters.treatDaysMax}
+                        onMin={(v) => set("treatDaysMin", v)}
+                        onMax={(v) => set("treatDaysMax", v)}
+                      />
+                      <RangeField
+                        label="该疾病各处方使用率"
+                        unit="%"
+                        min={filters.perfRxUsageMin}
+                        max={filters.perfRxUsageMax}
+                        onMin={(v) => set("perfRxUsageMin", v)}
+                        onMax={(v) => set("perfRxUsageMax", v)}
+                      />
+                      <RangeField
+                        label="该疾病各处方治愈率"
+                        unit="%"
+                        min={filters.perfRxCureMin}
+                        max={filters.perfRxCureMax}
+                        onMin={(v) => set("perfRxCureMin", v)}
+                        onMax={(v) => set("perfRxCureMax", v)}
+                      />
+                      <RangeField
+                        label="该疾病特殊药品使用次数"
+                        unit="次"
+                        min={filters.specialDrugMin}
+                        max={filters.specialDrugMax}
+                        onMin={(v) => set("specialDrugMin", v)}
+                        onMax={(v) => set("specialDrugMax", v)}
+                      />
+                    </div>
+                    <div className="text-caption text-text-tertiary">
+                      处方治愈率＝该兽医使用该处方治愈次数 ÷ 使用该处方次数
+                    </div>
+                  </div>
+                )}
+
+                {filters.perfTypes.includes("接生") && (
+                  <div className="pl-3 border-l-2 border-primary/30 space-y-4">
+                    <div className="text-body-sm text-text-secondary">接生绩效</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <RangeField
+                        label="存活率"
+                        unit="%"
+                        min={filters.survivalMin}
+                        max={filters.survivalMax}
+                        onMin={(v) => set("survivalMin", v)}
+                        onMax={(v) => set("survivalMax", v)}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {filters.perfTypes.includes("工单") && (
+                  <div className="pl-3 border-l-2 border-primary/30 space-y-4">
+                    <div className="text-body-sm text-text-secondary">工单绩效</div>
+                    <div>
+                      <div className="text-body-sm text-text-secondary mb-2">工单类型（可多选）</div>
+                      <div className="flex flex-wrap gap-2">
+                        {(Object.keys(WO_TYPE_LABEL) as WorkOrderType[]).map((t) => {
+                          const active = filters.woTypes.includes(t);
+                          const Icon = WO_TYPE_ICON[t];
+                          return (
+                            <button
+                              key={t}
+                              onClick={() => toggleIn("woTypes", t)}
+                              className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-full text-body-sm border transition-colors ${
+                                active
+                                  ? "border-primary bg-brand-subtle text-primary"
+                                  : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
+                              }`}
+                            >
+                              <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+                              {WO_TYPE_LABEL[t]}
+                              {active && <Check className="h-3 w-3" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <RangeField
+                        label="各类型工单完成次数"
+                        unit="次"
+                        min={filters.woDoneMin}
+                        max={filters.woDoneMax}
+                        onMin={(v) => set("woDoneMin", v)}
+                        onMax={(v) => set("woDoneMax", v)}
+                      />
+                      <RangeField
+                        label="各类型逾期次数"
+                        unit="次"
+                        min={filters.woOverdueMin}
+                        max={filters.woOverdueMax}
+                        onMin={(v) => set("woOverdueMin", v)}
+                        onMax={(v) => set("woOverdueMax", v)}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </Dimension>
           )}
@@ -1694,7 +1881,8 @@ function countActive(f: Filters): number {
   if (f.exitType !== "all") n++;
   if (f.keyword) n++;
   if (f.onlyAbnormal) n++;
-  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.diseaseSubs.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.drugTypes.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length;
+  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.diseaseSubs.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.drugTypes.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length + f.perfTypes.length + f.treatDiseases.length + f.treatSubs.length;
+  if (f.treatDiseaseCat !== "all") n++;
   const ranges: [string, string][] = [
     [f.caseCountMin, f.caseCountMax],
     [f.cureRateMin, f.cureRateMax],
@@ -1704,6 +1892,13 @@ function countActive(f: Filters): number {
     [f.rxDaysMin, f.rxDaysMax],
     [f.rxCostMin, f.rxCostMax],
     [f.drugUsageMin, f.drugUsageMax],
+    [f.treatDaysMin, f.treatDaysMax],
+    [f.perfRxUsageMin, f.perfRxUsageMax],
+    [f.perfRxCureMin, f.perfRxCureMax],
+    [f.specialDrugMin, f.specialDrugMax],
+    [f.survivalMin, f.survivalMax],
+    [f.woDoneMin, f.woDoneMax],
+    [f.woOverdueMin, f.woOverdueMax],
   ];
   n += ranges.filter(([a, b]) => a !== "" || b !== "").length;
   return n;
@@ -1721,6 +1916,10 @@ function describeFilters(f: Filters): string {
   if (f.barns.length) parts.push(`牛舍 ${f.barns.join("、")}`);
   if (f.role !== "all") parts.push(ROLE_OPTIONS.find((d) => d.value === f.role)?.label || "");
   if (f.operators.length) parts.push(`人员 ${f.operators.join("、")}`);
+  if (f.perfTypes.length) parts.push(`绩效 ${f.perfTypes.join("、")}`);
+  if (f.treatDiseaseCat !== "all") parts.push(`治疗病种类别 ${f.treatDiseaseCat}`);
+  if (f.treatDiseases.length) parts.push(`治疗病种 ${f.treatDiseases.join("、")}`);
+  if (f.treatSubs.length) parts.push(`治疗子类型 ${f.treatSubs.join("、")}`);
   if (f.diseaseCat !== "all") parts.push(f.diseaseCat);
   if (f.diseases.length) parts.push(`病种 ${f.diseases.join("、")}`);
   if (f.diseaseSubs.length) parts.push(`子类型 ${f.diseaseSubs.join("、")}`);
@@ -1734,6 +1933,13 @@ function describeFilters(f: Filters): string {
       ["平均诊疗天数", f.rxDaysMin, f.rxDaysMax, "天"],
       ["处方药费", f.rxCostMin, f.rxCostMax, "元"],
       ["使用量", f.drugUsageMin, f.drugUsageMax, "次"],
+      ["平均疗程", f.treatDaysMin, f.treatDaysMax, "天"],
+      ["处方使用率(人)", f.perfRxUsageMin, f.perfRxUsageMax, "%"],
+      ["处方治愈率(人)", f.perfRxCureMin, f.perfRxCureMax, "%"],
+      ["特殊药品使用", f.specialDrugMin, f.specialDrugMax, "次"],
+      ["存活率", f.survivalMin, f.survivalMax, "%"],
+      ["工单完成", f.woDoneMin, f.woDoneMax, "次"],
+      ["工单逾期", f.woOverdueMin, f.woOverdueMax, "次"],
     ];
     rangeLabels.forEach(([label, a, b, u]) => {
       if (a !== "" || b !== "") parts.push(`${label} ${a || "不限"}~${b || "不限"}${u}`);
