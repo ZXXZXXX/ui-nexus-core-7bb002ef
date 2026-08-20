@@ -317,6 +317,8 @@ export function WorkOrderPage({
   const reviewDateRef = useRef<HTMLInputElement>(null);
   const [keyword, setKeyword] = useState("");
   const [range, setRange] = useState<DateRange>("all");
+  const [dateField, setDateField] = useState<"createdAt" | "reviewedAt" | "executedAt">("createdAt");
+
   const [advOpen, setAdvOpen] = useState(false);
   const [advProposer, setAdvProposer] = useState<string>("all");
   const [advExecutor, setAdvExecutor] = useState<string>("all");
@@ -480,7 +482,11 @@ export function WorkOrderPage({
     const kw = keyword.trim().toLowerCase();
     const list = orders
       .filter((o) => !deletedIds.includes(o.id))
-      .filter((o) => inRange(o.createdAt, range))
+      .filter((o) => {
+        const v = dateField === "createdAt" ? o.createdAt : dateField === "reviewedAt" ? o.reviewedAt : o.executedAt;
+        if (range !== "all" && !v) return false;
+        return inRange(v ?? "", range);
+      })
       .filter((o) =>
         kw
           ? [o.id, o.target, o.event, o.proposer]
@@ -509,7 +515,7 @@ export function WorkOrderPage({
             : parseTime(b.executedAt);
       return sortDir === "asc" ? va - vb : vb - va;
     });
-  }, [orders, active, range, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
+  }, [orders, active, range, dateField, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
 
   const leftFrozenKeys: ColKey[] = ["id"];
   const rightFrozenKeys: ColKey[] = ["action"];
@@ -713,7 +719,16 @@ export function WorkOrderPage({
             <div className="flex items-center gap-2 flex-wrap">
               {/* 快捷时间筛选 */}
               <div className="flex items-center gap-1 p-0.5 rounded-md border border-border bg-surface-subtle">
-                <span className="px-2 text-caption text-text-tertiary">按创建时间</span>
+                <Select value={dateField} onValueChange={(v) => setDateField(v as typeof dateField)}>
+                  <SelectTrigger className="h-7 w-[112px] border-0 bg-transparent shadow-none text-caption text-text-secondary px-2 focus:ring-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="createdAt">按提出时间</SelectItem>
+                    <SelectItem value="reviewedAt">按诊断时间</SelectItem>
+                    <SelectItem value="executedAt">按执行时间</SelectItem>
+                  </SelectContent>
+                </Select>
                 {dateRanges.map((r) => (
                   <button
                     key={r.key}
@@ -728,6 +743,7 @@ export function WorkOrderPage({
                   </button>
                 ))}
               </div>
+
               <Button
                 variant="outline"
                 size="sm"
