@@ -238,6 +238,15 @@ type Filters = {
   // 药品维度
   drugs: string[];
   drugRoute: string;
+  // 牛只维度
+  cattleTypes: string[];
+  parities: string[];
+  reportCount: string;
+  cowStatuses: string[];
+  calfSex: string;
+  calfWeight: string;
+  calfKeep: string;
+  exitType: string;
   // 其它
   keyword: string;
   onlyAbnormal: boolean;
@@ -261,6 +270,14 @@ const DEFAULT_FILTERS: Filters = {
   calfOutcome: "all",
   drugs: [],
   drugRoute: "all",
+  cattleTypes: [],
+  parities: [],
+  reportCount: "all",
+  cowStatuses: [],
+  calfSex: "all",
+  calfWeight: "all",
+  calfKeep: "all",
+  exitType: "all",
   keyword: "",
   onlyAbnormal: false,
 };
