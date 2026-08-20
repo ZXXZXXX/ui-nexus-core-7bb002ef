@@ -83,35 +83,41 @@ type MetricCard = {
   topic: string;
   /** 绝对数量指标：随统计层级上卷；比率类指标不随层级变化 */
   absolute?: boolean;
+  /** 主题色，用于图标、数值与装饰元素 */
+  tone: string;
+  /** 右下角装饰图形 */
+  visual: StatVisualVariant;
 };
 
 const metricCards: MetricCard[] = [
-  { topic: "存栏总数", label: "（至今日）存栏总数", value: "4060", unit: "头", trend: "up", delta: "+38 头", icon: Beef, anchor: "topic-herd", good: true, absolute: true },
-  { topic: "产犊总数", label: "（本月）产犊数", value: "179", unit: "头", trend: "up", delta: "+12 头", icon: Baby, anchor: "topic-calving", good: true, absolute: true },
-  { topic: "死淘总数", label: "（本月）死淘数", value: "45", unit: "头", trend: "down", delta: "-6 头", icon: Activity, anchor: "topic-culling", good: true, absolute: true },
-  { topic: "治愈/报病数量", label: "（本月）治愈 / 发病头次", value: "337 / 365", unit: "头次", trend: "down", delta: "-4.2 %", icon: Stethoscope, anchor: "topic-disease", good: true, absolute: true },
-  { topic: "药费统计", label: "（本月）头均用药费用", value: "42.6", unit: "元/头", trend: "up", delta: "+6.9 %", icon: Pill, anchor: "topic-drug", good: false },
-  { topic: "免疫完成率", label: "（最近一次）疫苗完成率", value: "93.1", unit: "%", trend: "up", delta: "+2.3 %", icon: Syringe, anchor: "topic-vaccine", good: true },
+  { topic: "存栏总数", label: "（至今日）存栏总数", value: "4060", unit: "头", trend: "up", delta: "+38 头", icon: Beef, anchor: "topic-herd", good: true, absolute: true, tone: "var(--brand)", visual: "bars" },
+  { topic: "产犊总数", label: "（本月）产犊数", value: "179", unit: "头", trend: "up", delta: "+12 头", icon: Baby, anchor: "topic-calving", good: true, absolute: true, tone: "#FF8A3D", visual: "spark" },
+  { topic: "死淘总数", label: "（本月）死淘数", value: "45", unit: "头", trend: "down", delta: "-6 头", icon: Activity, anchor: "topic-culling", good: true, absolute: true, tone: "var(--state-danger)", visual: "truck" },
+  { topic: "治愈/报病数量", label: "（本月）治愈 / 发病头次", value: "337 / 365", unit: "头次", trend: "down", delta: "-4.2 %", icon: Stethoscope, anchor: "topic-disease", good: true, absolute: true, tone: "var(--state-success)", visual: "bars" },
+  { topic: "药费统计", label: "（本月）头均用药费用", value: "42.6", unit: "元/头", trend: "up", delta: "+6.9 %", icon: Pill, anchor: "topic-drug", good: false, tone: "var(--effect-ai-purple)", visual: "spark" },
+  { topic: "免疫完成率", label: "（最近一次）疫苗完成率", value: "93.1", unit: "%", trend: "up", delta: "+2.3 %", icon: Syringe, anchor: "topic-vaccine", good: true, tone: "var(--effect-ai-cyan)", visual: "ring" },
 ];
 
 /** 集团管理者视角下的指标卡口径覆盖 */
 const groupCardOverride: Record<string, Partial<MetricCard>> = {
-  "topic-herd": { topic: "总存栏数", label: "（至今日）集团总存栏", value: "29500", unit: "头", delta: "+286 头", trend: "up", good: true },
-  "topic-calving": { topic: "早产率", label: "（本月）早产率", value: "3.96", unit: "%", delta: "-0.4 pp", trend: "down", good: true },
-  "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: "344", unit: "头", delta: "-21 头", trend: "down", good: true },
-  "topic-disease": { topic: "治愈率", label: "（本月）治愈率", value: "91.4", unit: "%", delta: "+1.6 pp", trend: "up", good: true },
-  "topic-drug": { topic: "总药费支出", label: "（本月）集团总药费", value: "122.1", unit: "万元", delta: "+4.3 %", trend: "up", good: false, absolute: false },
-  "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: "4.4", unit: "天", delta: "-0.3 天", trend: "down", good: true, absolute: false },
+  "topic-herd": { topic: "总存栏数", label: "（至今日）集团总存栏", value: "29500", unit: "头", delta: "+286 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
+  "topic-calving": { topic: "早产率", label: "（本月）早产率", value: "3.96", unit: "%", delta: "-0.4 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: "344", unit: "头", delta: "-21 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
+  "topic-disease": { topic: "治愈率", label: "（本月）治愈率", value: "91.4", unit: "%", delta: "+1.6 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-drug": { topic: "总药费支出", label: "（本月）集团总药费", value: "122.1", unit: "万元", delta: "+4.3 %", trend: "up", good: false, absolute: false, tone: "var(--effect-ai-purple)", visual: "spark" },
+  "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: "4.4", unit: "天", delta: "-0.3 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
 
 /** 集团视角额外指标卡：发病率（首）、头均药费（末） */
 const groupLeadCard: MetricCard = {
   topic: "发病率", label: "（本月）发病率", value: "2.8", unit: "%", trend: "down", delta: "-0.3 pp",
   icon: Stethoscope, anchor: "topic-panorama", good: true,
+  tone: "#FF8A3D", visual: "spark",
 };
 const groupTailCard: MetricCard = {
   topic: "头均药费", label: "（本月）头均用药费用", value: "41.4", unit: "元/头", trend: "up", delta: "+3.1 %",
   icon: Pill, anchor: "topic-panorama", good: false,
+  tone: "var(--effect-ai-purple)", visual: "spark",
 };
 
 
@@ -225,11 +231,6 @@ const notifToneColor: Record<NotifTone, string> = {
 };
 
 
-function TrendIcon({ trend, className }: { trend: string; className?: string }) {
-  if (trend === "up") return <TrendingUp className={cn("h-3 w-3", className)} />;
-  if (trend === "down") return <TrendingDown className={cn("h-3 w-3", className)} />;
-  return <Minus className={cn("h-3 w-3", className)} />;
-}
 
 
 
