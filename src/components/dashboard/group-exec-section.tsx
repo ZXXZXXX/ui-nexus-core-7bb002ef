@@ -52,6 +52,43 @@ export const farmCountSummary = {
 /** 区域高管默认所辖区域 */
 export const CURRENT_REGION = "东北大区";
 
+/** 牧场级外部视角默认牧场 */
+export const CURRENT_FARM = { farm: "1号牧场", region: "东北大区" };
+
+/** 近 12 个月月份标签（自然月倒推） */
+const MONTH_LABELS = ["6月", "7月", "8月", "9月", "10月", "11月", "12月", "1月", "2月", "3月", "4月", "5月"];
+/** 月度波动因子（确定性，无随机） */
+const MONTH_FACTORS = [0.86, 0.92, 1.05, 0.97, 0.9, 0.99, 1.14, 1.2, 1.02, 0.94, 1.0, 1.08];
+
+/** 单牧场按月拆分的指标行 */
+export function farmMonthlyRows(farmName: string, region: string): Row[] {
+  const f = GROUP_FARMS.find((x) => x.farm === farmName && x.region === region) ?? GROUP_FARMS[0];
+  return MONTH_LABELS.map((m, i) => {
+    const k = MONTH_FACTORS[i];
+    const r = (v: number, d = 1) => Number((v * k).toFixed(d));
+    return {
+      key: m,
+      sub: `${f.region} · ${f.farm}`,
+      herd: Math.round(f.herd * (0.98 + i * 0.002)),
+      death: Math.round(f.death * k),
+      cull: Math.round(f.cull * k),
+      pp30: r(f.pp30),
+      pp60: r(f.pp60),
+      pp90: r(f.pp90),
+      pp30n: Math.round(f.pp30n * k),
+      pp60n: Math.round(f.pp60n * k),
+      pp90n: Math.round(f.pp90n * k),
+      sick: r(f.sick),
+      cure: Number(Math.min(99, f.cure / k ** 0.2).toFixed(1)),
+      perHead: r(f.perHead),
+      drugFee: Math.round(f.drugFee * k),
+      budgetDelta: r(f.budgetDelta),
+      treatmentDays: r(f.treatmentDays),
+      pretermRate: Number(((f.preterm * k) / (f.calving || 1) * 100).toFixed(1)),
+    };
+  });
+}
+
 /** 按区域（或集团）统计牧场数量分布 */
 export function farmCountFor(region?: string | null) {
   const list = region ? GROUP_FARMS.filter((f) => f.region === region) : GROUP_FARMS;
@@ -226,23 +263,24 @@ function StackedBars({
 }
 
 
-function PostpartumRankSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function PostpartumRankSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null }) {
   const [drill, setDrill] = useState<string | null>(null);
   const region = scopeRegion ?? drill;
   const setRegion = scopeRegion ? () => {} : setDrill;
   const rows = useMemo(() => {
+    if (scopeFarm) return farmMonthlyRows(scopeFarm.farm, scopeFarm.region);
     const list = region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
       : [...regionRows];
     return list.sort((a, b) => b.pp90n - a.pp90n);
-  }, [region]);
+  }, [region, scopeFarm]);
 
   return (
     <SectionCard
       id="topic-pp-rank"
-      title="产后淘汰率排名"
+      title={scopeFarm ? "产后淘汰率统计" : "产后淘汰率排名"}
       desc={
-        region && !scopeRegion ? (
+        region && !scopeRegion && !scopeFarm ? (
           <button
             type="button"
             onClick={() => setRegion(null)}
@@ -256,14 +294,18 @@ function PostpartumRankSection({ scopeRegion }: { scopeRegion?: string | null })
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <span className="text-caption text-text-secondary">
-          {region ? `${region} · 牧场排名` : "区域排名"}
+          {scopeFarm ? `${scopeFarm.farm} · 近 12 个月` : region ? `${region} · 牧场排名` : "区域排名"}
         </span>
       }
     >
       <p className="text-body-sm text-text-secondary mb-4">
-        {region ? "该区域下各牧场产后淘汰率对比" : "点击某区域可下钻查看该区域下所有牧场排名"}
+        {scopeFarm
+          ? "本牧场近 12 个月产后淘汰率对比"
+          : region
+            ? "该区域下各牧场产后淘汰率对比"
+            : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
-      <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      <StackedBars rows={rows} onPick={region || scopeFarm ? undefined : (r) => setRegion(r.key)} />
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
         {BUCKETS.map((b) => (
           <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
@@ -468,17 +510,18 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return dir === "asc" ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />;
 }
 
-function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null }) {
   const [drill, setDrill] = useState<string | null>(null);
   const region = scopeRegion ?? drill;
-  const setRegion = scopeRegion ? () => {} : setDrill;
+  const setRegion = scopeRegion || scopeFarm ? () => {} : setDrill;
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "pp30", dir: "asc" });
 
   const baseRows = useMemo(() => {
+    if (scopeFarm) return farmMonthlyRows(scopeFarm.farm, scopeFarm.region);
     return region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
       : [...regionRows];
-  }, [region]);
+  }, [region, scopeFarm]);
 
   const rows = useMemo(() => {
     const list = [...baseRows];
@@ -499,6 +542,9 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
     setSort((prev) => ({ key, dir: prev.key === key && prev.dir === "desc" ? "asc" : "desc" }));
   };
 
+  // 牧场级外部视角：隐藏药费相关列
+  const cols = scopeFarm ? COLUMNS.filter((c) => c.key !== "drugFee" && c.key !== "perHead") : COLUMNS;
+
   const fmt = (r: (typeof rows)[number], key: SortKey) => {
     switch (key) {
       case "name":
@@ -517,14 +563,15 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
 
   const exportCsv = () => {
     // 仅导出当前视图（当前层级 + 当前排序）的数据
-    const head = ["序号", ...COLUMNS.map((c) => (c.key === "name" ? (region ? "牧场名称" : "区域名称") : c.label))];
-    const body = rows.map((r, i) => [i + 1, ...COLUMNS.map((c) => fmt(r, c.key))]);
+    const nameLabel = scopeFarm ? "月份" : region ? "牧场名称" : "区域名称";
+    const head = ["序号", ...cols.map((c) => (c.key === "name" ? nameLabel : c.label))];
+    const body = rows.map((r, i) => [i + 1, ...cols.map((c) => fmt(r, c.key))]);
     const csv =
       "\uFEFF" + [head, ...body].map((line) => line.map((c) => `"${c}"`).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `关键指标排行_${region ?? "区域排名"}_${rows.length}条.csv`;
+    a.download = `${scopeFarm ? `关键指标统计_${scopeFarm.farm}` : `关键指标排行_${region ?? "区域排名"}`}_${rows.length}条.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`已导出当前视图 ${rows.length} 条数据`);
@@ -534,12 +581,12 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
   return (
     <SectionCard
       id="topic-panorama"
-      title="关键指标排行"
-      desc={region ? `${region} · 牧场排名` : "区域排名"}
+      title={scopeFarm ? "关键指标统计" : "关键指标排行"}
+      desc={scopeFarm ? `${scopeFarm.farm} · 近 12 个月` : region ? `${region} · 牧场排名` : "区域排名"}
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          {region && !scopeRegion && (
+          {region && !scopeRegion && !scopeFarm && (
             <button
               type="button"
               onClick={() => setRegion(null)}
@@ -561,9 +608,11 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
       }
     >
       <p className="text-body-sm text-text-secondary mb-4">
-        {region
-          ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
-          : "点击某区域可下钻查看该区域下所有牧场排名"}
+        {scopeFarm
+          ? "本牧场近 12 个月各项关键指标统计"
+          : region
+            ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
+            : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
 
       <div className="overflow-x-auto">
@@ -571,14 +620,14 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
           <thead>
             <tr className="text-caption text-text-tertiary">
               <th className="text-left font-normal py-2 w-12">序号</th>
-              {COLUMNS.map((c) => (
+              {cols.map((c) => (
                 <th
                   key={c.key}
                   className={`font-normal py-2 ${c.align === "left" ? "text-left" : "text-right"} ${c.key === "name" ? "" : "cursor-pointer hover:text-foreground"}`}
                   onClick={c.key === "name" ? undefined : () => onSort(c.key)}
                 >
                   <span className="inline-flex items-center gap-1">
-                    {c.key === "name" ? (region ? "牧场名称" : "区域名称") : c.label}
+                    {c.key === "name" ? (scopeFarm ? "月份" : region ? "牧场名称" : "区域名称") : c.label}
                     {c.key !== "name" && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
                   </span>
                 </th>
@@ -589,8 +638,8 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
             {rows.map((r, i) => (
               <tr
                 key={r.key}
-                className={`border-t border-border ${region ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
-                onClick={region ? undefined : () => setRegion(r.key)}
+                className={`border-t border-border ${region || scopeFarm ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
+                onClick={region || scopeFarm ? undefined : () => setRegion(r.key)}
               >
                 <td className="py-3">
                   <span
@@ -616,8 +665,12 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
                 <td className="py-3 text-right tabular-nums text-foreground">{r.sick}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.cure}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.treatmentDays} 天</td>
-                <td className="py-3 text-right tabular-nums text-foreground">￥{wan(r.drugFee)}</td>
-                <td className="py-3 text-right tabular-nums text-foreground">￥{r.perHead} /头</td>
+                {!scopeFarm && (
+                  <>
+                    <td className="py-3 text-right tabular-nums text-foreground">￥{wan(r.drugFee)}</td>
+                    <td className="py-3 text-right tabular-nums text-foreground">￥{r.perHead} /头</td>
+                  </>
+                )}
                 <td className="py-3 text-right tabular-nums text-foreground">{r.pp30}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.pp60}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.pp90}%</td>
@@ -633,14 +686,21 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
 
 /* ---------------- 集团视角总装 ---------------- */
 
-export function GroupExecSection({ scopeRegion }: { scopeRegion?: string | null } = {}) {
+export function GroupExecSection({
+  scopeRegion,
+  scopeFarm,
+}: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null } = {}) {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-        <PostpartumRankSection scopeRegion={scopeRegion} />
-        <DrugTrendSection scopeRegion={scopeRegion} />
-      </div>
-      <PanoramaSection scopeRegion={scopeRegion} />
+      {scopeFarm ? (
+        <PostpartumRankSection scopeFarm={scopeFarm} />
+      ) : (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+          <PostpartumRankSection scopeRegion={scopeRegion} />
+          <DrugTrendSection scopeRegion={scopeRegion} />
+        </div>
+      )}
+      <PanoramaSection scopeRegion={scopeRegion} scopeFarm={scopeFarm} />
     </div>
   );
 }
@@ -679,5 +739,21 @@ export function regionMetrics(region: string) {
     drugFee: t.drugFee,
     perHead: t.perHead,
     days: t.treatmentDays,
+  };
+}
+
+
+/** 牧场级外部视角指标卡数据（本牧场合计） */
+export function farmMetrics(farmName: string, region: string) {
+  const f = GROUP_FARMS.find((x) => x.farm === farmName && x.region === region) ?? GROUP_FARMS[0];
+  return {
+    herd: f.herd,
+    pretermRate: Number(((f.preterm / (f.calving || 1)) * 100).toFixed(1)),
+    deathCull: f.death + f.cull,
+    sick: f.sick,
+    cure: f.cure,
+    drugFee: f.drugFee,
+    perHead: f.perHead,
+    days: f.treatmentDays,
   };
 }
