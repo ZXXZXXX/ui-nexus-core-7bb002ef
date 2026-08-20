@@ -1238,11 +1238,27 @@ function StatsPage() {
                   </Select>
                 </FieldBlock>
                 <ChipGroup
+                  label="药品类型（可多选）"
+                  options={DRUG_TYPES}
+                  selected={filters.drugTypes}
+                  onToggle={(v) => toggleIn("drugTypes", v)}
+                />
+                <ChipGroup
                   label="药品（可多选）"
                   options={DRUGS}
                   selected={filters.drugs}
                   onToggle={(v) => toggleIn("drugs", v)}
                 />
+                <div className="pt-1">
+                  <RangeField
+                    label="使用量"
+                    unit="次"
+                    min={filters.drugUsageMin}
+                    max={filters.drugUsageMax}
+                    onMin={(v) => set("drugUsageMin", v)}
+                    onMax={(v) => set("drugUsageMax", v)}
+                  />
+                </div>
               </div>
             </Dimension>
           )}
