@@ -33,7 +33,7 @@ export function SectionCard({
         <div className="flex min-w-0 items-center gap-2">
           {icon}
           <h3 className="truncate text-card-title text-foreground">{title}</h3>
-          {desc && typeof desc === "string" ? <span className="tag tag-muted shrink-0">{desc}</span> : desc}
+          {desc && typeof desc === "string" && desc.trim() ? <span className="tag tag-muted shrink-0">{desc}</span> : desc}
         </div>
         {extra}
       </div>
