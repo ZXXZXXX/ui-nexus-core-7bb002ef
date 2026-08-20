@@ -582,7 +582,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
 
   const exportCsv = () => {
     // 仅导出当前视图（当前层级 + 当前排序）的数据
-    const nameLabel = scopeFarm ? "月份" : region ? "牧场名称" : "区域名称";
+    const nameLabel = scopeFarm ? "月份" : scopeRegion || viewMode === "farm" ? "牧场名称" : "区域名称";
     const head = ["序号", ...cols.map((c) => (c.key === "name" ? nameLabel : c.label))];
     const body = rows.map((r, i) => [i + 1, ...cols.map((c) => fmt(r, c.key))]);
     const csv =
@@ -590,7 +590,14 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${scopeFarm ? `关键指标统计_${scopeFarm.farm}` : `关键指标排行_${region ?? "区域排名"}`}_${rows.length}条.csv`;
+    const rankLabel = scopeFarm
+      ? `统计_${scopeFarm.farm}`
+      : scopeRegion
+        ? `排行_${scopeRegion}`
+        : viewMode === "farm"
+          ? "按牧场排行"
+          : "按区域排行";
+    a.download = `${scopeFarm ? "关键指标统计" : "关键指标排行"}_${rankLabel}_${rows.length}条.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`已导出当前视图 ${rows.length} 条数据`);
