@@ -276,7 +276,10 @@ type Filters = {
   calfOutcome: string;
   // 药品维度
   drugs: string[];
+  drugTypes: string[];
   drugRoute: string;
+  drugUsageMin: string;
+  drugUsageMax: string;
   // 牛只维度
   cattleTypes: string[];
   parities: string[];
