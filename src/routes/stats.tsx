@@ -989,19 +989,6 @@ function StatsPage() {
                   </FieldBlock>
                 </>
               )}
-              {cat !== "staff" && (
-                <FieldBlock label="关键词（耳号 / 编号）">
-                  <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
-                    <Input
-                      value={filters.keyword}
-                      onChange={(e) => set("keyword", e.target.value)}
-                      placeholder="输入关键词"
-                      className="h-9 pl-8 bg-white"
-                    />
-                  </div>
-                </FieldBlock>
-              )}
             </div>
           </Dimension>
 
