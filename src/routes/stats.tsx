@@ -718,6 +718,8 @@ function StatsPage() {
 
         </main>
         {saveDialog}
+        {catDialog}
+        {builderDrawer}
       </>
     );
   }
