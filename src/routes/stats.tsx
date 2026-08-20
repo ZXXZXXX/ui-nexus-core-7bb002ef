@@ -1047,7 +1047,13 @@ function StatsPage() {
                   label="牛只类型（可多选）"
                   options={CATTLE_TYPES}
                   selected={filters.cattleTypes}
-                  onToggle={(v) => toggleIn("cattleTypes", v)}
+                  onToggle={(v) => {
+                    if (v === "犊牛" && !filters.cattleTypes.includes("犊牛")) {
+                      setFilters((p) => ({ ...p, cattleTypes: ["犊牛"], parities: [] }));
+                      return;
+                    }
+                    toggleIn("cattleTypes", v);
+                  }}
                   disabledOptions={
                     filters.parities.length > 0
                       ? ["犊牛"]
