@@ -510,22 +510,8 @@ function HomePage() {
 
         {/* 数据指标卡 1-6 — 点击跳转至对应专题 */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {visibleCards.map((k, i) => {
-            const tones = [
-              "var(--brand)",
-              "var(--effect-ai-cyan)",
-              "var(--state-danger)",
-              "var(--effect-ai-purple)",
-              "var(--state-info)",
-              "var(--brand)",
-            ];
-
-            const tone = tones[i % tones.length];
-            const isUp = k.trend === "up";
-            const isDown = k.trend === "down";
-            const neutral = !isUp && !isDown;
-
-
+          {visibleCards.map((k) => {
+            const Icon = k.icon;
             return (
               <Card
                 key={k.label}
@@ -538,37 +524,33 @@ function HomePage() {
                     scrollToTopic(k.anchor);
                   }
                 }}
-                className="relative overflow-hidden border-0 p-5 rounded-2xl transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
+                className="relative overflow-hidden border-0 rounded-2xl p-5 transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
                 style={{
-                  background: `linear-gradient(135deg, color-mix(in oklab, ${tone} 90%, black 10%), color-mix(in oklab, ${tone} 72%, white 6%))`,
-                  boxShadow: `0 12px 26px -14px color-mix(in oklab, ${tone} 70%, transparent)`,
+                  background: `color-mix(in oklab, ${k.tone} 12%, var(--bg-surface))`,
                 }}
               >
-
-                <k.icon
+                <Icon
                   aria-hidden
-                  className="pointer-events-none absolute -right-2 -bottom-2 h-20 w-20 text-white/15"
+                  className="pointer-events-none absolute -right-2 -bottom-2 h-16 w-16 opacity-[0.08]"
+                  style={{ color: k.tone }}
                   strokeWidth={1.6}
                 />
-                <div className="relative">
-                  <p className="text-caption font-medium text-white/85 truncate">{k.topic}</p>
-                  <div className="mt-2 flex items-baseline gap-1.5">
-                    <span className="tabular-nums font-semibold leading-none text-white" style={{ fontSize: "28px" }}>
+                <div className="relative flex flex-col h-full justify-between">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-5 w-5" style={{ color: k.tone }} />
+                    <span className="text-body-sm font-medium text-text-primary">{k.topic}</span>
+                  </div>
+                  <div className="flex items-baseline gap-1.5">
+                    <span
+                      className="tabular-nums font-semibold leading-none"
+                      style={{ fontSize: "28px", color: k.tone }}
+                    >
                       {scaleCardValue(k)}
                     </span>
-                    <span className="text-body-sm text-white/75">{k.unit}</span>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2">
-                    <span
-                      className="inline-flex items-center gap-0.5 h-[22px] px-1.5 rounded-md text-caption font-medium tabular-nums bg-white/18 text-white"
-                    >
-                      <TrendIcon trend={k.trend} className="text-white/90" />
-                      {k.delta}
-                    </span>
-                    <span className="text-caption text-white/70">较上月</span>
-
+                    <span className="text-body-sm text-text-tertiary">{k.unit}</span>
                   </div>
                 </div>
+                <StatVisual variant={k.visual} tone={k.tone} />
               </Card>
             );
           })}
