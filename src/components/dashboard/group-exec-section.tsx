@@ -263,23 +263,24 @@ function StackedBars({
 }
 
 
-function PostpartumRankSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function PostpartumRankSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null }) {
   const [drill, setDrill] = useState<string | null>(null);
   const region = scopeRegion ?? drill;
   const setRegion = scopeRegion ? () => {} : setDrill;
   const rows = useMemo(() => {
+    if (scopeFarm) return farmMonthlyRows(scopeFarm.farm, scopeFarm.region);
     const list = region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
       : [...regionRows];
     return list.sort((a, b) => b.pp90n - a.pp90n);
-  }, [region]);
+  }, [region, scopeFarm]);
 
   return (
     <SectionCard
       id="topic-pp-rank"
-      title="产后淘汰率排名"
+      title={scopeFarm ? "产后淘汰率统计" : "产后淘汰率排名"}
       desc={
-        region && !scopeRegion ? (
+        region && !scopeRegion && !scopeFarm ? (
           <button
             type="button"
             onClick={() => setRegion(null)}
@@ -293,14 +294,18 @@ function PostpartumRankSection({ scopeRegion }: { scopeRegion?: string | null })
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <span className="text-caption text-text-secondary">
-          {region ? `${region} · 牧场排名` : "区域排名"}
+          {scopeFarm ? `${scopeFarm.farm} · 近 12 个月` : region ? `${region} · 牧场排名` : "区域排名"}
         </span>
       }
     >
       <p className="text-body-sm text-text-secondary mb-4">
-        {region ? "该区域下各牧场产后淘汰率对比" : "点击某区域可下钻查看该区域下所有牧场排名"}
+        {scopeFarm
+          ? "本牧场近 12 个月产后淘汰率对比"
+          : region
+            ? "该区域下各牧场产后淘汰率对比"
+            : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
-      <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      <StackedBars rows={rows} onPick={region || scopeFarm ? undefined : (r) => setRegion(r.key)} />
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
         {BUCKETS.map((b) => (
           <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
@@ -505,17 +510,18 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return dir === "asc" ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />;
 }
 
-function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null }) {
   const [drill, setDrill] = useState<string | null>(null);
   const region = scopeRegion ?? drill;
-  const setRegion = scopeRegion ? () => {} : setDrill;
+  const setRegion = scopeRegion || scopeFarm ? () => {} : setDrill;
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "pp30", dir: "asc" });
 
   const baseRows = useMemo(() => {
+    if (scopeFarm) return farmMonthlyRows(scopeFarm.farm, scopeFarm.region);
     return region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
       : [...regionRows];
-  }, [region]);
+  }, [region, scopeFarm]);
 
   const rows = useMemo(() => {
     const list = [...baseRows];
@@ -554,14 +560,15 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
 
   const exportCsv = () => {
     // 仅导出当前视图（当前层级 + 当前排序）的数据
-    const head = ["序号", ...COLUMNS.map((c) => (c.key === "name" ? (region ? "牧场名称" : "区域名称") : c.label))];
+    const nameLabel = scopeFarm ? "月份" : region ? "牧场名称" : "区域名称";
+    const head = ["序号", ...COLUMNS.map((c) => (c.key === "name" ? nameLabel : c.label))];
     const body = rows.map((r, i) => [i + 1, ...COLUMNS.map((c) => fmt(r, c.key))]);
     const csv =
       "\uFEFF" + [head, ...body].map((line) => line.map((c) => `"${c}"`).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
     const a = document.createElement("a");
     a.href = url;
-    a.download = `关键指标排行_${region ?? "区域排名"}_${rows.length}条.csv`;
+    a.download = `${scopeFarm ? `关键指标统计_${scopeFarm.farm}` : `关键指标排行_${region ?? "区域排名"}`}_${rows.length}条.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success(`已导出当前视图 ${rows.length} 条数据`);
@@ -571,12 +578,12 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
   return (
     <SectionCard
       id="topic-panorama"
-      title="关键指标排行"
-      desc={region ? `${region} · 牧场排名` : "区域排名"}
+      title={scopeFarm ? "关键指标统计" : "关键指标排行"}
+      desc={scopeFarm ? `${scopeFarm.farm} · 近 12 个月` : region ? `${region} · 牧场排名` : "区域排名"}
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          {region && !scopeRegion && (
+          {region && !scopeRegion && !scopeFarm && (
             <button
               type="button"
               onClick={() => setRegion(null)}
@@ -598,9 +605,11 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
       }
     >
       <p className="text-body-sm text-text-secondary mb-4">
-        {region
-          ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
-          : "点击某区域可下钻查看该区域下所有牧场排名"}
+        {scopeFarm
+          ? "本牧场近 12 个月各项关键指标统计"
+          : region
+            ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
+            : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
 
       <div className="overflow-x-auto">
@@ -615,7 +624,7 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
                   onClick={c.key === "name" ? undefined : () => onSort(c.key)}
                 >
                   <span className="inline-flex items-center gap-1">
-                    {c.key === "name" ? (region ? "牧场名称" : "区域名称") : c.label}
+                    {c.key === "name" ? (scopeFarm ? "月份" : region ? "牧场名称" : "区域名称") : c.label}
                     {c.key !== "name" && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
                   </span>
                 </th>
@@ -626,8 +635,8 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
             {rows.map((r, i) => (
               <tr
                 key={r.key}
-                className={`border-t border-border ${region ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
-                onClick={region ? undefined : () => setRegion(r.key)}
+                className={`border-t border-border ${region || scopeFarm ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
+                onClick={region || scopeFarm ? undefined : () => setRegion(r.key)}
               >
                 <td className="py-3">
                   <span
@@ -670,14 +679,21 @@ function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
 
 /* ---------------- 集团视角总装 ---------------- */
 
-export function GroupExecSection({ scopeRegion }: { scopeRegion?: string | null } = {}) {
+export function GroupExecSection({
+  scopeRegion,
+  scopeFarm,
+}: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null } = {}) {
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-        <PostpartumRankSection scopeRegion={scopeRegion} />
-        <DrugTrendSection scopeRegion={scopeRegion} />
-      </div>
-      <PanoramaSection scopeRegion={scopeRegion} />
+      {scopeFarm ? (
+        <PostpartumRankSection scopeFarm={scopeFarm} />
+      ) : (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+          <PostpartumRankSection scopeRegion={scopeRegion} />
+          <DrugTrendSection scopeRegion={scopeRegion} />
+        </div>
+      )}
+      <PanoramaSection scopeRegion={scopeRegion} scopeFarm={scopeFarm} />
     </div>
   );
 }
@@ -716,5 +732,21 @@ export function regionMetrics(region: string) {
     drugFee: t.drugFee,
     perHead: t.perHead,
     days: t.treatmentDays,
+  };
+}
+
+
+/** 牧场级外部视角指标卡数据（本牧场合计） */
+export function farmMetrics(farmName: string, region: string) {
+  const f = GROUP_FARMS.find((x) => x.farm === farmName && x.region === region) ?? GROUP_FARMS[0];
+  return {
+    herd: f.herd,
+    pretermRate: Number(((f.preterm / (f.calving || 1)) * 100).toFixed(1)),
+    deathCull: f.death + f.cull,
+    sick: f.sick,
+    cure: f.cure,
+    drugFee: f.drugFee,
+    perHead: f.perHead,
+    days: f.treatmentDays,
   };
 }
