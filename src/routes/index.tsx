@@ -749,7 +749,7 @@ function HomePage() {
 
           return (
             <div className="space-y-6">
-              <Frame title="数据概览">{cardsGrid}</Frame>
+              <Frame title="数据概览" extra={timeSelector}>{cardsGrid}</Frame>
               <Frame title="数据看板">
                 <GroupExecSection scopeRegion={region} part="charts" />
               </Frame>
