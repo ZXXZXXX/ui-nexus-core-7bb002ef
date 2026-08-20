@@ -3,6 +3,7 @@ import { BarChart3, Layers, Download, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDo
 import { toast } from "sonner";
 import { SectionCard, PeriodTabs, LineTrend } from "./charts";
 import { WorkOrderSection } from "./workorder-section";
+import { HerdSection } from "./herd-section";
 
 /* ---------------- 数据：牧场为最小口径 ---------------- */
 
