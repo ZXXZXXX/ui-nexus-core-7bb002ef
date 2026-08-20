@@ -172,6 +172,15 @@ const DRUG_ROUTES = [
   { value: "口服", label: "口服" },
 ];
 const DRUG_TYPES = ["抗生素", "消炎药", "止痛药", "体液补充剂", "驱虫药", "激素类", "其他"];
+const DRUGS_OF_TYPE: Record<string, string[]> = {
+  抗生素: ["精制盐酸头孢噻呋注射液"],
+  消炎药: ["氟尼新葡甲胺注射液"],
+  止痛药: [],
+  体液补充剂: ["复方氯化钠注射液", "20% 葡萄糖注射液"],
+  驱虫药: ["伊维菌素注射液"],
+  激素类: [],
+  其他: ["产后灌注"],
+};
 const CALVING_TYPES = ["顺产", "轻度助产", "难产", "剖腹产"];
 const CALF_OUTCOMES = [
   { value: "all", label: "全部犊牛结局" },
