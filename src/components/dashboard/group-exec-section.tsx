@@ -542,6 +542,9 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
     setSort((prev) => ({ key, dir: prev.key === key && prev.dir === "desc" ? "asc" : "desc" }));
   };
 
+  // 牧场级外部视角：隐藏药费相关列
+  const cols = scopeFarm ? COLUMNS.filter((c) => c.key !== "drugFee" && c.key !== "perHead") : COLUMNS;
+
   const fmt = (r: (typeof rows)[number], key: SortKey) => {
     switch (key) {
       case "name":
@@ -561,8 +564,8 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
   const exportCsv = () => {
     // 仅导出当前视图（当前层级 + 当前排序）的数据
     const nameLabel = scopeFarm ? "月份" : region ? "牧场名称" : "区域名称";
-    const head = ["序号", ...COLUMNS.map((c) => (c.key === "name" ? nameLabel : c.label))];
-    const body = rows.map((r, i) => [i + 1, ...COLUMNS.map((c) => fmt(r, c.key))]);
+    const head = ["序号", ...cols.map((c) => (c.key === "name" ? nameLabel : c.label))];
+    const body = rows.map((r, i) => [i + 1, ...cols.map((c) => fmt(r, c.key))]);
     const csv =
       "\uFEFF" + [head, ...body].map((line) => line.map((c) => `"${c}"`).join(",")).join("\n");
     const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8;" }));
@@ -617,7 +620,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
           <thead>
             <tr className="text-caption text-text-tertiary">
               <th className="text-left font-normal py-2 w-12">序号</th>
-              {COLUMNS.map((c) => (
+              {cols.map((c) => (
                 <th
                   key={c.key}
                   className={`font-normal py-2 ${c.align === "left" ? "text-left" : "text-right"} ${c.key === "name" ? "" : "cursor-pointer hover:text-foreground"}`}
@@ -662,8 +665,12 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
                 <td className="py-3 text-right tabular-nums text-foreground">{r.sick}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.cure}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.treatmentDays} 天</td>
-                <td className="py-3 text-right tabular-nums text-foreground">￥{wan(r.drugFee)}</td>
-                <td className="py-3 text-right tabular-nums text-foreground">￥{r.perHead} /头</td>
+                {!scopeFarm && (
+                  <>
+                    <td className="py-3 text-right tabular-nums text-foreground">￥{wan(r.drugFee)}</td>
+                    <td className="py-3 text-right tabular-nums text-foreground">￥{r.perHead} /头</td>
+                  </>
+                )}
                 <td className="py-3 text-right tabular-nums text-foreground">{r.pp30}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.pp60}%</td>
                 <td className="py-3 text-right tabular-nums text-foreground">{r.pp90}%</td>

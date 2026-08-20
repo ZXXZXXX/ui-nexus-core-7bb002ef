@@ -27,7 +27,7 @@ import { WorkOrderSection } from "@/components/dashboard/workorder-section";
 import { AlertSection, alertCounts } from "@/components/dashboard/alert-section";
 import { OpsSection } from "@/components/dashboard/ops-section";
 import { ExecFocusSection } from "@/components/dashboard/exec-focus-section";
-import { GroupExecSection, farmCountFor, CURRENT_REGION, regionMetrics } from "@/components/dashboard/group-exec-section";
+import { GroupExecSection, farmCountFor, CURRENT_REGION, CURRENT_FARM, regionMetrics, farmMetrics } from "@/components/dashboard/group-exec-section";
 import { StatVisual, type StatVisualVariant } from "@/components/stat-visual";
 
 
@@ -141,6 +141,20 @@ const regionLeadCard: MetricCard = {
 const regionTailCard: MetricCard = {
   topic: "头均药费", label: "（本月）头均用药费用", value: String(rm.perHead), unit: "元/头", trend: "up", delta: "+2.1 %",
   icon: Pill, anchor: "topic-panorama", good: false, tone: "var(--effect-ai-purple)", visual: "spark",
+};
+
+/** 牧场级外部视角：与区域口径一致，但只统计本牧场，且隐藏药费 */
+const fm = farmMetrics(CURRENT_FARM.farm, CURRENT_FARM.region);
+const farmOutCardOverride: Record<string, Partial<MetricCard>> = {
+  "topic-herd": { topic: "总存栏数", label: "（至今日）本牧场存栏", value: String(fm.herd), unit: "头", delta: "+42 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
+  "topic-calving": { topic: "早产率", label: "（本月）本牧场早产率", value: String(fm.pretermRate), unit: "%", delta: "-0.2 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: String(fm.deathCull), unit: "头", delta: "-3 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
+  "topic-disease": { topic: "治愈率", label: "（本月）本牧场治愈率", value: String(fm.cure), unit: "%", delta: "+0.8 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(fm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
+};
+const farmOutLeadCard: MetricCard = {
+  topic: "发病率", label: "（本月）本牧场发病率", value: String(fm.sick), unit: "%", trend: "down", delta: "-0.2 pp",
+  icon: Stethoscope, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "spark",
 };
 
 type WorkOrderType = "disease" | "vaccine" | "deworm" | "hoof" | "postpartum" | "drying" | "general";
@@ -289,7 +303,9 @@ function HomePage() {
         ? { ...c, ...groupCardOverride[c.anchor] }
         : scope === "region"
           ? { ...c, ...regionCardOverride[c.anchor] }
-          : c,
+          : scope === "farm-out"
+            ? { ...c, ...farmOutCardOverride[c.anchor] }
+            : c,
     )
 
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
@@ -298,18 +314,18 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[a.anchor]) -
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
-  const isExec = scope === "group" || scope === "region";
+  const isExec = scope === "group" || scope === "region" || scope === "farm-out";
   const visibleCards =
     isExec
       ? (() => {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const order = [
-            scope === "group" ? groupLeadCard : regionLeadCard,
+            scope === "group" ? groupLeadCard : scope === "region" ? regionLeadCard : farmOutLeadCard,
             map.get("治愈率"),
             map.get("早产率"),
             map.get("死淘总数"),
-            map.get("总药费支出"),
-            scope === "group" ? groupTailCard : regionTailCard,
+            scope === "farm-out" ? undefined : map.get("总药费支出"),
+            scope === "farm-out" ? undefined : scope === "group" ? groupTailCard : regionTailCard,
           ].filter(Boolean) as MetricCard[];
           return order;
         })()
@@ -400,9 +416,9 @@ function HomePage() {
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
                 <span className="text-caption text-text-tertiary">
-                  {isExec ? (scope === "group" ? "牧场分布" : `${CURRENT_REGION} · 牧场分布`) : "实时预警"}
+                  {isExec ? (scope === "group" ? "牧场分布" : scope === "region" ? `${CURRENT_REGION} · 牧场分布` : "实时预警") : "实时预警"}
                 </span>
-                {!isExec && (
+                {(!isExec || scope === "farm-out") && (
                   <button
                     type="button"
                     onClick={() => scrollToTopic("topic-alert")}
@@ -413,7 +429,7 @@ function HomePage() {
                 )}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2.5">
-                {isExec ? (
+                {isExec && scope !== "farm-out" ? (
                   (() => {
                     const fc = farmCountFor(scope === "group" ? null : CURRENT_REGION);
                     return [
@@ -623,7 +639,10 @@ function HomePage() {
               ) : key === "alert" ? (
                 <AlertSection />
               ) : isExec ? (
-                <GroupExecSection scopeRegion={scope === "group" ? null : CURRENT_REGION} />
+                <GroupExecSection
+                  scopeRegion={scope === "group" ? null : scope === "region" ? CURRENT_REGION : null}
+                  scopeFarm={scope === "farm-out" ? CURRENT_FARM : null}
+                />
               ) : (
                 <div className="space-y-6">
                   <ExecFocusSection level="farm" />
