@@ -306,7 +306,20 @@ function PostpartumRankSection({ scopeRegion, scopeFarm }: { scopeRegion?: strin
             ? "该区域下各牧场产后淘汰率对比"
             : "点击某区域可下钻查看该区域下所有牧场排名"}
       </p>
-      <StackedBars rows={rows} onPick={region || scopeFarm ? undefined : (r) => setRegion(r.key)} />
+      {scopeFarm ? (
+        <LineTrend
+          labels={rows.map((r) => r.key)}
+          series={[
+            { name: "0-30 天", color: BUCKETS[0]!.color, points: rows.map((r) => r.pp30) },
+            { name: "0-60 天", color: BUCKETS[1]!.color, points: rows.map((r) => r.pp60) },
+            { name: "0-90 天", color: BUCKETS[2]!.color, points: rows.map((r) => r.pp90) },
+          ]}
+          height={240}
+          unit="%"
+        />
+      ) : (
+        <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
+      )}
       <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
         {BUCKETS.map((b) => (
           <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
