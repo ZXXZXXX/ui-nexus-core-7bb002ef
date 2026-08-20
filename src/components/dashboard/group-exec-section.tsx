@@ -49,6 +49,16 @@ export const farmCountSummary = {
   },
 };
 
+/** 区域高管默认所辖区域 */
+export const CURRENT_REGION = "东北大区";
+
+/** 按区域（或集团）统计牧场数量分布 */
+export function farmCountFor(region?: string | null) {
+  const list = region ? GROUP_FARMS.filter((f) => f.region === region) : GROUP_FARMS;
+  const organic = list.filter((f) => f.organic).length;
+  return { total: list.length, organic, ordinary: list.length - organic };
+}
+
 type Row = {
   key: string;
   sub: string;
@@ -216,8 +226,10 @@ function StackedBars({
 }
 
 
-function PostpartumRankSection() {
-  const [region, setRegion] = useState<string | null>(null);
+function PostpartumRankSection({ scopeRegion }: { scopeRegion?: string | null }) {
+  const [drill, setDrill] = useState<string | null>(null);
+  const region = scopeRegion ?? drill;
+  const setRegion = scopeRegion ? () => {} : setDrill;
   const rows = useMemo(() => {
     const list = region
       ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
@@ -230,7 +242,7 @@ function PostpartumRankSection() {
       id="topic-pp-rank"
       title="产后淘汰率排名"
       desc={
-        region ? (
+        region && !scopeRegion ? (
           <button
             type="button"
             onClick={() => setRegion(null)}
@@ -370,17 +382,30 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
   );
 }
 
-function DrugTrendSection() {
+function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
   const [period, setPeriod] = useState("近 6 个月");
+  // 区域视角：总药费按该区域药费占比折算，单头药费按区域实际水平折算
+  const { feeRatio, headRatio } = useMemo(() => {
+    if (!scopeRegion) return { feeRatio: 1, headRatio: 1 };
+    const all = agg("集团", "", GROUP_FARMS);
+    const rg = agg(scopeRegion, "", GROUP_FARMS.filter((f) => f.region === scopeRegion));
+    return { feeRatio: rg.drugFee / all.drugFee, headRatio: rg.perHead / all.perHead };
+  }, [scopeRegion]);
   const months = useMemo(() => (period === "近 6 个月" ? ALL_MONTHS.slice(-6) : ALL_MONTHS), [period]);
-  const totalFee = useMemo(() => (period === "近 6 个月" ? ALL_TOTAL_FEE.slice(-6) : ALL_TOTAL_FEE), [period]);
-  const perHead = useMemo(() => (period === "近 6 个月" ? ALL_PER_HEAD.slice(-6) : ALL_PER_HEAD), [period]);
+  const totalFee = useMemo(
+    () => (period === "近 6 个月" ? ALL_TOTAL_FEE.slice(-6) : ALL_TOTAL_FEE).map((v) => Number((v * feeRatio).toFixed(1))),
+    [period, feeRatio],
+  );
+  const perHead = useMemo(
+    () => (period === "近 6 个月" ? ALL_PER_HEAD.slice(-6) : ALL_PER_HEAD).map((v) => Number((v * headRatio).toFixed(1))),
+    [period, headRatio],
+  );
 
   return (
     <SectionCard
       id="topic-drug-trend"
       title="药费支出趋势"
-      desc={period}
+      desc={scopeRegion ? `${scopeRegion} · ${period}` : period}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <PeriodTabs
@@ -443,8 +468,10 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
   return dir === "asc" ? <ArrowUp className="h-3 w-3 text-primary" /> : <ArrowDown className="h-3 w-3 text-primary" />;
 }
 
-function PanoramaSection() {
-  const [region, setRegion] = useState<string | null>(null);
+function PanoramaSection({ scopeRegion }: { scopeRegion?: string | null }) {
+  const [drill, setDrill] = useState<string | null>(null);
+  const region = scopeRegion ?? drill;
+  const setRegion = scopeRegion ? () => {} : setDrill;
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "pp30", dir: "asc" });
 
   const baseRows = useMemo(() => {
@@ -512,7 +539,7 @@ function PanoramaSection() {
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          {region && (
+          {region && !scopeRegion && (
             <button
               type="button"
               onClick={() => setRegion(null)}
@@ -606,14 +633,14 @@ function PanoramaSection() {
 
 /* ---------------- 集团视角总装 ---------------- */
 
-export function GroupExecSection() {
+export function GroupExecSection({ scopeRegion }: { scopeRegion?: string | null } = {}) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-        <PostpartumRankSection />
-        <DrugTrendSection />
+        <PostpartumRankSection scopeRegion={scopeRegion} />
+        <DrugTrendSection scopeRegion={scopeRegion} />
       </div>
-      <PanoramaSection />
+      <PanoramaSection scopeRegion={scopeRegion} />
     </div>
   );
 }
@@ -634,3 +661,23 @@ export const groupMetrics = (() => {
     drugFee: t.drugFee,
   };
 })();
+
+
+/** 区域高管视角指标卡数据（区域内合计） */
+export function regionMetrics(region: string) {
+  const list = GROUP_FARMS.filter((f) => f.region === region);
+  const t = agg(region, "", list);
+  const calving = list.reduce((s, f) => s + f.calving, 0);
+  const preterm = list.reduce((s, f) => s + f.preterm, 0);
+  return {
+    farms: list.length,
+    herd: t.herd,
+    pretermRate: Number(((preterm / (calving || 1)) * 100).toFixed(1)),
+    deathCull: t.death + t.cull,
+    sick: t.sick,
+    cure: t.cure,
+    drugFee: t.drugFee,
+    perHead: t.perHead,
+    days: t.treatmentDays,
+  };
+}
