@@ -629,12 +629,12 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
               {cols.map((c) => (
                 <th
                   key={c.key}
-                  className={`font-normal py-2 ${c.align === "left" ? "text-left" : "text-right"} ${c.key === "name" ? "" : "cursor-pointer hover:text-foreground"}`}
-                  onClick={c.key === "name" ? undefined : () => onSort(c.key)}
+                  className={`font-normal py-2 ${c.align === "left" ? "text-left" : "text-right"} ${c.key === "name" || scopeFarm ? "" : "cursor-pointer hover:text-foreground"}`}
+                  onClick={c.key === "name" || scopeFarm ? undefined : () => onSort(c.key)}
                 >
                   <span className="inline-flex items-center gap-1">
                     {c.key === "name" ? (scopeFarm ? "月份" : region ? "牧场名称" : "区域名称") : c.label}
-                    {c.key !== "name" && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
+                    {c.key !== "name" && !scopeFarm && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
                   </span>
                 </th>
               ))}
