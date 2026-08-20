@@ -263,6 +263,7 @@ type Template = {
 const DEFAULT_TEMPLATES: Template[] = [
   {
     id: "t-disease-30d",
+    category: "disease",
     name: "近 30 天疾病治疗",
     desc: "全部牧场 · 疾病治疗工单汇总",
     icon: Stethoscope,
@@ -275,6 +276,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-mastitis",
+    category: "disease",
     name: "乳房炎病种分析",
     desc: "近 30 天 · 乳房疾病类别",
     icon: Stethoscope,
@@ -286,6 +288,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-vaccine-month",
+    category: "cattle",
     name: "本月疫苗执行",
     desc: "本月已完成的疫苗免疫工单",
     icon: Syringe,
@@ -298,6 +301,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-postpartum-highrisk",
+    category: "drug",
     name: "产后高危跟进",
     desc: "近 7 天 · 产后高危处方",
     icon: Baby,
@@ -309,6 +313,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-calving-dystocia",
+    category: "cattle",
     name: "难产产犊统计",
     desc: "近 90 天 · 难产 / 剖腹产",
     icon: Baby,
@@ -320,6 +325,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-drug-cef",
+    category: "drug",
     name: "头孢类用药统计",
     desc: "近 30 天 · 肌内注射头孢噻呋",
     icon: Pill,
@@ -336,6 +342,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-operator",
+    category: "staff",
     name: "人员工作量统计",
     desc: "近 30 天 · 按操作人员查看",
     icon: Users,
@@ -347,6 +354,7 @@ const DEFAULT_TEMPLATES: Template[] = [
   },
   {
     id: "t-pending-7d",
+    category: "cattle",
     name: "近 7 天未处理",
     desc: "所有类型 · 待诊断",
     icon: BarChart3,
@@ -504,6 +512,7 @@ function StatsPage() {
       {
         id: `t-${Date.now()}`,
         name: saveName.trim(),
+        category: inferCategory(saveSource),
         desc: saveDesc.trim() || describeFilters(saveSource),
         icon: BarChart3,
         tone: "var(--brand)",
