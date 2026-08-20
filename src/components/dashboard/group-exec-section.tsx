@@ -713,7 +713,10 @@ export function GroupExecSection({
   return (
     <div className="space-y-6">
       {scopeFarm ? (
-        <PostpartumRankSection scopeFarm={scopeFarm} />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch [&>*]:h-full">
+          <PostpartumRankSection scopeFarm={scopeFarm} />
+          <HerdSection />
+        </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
           <PostpartumRankSection scopeRegion={scopeRegion} />
