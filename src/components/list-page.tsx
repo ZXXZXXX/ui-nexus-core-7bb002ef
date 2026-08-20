@@ -183,7 +183,7 @@ export function ListPage<T>({
         {children}
 
         {/* toolbar */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap xl:flex-nowrap">
           {searchCols.length > 0 && (
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
@@ -193,7 +193,7 @@ export function ListPage<T>({
                 placeholder={
                   searchPlaceholder ?? `搜索${searchCols.map((c) => c.label).join(" / ")}`
                 }
-                className="h-9 w-72 pl-9 text-body-sm bg-card border-border"
+                className="h-9 w-60 pl-9 text-body-sm bg-card border-border"
               />
               {q && (
                 <button
@@ -210,7 +210,7 @@ export function ListPage<T>({
           {dateCols.length > 0 && (
             <div className="flex items-center gap-1.5">
               <Select value={dateKey} onValueChange={setDateKey}>
-                <SelectTrigger className="h-9 w-[132px] text-body-sm bg-card border-border">
+                <SelectTrigger className="h-9 w-[116px] shrink-0 text-body-sm bg-card border-border">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -226,7 +226,7 @@ export function ListPage<T>({
                   <button
                     key={r.key}
                     onClick={() => setRange(r.key)}
-                    className={`h-8 px-2.5 rounded text-body-sm transition-colors ${
+                    className={`h-8 px-2 rounded text-body-sm transition-colors ${
                       range === r.key
                         ? "bg-brand-subtle text-primary font-medium"
                         : "text-text-secondary hover:text-foreground"
@@ -303,7 +303,7 @@ export function ListPage<T>({
             </PopoverContent>
           </Popover>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 shrink-0">
             {secondaryActions}
             {primaryAction && (
               <Button
