@@ -564,118 +564,150 @@ function HomePage() {
 
 
 
-        {/* 报表口径切换 */}
-        <div>
-          <h3 className="text-section-title text-foreground">数据看板</h3>
-        </div>
+        {(() => {
+          const execFrame = scope === "group" || scope === "region";
 
+          const cardsGrid = (
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+              {visibleCards.map((k) => {
+                const Icon = k.icon;
+                return (
+                  <Card
+                    key={k.label}
+                    onClick={() => scrollToTopic(k.anchor)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        scrollToTopic(k.anchor);
+                      }
+                    }}
+                    className="relative overflow-hidden border-0 rounded-2xl p-5 transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
+                    style={{
+                      background: `color-mix(in oklab, ${k.tone} 12%, var(--bg-surface))`,
+                    }}
+                  >
+                    <Icon
+                      aria-hidden
+                      className="pointer-events-none absolute -right-2 -bottom-2 h-16 w-16 opacity-[0.08]"
+                      style={{ color: k.tone }}
+                      strokeWidth={1.6}
+                    />
+                    <div className="relative flex flex-col h-full justify-between">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-5 w-5" style={{ color: k.tone }} />
+                        <span className="text-body-sm font-medium text-text-primary">{k.topic}</span>
+                      </div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span
+                          className="tabular-nums font-semibold leading-none"
+                          style={{ fontSize: "28px", color: k.tone }}
+                        >
+                          {scaleCardValue(k)}
+                        </span>
+                        <span className="text-body-sm text-text-tertiary">{k.unit}</span>
+                      </div>
+                    </div>
+                    <StatVisual variant={k.visual} tone={k.tone} />
+                  </Card>
+                );
+              })}
+            </div>
+          );
 
+          const topicGrid = (
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+              {topicOrder.map((key) => {
+                if (key === "ops" && scope !== "region" && scope !== "group" && scope !== "farm-out") return null;
+                // 集团 / 区域高管视角：不展示牛群 / 产犊 / 死淘 / 疾病 / 药品 / 疫苗 / 工单 / 预警专题
+                if (isExec && ["herd", "calving", "culling", "disease", "drug", "vaccine", "workorder", "alert"].includes(key)) return null;
+                const full = key === "drug" || key === "alert" || key === "ops";
+                const node =
+                  key === "herd" ? (
+                    <HerdSection />
+                  ) : key === "calving" ? (
+                    <CalvingSection />
+                  ) : key === "culling" ? (
+                    <div id="topic-culling" className="scroll-mt-24 h-full [&>*]:h-full">
+                      <CullingSection />
+                    </div>
+                  ) : key === "disease" ? (
+                    <div id="topic-disease" className="scroll-mt-24 h-full [&>*]:h-full">
+                      <DiseaseStatsSection />
+                    </div>
+                  ) : key === "drug" ? (
+                    <DrugSection />
+                  ) : key === "vaccine" ? (
+                    <div id="topic-vaccine" className="scroll-mt-24 h-full [&>*]:h-full">
+                      <ImmunizationRateCard />
+                    </div>
+                  ) : key === "workorder" ? (
+                    <div className="min-w-0 h-full [&>*]:h-full">
+                      <WorkOrderSection />
+                    </div>
+                  ) : key === "alert" ? (
+                    <AlertSection />
+                  ) : isExec ? (
+                    <GroupExecSection
+                      scopeRegion={scope === "group" ? null : scope === "region" ? CURRENT_REGION : null}
+                      scopeFarm={scope === "farm-out" ? CURRENT_FARM : null}
+                    />
+                  ) : (
+                    <div className="space-y-6">
+                      <ExecFocusSection level="farm" />
+                      <OpsSection level="region" />
+                    </div>
+                  );
 
-        {/* 数据指标卡 1-6 — 点击跳转至对应专题 */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-          {visibleCards.map((k) => {
-            const Icon = k.icon;
+                return (
+                  <div
+                    key={key}
+                    className={`min-w-0 h-full [&>*]:h-full ${full ? "xl:col-span-2" : ""}`}
+                  >
+                    {node}
+                  </div>
+                );
+              })}
+            </div>
+          );
+
+          if (!execFrame) {
             return (
-              <Card
-                key={k.label}
-                onClick={() => scrollToTopic(k.anchor)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    scrollToTopic(k.anchor);
-                  }
-                }}
-                className="relative overflow-hidden border-0 rounded-2xl p-5 transition-all cursor-pointer hover:-translate-y-0.5 hover:shadow-elevated"
-                style={{
-                  background: `color-mix(in oklab, ${k.tone} 12%, var(--bg-surface))`,
-                }}
-              >
-                <Icon
-                  aria-hidden
-                  className="pointer-events-none absolute -right-2 -bottom-2 h-16 w-16 opacity-[0.08]"
-                  style={{ color: k.tone }}
-                  strokeWidth={1.6}
-                />
-                <div className="relative flex flex-col h-full justify-between">
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-5 w-5" style={{ color: k.tone }} />
-                    <span className="text-body-sm font-medium text-text-primary">{k.topic}</span>
-                  </div>
-                  <div className="flex items-baseline gap-1.5">
-                    <span
-                      className="tabular-nums font-semibold leading-none"
-                      style={{ fontSize: "28px", color: k.tone }}
-                    >
-                      {scaleCardValue(k)}
-                    </span>
-                    <span className="text-body-sm text-text-tertiary">{k.unit}</span>
-                  </div>
+              <>
+                <div>
+                  <h3 className="text-section-title text-foreground">数据看板</h3>
                 </div>
-                <StatVisual variant={k.visual} tone={k.tone} />
-              </Card>
+                {cardsGrid}
+                {topicGrid}
+              </>
             );
-          })}
-        </div>
+          }
 
-
-        {/* 专题区：按默认顺序渲染，半宽专题自动两两并排 */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-          {topicOrder.map((key) => {
-            if (key === "ops" && scope !== "region" && scope !== "group" && scope !== "farm-out") return null;
-            // 集团 / 区域高管视角：不展示牛群 / 产犊 / 死淘 / 疾病 / 药品 / 疫苗 / 工单 / 预警专题
-            if (isExec && ["herd", "calving", "culling", "disease", "drug", "vaccine", "workorder", "alert"].includes(key)) return null;
-            const full = key === "drug" || key === "alert" || key === "ops";
-            const node =
-              key === "herd" ? (
-                <HerdSection />
-              ) : key === "calving" ? (
-                <CalvingSection />
-              ) : key === "culling" ? (
-                <div id="topic-culling" className="scroll-mt-24 h-full [&>*]:h-full">
-                  <CullingSection />
-                </div>
-              ) : key === "disease" ? (
-                <div id="topic-disease" className="scroll-mt-24 h-full [&>*]:h-full">
-                  <DiseaseStatsSection />
-                </div>
-              ) : key === "drug" ? (
-                <DrugSection />
-              ) : key === "vaccine" ? (
-                <div id="topic-vaccine" className="scroll-mt-24 h-full [&>*]:h-full">
-                  <ImmunizationRateCard />
-                </div>
-              ) : key === "workorder" ? (
-                <div className="min-w-0 h-full [&>*]:h-full">
-                  <WorkOrderSection />
-                </div>
-              ) : key === "alert" ? (
-                <AlertSection />
-              ) : isExec ? (
-                <GroupExecSection
-                  scopeRegion={scope === "group" ? null : scope === "region" ? CURRENT_REGION : null}
-                  scopeFarm={scope === "farm-out" ? CURRENT_FARM : null}
-                />
-              ) : (
-                <div className="space-y-6">
-                  <ExecFocusSection level="farm" />
-                  <OpsSection level="region" />
-                </div>
-
-              );
-
-
-            return (
-              <div
-                key={key}
-                className={`min-w-0 h-full [&>*]:h-full ${full ? "xl:col-span-2" : ""}`}
-              >
-                {node}
+          const region = scope === "region" ? CURRENT_REGION : null;
+          const Frame = ({ title, children }: { title: string; children: React.ReactNode }) => (
+            <section className="rounded-2xl border border-border bg-card p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="h-4 w-1 rounded-full bg-primary" />
+                <h3 className="text-section-title text-foreground">{title}</h3>
               </div>
-            );
-          })}
-        </div>
+              {children}
+            </section>
+          );
+
+          return (
+            <div className="space-y-6">
+              <Frame title="数据概览">{cardsGrid}</Frame>
+              <Frame title="数据看板">
+                <GroupExecSection scopeRegion={region} part="charts" />
+              </Frame>
+              <Frame title="排名情况">
+                <GroupExecSection scopeRegion={region} part="rank" />
+              </Frame>
+            </div>
+          );
+        })()}
+
 
 
 
