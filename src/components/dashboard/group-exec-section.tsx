@@ -684,11 +684,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
           </thead>
           <tbody>
             {rows.map((r, i) => (
-              <tr
-                key={r.key}
-                className={`border-t border-border ${region || scopeFarm ? "" : "cursor-pointer hover:bg-surface-subtle"}`}
-                onClick={region || scopeFarm ? undefined : () => setRegion(r.key)}
-              >
+              <tr key={r.key} className="border-t border-border">
                 <td className="py-3">
                   <span
                     className="inline-flex h-6 w-6 items-center justify-center rounded-full text-caption tabular-nums"
