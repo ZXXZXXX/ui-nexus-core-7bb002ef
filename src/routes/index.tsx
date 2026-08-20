@@ -717,14 +717,34 @@ function HomePage() {
           }
 
           const region = scope === "region" ? CURRENT_REGION : null;
-          const Frame = ({ title, children }: { title: string; children: ReactNode }) => (
+          const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
             <section>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="h-4 w-1 rounded-full bg-primary" />
-                <h3 className="text-section-title text-foreground">{title}</h3>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-1 rounded-full bg-primary" />
+                  <h3 className="text-section-title text-foreground">{title}</h3>
+                </div>
+                {extra}
               </div>
               {children}
             </section>
+          );
+
+          const timeSelector = (
+            <Select
+              value={timeScope}
+              onValueChange={(v) => setTimeScope(v as typeof timeScope)}
+            >
+              <SelectTrigger className="h-8 w-[120px] border-border bg-card text-body-sm text-text-primary">
+                <SelectValue placeholder="选择时间" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">今日</SelectItem>
+                <SelectItem value="month">本月</SelectItem>
+                <SelectItem value="quarter">本季度</SelectItem>
+                <SelectItem value="year">本年</SelectItem>
+              </SelectContent>
+            </Select>
           );
 
           return (
