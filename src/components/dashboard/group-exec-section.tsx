@@ -675,7 +675,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
                   onClick={c.key === "name" || scopeFarm ? undefined : () => onSort(c.key)}
                 >
                   <span className="inline-flex items-center gap-1">
-                    {c.key === "name" ? (scopeFarm ? "月份" : region ? "牧场名称" : "区域名称") : c.label}
+                    {c.key === "name" ? (scopeFarm ? "月份" : scopeRegion || viewMode === "farm" ? "牧场名称" : "区域名称") : c.label}
                     {c.key !== "name" && !scopeFarm && <SortIcon active={sort.key === c.key} dir={sort.dir} />}
                   </span>
                 </th>
