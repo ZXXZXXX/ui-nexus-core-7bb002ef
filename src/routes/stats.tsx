@@ -24,6 +24,7 @@ import {
   Users,
   ClipboardList,
   FileText,
+  Beef,
 } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
@@ -177,6 +178,41 @@ const CALF_OUTCOMES = [
   { value: "不留养", label: "不留养" },
 ];
 
+/** 牛只维度字典 */
+const CATTLE_TYPES = ["犊牛", "育成牛", "青年牛", "泌乳牛", "干奶牛"];
+const PARITY_OPTIONS = ["0 胎", "1 胎", "2 胎", "3 胎", "4 胎", "5 胎及以上"];
+const REPORT_COUNT_OPTIONS = [
+  { value: "all", label: "不限报病次数" },
+  { value: "0", label: "0 次" },
+  { value: "1-2", label: "1 ~ 2 次" },
+  { value: "3-5", label: "3 ~ 5 次" },
+  { value: "5+", label: "5 次以上" },
+];
+const COW_STATUSES = ["健康", "观察中", "治疗中", "死淘"];
+const CALF_SEX_OPTIONS = [
+  { value: "all", label: "全部性别" },
+  { value: "母", label: "母" },
+  { value: "公", label: "公" },
+];
+const CALF_WEIGHT_OPTIONS = [
+  { value: "all", label: "不限出生体重" },
+  { value: "<35", label: "35kg 以下" },
+  { value: "35-45", label: "35 ~ 45kg" },
+  { value: ">45", label: "45kg 以上" },
+];
+const CALF_KEEP_OPTIONS = [
+  { value: "all", label: "全部留养情况" },
+  { value: "留养", label: "留养" },
+  { value: "不留养", label: "不留养" },
+];
+const EXIT_TYPE_OPTIONS = [
+  { value: "all", label: "全部离场类型" },
+  { value: "死亡", label: "死亡" },
+  { value: "淘汰", label: "淘汰" },
+  { value: "转场", label: "转场" },
+];
+
+
 type Filters = {
   // 时间维度
   dateRange: string;
@@ -203,6 +239,15 @@ type Filters = {
   // 药品维度
   drugs: string[];
   drugRoute: string;
+  // 牛只维度
+  cattleTypes: string[];
+  parities: string[];
+  reportCount: string;
+  cowStatuses: string[];
+  calfSex: string;
+  calfWeight: string;
+  calfKeep: string;
+  exitType: string;
   // 其它
   keyword: string;
   onlyAbnormal: boolean;
@@ -226,6 +271,14 @@ const DEFAULT_FILTERS: Filters = {
   calfOutcome: "all",
   drugs: [],
   drugRoute: "all",
+  cattleTypes: [],
+  parities: [],
+  reportCount: "all",
+  cowStatuses: [],
+  calfSex: "all",
+  calfWeight: "all",
+  calfKeep: "all",
+  exitType: "all",
   keyword: "",
   onlyAbnormal: false,
 };
@@ -698,9 +751,9 @@ function StatsPage() {
   );
 
   const cat = builderCat ?? "cattle";
-  const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug") => {
+  const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug" | "cattle") => {
     if (d === "farm") return true;
-    if (cat === "cattle") return d === "order" || d === "calving";
+    if (cat === "cattle") return d === "cattle" || d === "order" || d === "calving";
     if (cat === "disease") return d === "disease" || d === "order" || d === "prescription";
     if (cat === "drug") return d === "drug" || d === "prescription";
     return d === "staff" || d === "order";
@@ -800,6 +853,99 @@ function StatsPage() {
               </div>
             </Dimension>
           )}
+
+          {/* 牛只维度 */}
+          {showDim("cattle") && (
+            <Dimension icon={Beef} title="牛只维度" tone="var(--brand)">
+              <div className="space-y-4">
+                <ChipGroup
+                  label="牛只类型（可多选）"
+                  options={CATTLE_TYPES}
+                  selected={filters.cattleTypes}
+                  onToggle={(v) => toggleIn("cattleTypes", v)}
+                />
+
+                {filters.cattleTypes.includes("犊牛") && (
+                  <div className="pl-3 border-l-2 border-primary/30 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <FieldBlock label="性别">
+                        <Select value={filters.calfSex} onValueChange={(v) => set("calfSex", v)}>
+                          <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {CALF_SEX_OPTIONS.map((d) => (
+                              <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldBlock>
+                      <FieldBlock label="出生体重">
+                        <Select value={filters.calfWeight} onValueChange={(v) => set("calfWeight", v)}>
+                          <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {CALF_WEIGHT_OPTIONS.map((d) => (
+                              <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldBlock>
+                      <FieldBlock label="留养情况">
+                        <Select value={filters.calfKeep} onValueChange={(v) => set("calfKeep", v)}>
+                          <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            {CALF_KEEP_OPTIONS.map((d) => (
+                              <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FieldBlock>
+                    </div>
+                  </div>
+                )}
+
+                <ChipGroup
+                  label="牛只胎次（可多选）"
+                  options={PARITY_OPTIONS}
+                  selected={filters.parities}
+                  onToggle={(v) => toggleIn("parities", v)}
+                />
+
+                <FieldBlock label="报病次数">
+                  <Select value={filters.reportCount} onValueChange={(v) => set("reportCount", v)}>
+                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {REPORT_COUNT_OPTIONS.map((d) => (
+                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FieldBlock>
+
+                <ChipGroup
+                  label="当前状态（可多选）"
+                  options={COW_STATUSES}
+                  selected={filters.cowStatuses}
+                  onToggle={(v) => toggleIn("cowStatuses", v)}
+                />
+
+                {filters.cowStatuses.includes("死淘") && (
+                  <div className="pl-3 border-l-2 border-primary/30">
+                    <FieldBlock label="离场类型">
+                      <Select value={filters.exitType} onValueChange={(v) => set("exitType", v)}>
+                        <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {EXIT_TYPE_OPTIONS.map((d) => (
+                            <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FieldBlock>
+                  </div>
+                )}
+              </div>
+            </Dimension>
+          )}
+
+
 
           {/* 操作人员维度 */}
           {showDim("staff") && (
@@ -1333,9 +1479,14 @@ function countActive(f: Filters): number {
   if (f.status !== "all") n++;
   if (f.calfOutcome !== "all") n++;
   if (f.drugRoute !== "all") n++;
+  if (f.reportCount !== "all") n++;
+  if (f.calfSex !== "all") n++;
+  if (f.calfWeight !== "all") n++;
+  if (f.calfKeep !== "all") n++;
+  if (f.exitType !== "all") n++;
   if (f.keyword) n++;
   if (f.onlyAbnormal) n++;
-  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length;
+  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length;
   return n;
 }
 
@@ -1360,6 +1511,14 @@ function describeFilters(f: Filters): string {
   if (f.calfOutcome !== "all") parts.push(`犊牛${f.calfOutcome}`);
   if (f.drugs.length) parts.push(`药品 ${f.drugs.join("、")}`);
   if (f.drugRoute !== "all") parts.push(f.drugRoute);
+  if (f.cattleTypes.length) parts.push(`牛只类型 ${f.cattleTypes.join("、")}`);
+  if (f.calfSex !== "all") parts.push(`性别${f.calfSex}`);
+  if (f.calfWeight !== "all") parts.push(`出生体重 ${f.calfWeight}`);
+  if (f.calfKeep !== "all") parts.push(f.calfKeep);
+  if (f.parities.length) parts.push(`胎次 ${f.parities.join("、")}`);
+  if (f.reportCount !== "all") parts.push(`报病 ${REPORT_COUNT_OPTIONS.find((d) => d.value === f.reportCount)?.label}`);
+  if (f.cowStatuses.length) parts.push(`状态 ${f.cowStatuses.join("、")}`);
+  if (f.exitType !== "all") parts.push(`离场 ${f.exitType}`);
   if (f.keyword) parts.push(`关键词「${f.keyword}」`);
   return parts.filter(Boolean).join(" · ");
 }
