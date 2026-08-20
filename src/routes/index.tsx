@@ -96,8 +96,9 @@ const metricCards: MetricCard[] = [
   { topic: "产犊总数", label: "（本月）产犊数", value: "179", unit: "头", trend: "up", delta: "+12 头", icon: Baby, anchor: "topic-calving", good: true, absolute: true, tone: "#FF8A3D", visual: "spark" },
   { topic: "死淘总数", label: "（本月）死淘数", value: "45", unit: "头", trend: "down", delta: "-6 头", icon: Activity, anchor: "topic-culling", good: true, absolute: true, tone: "var(--state-danger)", visual: "truck" },
   { topic: "治愈/报病数量", label: "（本月）治愈 / 发病头次", value: "337 / 365", unit: "头次", trend: "down", delta: "-4.2 %", icon: Stethoscope, anchor: "topic-disease", good: true, absolute: true, tone: "var(--state-success)", visual: "bars" },
-  { topic: "药费统计", label: "（本月）头均用药费用", value: "42.6", unit: "元/头", trend: "up", delta: "+6.9 %", icon: Pill, anchor: "topic-drug", good: false, tone: "var(--effect-ai-purple)", visual: "spark" },
+  { topic: "头均药费", label: "（本月）头均用药费用", value: "42.6", unit: "元/头", trend: "up", delta: "+6.9 %", icon: Pill, anchor: "topic-drug", good: false, tone: "var(--effect-ai-purple)", visual: "spark" },
   { topic: "免疫完成率", label: "（最近一次）疫苗完成率", value: "93.1", unit: "%", trend: "up", delta: "+2.3 %", icon: Syringe, anchor: "topic-vaccine", good: true, tone: "var(--effect-ai-cyan)", visual: "ring" },
+  { topic: "工单完成率", label: "（本月）工单完成率", value: "94.7", unit: "%", trend: "up", delta: "+1.8 %", icon: ClipboardList, anchor: "topic-workorder", good: true, tone: "var(--effect-ai-purple)", visual: "ring" },
 ];
 
 /** 集团管理者视角下的指标卡口径覆盖 */
