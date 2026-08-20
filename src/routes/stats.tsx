@@ -589,9 +589,14 @@ function StatsPage() {
     setSaveDesc("");
   };
 
-  const removeTemplate = (id: string) => {
-    setTemplates((prev) => prev.filter((t) => t.id !== id));
-    toast.success("模板已删除");
+  const toggleFreeze = (id: string) => {
+    setTemplates((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, frozen: !t.frozen } : t,
+      ),
+    );
+    const t = templates.find((x) => x.id === id);
+    toast.success(t?.frozen ? "模板已解冻" : "模板已冻结");
   };
 
   const toggleFav = (id: string) => {
