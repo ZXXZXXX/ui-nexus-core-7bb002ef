@@ -111,9 +111,9 @@ const metricCards: MetricCard[] = [
 /** 集团管理者视角下的指标卡口径覆盖 */
 const groupCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-herd": { topic: "总存栏数", label: "（至今日）集团总存栏", value: "29500", unit: "头", delta: "+286 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
-  "topic-calving": { topic: "早产率", label: "（本月）早产率", value: "3.96", unit: "%", delta: "-0.4 pp", trend: "down", good: true, tone: "#2E8CF0", visual: "ring" },
+  "topic-calving": { topic: "早产率", label: "（本月）早产率", value: "3.96", unit: "%", delta: "-0.4 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: "344", unit: "头", delta: "-21 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
-  "topic-disease": { topic: "治愈率", label: "（本月）治愈率", value: "91.4", unit: "%", delta: "+1.6 pp", trend: "up", good: true, tone: "var(--state-success)", visual: "ring" },
+  "topic-disease": { topic: "治愈率", label: "（本月）治愈率", value: "91.4", unit: "%", delta: "+1.6 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-drug": { topic: "总药费支出", label: "（本月）集团总药费", value: "122.1", unit: "万元", delta: "+4.3 %", trend: "up", good: false, absolute: false, tone: "var(--effect-ai-purple)", visual: "spark" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: "4.4", unit: "天", delta: "-0.3 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
