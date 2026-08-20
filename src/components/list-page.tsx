@@ -6,11 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Sheet,
   SheetContent,
   SheetHeader,
@@ -24,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Columns3, Plus, X } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, X } from "lucide-react";
 
 /* ---------------------------------- types --------------------------------- */
 
