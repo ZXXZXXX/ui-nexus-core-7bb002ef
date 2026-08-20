@@ -170,6 +170,7 @@ const DRUG_ROUTES = [
   { value: "灌注", label: "灌注" },
   { value: "口服", label: "口服" },
 ];
+const DRUG_TYPES = ["抗生素", "消炎药", "止痛药", "体液补充剂", "驱虫药", "激素类", "其他"];
 const CALVING_TYPES = ["顺产", "轻度助产", "难产", "剖腹产"];
 const CALF_OUTCOMES = [
   { value: "all", label: "全部犊牛结局" },
