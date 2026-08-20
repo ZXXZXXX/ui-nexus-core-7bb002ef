@@ -170,6 +170,7 @@ const DRUG_ROUTES = [
   { value: "灌注", label: "灌注" },
   { value: "口服", label: "口服" },
 ];
+const DRUG_TYPES = ["抗生素", "消炎药", "止痛药", "体液补充剂", "驱虫药", "激素类", "其他"];
 const CALVING_TYPES = ["顺产", "轻度助产", "难产", "剖腹产"];
 const CALF_OUTCOMES = [
   { value: "all", label: "全部犊牛结局" },
@@ -275,7 +276,10 @@ type Filters = {
   calfOutcome: string;
   // 药品维度
   drugs: string[];
+  drugTypes: string[];
   drugRoute: string;
+  drugUsageMin: string;
+  drugUsageMax: string;
   // 牛只维度
   cattleTypes: string[];
   parities: string[];
@@ -322,7 +326,10 @@ const DEFAULT_FILTERS: Filters = {
   calvingTypes: [],
   calfOutcome: "all",
   drugs: [],
+  drugTypes: [],
   drugRoute: "all",
+  drugUsageMin: "",
+  drugUsageMax: "",
   cattleTypes: [],
   parities: [],
   reportCount: "all",
@@ -1231,11 +1238,27 @@ function StatsPage() {
                   </Select>
                 </FieldBlock>
                 <ChipGroup
+                  label="药品类型（可多选）"
+                  options={DRUG_TYPES}
+                  selected={filters.drugTypes}
+                  onToggle={(v) => toggleIn("drugTypes", v)}
+                />
+                <ChipGroup
                   label="药品（可多选）"
                   options={DRUGS}
                   selected={filters.drugs}
                   onToggle={(v) => toggleIn("drugs", v)}
                 />
+                <div className="pt-1">
+                  <RangeField
+                    label="使用量"
+                    unit="次"
+                    min={filters.drugUsageMin}
+                    max={filters.drugUsageMax}
+                    onMin={(v) => set("drugUsageMin", v)}
+                    onMax={(v) => set("drugUsageMax", v)}
+                  />
+                </div>
               </div>
             </Dimension>
           )}
@@ -1671,7 +1694,7 @@ function countActive(f: Filters): number {
   if (f.exitType !== "all") n++;
   if (f.keyword) n++;
   if (f.onlyAbnormal) n++;
-  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.diseaseSubs.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length;
+  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.diseaseSubs.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.drugTypes.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length;
   const ranges: [string, string][] = [
     [f.caseCountMin, f.caseCountMax],
     [f.cureRateMin, f.cureRateMax],
@@ -1680,6 +1703,7 @@ function countActive(f: Filters): number {
     [f.rxCureMin, f.rxCureMax],
     [f.rxDaysMin, f.rxDaysMax],
     [f.rxCostMin, f.rxCostMax],
+    [f.drugUsageMin, f.drugUsageMax],
   ];
   n += ranges.filter(([a, b]) => a !== "" || b !== "").length;
   return n;
@@ -1709,6 +1733,7 @@ function describeFilters(f: Filters): string {
       ["处方治愈率", f.rxCureMin, f.rxCureMax, "%"],
       ["平均诊疗天数", f.rxDaysMin, f.rxDaysMax, "天"],
       ["处方药费", f.rxCostMin, f.rxCostMax, "元"],
+      ["使用量", f.drugUsageMin, f.drugUsageMax, "次"],
     ];
     rangeLabels.forEach(([label, a, b, u]) => {
       if (a !== "" || b !== "") parts.push(`${label} ${a || "不限"}~${b || "不限"}${u}`);
@@ -1719,6 +1744,7 @@ function describeFilters(f: Filters): string {
   if (f.status !== "all") parts.push(STATUS_OPTIONS.find((s) => s.value === f.status)?.label || "");
   if (f.calvingTypes.length) parts.push(`产犊 ${f.calvingTypes.join("、")}`);
   if (f.calfOutcome !== "all") parts.push(`犊牛${f.calfOutcome}`);
+  if (f.drugTypes.length) parts.push(`药品类型 ${f.drugTypes.join("、")}`);
   if (f.drugs.length) parts.push(`药品 ${f.drugs.join("、")}`);
   if (f.drugRoute !== "all") parts.push(f.drugRoute);
   if (f.cattleTypes.length) parts.push(`牛只类型 ${f.cattleTypes.join("、")}`);
