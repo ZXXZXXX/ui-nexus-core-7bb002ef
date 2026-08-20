@@ -686,7 +686,7 @@ function HomePage() {
 
           const region = scope === "region" ? CURRENT_REGION : null;
           const Frame = ({ title, children }: { title: string; children: ReactNode }) => (
-            <section className="rounded-2xl border border-border bg-card p-5">
+            <section>
               <div className="flex items-center gap-2 mb-4">
                 <span className="h-4 w-1 rounded-full bg-primary" />
                 <h3 className="text-section-title text-foreground">{title}</h3>
