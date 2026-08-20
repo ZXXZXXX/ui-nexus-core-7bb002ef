@@ -989,17 +989,19 @@ function StatsPage() {
                   </FieldBlock>
                 </>
               )}
-              <FieldBlock label="关键词（耳号 / 编号）">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
-                  <Input
-                    value={filters.keyword}
-                    onChange={(e) => set("keyword", e.target.value)}
-                    placeholder="输入关键词"
-                    className="h-9 pl-8 bg-white"
-                  />
-                </div>
-              </FieldBlock>
+              {cat !== "staff" && (
+                <FieldBlock label="关键词（耳号 / 编号）">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
+                    <Input
+                      value={filters.keyword}
+                      onChange={(e) => set("keyword", e.target.value)}
+                      placeholder="输入关键词"
+                      className="h-9 pl-8 bg-white"
+                    />
+                  </div>
+                </FieldBlock>
+              )}
             </div>
           </Dimension>
 
@@ -1007,16 +1009,18 @@ function StatsPage() {
           {showDim("farm") && (
             <Dimension icon={Building2} title="牧场维度" tone="var(--effect-ai-purple)">
               <div className="space-y-4">
-                <FieldBlock label="区域">
-                  <Select value={filters.region} onValueChange={(v) => set("region", v)}>
-                    <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {REGION_OPTIONS.map((d) => (
-                        <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FieldBlock>
+                {cat !== "staff" && (
+                  <FieldBlock label="区域">
+                    <Select value={filters.region} onValueChange={(v) => set("region", v)}>
+                      <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {REGION_OPTIONS.map((d) => (
+                          <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FieldBlock>
+                )}
                 <ChipGroup
                   label="牧场（可多选）"
                   options={
@@ -1027,12 +1031,14 @@ function StatsPage() {
                   selected={filters.farms}
                   onToggle={(v) => toggleIn("farms", v)}
                 />
-                <ChipGroup
-                  label="牛舍（可多选）"
-                  options={BARN_NAMES}
-                  selected={filters.barns}
-                  onToggle={(v) => toggleIn("barns", v)}
-                />
+                {cat !== "staff" && (
+                  <ChipGroup
+                    label="牛舍（可多选）"
+                    options={BARN_NAMES}
+                    selected={filters.barns}
+                    onToggle={(v) => toggleIn("barns", v)}
+                  />
+                )}
               </div>
             </Dimension>
           )}
