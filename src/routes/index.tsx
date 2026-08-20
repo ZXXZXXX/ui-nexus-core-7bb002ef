@@ -394,30 +394,34 @@ function HomePage() {
                     { key: "有机牧场", count: farmCountSummary.organic, icon: Leaf, tone: "--state-info" },
                   ].map((a) => {
                     const Icon = a.icon;
+                    const pct = a.key === "牧场总数" ? 100 : Math.round((a.count / farmCountSummary.total) * 100);
                     return (
                       <button
                         key={a.key}
                         type="button"
-                        className="group relative overflow-hidden rounded-xl px-3 py-3 text-left transition-all hover:-translate-y-0.5 hover:brightness-105"
-                        style={{
-                          background: `linear-gradient(140deg, color-mix(in oklab, var(${a.tone}) 92%, black 4%), color-mix(in oklab, var(${a.tone}) 72%, white 12%))`,
-                          boxShadow: `0 10px 22px -14px color-mix(in oklab, var(${a.tone}) 90%, transparent)`,
-                        }}
+                        className="group flex items-center gap-2.5 rounded-xl border border-border bg-bg-surface px-3 py-2.5 text-left transition-all hover:shadow-elevated hover:border-[var(--brand)]/30"
                       >
-                        <Icon
-                          aria-hidden
-                          className="pointer-events-none absolute -right-2 -bottom-2 h-12 w-12 text-white/20"
-                          strokeWidth={1.8}
-                        />
-                        <span className="relative block text-caption font-medium text-white/85 whitespace-nowrap">
-                          {a.key}
+                        <span
+                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                          style={{ background: `color-mix(in oklab, var(${a.tone}) 14%, var(--bg-surface))` }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: `var(${a.tone})` }} strokeWidth={1.8} />
                         </span>
-                        <span className="relative mt-1 flex items-baseline gap-1">
-                          <span className="text-[30px] leading-none font-semibold tabular-nums text-white">
-                            {a.count}
+                        <div className="min-w-0 flex-1">
+                          <span className="block text-caption text-text-tertiary whitespace-nowrap">{a.key}</span>
+                          <span className="mt-0.5 flex items-baseline gap-1">
+                            <span
+                              className="text-[22px] leading-none font-semibold tabular-nums"
+                              style={{ color: `var(${a.tone})` }}
+                            >
+                              {a.count}
+                            </span>
+                            <span className="text-caption text-text-tertiary">个</span>
+                            <span className="ml-auto text-caption tabular-nums" style={{ color: `var(${a.tone})` }}>
+                              {pct}%
+                            </span>
                           </span>
-                          <span className="text-caption text-white/80">个</span>
-                        </span>
+                        </div>
                       </button>
                     );
                   })
