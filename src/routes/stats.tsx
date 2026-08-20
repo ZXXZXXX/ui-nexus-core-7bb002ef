@@ -1479,9 +1479,14 @@ function countActive(f: Filters): number {
   if (f.status !== "all") n++;
   if (f.calfOutcome !== "all") n++;
   if (f.drugRoute !== "all") n++;
+  if (f.reportCount !== "all") n++;
+  if (f.calfSex !== "all") n++;
+  if (f.calfWeight !== "all") n++;
+  if (f.calfKeep !== "all") n++;
+  if (f.exitType !== "all") n++;
   if (f.keyword) n++;
   if (f.onlyAbnormal) n++;
-  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length;
+  n += f.farms.length + f.barns.length + f.operators.length + f.diseases.length + f.prescriptions.length + f.woTypes.length + f.calvingTypes.length + f.drugs.length + f.cattleTypes.length + f.parities.length + f.cowStatuses.length;
   return n;
 }
 
