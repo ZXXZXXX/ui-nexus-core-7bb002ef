@@ -608,19 +608,39 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
     <SectionCard
       id="topic-panorama"
       title={scopeFarm ? "关键指标统计" : "关键指标排行"}
-      desc={scopeFarm ? `${scopeFarm.farm} · 近 12 个月` : region ? `${region} · 牧场排名` : "区域排名"}
+      desc={
+        scopeFarm
+          ? `${scopeFarm.farm} · 近 12 个月`
+          : scopeRegion
+            ? `${scopeRegion} · 牧场排名`
+            : viewMode === "farm"
+              ? "全部牧场排名"
+              : "区域排名"
+      }
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          {region && !scopeRegion && !scopeFarm && (
-            <button
-              type="button"
-              onClick={() => setRegion(null)}
-              className="inline-flex items-center gap-1 text-caption text-primary hover:underline"
-            >
-              <ChevronLeft className="h-3.5 w-3.5" />
-              返回区域
-            </button>
+          {!scopeRegion && !scopeFarm && (
+            <div className="inline-flex items-center rounded-full border border-border bg-surface-subtle p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode("region")}
+                className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                  viewMode === "region" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+                }`}
+              >
+                按区域排行
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("farm")}
+                className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                  viewMode === "farm" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+                }`}
+              >
+                按牧场排行
+              </button>
+            </div>
           )}
           <button
             type="button"
@@ -636,9 +656,11 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       <p className="text-body-sm text-text-secondary mb-4">
         {scopeFarm
           ? "本牧场近 12 个月各项关键指标统计"
-          : region
+          : scopeRegion
             ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
-            : "点击某区域可下钻查看该区域下所有牧场排名"}
+            : viewMode === "farm"
+              ? "集团下所有牧场按死淘、药费、产后淘汰率横向对比"
+              : "集团下各区域按死淘、药费、产后淘汰率横向对比"}
       </p>
 
       <div className="overflow-x-auto">
