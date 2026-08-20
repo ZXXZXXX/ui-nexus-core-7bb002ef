@@ -1511,6 +1511,14 @@ function describeFilters(f: Filters): string {
   if (f.calfOutcome !== "all") parts.push(`犊牛${f.calfOutcome}`);
   if (f.drugs.length) parts.push(`药品 ${f.drugs.join("、")}`);
   if (f.drugRoute !== "all") parts.push(f.drugRoute);
+  if (f.cattleTypes.length) parts.push(`牛只类型 ${f.cattleTypes.join("、")}`);
+  if (f.calfSex !== "all") parts.push(`性别${f.calfSex}`);
+  if (f.calfWeight !== "all") parts.push(`出生体重 ${f.calfWeight}`);
+  if (f.calfKeep !== "all") parts.push(f.calfKeep);
+  if (f.parities.length) parts.push(`胎次 ${f.parities.join("、")}`);
+  if (f.reportCount !== "all") parts.push(`报病 ${REPORT_COUNT_OPTIONS.find((d) => d.value === f.reportCount)?.label}`);
+  if (f.cowStatuses.length) parts.push(`状态 ${f.cowStatuses.join("、")}`);
+  if (f.exitType !== "all") parts.push(`离场 ${f.exitType}`);
   if (f.keyword) parts.push(`关键词「${f.keyword}」`);
   return parts.filter(Boolean).join(" · ");
 }
