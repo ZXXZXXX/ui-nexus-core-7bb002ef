@@ -39,7 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -1237,25 +1236,6 @@ function describeFilters(f: Filters): string {
   if (f.drugRoute !== "all") parts.push(f.drugRoute);
   if (f.keyword) parts.push(`关键词「${f.keyword}」`);
   return parts.filter(Boolean).join(" · ");
-}
-
-function tagsFromFilters(f: Filters): string[] {
-  const tags: string[] = [];
-  tags.push(DATE_PRESETS.find((d) => d.value === f.dateRange)?.label || "");
-  if (f.region !== "all") tags.push(f.region);
-  if (f.farms.length) tags.push(f.farms.length === 1 ? f.farms[0] : `牧场 ${f.farms.length} 个`);
-  if (f.barns.length) tags.push(f.barns.length === 1 ? f.barns[0] : `牛舍 ${f.barns.length} 个`);
-  if (f.role !== "all") tags.push(ROLE_OPTIONS.find((d) => d.value === f.role)?.label || "");
-  if (f.diseaseCat !== "all") tags.push(f.diseaseCat);
-  if (f.diseases.length) tags.push(f.diseases.length === 1 ? f.diseases[0] : `病种 ${f.diseases.length} 项`);
-  if (f.prescriptions.length) tags.push(f.prescriptions.length === 1 ? f.prescriptions[0] : `处方 ${f.prescriptions.length} 项`);
-  if (f.woTypes.length === 1) tags.push(WO_TYPE_LABEL[f.woTypes[0]]);
-  else if (f.woTypes.length > 1) tags.push(`工单 ${f.woTypes.length} 类`);
-  if (f.status !== "all") tags.push(STATUS_OPTIONS.find((s) => s.value === f.status)?.label || "");
-  if (f.calvingTypes.length) tags.push(f.calvingTypes.length === 1 ? f.calvingTypes[0] : `产犊 ${f.calvingTypes.length} 项`);
-  if (f.drugs.length) tags.push(f.drugs.length === 1 ? f.drugs[0] : `药品 ${f.drugs.length} 项`);
-  if (f.drugRoute !== "all") tags.push(f.drugRoute);
-  return tags.filter(Boolean);
 }
 
 function filterRows(rows: Row[], f: Filters): Row[] {
