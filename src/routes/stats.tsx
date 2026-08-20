@@ -177,6 +177,41 @@ const CALF_OUTCOMES = [
   { value: "不留养", label: "不留养" },
 ];
 
+/** 牛只维度字典 */
+const CATTLE_TYPES = ["犊牛", "育成牛", "青年牛", "泌乳牛", "干奶牛"];
+const PARITY_OPTIONS = ["0 胎", "1 胎", "2 胎", "3 胎", "4 胎", "5 胎及以上"];
+const REPORT_COUNT_OPTIONS = [
+  { value: "all", label: "不限报病次数" },
+  { value: "0", label: "0 次" },
+  { value: "1-2", label: "1 ~ 2 次" },
+  { value: "3-5", label: "3 ~ 5 次" },
+  { value: "5+", label: "5 次以上" },
+];
+const COW_STATUSES = ["健康", "观察中", "治疗中", "死淘"];
+const CALF_SEX_OPTIONS = [
+  { value: "all", label: "全部性别" },
+  { value: "母", label: "母" },
+  { value: "公", label: "公" },
+];
+const CALF_WEIGHT_OPTIONS = [
+  { value: "all", label: "不限出生体重" },
+  { value: "<35", label: "35kg 以下" },
+  { value: "35-45", label: "35 ~ 45kg" },
+  { value: ">45", label: "45kg 以上" },
+];
+const CALF_KEEP_OPTIONS = [
+  { value: "all", label: "全部留养情况" },
+  { value: "留养", label: "留养" },
+  { value: "不留养", label: "不留养" },
+];
+const EXIT_TYPE_OPTIONS = [
+  { value: "all", label: "全部离场类型" },
+  { value: "死亡", label: "死亡" },
+  { value: "淘汰", label: "淘汰" },
+  { value: "转场", label: "转场" },
+];
+
+
 type Filters = {
   // 时间维度
   dateRange: string;
