@@ -690,127 +690,6 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
   );
 }
 
-/* ---------------- 五、兽医工单专题（区域视角） ---------------- */
-
-const VET_ORDER_TYPES = [
-  { label: "疾病诊疗", w: 0.42, tone: "var(--state-danger)" },
-  { label: "产后护理", w: 0.21, tone: "var(--state-success)" },
-  { label: "免疫接种", w: 0.16, tone: "var(--effect-ai-cyan)" },
-  { label: "干奶", w: 0.11, tone: "var(--effect-ai-purple)" },
-  { label: "修蹄/其他", w: 0.1, tone: "#FF8A3D" },
-];
-
-function VetOrderSection({ scopeRegion }: { scopeRegion: string }) {
-  const [period, setPeriod] = useState("本月");
-  const k = period === "本月" ? 1 : 3.1;
-
-  const farms = useMemo(() => GROUP_FARMS.filter((f) => f.region === scopeRegion), [scopeRegion]);
-  const rows = useMemo(
-    () =>
-      farms.map((f) => {
-        const total = Math.round((f.herd / 26) * k);
-        const rate = Number(Math.min(99, 88 + (100 - f.sick * 4) / 10).toFixed(1));
-        const done = Math.round((total * rate) / 100);
-        return {
-          farm: f.farm,
-          base: f.base,
-          total,
-          done,
-          doing: Math.max(0, Math.round((total - done) * 0.62)),
-          overdue: Math.max(0, total - done - Math.round((total - done) * 0.62)),
-          rate,
-          days: f.treatmentDays,
-        };
-      }),
-    [farms, k],
-  );
-
-  const sum = rows.reduce(
-    (a, r) => ({
-      total: a.total + r.total,
-      done: a.done + r.done,
-      doing: a.doing + r.doing,
-      overdue: a.overdue + r.overdue,
-    }),
-    { total: 0, done: 0, doing: 0, overdue: 0 },
-  );
-  const rate = sum.total ? Number(((sum.done / sum.total) * 100).toFixed(1)) : 0;
-  const avgDays = rows.length ? (rows.reduce((s, r) => s + r.days, 0) / rows.length).toFixed(1) : "0";
-
-  const kpis = [
-    { label: "工单总数", value: String(sum.total), unit: "单", tone: "var(--brand)" },
-    { label: "已完成", value: String(sum.done), unit: "单", tone: "var(--state-success)" },
-    { label: "执行中", value: String(sum.doing), unit: "单", tone: "var(--effect-ai-cyan)" },
-    { label: "超时未闭环", value: String(sum.overdue), unit: "单", tone: "var(--state-danger)" },
-    { label: "完成率", value: String(rate), unit: "%", tone: "var(--effect-ai-purple)" },
-    { label: "平均处置时长", value: avgDays, unit: "天", tone: "#FF8A3D" },
-  ];
-
-  return (
-    <SectionCard
-      id="topic-vet-order"
-      title="兽医工单专题"
-      desc={`${scopeRegion} · ${period}`}
-      icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<PeriodTabs value={period} onChange={setPeriod} options={["本月", "近 3 个月"]} />}
-    >
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
-        {kpis.map((m) => (
-          <div key={m.label} className="rounded-xl border border-border-secondary bg-surface-secondary/60 px-4 py-3">
-            <div className="text-caption text-text-secondary">{m.label}</div>
-            <div className="mt-1 flex items-baseline gap-1">
-              <span className="text-[22px] leading-7 font-medium" style={{ color: m.tone }}>{m.value}</span>
-              <span className="text-caption text-text-tertiary">{m.unit}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mt-6">
-        <div>
-          <div className="text-body-small text-text-secondary mb-3">各牧场工单完成率</div>
-          <div className="space-y-3">
-            {[...rows].sort((a, b) => b.rate - a.rate).map((r) => (
-              <div key={`${r.base}-${r.farm}`} className="flex items-center gap-3">
-                <div className="w-40 shrink-0 truncate text-body-small text-text-primary">
-                  {r.base} · {r.farm}
-                </div>
-                <div className="flex-1 h-2.5 rounded-full bg-surface-secondary overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${r.rate}%`, background: "var(--brand)" }} />
-                </div>
-                <div className="w-24 shrink-0 text-right text-body-small text-text-primary tabular-nums">
-                  {r.rate}%
-                  <span className="text-text-tertiary"> · {r.total}单</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="text-body-small text-text-secondary mb-3">工单类型分布</div>
-          <div className="space-y-3">
-            {VET_ORDER_TYPES.map((t) => {
-              const n = Math.round(sum.total * t.w);
-              return (
-                <div key={t.label} className="flex items-center gap-3">
-                  <div className="w-24 shrink-0 text-body-small text-text-primary">{t.label}</div>
-                  <div className="flex-1 h-2.5 rounded-full bg-surface-secondary overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${t.w * 100 * 2}%`, maxWidth: "100%", background: t.tone }} />
-                  </div>
-                  <div className="w-24 shrink-0 text-right text-body-small text-text-primary tabular-nums">
-                    {n}单 <span className="text-text-tertiary">{(t.w * 100).toFixed(0)}%</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </SectionCard>
-  );
-}
-
 /* ---------------- 集团视角总装 ---------------- */
 
 export function GroupExecSection({
@@ -827,7 +706,7 @@ export function GroupExecSection({
           <DrugTrendSection scopeRegion={scopeRegion} />
         </div>
       )}
-      {scopeRegion && !scopeFarm ? <VetOrderSection scopeRegion={scopeRegion} /> : null}
+      {scopeRegion && !scopeFarm ? <WorkOrderSection /> : null}
       <PanoramaSection scopeRegion={scopeRegion} scopeFarm={scopeFarm} />
     </div>
   );
