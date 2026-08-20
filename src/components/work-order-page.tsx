@@ -713,7 +713,16 @@ export function WorkOrderPage({
             <div className="flex items-center gap-2 flex-wrap">
               {/* 快捷时间筛选 */}
               <div className="flex items-center gap-1 p-0.5 rounded-md border border-border bg-surface-subtle">
-                <span className="px-2 text-caption text-text-tertiary">按创建时间</span>
+                <Select value={dateField} onValueChange={(v) => setDateField(v as typeof dateField)}>
+                  <SelectTrigger className="h-7 w-[112px] border-0 bg-transparent shadow-none text-caption text-text-secondary px-2 focus:ring-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="createdAt">按提出时间</SelectItem>
+                    <SelectItem value="reviewedAt">按诊断时间</SelectItem>
+                    <SelectItem value="executedAt">按执行时间</SelectItem>
+                  </SelectContent>
+                </Select>
                 {dateRanges.map((r) => (
                   <button
                     key={r.key}
@@ -728,6 +737,7 @@ export function WorkOrderPage({
                   </button>
                 ))}
               </div>
+
               <Button
                 variant="outline"
                 size="sm"
