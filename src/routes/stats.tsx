@@ -1,3 +1,17 @@
+function downloadCsv(rows: Row[], cols: ResultCol[], filename: string) {
+  const header = cols.map((c) => c.label);
+  const body = rows.map((r) => cols.map((c) => c.value(r).replace(/"/g, '""')));
+  const csv = [header, ...body]
+    .map((row) => row.map((c) => `"${c}"`).join(","))
+    .join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
@@ -735,6 +749,7 @@ function StatsPage() {
   const [view, setView] = useState<"templates" | "result">("templates");
   const [resultFilters, setResultFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [resultTitle, setResultTitle] = useState("筛选结果");
+  const [resultCat, setResultCat] = useState<TplCategory>("cattle");
   const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -758,8 +773,9 @@ function StatsPage() {
       };
     });
 
-  const runFilter = (f: Filters, title = "筛选结果") => {
+  const runFilter = (f: Filters, title = "筛选结果", cat?: TplCategory) => {
     setResultFilters(f);
+    setResultCat(cat ?? inferCategory(f));
     setResultTitle(title);
     setView("result");
   };
@@ -843,6 +859,7 @@ function StatsPage() {
   };
 
   const filteredRows = useMemo(() => filterRows(ROWS, resultFilters), [resultFilters]);
+  const resultCols = useMemo(() => resultColumns(resultCat, resultFilters), [resultCat, resultFilters]);
   const activeCount = countActive(filters);
   const visibleTemplates = useMemo(() => {
     const k = query.trim().toLowerCase();
@@ -1545,7 +1562,7 @@ function StatsPage() {
             className="h-10 px-5 bg-primary hover:bg-[var(--brand-hover)]"
             onClick={() => {
               setDrawerOpen(false);
-              runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`);
+              runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`, cat);
             }}
           >
             <Filter className="h-4 w-4 mr-1.5" />
@@ -1659,7 +1676,7 @@ function StatsPage() {
                         size="sm"
                         variant="ghost"
                         className="h-8 px-2 text-primary hover:bg-transparent hover:font-semibold"
-                        onClick={() => runFilter(t.filters, t.name)}
+                        onClick={() => runFilter(t.filters, t.name, t.category)}
                       >
                         查看结果
                       </Button>
@@ -1747,7 +1764,7 @@ function StatsPage() {
                 size="sm"
                 className="h-9 bg-primary hover:bg-[var(--brand-hover)]"
                 onClick={() => {
-                  downloadCsv(filteredRows, `${resultTitle}.csv`);
+                  downloadCsv(filteredRows, resultCols, `${resultTitle}.csv`);
                   toast.success("已开始下载 CSV");
                 }}
               >
