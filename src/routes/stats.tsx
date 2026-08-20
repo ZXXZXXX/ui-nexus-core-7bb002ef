@@ -632,12 +632,95 @@ const ROWS: Row[] = Array.from({ length: 36 }).map((_, i) => {
   };
 });
 
-const STATUS_TAG: Record<string, { label: string; bg: string; color: string }> = {
-  pending: { label: "待诊断", bg: "#FFF7ED", color: "#C2410C" },
-  executing: { label: "待执行", bg: "#EFF6FF", color: "#1D4ED8" },
-  done: { label: "已完成", bg: "#EFFBF1", color: "#00A14F" },
-  aborted: { label: "已终止", bg: "#F1F5F9", color: "#475569" },
-};
+
+// ============ 结果列：仅展示所选维度下的可筛选字段 ============
+type ResultCol = { key: string; label: string; num?: boolean; value: (r: Row) => string };
+
+function seedNum(seed: string, min: number, max: number) {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return min + (h % (max - min + 1));
+}
+const pickOf = <T,>(seed: string, list: T[]): T => list[seedNum(seed, 0, list.length - 1)];
+
+function resultColumns(cat: TplCategory, f: Filters): ResultCol[] {
+  const cols: ResultCol[] = [];
+  if (cat === "cattle") {
+    const isCalf = (r: Row) => r.barn.startsWith("犊牛");
+    cols.push(
+      { key: "earTag", label: "牛只耳号", value: (r) => r.earTag },
+      { key: "cattleType", label: "牛只类型", value: (r) => (isCalf(r) ? "犊牛" : pickOf(r.id + "ct", ["育成牛", "青年牛", "泌乳牛", "干奶牛"])) },
+      { key: "parity", label: "牛只胎次", num: true, value: (r) => (isCalf(r) ? "—" : `${seedNum(r.id + "p", 1, 5)} 胎`) },
+      { key: "reportCount", label: "报病次数", num: true, value: (r) => String(seedNum(r.id + "rc", 0, 6)) },
+      { key: "cowStatus", label: "当前状态", value: (r) => pickOf(r.id + "cs", COW_STATUSES) },
+    );
+    if (f.cattleTypes.includes("犊牛")) {
+      cols.push(
+        { key: "calfSex", label: "性别", value: (r) => pickOf(r.id + "sex", ["母", "公"]) },
+        { key: "birthWeight", label: "出生体重", num: true, value: (r) => `${seedNum(r.id + "bw", 32, 48)} kg` },
+        { key: "calfKeep", label: "留养情况", value: (r) => pickOf(r.id + "kp", ["留养", "不留养"]) },
+      );
+    }
+    if (f.cowStatuses.includes("死淘") || f.exitType !== "all") {
+      cols.push({ key: "exitType", label: "离场类型", value: (r) => pickOf(r.id + "ex", ["死亡", "淘汰", "转场"]) });
+    }
+    cols.push({ key: "createdAt", label: "统计时间", value: (r) => r.createdAt });
+    return cols;
+  }
+  if (cat === "disease") {
+    return [
+      { key: "diseaseCat", label: "疾病类型", value: (r) => (r.diseaseCat === "—" ? pickOf(r.id + "dc", Object.keys(DISEASES_OF_CAT)) : r.diseaseCat) },
+      { key: "disease", label: "疾病名称", value: (r) => (r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease) },
+      { key: "sub", label: "疾病子类型", value: (r) => { const d = r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease; return pickOf(r.id + "sb", SUBTYPES_OF[d] ?? ["常规"]); } },
+      { key: "caseCount", label: "发病头数", num: true, value: (r) => String(seedNum(r.id + "cc", 3, 68)) },
+      { key: "cureRate", label: "治愈率", num: true, value: (r) => `${seedNum(r.id + "cr", 62, 98)}%` },
+      { key: "cullRate", label: "死淘率", num: true, value: (r) => `${seedNum(r.id + "kr", 0, 12)}%` },
+      { key: "rx", label: "处方", value: (r) => r.prescription },
+      { key: "rxUsage", label: "处方使用率", num: true, value: (r) => `${seedNum(r.id + "ru", 15, 90)}%` },
+      { key: "rxCure", label: "处方治愈率", num: true, value: (r) => `${seedNum(r.id + "rk", 55, 97)}%` },
+      { key: "rxDays", label: "平均诊疗天数", num: true, value: (r) => `${seedNum(r.id + "rd", 2, 9)} 天` },
+      { key: "rxCost", label: "处方药费", num: true, value: (r) => `¥${seedNum(r.id + "rf", 40, 460)}` },
+    ];
+  }
+  if (cat === "drug") {
+    return [
+      { key: "drug", label: "药品名称", value: (r) => r.drug },
+      { key: "drugType", label: "药品类型", value: (r) => pickOf(r.id + "dt", DRUG_TYPES) },
+      { key: "usage", label: "使用量", num: true, value: (r) => `${seedNum(r.id + "us", 5, 320)} 支` },
+    ];
+  }
+  // staff
+  const perf = f.perfTypes.length ? f.perfTypes : PERF_TYPES;
+  cols.push(
+    { key: "farm", label: "牧场", value: (r) => r.farm },
+    { key: "operator", label: "姓名", value: (r) => r.operator },
+    { key: "role", label: "角色", value: () => "兽医" },
+    { key: "perf", label: "绩效类型", value: () => perf.join(" / ") },
+  );
+  if (perf.includes("治疗")) {
+    cols.push(
+      { key: "tCat", label: "治疗疾病类型", value: (r) => (r.diseaseCat === "—" ? pickOf(r.id + "dc", Object.keys(DISEASES_OF_CAT)) : r.diseaseCat) },
+      { key: "tDisease", label: "治疗疾病名称", value: (r) => (r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease) },
+      { key: "tSub", label: "治疗疾病子类型", value: (r) => { const d = r.disease === "—" ? pickOf(r.id + "dn", DISEASES) : r.disease; return pickOf(r.id + "sb", SUBTYPES_OF[d] ?? ["常规"]); } },
+      { key: "tDays", label: "平均疗程", num: true, value: (r) => `${seedNum(r.id + "td", 2, 10)} 天` },
+      { key: "tRxUsage", label: "处方使用率", num: true, value: (r) => `${seedNum(r.id + "pu", 10, 92)}%` },
+      { key: "tRxCure", label: "处方治愈率", num: true, value: (r) => `${seedNum(r.id + "pc", 55, 98)}%` },
+      { key: "tSpecial", label: "特殊药品使用次数", num: true, value: (r) => String(seedNum(r.id + "sp", 0, 14)) },
+    );
+  }
+  if (perf.includes("接生")) {
+    cols.push({ key: "survival", label: "存活率", num: true, value: (r) => `${seedNum(r.id + "sv", 78, 100)}%` });
+  }
+  if (perf.includes("工单")) {
+    cols.push(
+      { key: "woType", label: "工单类型", value: (r) => WO_TYPE_LABEL[r.type] },
+      { key: "woDone", label: "完成次数", num: true, value: (r) => String(seedNum(r.id + "wd", 2, 60)) },
+      { key: "woOver", label: "逾期次数", num: true, value: (r) => String(seedNum(r.id + "wo", 0, 9)) },
+    );
+  }
+  return cols;
+}
+
 
 // ============ Page ============
 function StatsPage() {
@@ -646,6 +729,7 @@ function StatsPage() {
   const [view, setView] = useState<"templates" | "result">("templates");
   const [resultFilters, setResultFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [resultTitle, setResultTitle] = useState("筛选结果");
+  const [resultCat, setResultCat] = useState<TplCategory>("cattle");
   const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -669,8 +753,9 @@ function StatsPage() {
       };
     });
 
-  const runFilter = (f: Filters, title = "筛选结果") => {
+  const runFilter = (f: Filters, title = "筛选结果", cat?: TplCategory) => {
     setResultFilters(f);
+    setResultCat(cat ?? inferCategory(f));
     setResultTitle(title);
     setView("result");
   };
@@ -754,6 +839,7 @@ function StatsPage() {
   };
 
   const filteredRows = useMemo(() => filterRows(ROWS, resultFilters), [resultFilters]);
+  const resultCols = useMemo(() => resultColumns(resultCat, resultFilters), [resultCat, resultFilters]);
   const activeCount = countActive(filters);
   const visibleTemplates = useMemo(() => {
     const k = query.trim().toLowerCase();
@@ -1456,7 +1542,7 @@ function StatsPage() {
             className="h-10 px-5 bg-primary hover:bg-[var(--brand-hover)]"
             onClick={() => {
               setDrawerOpen(false);
-              runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`);
+              runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`, cat);
             }}
           >
             <Filter className="h-4 w-4 mr-1.5" />
@@ -1570,7 +1656,7 @@ function StatsPage() {
                         size="sm"
                         variant="ghost"
                         className="h-8 px-2 text-primary hover:bg-transparent hover:font-semibold"
-                        onClick={() => runFilter(t.filters, t.name)}
+                        onClick={() => runFilter(t.filters, t.name, t.category)}
                       >
                         查看结果
                       </Button>
@@ -1658,7 +1744,7 @@ function StatsPage() {
                 size="sm"
                 className="h-9 bg-primary hover:bg-[var(--brand-hover)]"
                 onClick={() => {
-                  downloadCsv(filteredRows, `${resultTitle}.csv`);
+                  downloadCsv(filteredRows, resultCols, `${resultTitle}.csv`);
                   toast.success("已开始下载 CSV");
                 }}
               >
@@ -1673,61 +1759,31 @@ function StatsPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
-                  <TableHead>工单编号</TableHead>
-                  <TableHead>类型</TableHead>
-                  <TableHead>牛只耳号</TableHead>
-                  <TableHead>牧场 · 牛舍</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>操作人员</TableHead>
-                  <TableHead>疾病</TableHead>
-                  <TableHead>处方</TableHead>
-                  <TableHead>药品 · 给药</TableHead>
-                  <TableHead>产犊</TableHead>
-                  <TableHead>创建时间</TableHead>
+                  {resultCols.map((c) => (
+                    <TableHead key={c.key} className={c.num ? "text-right" : undefined}>
+                      {c.label}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredRows.map((r) => {
-                  const Icon = WO_TYPE_ICON[r.type];
-                  const s = STATUS_TAG[r.status];
-                  return (
-                    <TableRow key={r.id}>
-                      <TableCell className="font-mono text-body-sm">{r.id}</TableCell>
-                      <TableCell>
-                        <span className="inline-flex items-center gap-1.5 text-body-sm whitespace-nowrap">
-                          <Icon className="h-3.5 w-3.5 text-text-tertiary" strokeWidth={1.75} />
-                          {WO_TYPE_LABEL[r.type]}
-                        </span>
+                {filteredRows.map((r) => (
+                  <TableRow key={r.id}>
+                    {resultCols.map((c) => (
+                      <TableCell
+                        key={c.key}
+                        className={`text-body-sm whitespace-nowrap ${
+                          c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
+                        }`}
+                      >
+                        {c.value(r)}
                       </TableCell>
-                      <TableCell className="font-mono text-body-sm">{r.earTag}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.farm} · {r.barn}</TableCell>
-                      <TableCell>
-                        <span
-                          className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
-                          style={{ background: s.bg, color: s.color }}
-                        >
-                          {s.label}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-body-sm whitespace-nowrap">
-                        {r.operator}
-                        <span className="text-caption text-text-tertiary ml-1">
-                          {ROLE_OPTIONS.find((x) => x.value === r.role)?.label}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.disease}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.prescription}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{r.drug} · {r.drugRoute}</TableCell>
-                      <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">
-                        {r.calvingType === "—" ? "—" : `${r.calvingType} · ${r.calfOutcome}`}
-                      </TableCell>
-                      <TableCell className="text-body-sm text-text-secondary tabular-nums whitespace-nowrap">{r.createdAt}</TableCell>
-                    </TableRow>
-                  );
-                })}
+                    ))}
+                  </TableRow>
+                ))}
                 {filteredRows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center py-10 text-text-tertiary">
+                    <TableCell colSpan={resultCols.length} className="text-center py-10 text-text-tertiary">
                       当前筛选条件下暂无数据
                     </TableCell>
                   </TableRow>
@@ -1993,26 +2049,9 @@ function filterRows(rows: Row[], f: Filters): Row[] {
   });
 }
 
-function downloadCsv(rows: Row[], filename: string) {
-  const header = ["工单编号", "类型", "耳号", "牧场", "牛舍", "状态", "操作人员", "疾病", "病种类别", "处方", "药品", "给药方式", "产犊方式", "犊牛结局", "创建时间", "说明"];
-  const body = rows.map((r) => [
-    r.id,
-    WO_TYPE_LABEL[r.type],
-    r.earTag,
-    r.farm,
-    r.barn,
-    STATUS_TAG[r.status]?.label || r.status,
-    r.operator,
-    r.disease,
-    r.diseaseCat,
-    r.prescription,
-    r.drug,
-    r.drugRoute,
-    r.calvingType,
-    r.calfOutcome,
-    r.createdAt,
-    r.detail.replace(/"/g, '""'),
-  ]);
+function downloadCsv(rows: Row[], cols: ResultCol[], filename: string) {
+  const header = cols.map((c) => c.label);
+  const body = rows.map((r) => cols.map((c) => c.value(r).replace(/"/g, '""')));
   const csv = [header, ...body]
     .map((row) => row.map((c) => `"${c}"`).join(","))
     .join("\n");
