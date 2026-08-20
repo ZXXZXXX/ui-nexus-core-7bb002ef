@@ -295,6 +295,7 @@ function HomePage() {
     "topic-disease": "disease",
     "topic-drug": "drug",
     "topic-vaccine": "vaccine",
+    "topic-workorder": "workorder",
   };
   const { factor, level, levels } = useDataLevel();
   const scaleCardValue = (c: MetricCard) =>

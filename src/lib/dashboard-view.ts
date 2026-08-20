@@ -40,7 +40,7 @@ function base(overrides: Partial<TopicVisibility> = {}): TopicVisibility {
 }
 
 export const defaultConfig: Record<ReportScope, TopicVisibility> = {
-  "farm-in": base({ ops: false }),
+  "farm-in": base({ ops: false, culling: false }),
   "farm-out": base({ drug: false, workorder: false, alert: false, ops: true }),
   region: base(),
   group: base(),
@@ -51,7 +51,7 @@ export type TopicOrder = TopicKey[];
 export const defaultOrder: TopicOrder = topicMeta.map((t) => t.key);
 
 export const defaultOrders: Record<ReportScope, TopicOrder> = {
-  "farm-in": [...defaultOrder],
+  "farm-in": ["herd", "calving", "vaccine", "disease", "drug", "workorder", "culling", "alert", "ops"],
   "farm-out": [...defaultOrder],
   region: [...defaultOrder],
   group: [...defaultOrder],
