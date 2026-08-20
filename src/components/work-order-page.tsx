@@ -739,6 +739,14 @@ export function WorkOrderPage({
                 <Settings2 className="h-3.5 w-3.5" /> 筛选与列设置
               </Button>
 
+              <Button
+                size="sm"
+                className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
+              >
+                <Plus className="h-3.5 w-3.5" /> 新建工单
+              </Button>
+
+
             </div>
           </div>
 
