@@ -222,10 +222,34 @@ const DEFAULT_FILTERS: Filters = {
 };
 
 // ============ Templates ============
+type TplCategory = "cattle" | "disease" | "drug" | "staff";
+
+const TPL_CATEGORY_LABEL: Record<TplCategory, string> = {
+  cattle: "牛只",
+  disease: "疾病",
+  drug: "用药",
+  staff: "人员绩效",
+};
+
+const TPL_CATEGORY_TONE: Record<TplCategory, string> = {
+  cattle: "var(--brand)",
+  disease: "var(--effect-ai-purple)",
+  drug: "var(--state-success)",
+  staff: "var(--effect-ai-cyan)",
+};
+
+function inferCategory(f: Filters): TplCategory {
+  if (f.role !== "all" || f.operators.length) return "staff";
+  if (f.drugs.length || f.drugRoute !== "all" || f.prescriptions.length) return "drug";
+  if (f.diseases.length || f.diseaseCat !== "all" || f.woTypes.includes("disease")) return "disease";
+  return "cattle";
+}
+
 type Template = {
   id: string;
   name: string;
   desc: string;
+  category: TplCategory;
   icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
   tone: string;
   filters: Filters;
@@ -234,6 +258,7 @@ type Template = {
   creator: string;
   createdAt: string;
 };
+
 
 const DEFAULT_TEMPLATES: Template[] = [
   {
