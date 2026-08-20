@@ -526,17 +526,15 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 }
 
 function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | null; scopeFarm?: { farm: string; region: string } | null }) {
-  const [drill, setDrill] = useState<string | null>(null);
-  const region = scopeRegion ?? drill;
-  const setRegion = scopeRegion || scopeFarm ? () => {} : setDrill;
+  const [viewMode, setViewMode] = useState<"region" | "farm">("region");
   const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "pp30", dir: "asc" });
 
   const baseRows = useMemo(() => {
     if (scopeFarm) return farmMonthlyRows(scopeFarm.farm, scopeFarm.region);
-    return region
-      ? GROUP_FARMS.filter((f) => f.region === region).map((f) => agg(f.farm, f.base, [f]))
-      : [...regionRows];
-  }, [region, scopeFarm]);
+    if (scopeRegion) return GROUP_FARMS.filter((f) => f.region === scopeRegion).map((f) => agg(f.farm, f.base, [f]));
+    if (viewMode === "farm") return [...farmRows];
+    return [...regionRows];
+  }, [scopeRegion, scopeFarm, viewMode]);
 
   const rows = useMemo(() => {
     const list = [...baseRows];
