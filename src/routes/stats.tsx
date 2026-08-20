@@ -1535,12 +1535,22 @@ function StatsPage() {
                   selected={filters.drugTypes}
                   onToggle={(v) => toggleIn("drugTypes", v)}
                 />
-                <ChipGroup
-                  label="药品（可多选）"
-                  options={DRUGS}
-                  selected={filters.drugs}
-                  onToggle={(v) => toggleIn("drugs", v)}
-                />
+                {filters.drugTypes.length > 0 && (() => {
+                  const list = Array.from(
+                    new Set(filters.drugTypes.flatMap((t) => DRUGS_OF_TYPE[t] || [])),
+                  );
+                  if (list.length === 0) return null;
+                  return (
+                    <div className="pl-3 border-l-2 border-primary/30">
+                      <ChipGroup
+                        label="药品（可多选）"
+                        options={list}
+                        selected={filters.drugs}
+                        onToggle={(v) => toggleIn("drugs", v)}
+                      />
+                    </div>
+                  );
+                })()}
                 <div className="pt-1">
                   <RangeField
                     label="使用量"
