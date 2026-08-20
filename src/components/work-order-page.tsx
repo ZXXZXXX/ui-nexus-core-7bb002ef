@@ -734,43 +734,9 @@ export function WorkOrderPage({
                 className="h-9 gap-1.5 text-body-sm font-normal"
                 onClick={() => setAdvOpen((v) => !v)}
               >
-                <Filter className="h-3.5 w-3.5" /> 筛选
+                <Settings2 className="h-3.5 w-3.5" /> 筛选与列设置
               </Button>
-              {/* 列设置 */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
-                    <Settings2 className="h-3.5 w-3.5" /> 列设置
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-56 p-2">
-                  <div className="text-caption text-text-tertiary px-2 py-1.5">
-                    选择展示的字段
-                  </div>
-                  <div className="space-y-0.5">
-                    {ALL_COLS.map((c) => (
-                      <label
-                        key={c.key}
-                        className={`flex items-center gap-2 px-2 py-1.5 rounded text-body-sm ${
-                          c.locked ? "opacity-60 cursor-not-allowed" : "hover:bg-surface-subtle cursor-pointer"
-                        }`}
-                      >
-                        <Checkbox
-                          checked={visible[c.key]}
-                          disabled={c.locked}
-                          onCheckedChange={(v) =>
-                            setVisible((m) => ({ ...m, [c.key]: !!v }))
-                          }
-                        />
-                        <span className="flex-1">{c.label}</span>
-                        {c.locked && (
-                          <span className="text-caption text-text-tertiary">必选</span>
-                        )}
-                      </label>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+
             </div>
           </div>
 
