@@ -602,12 +602,14 @@ export function WorkOrderPage({
         const isCow = o.target.trim().startsWith("#");
         return <span className="tag tag-muted">{isCow ? "牛只" : "牛舍/群体"}</span>;
       }
-      case "diagnosis":
+      case "diagnosis": {
+        const diseaseName = o.event ? o.event.split(" · ")[0] : "";
         return (
-          <span className="text-body-sm text-text-secondary truncate" title={o.event}>
-            {o.event ?? "—"}
+          <span className="text-body-sm text-text-secondary truncate" title={diseaseName}>
+            {diseaseName || "—"}
           </span>
         );
+      }
       case "desc":
         return (
           <span className="text-body-sm text-text-secondary truncate" title={o.desc}>
