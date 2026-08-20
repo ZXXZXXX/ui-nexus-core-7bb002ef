@@ -1733,6 +1733,7 @@ function describeFilters(f: Filters): string {
       ["处方治愈率", f.rxCureMin, f.rxCureMax, "%"],
       ["平均诊疗天数", f.rxDaysMin, f.rxDaysMax, "天"],
       ["处方药费", f.rxCostMin, f.rxCostMax, "元"],
+      ["使用量", f.drugUsageMin, f.drugUsageMax, "次"],
     ];
     rangeLabels.forEach(([label, a, b, u]) => {
       if (a !== "" || b !== "") parts.push(`${label} ${a || "不限"}~${b || "不限"}${u}`);
@@ -1743,6 +1744,7 @@ function describeFilters(f: Filters): string {
   if (f.status !== "all") parts.push(STATUS_OPTIONS.find((s) => s.value === f.status)?.label || "");
   if (f.calvingTypes.length) parts.push(`产犊 ${f.calvingTypes.join("、")}`);
   if (f.calfOutcome !== "all") parts.push(`犊牛${f.calfOutcome}`);
+  if (f.drugTypes.length) parts.push(`药品类型 ${f.drugTypes.join("、")}`);
   if (f.drugs.length) parts.push(`药品 ${f.drugs.join("、")}`);
   if (f.drugRoute !== "all") parts.push(f.drugRoute);
   if (f.cattleTypes.length) parts.push(`牛只类型 ${f.cattleTypes.join("、")}`);
