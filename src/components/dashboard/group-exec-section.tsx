@@ -52,6 +52,43 @@ export const farmCountSummary = {
 /** 区域高管默认所辖区域 */
 export const CURRENT_REGION = "东北大区";
 
+/** 牧场级外部视角默认牧场 */
+export const CURRENT_FARM = { farm: "1号牧场", region: "东北大区" };
+
+/** 近 12 个月月份标签（自然月倒推） */
+const MONTH_LABELS = ["6月", "7月", "8月", "9月", "10月", "11月", "12月", "1月", "2月", "3月", "4月", "5月"];
+/** 月度波动因子（确定性，无随机） */
+const MONTH_FACTORS = [0.86, 0.92, 1.05, 0.97, 0.9, 0.99, 1.14, 1.2, 1.02, 0.94, 1.0, 1.08];
+
+/** 单牧场按月拆分的指标行 */
+export function farmMonthlyRows(farmName: string, region: string): Row[] {
+  const f = GROUP_FARMS.find((x) => x.farm === farmName && x.region === region) ?? GROUP_FARMS[0];
+  return MONTH_LABELS.map((m, i) => {
+    const k = MONTH_FACTORS[i];
+    const r = (v: number, d = 1) => Number((v * k).toFixed(d));
+    return {
+      key: m,
+      sub: `${f.region} · ${f.farm}`,
+      herd: Math.round(f.herd * (0.98 + i * 0.002)),
+      death: Math.round(f.death * k),
+      cull: Math.round(f.cull * k),
+      pp30: r(f.pp30),
+      pp60: r(f.pp60),
+      pp90: r(f.pp90),
+      pp30n: Math.round(f.pp30n * k),
+      pp60n: Math.round(f.pp60n * k),
+      pp90n: Math.round(f.pp90n * k),
+      sick: r(f.sick),
+      cure: Number(Math.min(99, f.cure / k ** 0.2).toFixed(1)),
+      perHead: r(f.perHead),
+      drugFee: Math.round(f.drugFee * k),
+      budgetDelta: r(f.budgetDelta),
+      treatmentDays: r(f.treatmentDays),
+      pretermRate: Number(((f.preterm * k) / (f.calving || 1) * 100).toFixed(1)),
+    };
+  });
+}
+
 /** 按区域（或集团）统计牧场数量分布 */
 export function farmCountFor(region?: string | null) {
   const list = region ? GROUP_FARMS.filter((f) => f.region === region) : GROUP_FARMS;
