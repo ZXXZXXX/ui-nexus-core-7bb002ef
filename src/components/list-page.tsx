@@ -245,10 +245,11 @@ export function ListPage<T>({
             className="h-9 gap-1.5 text-body-sm font-normal"
             onClick={() => {
               setDraft(filters);
+              setDraftVisible(visible);
               setFilterOpen(true);
             }}
           >
-            <SlidersHorizontal className="h-3.5 w-3.5" /> 高级筛选
+            <SlidersHorizontal className="h-3.5 w-3.5" /> 筛选与列设置
             {activeFilterCount > 0 && (
               <span className="ml-0.5 rounded bg-brand-subtle px-1.5 text-caption text-primary tabular-nums">
                 {activeFilterCount}
@@ -256,52 +257,6 @@ export function ListPage<T>({
             )}
           </Button>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
-                <Columns3 className="h-3.5 w-3.5" /> 列设置
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start" className="w-56 p-2 border-border">
-              <div className="px-1 pb-2 text-caption text-text-tertiary">选择展示的列</div>
-              <div className="max-h-72 overflow-auto space-y-0.5">
-                {columns.map((c) => {
-                  const checked = visible.includes(c.key);
-                  return (
-                    <label
-                      key={c.key}
-                      className="flex items-center gap-2 rounded px-1.5 py-1.5 hover:bg-surface-subtle cursor-pointer"
-                    >
-                      <Checkbox
-                        checked={checked}
-                        disabled={c.required}
-                        onCheckedChange={(v) =>
-                          setVisible((prev) =>
-                            v
-                              ? columns.filter((x) => prev.includes(x.key) || x.key === c.key).map((x) => x.key)
-                              : prev.filter((k) => k !== c.key),
-                          )
-                        }
-                      />
-                      <span className="text-body-sm text-foreground">{c.label}</span>
-                    </label>
-                  );
-                })}
-              </div>
-              <div className="pt-2 flex justify-end">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 text-body-sm font-normal"
-                  onClick={() =>
-                    setVisible(columns.filter((c) => !c.defaultHidden).map((c) => c.key))
-                  }
-                >
-                  重置
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
 
           <div className="ml-auto flex items-center gap-2 shrink-0">
             {secondaryActions}
