@@ -1078,18 +1078,23 @@ function StatsPage() {
                         查看结果
                       </Button>
                       <Button size="sm" variant="ghost" className="h-8 px-2" onClick={() => openBuilder(t)}>
-                        <Pencil className="h-3.5 w-3.5 mr-1" />
-                        编辑
+                        编辑模板
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-8 px-2 text-text-tertiary"
-                        onClick={() => removeTemplate(t.id)}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 mr-1" />
-                        删除
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="ghost" className="h-8 px-2 text-text-tertiary">
+                            更多
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => toggleFreeze(t.id)}
+                            className="text-body-sm"
+                          >
+                            {t.frozen ? "解冻模板" : "冻结模板"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
