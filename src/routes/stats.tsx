@@ -849,11 +849,11 @@ function StatsPage() {
 
   const cat = builderCat ?? "cattle";
   const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug" | "cattle") => {
-    if (d === "farm") return true;
-    if (cat === "cattle") return d === "cattle" || d === "order" || d === "calving";
-    if (cat === "disease") return d === "disease" || d === "order" || d === "prescription";
-    if (cat === "drug") return d === "drug" || d === "prescription";
-    return d === "staff";
+    if (cat === "cattle") return d === "cattle";
+    if (cat === "disease") return d === "disease";
+    if (cat === "drug") return d === "drug";
+    // 人员分析：牧场 + 人员
+    return d === "staff" || d === "farm";
   };
 
   const builderDrawer = (
