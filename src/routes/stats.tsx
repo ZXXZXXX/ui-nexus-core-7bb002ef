@@ -750,9 +750,9 @@ function StatsPage() {
   );
 
   const cat = builderCat ?? "cattle";
-  const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug") => {
+  const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug" | "cattle") => {
     if (d === "farm") return true;
-    if (cat === "cattle") return d === "order" || d === "calving";
+    if (cat === "cattle") return d === "cattle" || d === "order" || d === "calving";
     if (cat === "disease") return d === "disease" || d === "order" || d === "prescription";
     if (cat === "drug") return d === "drug" || d === "prescription";
     return d === "staff" || d === "order";
