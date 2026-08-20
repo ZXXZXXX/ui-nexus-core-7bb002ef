@@ -734,96 +734,86 @@ export function WorkOrderPage({
                 className="h-9 gap-1.5 text-body-sm font-normal"
                 onClick={() => setAdvOpen((v) => !v)}
               >
-                <Filter className="h-3.5 w-3.5" /> 筛选
+                <Settings2 className="h-3.5 w-3.5" /> 筛选与列设置
               </Button>
-              {/* 列设置 */}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
-                    <Settings2 className="h-3.5 w-3.5" /> 列设置
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="end" className="w-56 p-2">
-                  <div className="text-caption text-text-tertiary px-2 py-1.5">
-                    选择展示的字段
-                  </div>
-                  <div className="space-y-0.5">
-                    {ALL_COLS.map((c) => (
-                      <label
-                        key={c.key}
-                        className={`flex items-center gap-2 px-2 py-1.5 rounded text-body-sm ${
-                          c.locked ? "opacity-60 cursor-not-allowed" : "hover:bg-surface-subtle cursor-pointer"
-                        }`}
-                      >
-                        <Checkbox
-                          checked={visible[c.key]}
-                          disabled={c.locked}
-                          onCheckedChange={(v) =>
-                            setVisible((m) => ({ ...m, [c.key]: !!v }))
-                          }
-                        />
-                        <span className="flex-1">{c.label}</span>
-                        {c.locked && (
-                          <span className="text-caption text-text-tertiary">必选</span>
-                        )}
-                      </label>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+
             </div>
           </div>
 
-          {/* 高级筛选面板 */}
+          {/* 筛选与列设置面板 */}
           {advOpen && (
-            <div className="px-6 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="px-6 pb-4 space-y-4">
               <div>
-                <div className="text-caption text-text-tertiary mb-1.5">提出人</div>
-                <Select value={advProposer} onValueChange={setAdvProposer}>
-                  <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部</SelectItem>
-                    {proposers.map((p) => (
-                      <SelectItem key={p} value={p}>{p}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="text-caption text-text-tertiary mb-2">显示列（筛选仅作用于展示中的列）</div>
+                <div className="flex flex-wrap gap-x-4 gap-y-2">
+                  {ALL_COLS.map((c) => (
+                    <label
+                      key={c.key}
+                      className={`flex items-center gap-2 text-body-sm ${
+                        c.locked ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                      }`}
+                    >
+                      <Checkbox
+                        checked={visible[c.key]}
+                        disabled={c.locked}
+                        onCheckedChange={(v) => setVisible((m) => ({ ...m, [c.key]: !!v }))}
+                      />
+                      <span>{c.label}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
-              <div>
-                <div className="text-caption text-text-tertiary mb-1.5">执行人</div>
-                <Select value={advExecutor} onValueChange={setAdvExecutor}>
-                  <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">全部</SelectItem>
-                    {executors.map((p) => (
-                      <SelectItem key={p} value={p}>{p}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <div className="text-caption text-text-tertiary mb-1.5">排序字段</div>
-                <Select value={sortKey} onValueChange={(v) => setSortKey(v as typeof sortKey)}>
-                  <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="proposedAt">提出时间</SelectItem>
-                    <SelectItem value="reviewedAt">诊断时间</SelectItem>
-                    <SelectItem value="executedAt">执行时间</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <div className="text-caption text-text-tertiary mb-1.5">排序方向</div>
-                <Select value={sortDir} onValueChange={(v) => setSortDir(v as "asc" | "desc")}>
-                  <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="desc">倒序（新 → 旧）</SelectItem>
-                    <SelectItem value="asc">正序（旧 → 新）</SelectItem>
-                  </SelectContent>
-                </Select>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 border-t border-border pt-4">
+                <div>
+                  <div className="text-caption text-text-tertiary mb-1.5">提出人</div>
+                  <Select value={advProposer} onValueChange={setAdvProposer}>
+                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全部</SelectItem>
+                      {proposers.map((p) => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <div className="text-caption text-text-tertiary mb-1.5">执行人</div>
+                  <Select value={advExecutor} onValueChange={setAdvExecutor}>
+                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">全部</SelectItem>
+                      {executors.map((p) => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <div className="text-caption text-text-tertiary mb-1.5">排序字段</div>
+                  <Select value={sortKey} onValueChange={(v) => setSortKey(v as typeof sortKey)}>
+                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="proposedAt">提出时间</SelectItem>
+                      <SelectItem value="reviewedAt">诊断时间</SelectItem>
+                      <SelectItem value="executedAt">执行时间</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <div className="text-caption text-text-tertiary mb-1.5">排序方向</div>
+                  <Select value={sortDir} onValueChange={(v) => setSortDir(v as "asc" | "desc")}>
+                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="desc">倒序（新 → 旧）</SelectItem>
+                      <SelectItem value="asc">正序（旧 → 新）</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           )}
+
 
           {/* 表格（仅在该容器内部横向滚动，左/右两侧列冻结） */}
           <div className="overflow-x-auto border-t border-border">
