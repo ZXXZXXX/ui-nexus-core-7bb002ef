@@ -81,6 +81,8 @@ type State = {
 };
 
 const KEY = "pc:dashboard-view";
+/** 专题结构调整后需要重置旧的显隐配置，避免历史缓存把专题全部隐藏 */
+const VERSION = 2;
 const listeners = new Set<() => void>();
 let state: State = { scope: "farm-in", config: defaultConfig, order: defaultOrders, level: "farm" };
 let loaded = false;
@@ -91,7 +93,14 @@ function load(): State {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
-      const parsed = JSON.parse(raw) as Partial<State>;
+      const parsed = JSON.parse(raw) as Partial<State> & { v?: number };
+      if (parsed.v !== VERSION) {
+        // 旧版本缓存：仅保留视角与层级，显隐 / 顺序回到默认
+        state = { ...state, scope: parsed.scope ?? "farm-in", level: parsed.level ?? "farm" };
+        localStorage.setItem(KEY, JSON.stringify({ ...state, v: VERSION }));
+        return state;
+      }
+
       state = {
         scope: parsed.scope ?? "farm-in",
         level: parsed.level ?? "farm",
@@ -115,7 +124,7 @@ function load(): State {
 
 function persist() {
   try {
-    localStorage.setItem(KEY, JSON.stringify(state));
+    localStorage.setItem(KEY, JSON.stringify({ ...state, v: VERSION }));
   } catch {}
   listeners.forEach((fn) => fn());
 }
