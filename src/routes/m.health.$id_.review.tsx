@@ -142,7 +142,7 @@ function ReviewPage() {
             <div className="text-caption text-text-tertiary mb-2">复查结论</div>
             <div className="grid grid-cols-3 gap-2">
               {([
-                { v: "cure", icon: CheckCircle2, label: "治愈", tone: "primary" },
+                { v: "cure", icon: CheckCircle2, label: "正常", tone: "primary" },
                 { v: "revisit", icon: StethoscopeIcon, label: "复诊", tone: "info" },
                 { v: "abandon", icon: Ban, label: "放弃", tone: "danger" },
               ] as { v: Verdict; icon: typeof CheckCircle2; label: string; tone: string }[]).map(
