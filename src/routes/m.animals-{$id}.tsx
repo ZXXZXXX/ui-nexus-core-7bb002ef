@@ -405,7 +405,8 @@ function AnimalDetailPage() {
         </section>
       </div>
 
-      {/* 底部：记录 + 健康上报 */}
+      {/* 底部：记录 + 健康上报（离场牛只不展示） */}
+      {!isLeft && (
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] bg-card/85 backdrop-blur-lg border-t border-border p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-[0_-8px_30px_rgba(0,0,0,0.04)]">
         <div className="flex items-center gap-2">
           <button
@@ -424,6 +425,8 @@ function AnimalDetailPage() {
           </Link>
         </div>
       </div>
+      )}
+
 
       {/* 记录选择 Sheet */}
       {recordOpen && (
