@@ -271,41 +271,15 @@ function ReviewPage() {
         }}
       />
 
-      {revisitConfirmOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center"
-          onClick={() => setRevisitConfirmOpen(false)}
-        >
-          <div
-            className="w-full max-w-[440px] bg-card rounded-t-2xl sm:rounded-2xl p-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="text-body font-medium text-foreground mb-2">前往复诊上报</div>
-            <p className="text-body-sm text-text-secondary leading-relaxed">
-              确认后，本工单 <span className="font-mono text-text-primary">{id}</span> 将自动完结，并在新的复诊上报中自动关联本工单的所有信息字段。
-            </p>
-            <div className="mt-5 flex gap-2">
-              <button
-                type="button"
-                onClick={() => setRevisitConfirmOpen(false)}
-                className="flex-1 h-10 rounded-lg border border-border bg-card text-body-sm text-text-secondary"
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setRevisitConfirmOpen(false);
-                  goRevisit();
-                }}
-                className="flex-1 h-10 rounded-lg bg-primary text-primary-foreground text-body-sm"
-              >
-                确认并前往
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmRevisitDialog
+        open={revisitConfirmOpen}
+        orderId={id}
+        onOpenChange={setRevisitConfirmOpen}
+        onConfirm={() => {
+          setRevisitConfirmOpen(false);
+          goRevisit();
+        }}
+      />
     </MobileShell>
   );
 }
