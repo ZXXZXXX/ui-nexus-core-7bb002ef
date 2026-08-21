@@ -25,10 +25,6 @@ export const Route = createFileRoute("/m/health/$id_/review")({
 
 type Verdict = "cure" | "abandon" | "revisit";
 
-type LeaveKind = "死亡" | "淘汰";
-
-const LEAVE_KINDS: LeaveKind[] = ["死亡", "淘汰"];
-
 const ABANDON_REASONS = ["牛只死亡", "淘汰处理", "其他"] as const;
 
 type AbandonReason = (typeof ABANDON_REASONS)[number];
@@ -69,7 +65,6 @@ function ReviewPage() {
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [abandonReason, setAbandonReason] = useState<AbandonReason | null>(null);
   const [leaveDate, setLeaveDate] = useState(new Date().toISOString().slice(0, 10));
-  const [leaveKind, setLeaveKind] = useState<LeaveKind>("死亡");
   const [leaveDetail, setLeaveDetail] = useState("");
   const [leavePrice, setLeavePrice] = useState("");
   const [leaveNote, setLeaveNote] = useState("");
@@ -130,6 +125,7 @@ function ReviewPage() {
       toast.success(needTransfer ? `已确认治愈，转至 ${transferTo}` : "已确认治愈");
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
     } else if (verdict === "abandon") {
+      const leaveKind = abandonReason === "淘汰处理" ? "淘汰" : "死亡";
       toast.success(`已放弃治疗（${finalAbandonReason}），工单终止并登记${leaveKind}离场（${leaveDate}）`);
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
     } else if (verdict === "revisit") {
@@ -235,8 +231,6 @@ function ReviewPage() {
                         type="button"
                         onClick={() => {
                           setAbandonReason(r);
-                          if (r === "牛只死亡") setLeaveKind("死亡");
-                          if (r === "淘汰处理") setLeaveKind("淘汰");
                           setLeaveDetail("");
                         }}
                         className={`h-10 rounded-lg border text-body-sm transition-colors ${
@@ -299,27 +293,7 @@ function ReviewPage() {
                     />
                   </Field>
 
-                  <div className="space-y-1.5">
-                    <div className="text-caption text-text-tertiary">离场类型</div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {LEAVE_KINDS.map((k) => (
-                        <button
-                          key={k}
-                          type="button"
-                          onClick={() => setLeaveKind(k)}
-                          className={`h-10 rounded-lg text-body-sm ${
-                            leaveKind === k
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-card border border-border text-text-secondary"
-                          }`}
-                        >
-                          {k}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {leaveKind === "淘汰" && (
+                  {abandonReason === "淘汰处理" && (
                     <Field label="金额 (元)">
                       <input
                         type="number"
