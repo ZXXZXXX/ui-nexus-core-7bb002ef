@@ -120,8 +120,9 @@ function ReviewPage() {
       toast.success(needTransfer ? `已确认治愈，转至 ${transferTo}` : "已确认治愈");
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
     } else if (verdict === "abandon") {
-      toast.success(needTransfer ? `已放弃治疗，已转至 ${transferTo}` : "已放弃治疗，工单已终止");
+      toast.success(`已放弃治疗，工单终止并登记${leaveKind}离场（${leaveDate}）`);
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
+
     } else if (verdict === "revisit") {
       goRevisit();
     }
