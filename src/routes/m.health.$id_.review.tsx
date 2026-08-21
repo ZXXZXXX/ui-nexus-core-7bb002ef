@@ -29,6 +29,10 @@ type LeaveKind = "死亡" | "淘汰";
 
 const LEAVE_KINDS: LeaveKind[] = ["死亡", "淘汰"];
 
+const ABANDON_REASONS = ["治疗无效", "预后不良", "经济性淘汰", "其他"] as const;
+
+type AbandonReason = (typeof ABANDON_REASONS)[number];
+
 const inputCls =
   "w-full h-11 px-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary";
 
