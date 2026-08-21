@@ -175,6 +175,22 @@ function TodayTasksPage() {
   // 兽医/场长可指定责任人
   const canAssign = role === "vet" || role === "manager";
 
+  const commitAssign = (s: (typeof SHIFT_STAFF)[number]) => {
+    const ids = Array.from(selected);
+    assignTasks(ids, s.name);
+    setPendingAssignee(null);
+    setAssignSheetOpen(false);
+    exitSelect();
+    if (s.onShift) {
+      toast.success(`已将 ${ids.length} 项任务指派给 ${s.name}`);
+    } else {
+      toast.warning(
+        `${s.name} 本场次${offReasonLabel[s.offReason ?? "absent"]}，已指派 ${ids.length} 项任务`,
+      );
+    }
+  };
+
+
   
   const { capture } = Route.useSearch();
 
