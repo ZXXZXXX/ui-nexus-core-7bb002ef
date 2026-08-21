@@ -297,8 +297,6 @@ function AnimalDetailPage() {
                   <InfoRow label="用药方式" value="肌内注射 1 天 1 次" />
                   <InfoRow label="负责兽医" value="李雨晴" />
                   <InfoRow label="下次执行" value="今日 15:30" />
-                  <InfoRow label="所在牛舍" value="病牛舍" />
-                  <InfoRow label="开始日期" value="2026-08-19" />
                 </div>
                 <Link
                   to="/m/health/$id"
