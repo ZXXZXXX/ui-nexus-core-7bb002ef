@@ -213,8 +213,61 @@ function AnimalDetailPage() {
           </div>
         </div>
 
+        {/* 离场信息 */}
+        {isLeft && (
+          <section className="px-4 mt-3">
+            <div className="rounded-2xl bg-card border border-border overflow-hidden">
+              <div className="flex items-center gap-2 px-4 h-11 bg-[#F0F2F4] border-b border-border">
+                <LogOut className="h-4 w-4 text-[#64748B]" />
+                <span className="text-card-title text-[#475569]">离场信息</span>
+                <span className="ml-auto tag tag-muted">{leave.kind}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-y-3 gap-x-3 p-4">
+                <InfoRow label="离场类型" value={leave.kind} />
+                <InfoRow label="离场日期" value={leave.date} />
+                <InfoRow label="处置去向" value={leave.dest} />
+                <InfoRow label="离场体重" value={leave.weight} />
+                <InfoRow label="经办人" value={leave.operator} />
+                <InfoRow label="原离场牛舍" value={`${barnIdx} 号牛舍`} />
+              </div>
+              <div className="px-4 pb-4 space-y-2">
+                <div>
+                  <div className="text-[11px] leading-tight text-text-tertiary">离场原因</div>
+                  <div className="text-body-sm text-foreground mt-0.5">{leave.reason}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] leading-tight text-text-tertiary">备注</div>
+                  <div className="text-body-sm text-text-secondary mt-0.5">{leave.note}</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 rounded-xl bg-[#F0F2F4] px-3 py-2 text-caption text-[#64748B] inline-flex items-center gap-1.5 w-full">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+              该牛只已离场，档案仅供查询，不支持上报与记录操作。
+            </div>
+          </section>
+        )}
 
-
+        {/* 健康摘要 */}
+        {!isLeft && a.health === "健康" && (
+          <section className="px-4 mt-3">
+            <div className="rounded-2xl bg-card border border-border p-4">
+              <div className="flex items-center gap-1.5 mb-3">
+                <ListChecks className="h-4 w-4 text-primary" />
+                <span className="text-card-title text-foreground">健康摘要</span>
+                <span className="ml-auto tag tag-success">状态正常</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <InfoRow label="连续健康" value="42 天" />
+                <InfoRow label="近一年报病" value="1 次" />
+                <InfoRow label="上次治愈" value="2026-04-10" />
+                <InfoRow label="最近检查" value="2026-05-26" />
+                <InfoRow label="免疫状态" value="已完成" />
+                <InfoRow label="休药期" value="无" />
+              </div>
+            </div>
+          </section>
+        )}
 
 
         {/* 休药期 */}
