@@ -299,6 +299,8 @@ function AnimalDetailPage() {
           )}
 
         </section>
+        )}
+
 
         {/* 近7日产奶数据 */}
         {!isLeft && (
