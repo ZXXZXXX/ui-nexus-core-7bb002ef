@@ -200,13 +200,13 @@ function ReviewPage() {
                         }
                         if (v === "abandon") {
                           setVerdict("abandon");
-                          setAbandonStep(1);
                           setAbandonReason(null);
+                          setLeaveDetail("");
                           return;
                         }
                         setVerdict(v);
                         setAbandonReason(null);
-                        setAbandonStep(1);
+                        setLeaveDetail("");
                       }}
                       className={`h-20 rounded-lg border flex flex-col items-center justify-center gap-1 text-body-sm ${
                         active ? activeCls : "border-border bg-card text-foreground"
