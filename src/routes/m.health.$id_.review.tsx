@@ -91,8 +91,11 @@ function ReviewPage() {
     if (verdict === "revisit") return true;
     if (verdict === "abandon") {
       if (abandonStep === 1) return !!abandonReason;
-      if (!leaveDate || !finalAbandonReason) return false;
-      if (media.length === 0) return false;
+      if (abandonReason === "其他") {
+        if (!finalAbandonReason || media.length === 0) return false;
+        return true;
+      }
+      if (!leaveDate || !finalAbandonReason || media.length === 0) return false;
       return true;
     }
     if (needTransfer && !transferTo) return false;
