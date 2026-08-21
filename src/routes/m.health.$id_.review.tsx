@@ -146,12 +146,9 @@ function ReviewPage() {
 
   const handleAbortConfirm = () => {
     setConfirmAbortOpen(false);
-    if (needTransfer && transferTo) {
-      setTransferConfirmOpen(true);
-      return;
-    }
     doSubmit();
   };
+
 
   return (
     <MobileShell title="复查记录" back hideTabBar>
