@@ -25,13 +25,33 @@ export const Route = createFileRoute("/m/health/$id_/review")({
 
 type Verdict = "cure" | "abandon" | "revisit";
 
-const ABANDON_REASONS = [
-  "治疗无效",
-  "牛只死亡",
-  "经济性放弃",
-  "牛只淘汰",
-  "其他",
-];
+type LeaveKind = "死亡" | "淘汰";
+
+const LEAVE_KINDS: LeaveKind[] = ["死亡", "淘汰"];
+
+const inputCls =
+  "w-full h-11 px-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary";
+
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="text-caption text-text-tertiary">
+        {label} {required && <span className="text-[var(--state-danger)]">*</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+
 
 
 
@@ -43,8 +63,11 @@ function ReviewPage() {
   const isVet = role === "vet" || role === "manager";
 
   const [verdict, setVerdict] = useState<Verdict | null>(null);
-  const [abandonReason, setAbandonReason] = useState("");
-  const [abandonOther, setAbandonOther] = useState("");
+  const [leaveDate, setLeaveDate] = useState(new Date().toISOString().slice(0, 10));
+  const [leaveKind, setLeaveKind] = useState<LeaveKind>("死亡");
+  const [leaveDetail, setLeaveDetail] = useState("");
+  const [leavePrice, setLeavePrice] = useState("");
+  const [leaveNote, setLeaveNote] = useState("");
   const [media, setMedia] = useState<number[]>([]);
   const [needTransfer, setNeedTransfer] = useState(false);
   const [transferTo, setTransferTo] = useState("");
@@ -53,15 +76,20 @@ function ReviewPage() {
   const [confirmAbortOpen, setConfirmAbortOpen] = useState(false);
   const earTagLabel = getOrderEarTagLabel(id);
 
-  const finalAbandonReason = abandonReason === "其他" ? abandonOther.trim() : abandonReason;
+  const finalAbandonReason = leaveDetail.trim();
 
   const canSubmit = (() => {
     if (!verdict) return false;
     if (verdict === "revisit") return true;
+    if (verdict === "abandon") {
+      if (!leaveDate || !finalAbandonReason) return false;
+      if (media.length === 0) return false;
+      return true;
+    }
     if (needTransfer && !transferTo) return false;
-    if (verdict === "abandon" && !finalAbandonReason) return false;
     return true;
   })();
+
 
   if (!isVet) {
     return (
@@ -92,8 +120,9 @@ function ReviewPage() {
       toast.success(needTransfer ? `已确认治愈，转至 ${transferTo}` : "已确认治愈");
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
     } else if (verdict === "abandon") {
-      toast.success(needTransfer ? `已放弃治疗，已转至 ${transferTo}` : "已放弃治疗，工单已终止");
+      toast.success(`已放弃治疗，工单终止并登记${leaveKind}离场（${leaveDate}）`);
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
+
     } else if (verdict === "revisit") {
       goRevisit();
     }
@@ -117,12 +146,9 @@ function ReviewPage() {
 
   const handleAbortConfirm = () => {
     setConfirmAbortOpen(false);
-    if (needTransfer && transferTo) {
-      setTransferConfirmOpen(true);
-      return;
-    }
     doSubmit();
   };
+
 
   return (
     <MobileShell title="复查记录" back hideTabBar>
@@ -178,52 +204,88 @@ function ReviewPage() {
             </div>
           </div>
 
-          {/* 放弃原因 */}
+          {/* 放弃 = 登记离场（死亡 / 淘汰），字段与离场记录保持一致 */}
           {verdict === "abandon" && (
-            <div className="rounded-xl bg-card border border-border p-4">
-              <div className="text-caption text-text-tertiary mb-2">
-                放弃原因 <span className="text-[var(--state-danger)]">*</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {ABANDON_REASONS.map((r) => {
-                  const active = abandonReason === r;
-                  return (
+            <div className="rounded-xl bg-card border border-border p-4 space-y-4">
+              <Field label="离场日期" required>
+                <input
+                  type="date"
+                  value={leaveDate}
+                  onChange={(e) => setLeaveDate(e.target.value)}
+                  className={inputCls}
+                />
+              </Field>
+              <Field label="离场类型" required>
+                <div className="grid grid-cols-2 gap-2">
+                  {LEAVE_KINDS.map((k) => (
                     <button
-                      key={r}
+                      key={k}
                       type="button"
-                      onClick={() => setAbandonReason(r)}
-                      className={`h-8 px-3 rounded-full text-body-sm border ${
-                        active
-                          ? "bg-brand-subtle text-primary border-primary/40"
-                          : "bg-card text-text-secondary border-border"
+                      onClick={() => setLeaveKind(k)}
+                      className={`h-10 rounded-lg text-body-sm ${
+                        leaveKind === k
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card border border-border text-text-secondary"
                       }`}
                     >
-                      {r}
+                      {k}
                     </button>
-                  );
-                })}
-              </div>
-              {abandonReason === "其他" && (
-                <textarea
-                  value={abandonOther}
-                  onChange={(e) => setAbandonOther(e.target.value)}
-                  placeholder="请输入放弃原因"
-                  className="mt-2 w-full min-h-[72px] rounded-lg border border-border bg-card px-3 py-2 text-body-sm placeholder:text-text-tertiary resize-none focus:outline-none focus:border-primary/40"
+                  ))}
+                </div>
+              </Field>
+              <Field label={leaveKind === "死亡" ? "死亡原因" : "淘汰原因"} required>
+                <input
+                  value={leaveDetail}
+                  onChange={(e) => setLeaveDetail(e.target.value)}
+                  className={inputCls}
+                  placeholder={leaveKind === "死亡" ? "如：乳房炎并发症" : "如：治疗无效，经济性淘汰"}
                 />
+              </Field>
+              {leaveKind === "淘汰" && (
+                <Field label="金额 (元)">
+                  <input
+                    type="number"
+                    value={leavePrice}
+                    onChange={(e) => setLeavePrice(e.target.value)}
+                    className={inputCls}
+                  />
+                </Field>
               )}
+              <Field label="备注">
+                <textarea
+                  value={leaveNote}
+                  onChange={(e) => setLeaveNote(e.target.value)}
+                  rows={3}
+                  className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
+                  placeholder="补充说明"
+                />
+              </Field>
             </div>
           )}
 
           {/* 现场材料 */}
           {verdict && (
             <div className="rounded-xl bg-card border border-border p-4">
-              <div className="text-caption text-text-tertiary mb-2">现场材料</div>
-              <MediaGrid items={media} setItems={setMedia} max={9} />
+              {verdict === "abandon" ? (
+                <MediaGrid
+                  items={media}
+                  setItems={setMedia}
+                  max={9}
+                  required
+                  caption="现场照片 / 视频"
+                  helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
+                />
+              ) : (
+                <>
+                  <div className="text-caption text-text-tertiary mb-2">现场材料</div>
+                  <MediaGrid items={media} setItems={setMedia} max={9} />
+                </>
+              )}
             </div>
           )}
 
           {/* 转栏 */}
-          {verdict && verdict !== "revisit" && (
+          {verdict === "cure" && (
             <TransferBarnControl
               enabled={needTransfer}
               onEnabledChange={setNeedTransfer}
@@ -231,6 +293,7 @@ function ReviewPage() {
               onValueChange={setTransferTo}
             />
           )}
+
 
         </div>
       </div>
