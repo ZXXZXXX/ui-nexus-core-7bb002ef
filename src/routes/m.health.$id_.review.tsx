@@ -91,12 +91,9 @@ function ReviewPage() {
     if (!verdict) return false;
     if (verdict === "revisit") return true;
     if (verdict === "abandon") {
-      if (abandonStep === 1) return !!abandonReason;
-      if (abandonReason === "其他") {
-        if (!finalAbandonReason || media.length === 0) return false;
-        return true;
-      }
-      if (!leaveDate || !finalAbandonReason || media.length === 0) return false;
+      if (!abandonReason) return false;
+      if (!finalAbandonReason) return false;
+      if (media.length === 0) return false;
       return true;
     }
     if (needTransfer && !transferTo) return false;
