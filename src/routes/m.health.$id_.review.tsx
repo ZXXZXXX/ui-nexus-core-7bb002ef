@@ -231,8 +231,6 @@ function ReviewPage() {
                         type="button"
                         onClick={() => {
                           setAbandonReason(r);
-                          if (r === "牛只死亡") setLeaveKind("死亡");
-                          if (r === "淘汰处理") setLeaveKind("淘汰");
                           setLeaveDetail("");
                         }}
                         className={`h-10 rounded-lg border text-body-sm transition-colors ${
