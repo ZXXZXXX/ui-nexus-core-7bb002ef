@@ -239,7 +239,7 @@ function AnimalDetailPage() {
             <div className="rounded-xl bg-[#F0F2F4] px-3 py-2.5 text-body-sm text-[#64748B] w-full">
               <span className="inline-flex items-start gap-1.5">
                 <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-                牛只已于 {leave.date} 因 {leave.reason} 而 {leave.kind}，操作人：{leave.operator}
+                牛只已于 {leave.date} 因 {leave.reason} 而登记{leave.kind}，操作人：{leave.operator}
               </span>
             </div>
           </section>
