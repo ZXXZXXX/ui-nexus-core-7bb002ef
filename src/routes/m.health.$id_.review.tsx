@@ -224,41 +224,34 @@ function ReviewPage() {
           {/* 放弃流程：选择原因后自动展开补充信息 */}
           {verdict === "abandon" && (
             <div className="space-y-4">
-              <div className="flex items-center gap-8">
-                {ABANDON_REASONS.map((r) => (
-                  <label
-                    key={r}
-                    className="flex items-center gap-2 cursor-pointer"
-                    onClick={() => {
-                      setAbandonReason(r);
-                      if (r === "牛只死亡") setLeaveKind("死亡");
-                      if (r === "淘汰处理") setLeaveKind("淘汰");
-                      setLeaveDetail("");
-                    }}
-                  >
-                    <span
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        abandonReason === r
-                          ? "border-primary"
-                          : "border-border"
-                      }`}
-                    >
-                      {abandonReason === r && (
-                        <span className="w-2.5 h-2.5 rounded-full bg-primary" />
-                      )}
-                    </span>
-                    <span
-                      className={`text-body ${
-                        abandonReason === r
-                          ? "text-foreground"
-                          : "text-text-secondary"
-                      }`}
-                    >
-                      {r}
-                    </span>
-                  </label>
-                ))}
+              <div className="rounded-xl bg-card border border-border p-4 space-y-3">
+                <div className="text-caption text-text-tertiary">放弃原因</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {ABANDON_REASONS.map((r) => {
+                    const active = abandonReason === r;
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => {
+                          setAbandonReason(r);
+                          if (r === "牛只死亡") setLeaveKind("死亡");
+                          if (r === "淘汰处理") setLeaveKind("淘汰");
+                          setLeaveDetail("");
+                        }}
+                        className={`h-10 rounded-lg border text-body-sm transition-colors ${
+                          active
+                            ? "border-primary bg-brand-subtle text-primary font-medium"
+                            : "border-border bg-card text-text-secondary"
+                        }`}
+                      >
+                        {r}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
+
 
               {abandonReason === "其他" && (
                 <div className="rounded-xl bg-card border border-border p-4 space-y-4">
