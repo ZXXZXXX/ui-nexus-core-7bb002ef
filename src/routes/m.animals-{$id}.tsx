@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { markAlertHandled } from "@/lib/alert-store";
 import { MobileShell } from "@/components/mobile-shell";
+import { cowStatusOf, leaveInfoOf, locateCow } from "@/lib/cow-status";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 
