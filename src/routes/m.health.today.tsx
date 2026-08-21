@@ -987,9 +987,6 @@ function TodayTasksPage() {
           <SheetHeader className="px-4 pt-4 pb-2">
             <SheetTitle className="text-section">指定责任人</SheetTitle>
           </SheetHeader>
-          <div className="px-4 pb-1 text-caption text-text-tertiary">
-            为已选 {count} 项任务指定责任人（在岗人员优先）
-          </div>
           <div className="px-4 py-2">
             <input
               value={staffQuery}
