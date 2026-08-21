@@ -301,7 +301,7 @@ function AnimalDetailPage() {
                   params={{ id: "WO-2298" }}
                   className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#E6F7FF] text-[#22ACEB] text-body-sm font-medium active:opacity-80"
                 >
-                  查看治疗工单
+                  查看工单
                   <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
