@@ -342,24 +342,25 @@ function ReviewPage() {
             </div>
           )}
 
-          {/* 现场材料 */}
-          {verdict && (
+          {/* 现场材料（仅在放弃并已选择原因后展示） */}
+          {verdict === "abandon" && abandonReason && (
             <div className="rounded-xl bg-card border border-border p-4">
-              {verdict === "abandon" ? (
-                <MediaGrid
-                  items={media}
-                  setItems={setMedia}
-                  max={9}
-                  required
-                  caption="现场照片 / 视频"
-                  helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
-                />
-              ) : (
-                <>
-                  <div className="text-caption text-text-tertiary mb-2">现场材料</div>
-                  <MediaGrid items={media} setItems={setMedia} max={9} />
-                </>
-              )}
+              <MediaGrid
+                items={media}
+                setItems={setMedia}
+                max={9}
+                required
+                caption="现场照片 / 视频"
+                helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
+              />
+            </div>
+          )}
+
+          {/* 非放弃结论的现场材料 */}
+          {verdict && verdict !== "abandon" && (
+            <div className="rounded-xl bg-card border border-border p-4">
+              <div className="text-caption text-text-tertiary mb-2">现场材料</div>
+              <MediaGrid items={media} setItems={setMedia} max={9} />
             </div>
           )}
 
