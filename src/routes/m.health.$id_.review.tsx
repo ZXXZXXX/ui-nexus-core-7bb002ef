@@ -143,10 +143,6 @@ function ReviewPage() {
       return;
     }
     if (verdict === "abandon") {
-      if (abandonStep === 1) {
-        setAbandonStep(2);
-        return;
-      }
       setConfirmAbortOpen(true);
       return;
     }
