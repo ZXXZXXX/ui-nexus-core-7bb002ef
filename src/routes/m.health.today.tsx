@@ -168,6 +168,9 @@ function TodayTasksPage() {
   const [done, setDone] = useState<"batch" | null>(null);
   const [assignSheetOpen, setAssignSheetOpen] = useState(false);
   const [staffQuery, setStaffQuery] = useState("");
+  const [pendingAssignee, setPendingAssignee] = useState<
+    (typeof SHIFT_STAFF)[number] | null
+  >(null);
   const assignees = useAssignees();
   // 兽医/场长可指定责任人
   const canAssign = role === "vet" || role === "manager";
