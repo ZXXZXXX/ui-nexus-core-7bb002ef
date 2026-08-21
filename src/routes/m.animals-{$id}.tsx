@@ -255,7 +255,6 @@ function AnimalDetailPage() {
               <div className="flex items-center gap-1.5 mb-3">
                 <ListChecks className="h-4 w-4 text-primary" />
                 <span className="text-card-title text-foreground">健康摘要</span>
-                <span className="ml-auto tag tag-success">状态正常</span>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <InfoRow label="连续健康" value="42 天" />
@@ -281,7 +280,6 @@ function AnimalDetailPage() {
               <div className="p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="text-body font-medium text-foreground">产后子宫炎</span>
-                  <span className="tag tag-info">治疗中</span>
                 </div>
                 <div>
                   <div className="h-1.5 rounded-full bg-surface-subtle overflow-hidden">
@@ -352,7 +350,6 @@ function AnimalDetailPage() {
               <div className="p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="text-body font-medium text-foreground">设备预警 · 体温偏高</span>
-                  <span className="tag tag-danger">异常</span>
                 </div>
                 <div className="grid grid-cols-2 gap-y-3 gap-x-3">
                   <InfoRow label="触发时间" value="2026-08-20 14:32" />
