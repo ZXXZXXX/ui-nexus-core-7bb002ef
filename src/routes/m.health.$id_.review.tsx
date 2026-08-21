@@ -257,85 +257,102 @@ function ReviewPage() {
                 </div>
               )}
 
-              {/* Step 2：登记离场信息 */}
+              {/* Step 2：按原因补充信息 */}
               {abandonStep === 2 && (
-                <div className="rounded-xl bg-card border border-border p-4 space-y-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-caption text-text-tertiary">登记离场信息</div>
-                    <button
-                      type="button"
-                      onClick={() => setAbandonStep(1)}
-                      className="text-caption text-primary hover:underline"
-                    >
-                      修改放弃原因
-                    </button>
-                  </div>
-
-                  <div className="rounded-lg bg-surface-subtle px-3 py-2 text-body-sm text-foreground">
-                    <span className="text-text-tertiary">放弃原因：</span>
-                    {abandonReason}
-                    {abandonReason === "其他" && leaveDetail && (
-                      <span className="text-text-tertiary">（{leaveDetail}）</span>
-                    )}
-                  </div>
-
-                  <Field label="离场日期" required>
-                    <input
-                      type="date"
-                      value={leaveDate}
-                      onChange={(e) => setLeaveDate(e.target.value)}
-                      className={inputCls}
-                    />
-                  </Field>
-                  <Field label="离场类型" required>
-                    <div className="grid grid-cols-2 gap-2">
-                      {LEAVE_KINDS.map((k) => (
-                        <button
-                          key={k}
-                          type="button"
-                          onClick={() => setLeaveKind(k)}
-                          className={`h-10 rounded-lg text-body-sm ${
-                            leaveKind === k
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-card border border-border text-text-secondary"
-                          }`}
-                        >
-                          {k}
-                        </button>
-                      ))}
-                    </div>
-                  </Field>
+                <>
                   {abandonReason === "其他" && (
-                    <Field label="具体原因" required>
-                      <textarea
-                        value={leaveDetail}
-                        onChange={(e) => setLeaveDetail(e.target.value)}
-                        rows={3}
-                        className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
-                        placeholder="请填写具体放弃原因"
-                      />
-                    </Field>
+                    <div className="rounded-xl bg-card border border-border p-4 space-y-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-caption text-text-tertiary">补充原因</div>
+                        <button
+                          type="button"
+                          onClick={() => setAbandonStep(1)}
+                          className="text-caption text-primary hover:underline"
+                        >
+                          修改放弃原因
+                        </button>
+                      </div>
+                      <Field label="具体原因" required>
+                        <textarea
+                          value={leaveDetail}
+                          onChange={(e) => setLeaveDetail(e.target.value)}
+                          rows={3}
+                          className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
+                          placeholder="请填写具体放弃原因"
+                        />
+                      </Field>
+                    </div>
                   )}
-                  {leaveKind === "淘汰" && (
-                    <Field label="金额 (元)">
-                      <input
-                        type="number"
-                        value={leavePrice}
-                        onChange={(e) => setLeavePrice(e.target.value)}
-                        className={inputCls}
-                      />
-                    </Field>
+
+                  {(abandonReason === "牛只死亡" || abandonReason === "淘汰处理") && (
+                    <div className="rounded-xl bg-card border border-border p-4 space-y-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-caption text-text-tertiary">登记离场信息</div>
+                        <button
+                          type="button"
+                          onClick={() => setAbandonStep(1)}
+                          className="text-caption text-primary hover:underline"
+                        >
+                          修改放弃原因
+                        </button>
+                      </div>
+
+                      <div className="rounded-lg bg-surface-subtle px-3 py-2 text-body-sm text-foreground">
+                        <span className="text-text-tertiary">放弃原因：</span>
+                        {abandonReason}
+                      </div>
+
+                      <Field label="离场日期" required>
+                        <input
+                          type="date"
+                          value={leaveDate}
+                          onChange={(e) => setLeaveDate(e.target.value)}
+                          className={inputCls}
+                        />
+                      </Field>
+
+                      <div className="space-y-1.5">
+                        <div className="text-caption text-text-tertiary">离场类型</div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {LEAVE_KINDS.map((k) => (
+                            <button
+                              key={k}
+                              type="button"
+                              onClick={() => setLeaveKind(k)}
+                              className={`h-10 rounded-lg text-body-sm ${
+                                leaveKind === k
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-card border border-border text-text-secondary"
+                              }`}
+                            >
+                              {k}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {leaveKind === "淘汰" && (
+                        <Field label="金额 (元)">
+                          <input
+                            type="number"
+                            value={leavePrice}
+                            onChange={(e) => setLeavePrice(e.target.value)}
+                            className={inputCls}
+                          />
+                        </Field>
+                      )}
+                      <Field label="备注">
+                        <textarea
+                          value={leaveNote}
+                          onChange={(e) => setLeaveNote(e.target.value)}
+                          rows={3}
+                          className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
+                          placeholder="补充说明"
+                        />
+                      </Field>
+                    </div>
                   )}
-                  <Field label="备注">
-                    <textarea
-                      value={leaveNote}
-                      onChange={(e) => setLeaveNote(e.target.value)}
-                      rows={3}
-                      className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
-                      placeholder="补充说明"
-                    />
-                  </Field>
-                </div>
+                </>
               )}
             </div>
           )}
