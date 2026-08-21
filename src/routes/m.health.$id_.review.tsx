@@ -82,12 +82,15 @@ function ReviewPage() {
   const [confirmAbortOpen, setConfirmAbortOpen] = useState(false);
   const earTagLabel = getOrderEarTagLabel(id);
 
-  const finalAbandonReason = leaveDetail.trim();
+  const finalAbandonReason = abandonReason === "其他"
+    ? leaveDetail.trim()
+    : abandonReason ?? leaveDetail.trim();
 
   const canSubmit = (() => {
     if (!verdict) return false;
     if (verdict === "revisit") return true;
     if (verdict === "abandon") {
+      if (abandonStep === 1) return !!abandonReason;
       if (!leaveDate || !finalAbandonReason) return false;
       if (media.length === 0) return false;
       return true;
