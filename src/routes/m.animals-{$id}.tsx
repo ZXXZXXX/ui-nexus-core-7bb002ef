@@ -272,20 +272,20 @@ function AnimalDetailPage() {
         {/* 治疗中：治疗进展 */}
         {!isLeft && a.health === "治疗中" && (
           <section className="px-4 mt-3">
-            <div className="rounded-2xl bg-card border border-[#FFD8A8] overflow-hidden">
-              <div className="flex items-center gap-2 px-4 h-11 bg-[#FFF4E6] border-b border-[#FFD8A8]">
-                <Stethoscope className="h-4 w-4 text-[#C9621F]" />
-                <span className="text-card-title text-[#C9621F]">治疗进展</span>
-                <span className="ml-auto text-caption text-[#C9621F]">第 2 / 3 天</span>
+            <div className="rounded-2xl bg-card border border-[#91D5FF] overflow-hidden">
+              <div className="flex items-center gap-2 px-4 h-11 bg-[#E6F7FF] border-b border-[#91D5FF]">
+                <Stethoscope className="h-4 w-4 text-[#22ACEB]" />
+                <span className="text-card-title text-[#22ACEB]">治疗进展</span>
+                <span className="ml-auto text-caption text-[#22ACEB]">第 2 / 3 天</span>
               </div>
               <div className="p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="text-body font-medium text-foreground">产后子宫炎</span>
-                  <span className="tag tag-warning">治疗中</span>
+                  <span className="tag tag-info">治疗中</span>
                 </div>
                 <div>
                   <div className="h-1.5 rounded-full bg-surface-subtle overflow-hidden">
-                    <div className="h-full rounded-full bg-[#F59E0B]" style={{ width: "66%" }} />
+                    <div className="h-full rounded-full bg-[#22ACEB]" style={{ width: "66%" }} />
                   </div>
                   <div className="mt-1 flex items-center justify-between text-caption text-text-tertiary">
                     <span>疗程进度</span>
@@ -303,7 +303,7 @@ function AnimalDetailPage() {
                 <Link
                   to="/m/health/$id"
                   params={{ id: "WO-2298" }}
-                  className="flex items-center justify-center gap-1 h-10 rounded-xl bg-brand-subtle text-primary text-body-sm font-medium active:opacity-80"
+                  className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#E6F7FF] text-[#22ACEB] text-body-sm font-medium active:opacity-80"
                 >
                   查看治疗工单
                   <ChevronRight className="h-4 w-4" />
