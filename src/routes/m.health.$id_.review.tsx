@@ -25,13 +25,33 @@ export const Route = createFileRoute("/m/health/$id_/review")({
 
 type Verdict = "cure" | "abandon" | "revisit";
 
-const ABANDON_REASONS = [
-  "治疗无效",
-  "牛只死亡",
-  "经济性放弃",
-  "牛只淘汰",
-  "其他",
-];
+type LeaveKind = "死亡" | "淘汰";
+
+const LEAVE_KINDS: LeaveKind[] = ["死亡", "淘汰"];
+
+const inputCls =
+  "w-full h-11 px-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary";
+
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <div className="text-caption text-text-tertiary">
+        {label} {required && <span className="text-[var(--state-danger)]">*</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+
 
 
 
