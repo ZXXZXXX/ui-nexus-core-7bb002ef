@@ -342,6 +342,56 @@ function AnimalDetailPage() {
           </section>
         )}
 
+        {/* 异常：异常详情 */}
+        {!isLeft && a.health === "异常" && (
+          <section className="px-4 mt-3">
+            <div className="rounded-2xl bg-card border border-[#FFA39E] overflow-hidden">
+              <div className="flex items-center gap-2 px-4 h-11 bg-[#FFF1F0] border-b border-[#FFA39E]">
+                <Activity className="h-4 w-4 text-[#CF1322]" />
+                <span className="text-card-title text-[#CF1322]">异常详情</span>
+                <span className="ml-auto text-caption text-[#CF1322]">待处理</span>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-body font-medium text-foreground">设备预警 · 体温偏高</span>
+                  <span className="tag tag-danger">异常</span>
+                </div>
+                <div className="grid grid-cols-2 gap-y-3 gap-x-3">
+                  <InfoRow label="触发时间" value="2026-08-20 14:32" />
+                  <InfoRow label="持续时长" value="6 小时" />
+                  <InfoRow label="异常指标" value="耳温 39.8℃" />
+                  <InfoRow label="参考范围" value="38.5–39.5℃" />
+                  <InfoRow label="关联设备" value="D-EAR-088" />
+                  <InfoRow label="负责兽医" value="李雨晴" />
+                </div>
+                <div>
+                  <div className="text-[11px] leading-tight text-text-tertiary">建议动作</div>
+                  <div className="text-body-sm text-foreground mt-0.5">
+                    建议立即进行人工测温复核；若体温持续偏高或伴随精神沉郁、食欲下降，请尽快发起疾病上报。
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <Link
+                    to="/m/health/$id"
+                    params={{ id: "WO-ALERT-998" }}
+                    className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#FFF1F0] text-[#CF1322] text-body-sm font-medium active:opacity-80"
+                  >
+                    查看预警工单
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                  <Link
+                    to="/m/report"
+                    search={{ cow: a.id }}
+                    className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#CF1322] text-white text-body-sm font-medium active:opacity-90"
+                  >
+                    发起疾病上报
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* 休药期 */}
         {a.withdrawalDays > 0 && (
