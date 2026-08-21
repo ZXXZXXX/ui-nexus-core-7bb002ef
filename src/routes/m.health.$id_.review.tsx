@@ -25,10 +25,6 @@ export const Route = createFileRoute("/m/health/$id_/review")({
 
 type Verdict = "cure" | "abandon" | "revisit";
 
-type LeaveKind = "死亡" | "淘汰";
-
-const LEAVE_KINDS: LeaveKind[] = ["死亡", "淘汰"];
-
 const ABANDON_REASONS = ["牛只死亡", "淘汰处理", "其他"] as const;
 
 type AbandonReason = (typeof ABANDON_REASONS)[number];
