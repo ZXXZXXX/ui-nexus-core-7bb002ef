@@ -245,6 +245,20 @@ function AnimalDetailPage() {
           </section>
         )}
 
+        {/* 异常 / 观察中：休药期提示 */}
+        {withdrawal && (
+          <section className="px-4 mt-3">
+            <div className="rounded-xl bg-[#FFF7E6] px-3 py-2.5 text-body-sm text-[#B8860B] w-full">
+              <span className="inline-flex items-start gap-1.5">
+                <Clock className="h-4 w-4 shrink-0 mt-0.5" />
+                牛只预计休药期至 {withdrawal.until}，余 {withdrawal.remain} 天
+              </span>
+            </div>
+          </section>
+        )}
+
+
+
         {/* 休药期 */}
         {a.withdrawalDays > 0 && (
           <section className="px-4 mt-3">
