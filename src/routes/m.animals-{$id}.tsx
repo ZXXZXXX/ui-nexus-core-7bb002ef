@@ -261,7 +261,7 @@ function AnimalDetailPage() {
                 <InfoRow label="近一年报病" value="1 次" />
                 <InfoRow label="上次治愈" value="2026-04-10" />
                 <InfoRow label="最近检查" value="2026-05-26" />
-                <InfoRow label="免疫状态" value="已完成" />
+                <InfoRow label="上次免疫" value="2026-04-18" />
                 <InfoRow label="休药期" value="无" />
               </div>
             </div>
