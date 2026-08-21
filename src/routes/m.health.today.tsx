@@ -470,8 +470,8 @@ function TodayTasksPage() {
           hideClose
           className="rounded-t-2xl p-0 max-h-[85vh] flex flex-col"
         >
-          <SheetHeader className="px-4 pt-4 pb-2 flex flex-row items-center justify-between space-y-0">
-            <SheetTitle className="text-section">筛选条件</SheetTitle>
+          <SheetHeader className="px-5 pt-5 pb-3 flex flex-row items-center justify-between space-y-0">
+            <SheetTitle className="text-section font-medium">筛选条件</SheetTitle>
             <button
               type="button"
               onClick={() => {
@@ -480,24 +480,24 @@ function TodayTasksPage() {
                 setSelectedTypes(new Set());
                 setMineOnly(false);
               }}
-              className="text-body-sm text-primary active:opacity-70"
+              className="text-body text-primary active:opacity-70"
             >
               重置
             </button>
           </SheetHeader>
 
-          <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-5">
+          <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-6">
             {/* 工单类型 */}
             {showStatusTabs && (
               <section>
-                <h4 className="text-body-sm text-text-tertiary mb-2">工单类型</h4>
-                <div className="space-y-1">
+                <h4 className="text-body font-medium text-foreground mb-3">工单类型</h4>
+                <div className="space-y-2">
                   <button
                     type="button"
                     onClick={() => setSelectedTypes(new Set())}
-                    className={`w-full min-h-10 px-3 py-2.5 flex items-center gap-3 rounded-xl border transition-colors ${
+                    className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
                       selectedTypes.size === 0
-                        ? "border-primary bg-primary/5"
+                        ? "border-primary bg-[var(--brand-subtle)]"
                         : "border-border bg-card"
                     }`}
                   >
@@ -505,7 +505,7 @@ function TodayTasksPage() {
                       全部类型
                     </span>
                     <span
-                      className={`h-5 w-5 rounded-md flex items-center justify-center border ${
+                      className={`h-5 w-5 rounded-full flex items-center justify-center border ${
                         selectedTypes.size === 0
                           ? "bg-primary border-primary"
                           : "border-border bg-card"
@@ -513,7 +513,7 @@ function TodayTasksPage() {
                     >
                       {selectedTypes.size === 0 && (
                         <Check
-                          className="h-3.5 w-3.5 text-primary-foreground"
+                          className="h-3 w-3 text-primary-foreground"
                           strokeWidth={3}
                         />
                       )}
@@ -529,8 +529,8 @@ function TodayTasksPage() {
                         key={type}
                         type="button"
                         onClick={() => toggleType(type)}
-                        className={`w-full min-h-10 px-3 py-2.5 flex items-center gap-3 rounded-xl border transition-colors ${
-                          sel ? "border-primary bg-primary/5" : "border-border bg-card"
+                        className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
+                          sel ? "border-primary bg-[var(--brand-subtle)]" : "border-border bg-card"
                         }`}
                       >
                         <Icon className={`h-4 w-4 shrink-0 ${meta.text}`} />
@@ -541,13 +541,13 @@ function TodayTasksPage() {
                           {cnt}
                         </span>
                         <span
-                          className={`h-5 w-5 rounded-md flex items-center justify-center border ${
+                          className={`h-5 w-5 rounded-full flex items-center justify-center border ${
                             sel ? "bg-primary border-primary" : "border-border bg-card"
                           }`}
                         >
                           {sel && (
                             <Check
-                              className="h-3.5 w-3.5 text-primary-foreground"
+                              className="h-3 w-3 text-primary-foreground"
                               strokeWidth={3}
                             />
                           )}
@@ -562,8 +562,8 @@ function TodayTasksPage() {
             {/* 任务状态 */}
             {showStatusTabs && (
               <section>
-                <h4 className="text-body-sm text-text-tertiary mb-2">任务状态</h4>
-                <div className="flex flex-wrap gap-2">
+                <h4 className="text-body font-medium text-foreground mb-3">任务状态</h4>
+                <div className="flex flex-wrap gap-3">
                   {tabs.map((tb) => {
                     const sel = activeTab === tb;
                     const tabCount = kindTasks.filter(
@@ -577,18 +577,18 @@ function TodayTasksPage() {
                           setActiveTab(tb);
                           setSelectedTypes(new Set());
                         }}
-                        className={`h-9 px-3 rounded-full border text-body-sm inline-flex items-center gap-1.5 transition-colors ${
+                        className={`h-10 px-4 rounded-full border text-body inline-flex items-center gap-1.5 transition-colors ${
                           sel
-                            ? "border-primary bg-brand-subtle text-primary"
+                            ? "border-primary bg-[var(--brand-subtle)] text-primary"
                             : "border-border bg-card text-text-secondary"
                         }`}
                       >
                         <span>{tb}</span>
-                        <span className="text-caption tabular-nums text-text-tertiary">
+                        <span className="text-body-sm tabular-nums text-text-tertiary">
                           {tabCount}
                         </span>
                         {sel && (
-                          <Check className="h-3.5 w-3.5 text-primary" strokeWidth={3} />
+                          <Check className="h-3.5 w-3.5 text-primary ml-0.5" strokeWidth={3} />
                         )}
                       </button>
                     );
@@ -599,20 +599,20 @@ function TodayTasksPage() {
 
             {/* 牛舍 */}
             <section>
-              <h4 className="text-body-sm text-text-tertiary mb-2">牛舍</h4>
+              <h4 className="text-body font-medium text-foreground mb-3">牛舍</h4>
               <input
                 value={barnQuery}
                 onChange={(e) => setBarnQuery(e.target.value)}
                 placeholder="搜索牛舍"
-                className="w-full h-10 px-3 rounded-xl bg-surface-subtle text-body-sm outline-none"
+                className="w-full h-11 px-4 rounded-xl bg-surface-subtle text-body text-foreground placeholder:text-text-tertiary outline-none mb-3"
               />
-              <div className="mt-2 space-y-1">
+              <div className="space-y-2">
                 <button
                   type="button"
                   onClick={() => setSelectedBarns(new Set())}
-                  className={`w-full min-h-10 px-3 py-2.5 flex items-center gap-3 rounded-xl border transition-colors ${
+                  className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
                     selectedBarns.size === 0
-                      ? "border-primary bg-primary/5"
+                      ? "border-primary bg-[var(--brand-subtle)]"
                       : "border-border bg-card"
                   }`}
                 >
@@ -620,7 +620,7 @@ function TodayTasksPage() {
                     全部牛舍
                   </span>
                   <span
-                    className={`h-5 w-5 rounded-md flex items-center justify-center border ${
+                    className={`h-5 w-5 rounded-full flex items-center justify-center border ${
                       selectedBarns.size === 0
                         ? "bg-primary border-primary"
                         : "border-border bg-card"
@@ -628,7 +628,7 @@ function TodayTasksPage() {
                   >
                     {selectedBarns.size === 0 && (
                       <Check
-                        className="h-3.5 w-3.5 text-primary-foreground"
+                        className="h-3 w-3 text-primary-foreground"
                         strokeWidth={3}
                       />
                     )}
@@ -644,8 +644,8 @@ function TodayTasksPage() {
                         key={b}
                         type="button"
                         onClick={() => toggleBarn(b)}
-                        className={`w-full min-h-10 px-3 py-2.5 flex items-center gap-3 rounded-xl border transition-colors ${
-                          sel ? "border-primary bg-primary/5" : "border-border bg-card"
+                        className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
+                          sel ? "border-primary bg-[var(--brand-subtle)]" : "border-border bg-card"
                         }`}
                       >
                         <span className="flex-1 text-left text-body text-foreground">
@@ -655,13 +655,13 @@ function TodayTasksPage() {
                           {cnt} 个任务
                         </span>
                         <span
-                          className={`h-5 w-5 rounded-md flex items-center justify-center border ${
+                          className={`h-5 w-5 rounded-full flex items-center justify-center border ${
                             sel ? "bg-primary border-primary" : "border-border bg-card"
                           }`}
                         >
                           {sel && (
                             <Check
-                              className="h-3.5 w-3.5 text-primary-foreground"
+                              className="h-3 w-3 text-primary-foreground"
                               strokeWidth={3}
                             />
                           )}
@@ -673,11 +673,11 @@ function TodayTasksPage() {
             </section>
           </div>
 
-          <div className="px-4 py-3 border-t border-border">
+          <div className="px-5 py-4 border-t border-border">
             <button
               type="button"
               onClick={() => setFilterSheetOpen(false)}
-              className="w-full h-11 rounded-xl bg-primary text-primary-foreground text-body font-medium"
+              className="w-full h-12 rounded-full bg-primary text-primary-foreground text-body font-medium active:opacity-90"
             >
               确定
             </button>
