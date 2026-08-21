@@ -67,6 +67,8 @@ function ReviewPage() {
   const isVet = role === "vet" || role === "manager";
 
   const [verdict, setVerdict] = useState<Verdict | null>(null);
+  const [abandonReason, setAbandonReason] = useState<AbandonReason | null>(null);
+  const [abandonStep, setAbandonStep] = useState<1 | 2>(1);
   const [leaveDate, setLeaveDate] = useState(new Date().toISOString().slice(0, 10));
   const [leaveKind, setLeaveKind] = useState<LeaveKind>("死亡");
   const [leaveDetail, setLeaveDetail] = useState("");
