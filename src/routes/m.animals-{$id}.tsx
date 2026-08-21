@@ -324,7 +324,6 @@ function AnimalDetailPage() {
                   <InfoRow label="开始时间" value="2026-08-20 09:12" />
                   <InfoRow label="发起人" value="王强" />
                   <InfoRow label="已观察" value="1 天" />
-                  <InfoRow label="所在牛舍" value={`${barnIdx} 号牛舍`} />
                 </div>
                 <div className="rounded-xl bg-[#FFF7E6] border border-[#FFE7BA] px-3 py-2">
                   <div className="flex items-center justify-between">
