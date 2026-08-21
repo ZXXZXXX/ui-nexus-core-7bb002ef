@@ -129,6 +129,18 @@ function statusOf(t: HomeTask): StatusTab {
 type TaskKind = "工单任务" | "基础检查" | "异常排查";
 const ALL_KINDS: TaskKind[] = ["工单任务", "基础检查", "异常排查"];
 
+function AssigneeBadge({ name }: { name: string | null | undefined }) {
+  const initial = name ? name.slice(0, 1) : "?";
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-surface-subtle/70 px-1.5 h-[22px]">
+      <span className="h-4 w-4 rounded-full bg-brand-subtle text-primary inline-flex items-center justify-center text-[10px] font-medium">
+        {initial}
+      </span>
+      <span className="text-caption text-text-secondary">{name ?? "未指定"}</span>
+    </span>
+  );
+}
+
 function TodayTasksPage() {
   const role = useRole();
   const navigate = useNavigate();
@@ -763,11 +775,7 @@ function TodayTasksPage() {
                   </div>
                   <div className="mt-1 text-body-sm truncate">
                     <span className="text-text-tertiary mr-1.5">责任人</span>
-                    {assignees[t.id] ? (
-                      <span className="text-text-secondary">{assignees[t.id]}</span>
-                    ) : (
-                      <span className="text-text-disabled">未指定</span>
-                    )}
+                    <AssigneeBadge name={assignees[t.id]} />
                   </div>
                 </div>
 
