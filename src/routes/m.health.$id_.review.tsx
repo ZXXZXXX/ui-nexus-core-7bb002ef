@@ -380,11 +380,7 @@ function ReviewPage() {
           }`}
         >
           <Send className="h-4 w-4" />
-          {verdict === "abandon" && abandonStep === 1
-            ? abandonReason === "其他"
-              ? "下一步：补充原因"
-              : "下一步：登记离场信息"
-            : "提交复查结论"}
+          {verdict === "abandon" ? "提交复查结论" : "提交复查结论"}
         </button>
       </div>
 
