@@ -269,6 +269,79 @@ function AnimalDetailPage() {
           </section>
         )}
 
+        {/* 治疗中：治疗进展 */}
+        {!isLeft && a.health === "治疗中" && (
+          <section className="px-4 mt-3">
+            <div className="rounded-2xl bg-card border border-[#FFD8A8] overflow-hidden">
+              <div className="flex items-center gap-2 px-4 h-11 bg-[#FFF4E6] border-b border-[#FFD8A8]">
+                <Stethoscope className="h-4 w-4 text-[#C9621F]" />
+                <span className="text-card-title text-[#C9621F]">治疗进展</span>
+                <span className="ml-auto text-caption text-[#C9621F]">第 2 / 3 天</span>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-body font-medium text-foreground">产后子宫炎</span>
+                  <span className="tag tag-warning">治疗中</span>
+                </div>
+                <div>
+                  <div className="h-1.5 rounded-full bg-surface-subtle overflow-hidden">
+                    <div className="h-full rounded-full bg-[#F59E0B]" style={{ width: "66%" }} />
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-caption text-text-tertiary">
+                    <span>疗程进度</span>
+                    <span className="tabular-nums">2/3 天</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-y-3 gap-x-3">
+                  <InfoRow label="当前处方" value="处方 1 · 头孢噻呋" />
+                  <InfoRow label="用药方式" value="肌内注射 1 天 1 次" />
+                  <InfoRow label="负责兽医" value="李雨晴" />
+                  <InfoRow label="下次执行" value="今日 15:30" />
+                  <InfoRow label="所在牛舍" value="病牛舍" />
+                  <InfoRow label="开始日期" value="2026-08-19" />
+                </div>
+                <Link
+                  to="/m/health/$id"
+                  params={{ id: "WO-2298" }}
+                  className="flex items-center justify-center gap-1 h-10 rounded-xl bg-brand-subtle text-primary text-body-sm font-medium active:opacity-80"
+                >
+                  查看治疗工单
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 观察中：观察详情 */}
+        {!isLeft && (a.health === "观察中" || observing) && (
+          <section className="px-4 mt-3">
+            <div className="rounded-2xl bg-card border border-[#FFE7BA] overflow-hidden">
+              <div className="flex items-center gap-2 px-4 h-11 bg-[#FFF7E6] border-b border-[#FFE7BA]">
+                <ListChecks className="h-4 w-4 text-[#B8860B]" />
+                <span className="text-card-title text-[#B8860B]">观察详情</span>
+                <span className="ml-auto text-caption text-[#B8860B]">至次日 00:00 解除</span>
+              </div>
+              <div className="p-4 space-y-3">
+                <div className="grid grid-cols-2 gap-y-3 gap-x-3">
+                  <InfoRow label="观察原因" value="设备预警 · 反刍下降" />
+                  <InfoRow label="开始时间" value="2026-08-20 09:12" />
+                  <InfoRow label="发起人" value="王强" />
+                  <InfoRow label="已观察" value="1 天" />
+                  <InfoRow label="所在牛舍" value={`${barnIdx} 号牛舍`} />
+                  <InfoRow label="休药 / 过抗" value="无" />
+                </div>
+                <div>
+                  <div className="text-[11px] leading-tight text-text-tertiary">观察要点</div>
+                  <div className="text-body-sm text-foreground mt-0.5">
+                    关注采食与反刍时长、体温变化；如出现精神沉郁或产奶量继续下降，立即发起疾病上报。
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
 
         {/* 休药期 */}
         {a.withdrawalDays > 0 && (
