@@ -29,6 +29,10 @@ type LeaveKind = "死亡" | "淘汰";
 
 const LEAVE_KINDS: LeaveKind[] = ["死亡", "淘汰"];
 
+const ABANDON_REASONS = ["治疗无效", "预后不良", "经济性淘汰", "其他"] as const;
+
+type AbandonReason = (typeof ABANDON_REASONS)[number];
+
 const inputCls =
   "w-full h-11 px-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary";
 
@@ -63,6 +67,8 @@ function ReviewPage() {
   const isVet = role === "vet" || role === "manager";
 
   const [verdict, setVerdict] = useState<Verdict | null>(null);
+  const [abandonReason, setAbandonReason] = useState<AbandonReason | null>(null);
+  const [abandonStep, setAbandonStep] = useState<1 | 2>(1);
   const [leaveDate, setLeaveDate] = useState(new Date().toISOString().slice(0, 10));
   const [leaveKind, setLeaveKind] = useState<LeaveKind>("死亡");
   const [leaveDetail, setLeaveDetail] = useState("");
@@ -76,12 +82,15 @@ function ReviewPage() {
   const [confirmAbortOpen, setConfirmAbortOpen] = useState(false);
   const earTagLabel = getOrderEarTagLabel(id);
 
-  const finalAbandonReason = leaveDetail.trim();
+  const finalAbandonReason = abandonReason === "其他"
+    ? leaveDetail.trim()
+    : abandonReason ?? leaveDetail.trim();
 
   const canSubmit = (() => {
     if (!verdict) return false;
     if (verdict === "revisit") return true;
     if (verdict === "abandon") {
+      if (abandonStep === 1) return !!abandonReason;
       if (!leaveDate || !finalAbandonReason) return false;
       if (media.length === 0) return false;
       return true;
@@ -120,9 +129,8 @@ function ReviewPage() {
       toast.success(needTransfer ? `已确认治愈，转至 ${transferTo}` : "已确认治愈");
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
     } else if (verdict === "abandon") {
-      toast.success(`已放弃治疗，工单终止并登记${leaveKind}离场（${leaveDate}）`);
+      toast.success(`已放弃治疗（${finalAbandonReason}），工单终止并登记${leaveKind}离场（${leaveDate}）`);
       navigate({ to: "/m/health/$id", params: { id }, search: { tab: "execute" } });
-
     } else if (verdict === "revisit") {
       goRevisit();
     }
@@ -134,6 +142,10 @@ function ReviewPage() {
       return;
     }
     if (verdict === "abandon") {
+      if (abandonStep === 1) {
+        setAbandonStep(2);
+        return;
+      }
       setConfirmAbortOpen(true);
       return;
     }
@@ -189,7 +201,15 @@ function ReviewPage() {
                           setRevisitConfirmOpen(true);
                           return;
                         }
+                        if (v === "abandon") {
+                          setVerdict("abandon");
+                          setAbandonStep(1);
+                          setAbandonReason(null);
+                          return;
+                        }
                         setVerdict(v);
+                        setAbandonReason(null);
+                        setAbandonStep(1);
                       }}
                       className={`h-20 rounded-lg border flex flex-col items-center justify-center gap-1 text-body-sm ${
                         active ? activeCls : "border-border bg-card text-foreground"
@@ -204,62 +224,112 @@ function ReviewPage() {
             </div>
           </div>
 
-          {/* 放弃 = 登记离场（死亡 / 淘汰），字段与离场记录保持一致 */}
+          {/* 放弃流程：先选择放弃原因，再登记离场信息 */}
           {verdict === "abandon" && (
-            <div className="rounded-xl bg-card border border-border p-4 space-y-4">
-              <Field label="离场日期" required>
-                <input
-                  type="date"
-                  value={leaveDate}
-                  onChange={(e) => setLeaveDate(e.target.value)}
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="离场类型" required>
-                <div className="grid grid-cols-2 gap-2">
-                  {LEAVE_KINDS.map((k) => (
-                    <button
-                      key={k}
-                      type="button"
-                      onClick={() => setLeaveKind(k)}
-                      className={`h-10 rounded-lg text-body-sm ${
-                        leaveKind === k
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-card border border-border text-text-secondary"
-                      }`}
-                    >
-                      {k}
-                    </button>
-                  ))}
+            <div className="space-y-4">
+              {/* Step 1：选择放弃原因 */}
+              {abandonStep === 1 && (
+                <div className="rounded-xl bg-card border border-border p-4 space-y-4">
+                  <div className="text-caption text-text-tertiary">放弃原因</div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {ABANDON_REASONS.map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setAbandonReason(r)}
+                        className={`h-11 rounded-lg text-body-sm ${
+                          abandonReason === r
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-card border border-border text-text-secondary"
+                        }`}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </Field>
-              <Field label={leaveKind === "死亡" ? "死亡原因" : "淘汰原因"} required>
-                <input
-                  value={leaveDetail}
-                  onChange={(e) => setLeaveDetail(e.target.value)}
-                  className={inputCls}
-                  placeholder={leaveKind === "死亡" ? "如：乳房炎并发症" : "如：治疗无效，经济性淘汰"}
-                />
-              </Field>
-              {leaveKind === "淘汰" && (
-                <Field label="金额 (元)">
-                  <input
-                    type="number"
-                    value={leavePrice}
-                    onChange={(e) => setLeavePrice(e.target.value)}
-                    className={inputCls}
-                  />
-                </Field>
               )}
-              <Field label="备注">
-                <textarea
-                  value={leaveNote}
-                  onChange={(e) => setLeaveNote(e.target.value)}
-                  rows={3}
-                  className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
-                  placeholder="补充说明"
-                />
-              </Field>
+
+              {/* Step 2：登记离场信息 */}
+              {abandonStep === 2 && (
+                <div className="rounded-xl bg-card border border-border p-4 space-y-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-caption text-text-tertiary">登记离场信息</div>
+                    <button
+                      type="button"
+                      onClick={() => setAbandonStep(1)}
+                      className="text-caption text-primary hover:underline"
+                    >
+                      修改放弃原因
+                    </button>
+                  </div>
+
+                  <div className="rounded-lg bg-surface-subtle px-3 py-2 text-body-sm text-foreground">
+                    <span className="text-text-tertiary">放弃原因：</span>
+                    {abandonReason}
+                    {abandonReason === "其他" && leaveDetail && (
+                      <span className="text-text-tertiary">（{leaveDetail}）</span>
+                    )}
+                  </div>
+
+                  <Field label="离场日期" required>
+                    <input
+                      type="date"
+                      value={leaveDate}
+                      onChange={(e) => setLeaveDate(e.target.value)}
+                      className={inputCls}
+                    />
+                  </Field>
+                  <Field label="离场类型" required>
+                    <div className="grid grid-cols-2 gap-2">
+                      {LEAVE_KINDS.map((k) => (
+                        <button
+                          key={k}
+                          type="button"
+                          onClick={() => setLeaveKind(k)}
+                          className={`h-10 rounded-lg text-body-sm ${
+                            leaveKind === k
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-card border border-border text-text-secondary"
+                          }`}
+                        >
+                          {k}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                  {abandonReason === "其他" && (
+                    <Field label="具体原因" required>
+                      <textarea
+                        value={leaveDetail}
+                        onChange={(e) => setLeaveDetail(e.target.value)}
+                        rows={3}
+                        className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
+                        placeholder="请填写具体放弃原因"
+                      />
+                    </Field>
+                  )}
+                  {leaveKind === "淘汰" && (
+                    <Field label="金额 (元)">
+                      <input
+                        type="number"
+                        value={leavePrice}
+                        onChange={(e) => setLeavePrice(e.target.value)}
+                        className={inputCls}
+                      />
+                    </Field>
+                  )}
+                  <Field label="备注">
+                    <textarea
+                      value={leaveNote}
+                      onChange={(e) => setLeaveNote(e.target.value)}
+                      rows={3}
+                      className="w-full p-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary resize-none"
+                      placeholder="补充说明"
+                    />
+                  </Field>
+                </div>
+              )}
             </div>
           )}
 
@@ -311,7 +381,8 @@ function ReviewPage() {
               : "bg-border text-text-tertiary"
           }`}
         >
-          <Send className="h-4 w-4" /> 提交复查结论
+          <Send className="h-4 w-4" />
+          {verdict === "abandon" && abandonStep === 1 ? "下一步：登记离场信息" : "提交复查结论"}
         </button>
       </div>
 
