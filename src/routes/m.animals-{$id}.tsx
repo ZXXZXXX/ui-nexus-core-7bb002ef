@@ -296,6 +296,19 @@ function AnimalDetailPage() {
                   <InfoRow label="负责兽医" value="李雨晴" />
                   <InfoRow label="下次执行" value="今日 15:30" />
                 </div>
+                <div className="rounded-xl bg-[#FFF7E6] border border-[#FFE7BA] px-3 py-2">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-[#B8860B] min-w-0">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">预计休药期至 2026-08-26</span>
+                    </span>
+                    <span className="ml-2 shrink-0 text-caption text-[#B8860B]">末次用药后 5 天</span>
+                  </div>
+                  <div className="mt-1 text-[11px] leading-tight text-text-tertiary">
+                    按本疗程用药中休药期最长的药品（头孢噻呋 5 天）自末次用药日起推算，治疗结束后正式生效。
+                  </div>
+                </div>
+
                 <Link
                   to="/m/health/$id"
                   params={{ id: "WO-2298" }}
@@ -389,7 +402,7 @@ function AnimalDetailPage() {
         )}
 
         {/* 休药期 */}
-        {a.withdrawalDays > 0 && (
+        {a.withdrawalDays > 0 && a.health !== "治疗中" && (
           <section className="px-4 mt-3">
             <div className="bg-[#FFF1F0] border border-[#FFA39E] rounded-lg px-3 py-2 inline-flex items-center justify-between w-full">
               <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-[#CF1322] min-w-0">
