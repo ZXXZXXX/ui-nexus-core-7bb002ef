@@ -1070,7 +1070,7 @@ function TodayTasksPage() {
       {/* 覆盖已有责任人确认 */}
       <AlertDialog
         open={!!pendingAssignee}
-        onOpenChange={(o) => !o && setPendingAssignee(null)}
+        onOpenChange={(o: boolean) => !o && setPendingAssignee(null)}
       >
         <AlertDialogContent className="max-w-[320px] rounded-2xl">
           <AlertDialogHeader>
