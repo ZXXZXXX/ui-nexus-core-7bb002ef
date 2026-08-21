@@ -380,7 +380,7 @@ function ReviewPage() {
           }`}
         >
           <Send className="h-4 w-4" />
-          {verdict === "abandon" ? "提交复查结论" : "提交复查结论"}
+          提交复查结论
         </button>
       </div>
 
