@@ -402,7 +402,7 @@ function AnimalDetailPage() {
         )}
 
         {/* 休药期 */}
-        {a.withdrawalDays > 0 && (
+        {a.withdrawalDays > 0 && a.health !== "治疗中" && (
           <section className="px-4 mt-3">
             <div className="bg-[#FFF1F0] border border-[#FFA39E] rounded-lg px-3 py-2 inline-flex items-center justify-between w-full">
               <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-[#CF1322] min-w-0">
