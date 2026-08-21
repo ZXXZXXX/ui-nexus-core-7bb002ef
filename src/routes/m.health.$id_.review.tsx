@@ -239,7 +239,11 @@ function ReviewPage() {
                       <button
                         key={r}
                         type="button"
-                        onClick={() => setAbandonReason(r)}
+                        onClick={() => {
+                          setAbandonReason(r);
+                          if (r === "牛只死亡") setLeaveKind("死亡");
+                          if (r === "淘汰处理") setLeaveKind("淘汰");
+                        }}
                         className={`h-11 rounded-lg text-body-sm ${
                           abandonReason === r
                             ? "bg-primary text-primary-foreground"
