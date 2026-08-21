@@ -325,7 +325,18 @@ function AnimalDetailPage() {
                   <InfoRow label="发起人" value="王强" />
                   <InfoRow label="已观察" value="1 天" />
                   <InfoRow label="所在牛舍" value={`${barnIdx} 号牛舍`} />
-                  <InfoRow label="休药 / 过抗" value="无" />
+                </div>
+                <div className="rounded-xl bg-[#FFF7E6] border border-[#FFE7BA] px-3 py-2">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-[#B8860B] min-w-0">
+                      <Clock className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">预计休药期至 2026-08-26</span>
+                    </span>
+                    <span className="ml-2 shrink-0 text-caption text-[#B8860B]">末次用药后 5 天</span>
+                  </div>
+                  <div className="mt-1 text-[11px] leading-tight text-text-tertiary">
+                    按治疗期间所用药品中休药期最长的药品（头孢噻呋 5 天）自末次用药日起推算。
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] leading-tight text-text-tertiary">观察要点</div>
