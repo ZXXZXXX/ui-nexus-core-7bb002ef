@@ -94,6 +94,27 @@ function AnimalDetailPage() {
   const abnormal = a.health === "异常";
   if (observing) a.health = "观察中";
 
+  // 异常 / 观察中：若仍处于休药期，按治疗期间休药期最长的药品自末次用药日推算
+  const withdrawal = useMemo(() => {
+    if (!(a.health === "异常" || a.health === "观察中")) return null;
+    const { i } = locateCow(id);
+    if (i % 2 !== 0) return null; // 部分牛只无休药期
+    const maxDays = 5 + (i % 3) * 2; // 休药期最长药品的天数
+    const last = new Date();
+    last.setHours(0, 0, 0, 0);
+    last.setDate(last.getDate() - (i % maxDays));
+    const until = new Date(last);
+    until.setDate(until.getDate() + maxDays);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const remain = Math.ceil((until.getTime() - today.getTime()) / 86400000);
+    if (remain <= 0) return null;
+    const fmt = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return { until: fmt(until), remain };
+  }, [a.health, id]);
+
+
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
