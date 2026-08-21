@@ -17,7 +17,6 @@ import {
   FilePlus2,
   Baby,
   LogOut,
-  ListChecks,
   Stethoscope,
   MessageSquareWarning,
   Image as ImageIcon,
