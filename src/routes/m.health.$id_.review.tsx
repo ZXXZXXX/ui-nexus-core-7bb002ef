@@ -63,8 +63,11 @@ function ReviewPage() {
   const isVet = role === "vet" || role === "manager";
 
   const [verdict, setVerdict] = useState<Verdict | null>(null);
-  const [abandonReason, setAbandonReason] = useState("");
-  const [abandonOther, setAbandonOther] = useState("");
+  const [leaveDate, setLeaveDate] = useState(new Date().toISOString().slice(0, 10));
+  const [leaveKind, setLeaveKind] = useState<LeaveKind>("死亡");
+  const [leaveDetail, setLeaveDetail] = useState("");
+  const [leavePrice, setLeavePrice] = useState("");
+  const [leaveNote, setLeaveNote] = useState("");
   const [media, setMedia] = useState<number[]>([]);
   const [needTransfer, setNeedTransfer] = useState(false);
   const [transferTo, setTransferTo] = useState("");
@@ -73,15 +76,20 @@ function ReviewPage() {
   const [confirmAbortOpen, setConfirmAbortOpen] = useState(false);
   const earTagLabel = getOrderEarTagLabel(id);
 
-  const finalAbandonReason = abandonReason === "其他" ? abandonOther.trim() : abandonReason;
+  const finalAbandonReason = leaveDetail.trim();
 
   const canSubmit = (() => {
     if (!verdict) return false;
     if (verdict === "revisit") return true;
+    if (verdict === "abandon") {
+      if (!leaveDate || !finalAbandonReason) return false;
+      if (media.length === 0) return false;
+      return true;
+    }
     if (needTransfer && !transferTo) return false;
-    if (verdict === "abandon" && !finalAbandonReason) return false;
     return true;
   })();
+
 
   if (!isVet) {
     return (
