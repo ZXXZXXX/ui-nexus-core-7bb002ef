@@ -29,7 +29,7 @@ type LeaveKind = "死亡" | "淘汰";
 
 const LEAVE_KINDS: LeaveKind[] = ["死亡", "淘汰"];
 
-const ABANDON_REASONS = ["牛只死亡", "经济性放弃", "预后不良", "其他"] as const;
+const ABANDON_REASONS = ["牛只死亡", "淘汰处理", "其他"] as const;
 
 type AbandonReason = (typeof ABANDON_REASONS)[number];
 
