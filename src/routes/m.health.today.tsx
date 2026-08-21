@@ -19,6 +19,16 @@ import {
 import { toast } from "sonner";
 import { MobileShell } from "@/components/mobile-shell";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 import { EmptyState } from "@/components/empty-state";
@@ -168,9 +178,28 @@ function TodayTasksPage() {
   const [done, setDone] = useState<"batch" | null>(null);
   const [assignSheetOpen, setAssignSheetOpen] = useState(false);
   const [staffQuery, setStaffQuery] = useState("");
+  const [pendingAssignee, setPendingAssignee] = useState<
+    (typeof SHIFT_STAFF)[number] | null
+  >(null);
   const assignees = useAssignees();
   // 兽医/场长可指定责任人
   const canAssign = role === "vet" || role === "manager";
+
+  const commitAssign = (s: (typeof SHIFT_STAFF)[number]) => {
+    const ids = Array.from(selected);
+    assignTasks(ids, s.name);
+    setPendingAssignee(null);
+    setAssignSheetOpen(false);
+    exitSelect();
+    if (s.onShift) {
+      toast.success(`已将 ${ids.length} 项任务指派给 ${s.name}`);
+    } else {
+      toast.warning(
+        `${s.name} 本场次${offReasonLabel[s.offReason ?? "absent"]}，已指派 ${ids.length} 项任务`,
+      );
+    }
+  };
+
 
   
   const { capture } = Route.useSearch();
@@ -983,16 +1012,14 @@ function TodayTasksPage() {
                   key={s.id}
                   type="button"
                   onClick={() => {
-                    assignTasks(Array.from(selected), s.name);
-                    setAssignSheetOpen(false);
-                    exitSelect();
-                    if (s.onShift) {
-                      toast.success(`已将 ${count} 项任务指派给 ${s.name}`);
-                    } else {
-                      toast.warning(
-                        `${s.name} 本场次${offReasonLabel[s.offReason ?? "absent"]}，已指派 ${count} 项任务`,
-                      );
+                    const existing = Array.from(selected).filter(
+                      (id) => assignees[id] && assignees[id] !== s.name,
+                    );
+                    if (existing.length > 0) {
+                      setPendingAssignee(s);
+                      return;
                     }
+                    commitAssign(s);
                   }}
                   className={
                     "w-full min-h-12 px-4 py-3 flex items-center gap-3 rounded-xl border active:bg-surface-subtle " +
@@ -1039,6 +1066,36 @@ function TodayTasksPage() {
 
         </SheetContent>
       </Sheet>
+
+      {/* 覆盖已有责任人确认 */}
+      <AlertDialog
+        open={!!pendingAssignee}
+        onOpenChange={(o: boolean) => !o && setPendingAssignee(null)}
+      >
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-section">更新责任人</AlertDialogTitle>
+            <AlertDialogDescription className="text-body-sm">
+              当前有{" "}
+              {
+                Array.from(selected).filter(
+                  (id) => assignees[id] && assignees[id] !== pendingAssignee?.name,
+                ).length
+              }{" "}
+              项任务已有指定责任人，是否更新责任人为 {pendingAssignee?.name}？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => pendingAssignee && commitAssign(pendingAssignee)}
+            >
+              确认更新
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
 
 
 
