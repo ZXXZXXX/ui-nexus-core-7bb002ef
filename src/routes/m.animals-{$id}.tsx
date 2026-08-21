@@ -381,7 +381,7 @@ function AnimalDetailPage() {
                   </Link>
                   <Link
                     to="/m/report"
-                    search={{ cow: a.id }}
+                    search={{ target: a.id }}
                     className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#CF1322] text-white text-body-sm font-medium active:opacity-90"
                   >
                     发起疾病上报
