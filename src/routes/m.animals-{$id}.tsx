@@ -25,6 +25,7 @@ import {
 import { toast } from "sonner";
 import { markAlertHandled } from "@/lib/alert-store";
 import { MobileShell } from "@/components/mobile-shell";
+import { cowStatusOf, leaveInfoOf, locateCow } from "@/lib/cow-status";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 
@@ -46,33 +47,39 @@ function AnimalDetailPage() {
   const { id } = useParams({ from: "/m/animals-{$id}" });
   const navigate = useNavigate();
 
+  const baseStatus = cowStatusOf(id);
+  const isLeft = baseStatus === "死淘";
+  const leave = useMemo(() => leaveInfoOf(id), [id]);
+  const { barnIdx } = locateCow(id);
+
   const a = {
     id,
     farm: "1 号牧场",
-    barn: "3 号牛舍",
-    
+    barn: isLeft ? "—（已离场）" : `${barnIdx} 号牛舍`,
+
     breed: "荷斯坦",
     sex: "母",
     type: "哺乳牛",
     ageDays: 1218,
-    health: "健康" as "健康" | "观察中" | "异常" | "治疗中" | "死淘",
-    withdrawalDays: 3,
+    health: baseStatus as "健康" | "观察中" | "异常" | "治疗中" | "死淘",
+    withdrawalDays: baseStatus === "治疗中" ? 3 : 0,
     withdrawalUntil: "2026-05-28",
-    lactationDays: 168,
-    pregnancyDays: 92,
+    lactationDays: isLeft ? 0 : 168,
+    pregnancyDays: isLeft ? 0 : 92,
     parity: 3,
   };
 
-  const devices: Device[] = [
-    { kind: "collar", id: "D-COL-012", name: "颈环项圈 · Nedap", status: "正常" },
-    { kind: "ear", id: "D-EAR-088", name: "耳温设备 · smaXtec", status: "异常", alertText: "耳部温度偏高 39.8℃" },
-  ];
-
-
-  // 外接设备异常 → 牛只状态为"异常"
-  if (devices.some((d) => d.status === "异常")) {
-    a.health = "异常";
-  }
+  const devices: Device[] = isLeft
+    ? []
+    : baseStatus === "异常"
+      ? [
+          { kind: "collar", id: "D-COL-012", name: "颈环项圈 · Nedap", status: "正常" },
+          { kind: "ear", id: "D-EAR-088", name: "耳温设备 · smaXtec", status: "异常", alertText: "耳部温度偏高 39.8℃" },
+        ]
+      : [
+          { kind: "collar", id: "D-COL-012", name: "颈环项圈 · Nedap", status: "正常" },
+          { kind: "ear", id: "D-EAR-088", name: "耳温设备 · smaXtec", status: "正常" },
+        ];
 
   // 强制"观察中"（至次日 00:00 解除）
   const obsKey = `cow-observe-${id}`;
@@ -84,9 +91,10 @@ function AnimalDetailPage() {
     else if (raw) window.localStorage.removeItem(obsKey);
   }, [obsKey]);
 
-  const observing = observeUntil != null && observeUntil > Date.now();
+  const observing = !isLeft && observeUntil != null && observeUntil > Date.now();
   const abnormal = a.health === "异常";
   if (observing) a.health = "观察中";
+
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
@@ -133,7 +141,7 @@ function AnimalDetailPage() {
       <div className="pb-28">
         {/* 头部 */}
         <div className="-mt-px">
-          <div className="rounded-b-3xl bg-gradient-to-b from-primary to-[#00823F] px-5 pt-2 pb-5 text-primary-foreground relative overflow-hidden shadow-lg shadow-primary/20">
+          <div className={`rounded-b-3xl px-5 pt-2 pb-5 text-primary-foreground relative overflow-hidden shadow-lg ${isLeft ? "bg-gradient-to-b from-[#7A8899] to-[#5A6675] shadow-black/10" : "bg-gradient-to-b from-primary to-[#00823F] shadow-primary/20"}`}>
             <Beef className="absolute -right-6 -bottom-6 h-36 w-36 opacity-[0.08]" strokeWidth={1} />
 
             {/* 标题行 */}
@@ -205,8 +213,61 @@ function AnimalDetailPage() {
           </div>
         </div>
 
+        {/* 离场信息 */}
+        {isLeft && (
+          <section className="px-4 mt-3">
+            <div className="rounded-2xl bg-card border border-border overflow-hidden">
+              <div className="flex items-center gap-2 px-4 h-11 bg-[#F0F2F4] border-b border-border">
+                <LogOut className="h-4 w-4 text-[#64748B]" />
+                <span className="text-card-title text-[#475569]">离场信息</span>
+                <span className="ml-auto tag tag-muted">{leave.kind}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-y-3 gap-x-3 p-4">
+                <InfoRow label="离场类型" value={leave.kind} />
+                <InfoRow label="离场日期" value={leave.date} />
+                <InfoRow label="处置去向" value={leave.dest} />
+                <InfoRow label="离场体重" value={leave.weight} />
+                <InfoRow label="经办人" value={leave.operator} />
+                <InfoRow label="原离场牛舍" value={`${barnIdx} 号牛舍`} />
+              </div>
+              <div className="px-4 pb-4 space-y-2">
+                <div>
+                  <div className="text-[11px] leading-tight text-text-tertiary">离场原因</div>
+                  <div className="text-body-sm text-foreground mt-0.5">{leave.reason}</div>
+                </div>
+                <div>
+                  <div className="text-[11px] leading-tight text-text-tertiary">备注</div>
+                  <div className="text-body-sm text-text-secondary mt-0.5">{leave.note}</div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 rounded-xl bg-[#F0F2F4] px-3 py-2 text-caption text-[#64748B] inline-flex items-center gap-1.5 w-full">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+              该牛只已离场，档案仅供查询，不支持上报与记录操作。
+            </div>
+          </section>
+        )}
 
-
+        {/* 健康摘要 */}
+        {!isLeft && a.health === "健康" && (
+          <section className="px-4 mt-3">
+            <div className="rounded-2xl bg-card border border-border p-4">
+              <div className="flex items-center gap-1.5 mb-3">
+                <ListChecks className="h-4 w-4 text-primary" />
+                <span className="text-card-title text-foreground">健康摘要</span>
+                <span className="ml-auto tag tag-success">状态正常</span>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <InfoRow label="连续健康" value="42 天" />
+                <InfoRow label="近一年报病" value="1 次" />
+                <InfoRow label="上次治愈" value="2026-04-10" />
+                <InfoRow label="最近检查" value="2026-05-26" />
+                <InfoRow label="免疫状态" value="已完成" />
+                <InfoRow label="休药期" value="无" />
+              </div>
+            </div>
+          </section>
+        )}
 
 
         {/* 休药期 */}
@@ -226,7 +287,9 @@ function AnimalDetailPage() {
 
         {/* 外接设备 */}
 
+        {!isLeft && (
         <section className="px-4 mt-4">
+
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-card-title text-foreground inline-flex items-center gap-1.5">
               <Watch className="h-4 w-4 text-primary" />
@@ -289,20 +352,25 @@ function AnimalDetailPage() {
           )}
 
         </section>
+        )}
+
 
         {/* 近7日产奶数据 */}
-        <section className="px-4 mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-card-title text-foreground inline-flex items-center gap-1.5">
-              <Activity className="h-4 w-4 text-primary" />
-              产奶数据
-            </h3>
-            <span className="text-caption text-text-tertiary">最近7天</span>
-          </div>
-          <div className="rounded-2xl bg-card border border-border p-4">
-            <MilkChart />
-          </div>
-        </section>
+        {!isLeft && (
+          <section className="px-4 mt-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-card-title text-foreground inline-flex items-center gap-1.5">
+                <Activity className="h-4 w-4 text-primary" />
+                产奶数据
+              </h3>
+              <span className="text-caption text-text-tertiary">最近7天</span>
+            </div>
+            <div className="rounded-2xl bg-card border border-border p-4">
+              <MilkChart />
+            </div>
+          </section>
+        )}
+
 
 
         {/* Tabs */}
@@ -337,7 +405,8 @@ function AnimalDetailPage() {
         </section>
       </div>
 
-      {/* 底部：记录 + 健康上报 */}
+      {/* 底部：记录 + 健康上报（离场牛只不展示） */}
+      {!isLeft && (
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] bg-card/85 backdrop-blur-lg border-t border-border p-3 pb-[calc(env(safe-area-inset-bottom)+12px)] shadow-[0_-8px_30px_rgba(0,0,0,0.04)]">
         <div className="flex items-center gap-2">
           <button
@@ -356,6 +425,8 @@ function AnimalDetailPage() {
           </Link>
         </div>
       </div>
+      )}
+
 
       {/* 记录选择 Sheet */}
       {recordOpen && (
