@@ -371,11 +371,6 @@ function ReviewPage() {
               )}
             </div>
           )}
-            <div className="rounded-xl bg-card border border-border p-4">
-              <div className="text-caption text-text-tertiary mb-2">现场材料</div>
-              <MediaGrid items={media} setItems={setMedia} max={9} />
-            </div>
-          )}
 
           {/* 转栏 */}
           {verdict === "cure" && (
