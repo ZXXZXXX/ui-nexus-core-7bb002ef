@@ -272,6 +272,14 @@ function ReviewPage() {
                       placeholder="请填写具体放弃原因"
                     />
                   </Field>
+                  <MediaGrid
+                    items={media}
+                    setItems={setMedia}
+                    max={9}
+                    required
+                    caption="现场照片 / 视频"
+                    helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
+                  />
                 </div>
               )}
 
