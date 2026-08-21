@@ -215,34 +215,11 @@ function AnimalDetailPage() {
         {/* 离场信息 */}
         {isLeft && (
           <section className="px-4 mt-3">
-            <div className="rounded-2xl bg-card border border-border overflow-hidden">
-              <div className="flex items-center gap-2 px-4 h-11 bg-[#F0F2F4] border-b border-border">
-                <LogOut className="h-4 w-4 text-[#64748B]" />
-                <span className="text-card-title text-[#475569]">离场信息</span>
-                <span className="ml-auto tag tag-muted">{leave.kind}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-y-3 gap-x-3 p-4">
-                <InfoRow label="离场类型" value={leave.kind} />
-                <InfoRow label="离场日期" value={leave.date} />
-                <InfoRow label="处置去向" value={leave.dest} />
-                <InfoRow label="离场体重" value={leave.weight} />
-                <InfoRow label="经办人" value={leave.operator} />
-                <InfoRow label="原离场牛舍" value={`${barnIdx} 号牛舍`} />
-              </div>
-              <div className="px-4 pb-4 space-y-2">
-                <div>
-                  <div className="text-[11px] leading-tight text-text-tertiary">离场原因</div>
-                  <div className="text-body-sm text-foreground mt-0.5">{leave.reason}</div>
-                </div>
-                <div>
-                  <div className="text-[11px] leading-tight text-text-tertiary">备注</div>
-                  <div className="text-body-sm text-text-secondary mt-0.5">{leave.note}</div>
-                </div>
-              </div>
-            </div>
-            <div className="mt-2 rounded-xl bg-[#F0F2F4] px-3 py-2 text-caption text-[#64748B] inline-flex items-center gap-1.5 w-full">
-              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-              该牛只已离场，档案仅供查询，不支持上报与记录操作。
+            <div className="rounded-xl bg-[#F0F2F4] px-3 py-2.5 text-body-sm text-[#64748B] w-full">
+              <span className="inline-flex items-start gap-1.5">
+                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+                牛只已于 {leave.date} 因 {leave.reason} 而 {leave.kind}，操作人：{leave.operator}
+              </span>
             </div>
           </section>
         )}
