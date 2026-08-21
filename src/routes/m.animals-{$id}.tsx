@@ -47,7 +47,6 @@ function AnimalDetailPage() {
 
   const baseStatus = cowStatusOf(id);
   const isLeft = baseStatus === "死淘";
-  const leave = useMemo(() => leaveInfoOf(id), [id]);
   const { barnIdx } = locateCow(id);
 
   const a = {
