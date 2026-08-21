@@ -13,11 +13,9 @@ import {
   Activity,
   Radio,
   Watch,
-  AlertTriangle,
   FilePlus2,
   Baby,
   LogOut,
-  ListChecks,
   Stethoscope,
   MessageSquareWarning,
   Image as ImageIcon,
@@ -25,7 +23,7 @@ import {
 import { toast } from "sonner";
 import { markAlertHandled } from "@/lib/alert-store";
 import { MobileShell } from "@/components/mobile-shell";
-import { cowStatusOf, leaveInfoOf, locateCow } from "@/lib/cow-status";
+import { cowStatusOf, locateCow } from "@/lib/cow-status";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 
@@ -49,7 +47,6 @@ function AnimalDetailPage() {
 
   const baseStatus = cowStatusOf(id);
   const isLeft = baseStatus === "死淘";
-  const leave = useMemo(() => leaveInfoOf(id), [id]);
   const { barnIdx } = locateCow(id);
 
   const a = {
@@ -213,190 +210,6 @@ function AnimalDetailPage() {
           </div>
         </div>
 
-        {/* 离场信息 */}
-        {isLeft && (
-          <section className="px-4 mt-3">
-            <div className="rounded-2xl bg-card border border-border overflow-hidden">
-              <div className="flex items-center gap-2 px-4 h-11 bg-[#F0F2F4] border-b border-border">
-                <LogOut className="h-4 w-4 text-[#64748B]" />
-                <span className="text-card-title text-[#475569]">离场信息</span>
-                <span className="ml-auto tag tag-muted">{leave.kind}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-y-3 gap-x-3 p-4">
-                <InfoRow label="离场类型" value={leave.kind} />
-                <InfoRow label="离场日期" value={leave.date} />
-                <InfoRow label="处置去向" value={leave.dest} />
-                <InfoRow label="离场体重" value={leave.weight} />
-                <InfoRow label="经办人" value={leave.operator} />
-                <InfoRow label="原离场牛舍" value={`${barnIdx} 号牛舍`} />
-              </div>
-              <div className="px-4 pb-4 space-y-2">
-                <div>
-                  <div className="text-[11px] leading-tight text-text-tertiary">离场原因</div>
-                  <div className="text-body-sm text-foreground mt-0.5">{leave.reason}</div>
-                </div>
-                <div>
-                  <div className="text-[11px] leading-tight text-text-tertiary">备注</div>
-                  <div className="text-body-sm text-text-secondary mt-0.5">{leave.note}</div>
-                </div>
-              </div>
-            </div>
-            <div className="mt-2 rounded-xl bg-[#F0F2F4] px-3 py-2 text-caption text-[#64748B] inline-flex items-center gap-1.5 w-full">
-              <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-              该牛只已离场，档案仅供查询，不支持上报与记录操作。
-            </div>
-          </section>
-        )}
-
-        {/* 健康摘要 */}
-        {!isLeft && a.health === "健康" && (
-          <section className="px-4 mt-3">
-            <div className="rounded-2xl bg-card border border-border p-4">
-              <div className="flex items-center gap-1.5 mb-3">
-                <ListChecks className="h-4 w-4 text-primary" />
-                <span className="text-card-title text-foreground">健康摘要</span>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <InfoRow label="连续健康" value="42 天" />
-                <InfoRow label="近一年报病" value="1 次" />
-                <InfoRow label="上次治愈" value="2026-04-10" />
-                <InfoRow label="最近检查" value="2026-05-26" />
-                <InfoRow label="上次免疫" value="2026-04-18" />
-                <InfoRow label="休药期" value="无" />
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* 治疗中：治疗进展 */}
-        {!isLeft && a.health === "治疗中" && (
-          <section className="px-4 mt-3">
-            <div className="rounded-2xl bg-card border border-[#91D5FF] overflow-hidden">
-              <div className="flex items-center gap-2 px-4 h-11 bg-[#E6F7FF] border-b border-[#91D5FF]">
-                <Stethoscope className="h-4 w-4 text-[#22ACEB]" />
-                <span className="text-card-title text-[#22ACEB]">治疗进展</span>
-                <span className="ml-auto text-caption text-[#22ACEB]">第 2 / 3 天</span>
-              </div>
-              <div className="p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-body font-medium text-foreground">产后子宫炎</span>
-                </div>
-                <div>
-                  <div className="h-1.5 rounded-full bg-surface-subtle overflow-hidden">
-                    <div className="h-full rounded-full bg-[#22ACEB]" style={{ width: "66%" }} />
-                  </div>
-                  <div className="mt-1 flex items-center justify-between text-caption text-text-tertiary">
-                    <span>疗程进度</span>
-                    <span className="tabular-nums">2/3 天</span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-y-3 gap-x-3">
-                  <InfoRow label="当前处方" value="处方 1 · 头孢噻呋" />
-                  <InfoRow label="用药方式" value="肌内注射 1 天 1 次" />
-                  <InfoRow label="负责兽医" value="李雨晴" />
-                  <InfoRow label="下次执行" value="今日 15:30" />
-                </div>
-                <Link
-                  to="/m/health/$id"
-                  params={{ id: "WO-2298" }}
-                  className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#E6F7FF] text-[#22ACEB] text-body-sm font-medium active:opacity-80"
-                >
-                  查看工单
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* 观察中：观察详情 */}
-        {!isLeft && (a.health === "观察中" || observing) && (
-          <section className="px-4 mt-3">
-            <div className="rounded-2xl bg-card border border-[#FFE7BA] overflow-hidden">
-              <div className="flex items-center gap-2 px-4 h-11 bg-[#FFF7E6] border-b border-[#FFE7BA]">
-                <ListChecks className="h-4 w-4 text-[#B8860B]" />
-                <span className="text-card-title text-[#B8860B]">观察详情</span>
-                <span className="ml-auto text-caption text-[#B8860B]">至次日 00:00 解除</span>
-              </div>
-              <div className="p-4 space-y-3">
-                <div className="grid grid-cols-2 gap-y-3 gap-x-3">
-                  <InfoRow label="观察原因" value="设备预警 · 反刍下降" />
-                  <InfoRow label="开始时间" value="2026-08-20 09:12" />
-                  <InfoRow label="发起人" value="王强" />
-                  <InfoRow label="已观察" value="1 天" />
-                </div>
-                <div className="rounded-xl bg-[#FFF7E6] border border-[#FFE7BA] px-3 py-2">
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-[#B8860B] min-w-0">
-                      <Clock className="h-3.5 w-3.5 shrink-0" />
-                      <span className="truncate">预计休药期至 2026-08-26</span>
-                    </span>
-                    <span className="ml-2 shrink-0 text-caption text-[#B8860B]">末次用药后 5 天</span>
-                  </div>
-                  <div className="mt-1 text-[11px] leading-tight text-text-tertiary">
-                    按治疗期间所用药品中休药期最长的药品（头孢噻呋 5 天）自末次用药日起推算。
-                  </div>
-                </div>
-                <div>
-                  <div className="text-[11px] leading-tight text-text-tertiary">观察要点</div>
-                  <div className="text-body-sm text-foreground mt-0.5">
-                    关注采食与反刍时长、体温变化；如出现精神沉郁或产奶量继续下降，立即发起疾病上报。
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* 异常：异常详情 */}
-        {!isLeft && a.health === "异常" && (
-          <section className="px-4 mt-3">
-            <div className="rounded-2xl bg-card border border-[#FFA39E] overflow-hidden">
-              <div className="flex items-center gap-2 px-4 h-11 bg-[#FFF1F0] border-b border-[#FFA39E]">
-                <Activity className="h-4 w-4 text-[#CF1322]" />
-                <span className="text-card-title text-[#CF1322]">异常详情</span>
-                <span className="ml-auto text-caption text-[#CF1322]">待处理</span>
-              </div>
-              <div className="p-4 space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-body font-medium text-foreground">设备预警 · 体温偏高</span>
-                </div>
-                <div className="grid grid-cols-2 gap-y-3 gap-x-3">
-                  <InfoRow label="触发时间" value="2026-08-20 14:32" />
-                  <InfoRow label="持续时长" value="6 小时" />
-                  <InfoRow label="异常指标" value="耳温 39.8℃" />
-                  <InfoRow label="参考范围" value="38.5–39.5℃" />
-                  <InfoRow label="关联设备" value="D-EAR-088" />
-                  <InfoRow label="负责兽医" value="李雨晴" />
-                </div>
-                <div>
-                  <div className="text-[11px] leading-tight text-text-tertiary">建议动作</div>
-                  <div className="text-body-sm text-foreground mt-0.5">
-                    建议立即进行人工测温复核；若体温持续偏高或伴随精神沉郁、食欲下降，请尽快发起疾病上报。
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <Link
-                    to="/m/health/$id"
-                    params={{ id: "WO-ALERT-998" }}
-                    className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#FFF1F0] text-[#CF1322] text-body-sm font-medium active:opacity-80"
-                  >
-                    查看预警工单
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    to="/m/report"
-                    search={{ target: a.id }}
-                    className="flex items-center justify-center gap-1 h-10 rounded-xl bg-[#CF1322] text-white text-body-sm font-medium active:opacity-90"
-                  >
-                    发起疾病上报
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* 休药期 */}
         {a.withdrawalDays > 0 && a.health !== "治疗中" && (
