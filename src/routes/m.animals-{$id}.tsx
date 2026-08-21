@@ -165,7 +165,7 @@ function AnimalDetailPage() {
                       : a.health === "观察中"
                       ? "bg-[#FFF7E6] text-[#B8860B]"
                       : a.health === "治疗中"
-                      ? "bg-[#FFE8CC] text-[#C9621F]"
+                      ? "bg-[#E6F7FE] text-[#22ACEB]"
                       : "bg-[#E8F5E9] text-[#2E7D32]"
                   }`}
                 >
