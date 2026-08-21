@@ -986,16 +986,14 @@ function TodayTasksPage() {
                   key={s.id}
                   type="button"
                   onClick={() => {
-                    assignTasks(Array.from(selected), s.name);
-                    setAssignSheetOpen(false);
-                    exitSelect();
-                    if (s.onShift) {
-                      toast.success(`已将 ${count} 项任务指派给 ${s.name}`);
-                    } else {
-                      toast.warning(
-                        `${s.name} 本场次${offReasonLabel[s.offReason ?? "absent"]}，已指派 ${count} 项任务`,
-                      );
+                    const existing = Array.from(selected).filter(
+                      (id) => assignees[id] && assignees[id] !== s.name,
+                    );
+                    if (existing.length > 0) {
+                      setPendingAssignee(s);
+                      return;
                     }
+                    commitAssign(s);
                   }}
                   className={
                     "w-full min-h-12 px-4 py-3 flex items-center gap-3 rounded-xl border active:bg-surface-subtle " +
