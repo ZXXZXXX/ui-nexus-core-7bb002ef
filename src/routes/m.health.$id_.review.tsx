@@ -293,27 +293,7 @@ function ReviewPage() {
                     />
                   </Field>
 
-                  <div className="space-y-1.5">
-                    <div className="text-caption text-text-tertiary">离场类型</div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {LEAVE_KINDS.map((k) => (
-                        <button
-                          key={k}
-                          type="button"
-                          onClick={() => setLeaveKind(k)}
-                          className={`h-10 rounded-lg text-body-sm ${
-                            leaveKind === k
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-card border border-border text-text-secondary"
-                          }`}
-                        >
-                          {k}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {leaveKind === "淘汰" && (
+                  {abandonReason === "淘汰处理" && (
                     <Field label="金额 (元)">
                       <input
                         type="number"
