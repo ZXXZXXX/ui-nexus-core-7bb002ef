@@ -497,7 +497,7 @@ function TodayTasksPage() {
                     onClick={() => setSelectedTypes(new Set())}
                     className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
                       selectedTypes.size === 0
-                        ? "border-primary bg-[var(--brand-subtle)]"
+                        ? "border-primary bg-brand-subtle"
                         : "border-border bg-card"
                     }`}
                   >
@@ -530,7 +530,7 @@ function TodayTasksPage() {
                         type="button"
                         onClick={() => toggleType(type)}
                         className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
-                          sel ? "border-primary bg-[var(--brand-subtle)]" : "border-border bg-card"
+                          sel ? "border-primary bg-brand-subtle" : "border-border bg-card"
                         }`}
                       >
                         <Icon className={`h-4 w-4 shrink-0 ${meta.text}`} />
@@ -579,7 +579,7 @@ function TodayTasksPage() {
                         }}
                         className={`h-10 px-4 rounded-full border text-body inline-flex items-center gap-1.5 transition-colors ${
                           sel
-                            ? "border-primary bg-[var(--brand-subtle)] text-primary"
+                            ? "border-primary bg-brand-subtle text-primary"
                             : "border-border bg-card text-text-secondary"
                         }`}
                       >
@@ -612,7 +612,7 @@ function TodayTasksPage() {
                   onClick={() => setSelectedBarns(new Set())}
                   className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
                     selectedBarns.size === 0
-                      ? "border-primary bg-[var(--brand-subtle)]"
+                      ? "border-primary bg-brand-subtle"
                       : "border-border bg-card"
                   }`}
                 >
@@ -645,7 +645,7 @@ function TodayTasksPage() {
                         type="button"
                         onClick={() => toggleBarn(b)}
                         className={`w-full h-12 px-4 flex items-center gap-3 rounded-xl border transition-colors ${
-                          sel ? "border-primary bg-[var(--brand-subtle)]" : "border-border bg-card"
+                          sel ? "border-primary bg-brand-subtle" : "border-border bg-card"
                         }`}
                       >
                         <span className="flex-1 text-left text-body text-foreground">
