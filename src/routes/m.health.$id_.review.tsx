@@ -381,7 +381,8 @@ function ReviewPage() {
               : "bg-border text-text-tertiary"
           }`}
         >
-          <Send className="h-4 w-4" /> 提交复查结论
+          <Send className="h-4 w-4" />
+          {verdict === "abandon" && abandonStep === 1 ? "下一步：登记离场信息" : "提交复查结论"}
         </button>
       </div>
 
