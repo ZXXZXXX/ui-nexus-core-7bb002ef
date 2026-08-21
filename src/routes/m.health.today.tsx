@@ -1057,6 +1057,36 @@ function TodayTasksPage() {
         </SheetContent>
       </Sheet>
 
+      {/* 覆盖已有责任人确认 */}
+      <AlertDialog
+        open={!!pendingAssignee}
+        onOpenChange={(o) => !o && setPendingAssignee(null)}
+      >
+        <AlertDialogContent className="max-w-[320px] rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-section">更新责任人</AlertDialogTitle>
+            <AlertDialogDescription className="text-body-sm">
+              当前有{" "}
+              {
+                Array.from(selected).filter(
+                  (id) => assignees[id] && assignees[id] !== pendingAssignee?.name,
+                ).length
+              }{" "}
+              项任务已有指定责任人，是否更新责任人为 {pendingAssignee?.name}？
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => pendingAssignee && commitAssign(pendingAssignee)}
+            >
+              确认更新
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+
 
 
 
