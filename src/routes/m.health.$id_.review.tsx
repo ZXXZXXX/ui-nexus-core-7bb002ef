@@ -65,7 +65,6 @@ function ReviewPage() {
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [abandonReason, setAbandonReason] = useState<AbandonReason | null>(null);
   const [leaveDate, setLeaveDate] = useState(new Date().toISOString().slice(0, 10));
-  const [leaveKind, setLeaveKind] = useState<LeaveKind>("死亡");
   const [leaveDetail, setLeaveDetail] = useState("");
   const [leavePrice, setLeavePrice] = useState("");
   const [leaveNote, setLeaveNote] = useState("");
