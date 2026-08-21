@@ -46,33 +46,39 @@ function AnimalDetailPage() {
   const { id } = useParams({ from: "/m/animals-{$id}" });
   const navigate = useNavigate();
 
+  const baseStatus = cowStatusOf(id);
+  const isLeft = baseStatus === "死淘";
+  const leave = useMemo(() => leaveInfoOf(id), [id]);
+  const { barnIdx } = locateCow(id);
+
   const a = {
     id,
     farm: "1 号牧场",
-    barn: "3 号牛舍",
-    
+    barn: isLeft ? "—（已离场）" : `${barnIdx} 号牛舍`,
+
     breed: "荷斯坦",
     sex: "母",
     type: "哺乳牛",
     ageDays: 1218,
-    health: "健康" as "健康" | "观察中" | "异常" | "治疗中" | "死淘",
-    withdrawalDays: 3,
+    health: baseStatus as "健康" | "观察中" | "异常" | "治疗中" | "死淘",
+    withdrawalDays: baseStatus === "治疗中" ? 3 : 0,
     withdrawalUntil: "2026-05-28",
-    lactationDays: 168,
-    pregnancyDays: 92,
+    lactationDays: isLeft ? 0 : 168,
+    pregnancyDays: isLeft ? 0 : 92,
     parity: 3,
   };
 
-  const devices: Device[] = [
-    { kind: "collar", id: "D-COL-012", name: "颈环项圈 · Nedap", status: "正常" },
-    { kind: "ear", id: "D-EAR-088", name: "耳温设备 · smaXtec", status: "异常", alertText: "耳部温度偏高 39.8℃" },
-  ];
-
-
-  // 外接设备异常 → 牛只状态为"异常"
-  if (devices.some((d) => d.status === "异常")) {
-    a.health = "异常";
-  }
+  const devices: Device[] = isLeft
+    ? []
+    : baseStatus === "异常"
+      ? [
+          { kind: "collar", id: "D-COL-012", name: "颈环项圈 · Nedap", status: "正常" },
+          { kind: "ear", id: "D-EAR-088", name: "耳温设备 · smaXtec", status: "异常", alertText: "耳部温度偏高 39.8℃" },
+        ]
+      : [
+          { kind: "collar", id: "D-COL-012", name: "颈环项圈 · Nedap", status: "正常" },
+          { kind: "ear", id: "D-EAR-088", name: "耳温设备 · smaXtec", status: "正常" },
+        ];
 
   // 强制"观察中"（至次日 00:00 解除）
   const obsKey = `cow-observe-${id}`;
@@ -84,9 +90,10 @@ function AnimalDetailPage() {
     else if (raw) window.localStorage.removeItem(obsKey);
   }, [obsKey]);
 
-  const observing = observeUntil != null && observeUntil > Date.now();
+  const observing = !isLeft && observeUntil != null && observeUntil > Date.now();
   const abnormal = a.health === "异常";
   if (observing) a.health = "观察中";
+
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
 
