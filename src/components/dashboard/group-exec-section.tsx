@@ -3,7 +3,6 @@ import { BarChart3, Layers, Download, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDo
 import { toast } from "sonner";
 import { SectionCard, PeriodTabs, LineTrend, SmoothAreaTrend } from "./charts";
 import { WorkOrderSection } from "./workorder-section";
-import { HerdSection } from "./herd-section";
 
 /* ---------------- 数据：牧场为最小口径 ---------------- */
 
@@ -670,7 +669,7 @@ function usePeriod() {
 
 /* ---------------- 产后淘汰率趋势 ---------------- */
 
-function PostpartumTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function PostpartumTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
   const s30 = factors.map((k) => Number((all.pp30 * k).toFixed(2)));
@@ -681,7 +680,7 @@ function PostpartumTrendSection({ scopeRegion }: { scopeRegion?: string | null }
     <SectionCard
       id="topic-pp-rank"
       title="产后淘汰率趋势"
-      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
@@ -706,7 +705,7 @@ function PostpartumTrendSection({ scopeRegion }: { scopeRegion?: string | null }
 
 /* ---------------- 牛只死淘变化趋势 ---------------- */
 
-function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function DeathCullTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
   const herd = all.herd || 1;
@@ -717,7 +716,7 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
     <SectionCard
       id="topic-deathcull-trend"
       title="牛只死淘变化趋势"
-      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
@@ -737,7 +736,7 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
 
 /* ---------------- 早产率变化趋势 ---------------- */
 
-function PrematureRateTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function PrematureRateTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
   const base = ((all.pp30 || 2) * 1.6) / 2 + 3.2;
@@ -748,7 +747,7 @@ function PrematureRateTrendSection({ scopeRegion }: { scopeRegion?: string | nul
     <SectionCard
       id="topic-premature-trend"
       title="早产率变化趋势"
-      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
@@ -768,7 +767,7 @@ function PrematureRateTrendSection({ scopeRegion }: { scopeRegion?: string | nul
 
 /* ---------------- 发病率 / 治愈率 / 平均诊疗天数趋势 ---------------- */
 
-function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+function TreatmentDaysTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
@@ -779,7 +778,7 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
     <SectionCard
       id="topic-treatdays-trend"
       title="发病治愈趋势"
-      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
@@ -1060,9 +1059,11 @@ export function GroupExecSection({
   return (
     <div className="space-y-6">
       {showCharts && (scopeFarm ? (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch [&>*]:h-full">
-          <HerdSection />
-          <PostpartumRankSection scopeFarm={scopeFarm} />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+          <DeathCullTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
+          <PostpartumTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
+          <TreatmentDaysTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
+          <PrematureRateTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
@@ -1075,6 +1076,7 @@ export function GroupExecSection({
           </div>
         </div>
       ))}
+
       {showCharts && scopeRegion && !scopeFarm ? (
         <WorkOrderSection farms={GROUP_FARMS.filter((f) => f.region === scopeRegion).map((f) => f.farm)} />
       ) : null}

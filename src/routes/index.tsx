@@ -138,16 +138,39 @@ const CATTLE_TYPE_DIST = [
   { key: "犊牛", value: 3960, color: "#FF8A3D" },
 ];
 
-function CattleTypeDonut() {
+/** 牧场级·外部：牛只类型分布（本牧场口径） */
+const FARM_TYPE_DIST = [
+  { key: "泌乳牛", value: 2280, color: "var(--brand)" },
+  { key: "干奶牛", value: 430, color: "#2E8CF0" },
+  { key: "青年牛", value: 860, color: "var(--effect-ai-cyan)" },
+  { key: "犊牛", value: 490, color: "#FF8A3D" },
+];
+
+/** 牧场级·外部：牛只健康占比 */
+const FARM_HEALTH_DIST = [
+  { key: "健康", value: 3812, color: "var(--brand)" },
+  { key: "治疗中", value: 148, color: "var(--state-danger)" },
+  { key: "休药 / 过抗", value: 76, color: "var(--state-alert)" },
+  { key: "观察中", value: 24, color: "#2E8CF0" },
+];
+
+function SemiArcStat({
+  title,
+  data,
+  centerLabel,
+}: {
+  title: string;
+  data: { key: string; value: number; color: string }[];
+  centerLabel: string;
+}) {
   const [hover, setHover] = useState<number | null>(null);
-  const total = CATTLE_TYPE_DIST.reduce((s, d) => s + d.value, 0);
+  const total = data.reduce((s, d) => s + d.value, 0);
   const cx = 80;
   const cy = 74;
   const R = 58;
-  const active = hover === null ? null : CATTLE_TYPE_DIST[hover];
-  // 半圆：从 180° 到 360°（顺时针经过顶部）
+  const active = hover === null ? null : data[hover];
   let acc = 0;
-  const arcs = CATTLE_TYPE_DIST.map((d) => {
+  const arcs = data.map((d) => {
     const start = 180 + (acc / total) * 180;
     acc += d.value;
     const end = 180 + (acc / total) * 180;
@@ -161,7 +184,7 @@ function CattleTypeDonut() {
   });
   return (
     <div className="flex flex-col justify-between px-5 py-4">
-      <span className="text-caption text-text-tertiary">牛只类型分布</span>
+      <span className="text-caption text-text-tertiary">{title}</span>
       <div className="mt-1 flex items-center justify-center">
         <div className="relative h-[86px] w-[160px] shrink-0">
           <svg viewBox="0 0 160 82" className="h-full w-full">
@@ -187,15 +210,19 @@ function CattleTypeDonut() {
             <span className="mt-1 text-caption text-text-tertiary">
               {active
                 ? `${active.key} · ${((active.value / total) * 100).toFixed(1)}%`
-                : "存栏总数"}
+                : centerLabel}
             </span>
           </div>
         </div>
       </div>
-
     </div>
   );
 }
+
+function CattleTypeDonut() {
+  return <SemiArcStat title="牛只类型分布" data={CATTLE_TYPE_DIST} centerLabel="存栏总数" />;
+}
+
 
 
 /** 集团高管视角：数据概览指标卡（本月 / 本年） */
@@ -242,14 +269,18 @@ const farmOutCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-disease": { topic: "治愈率", label: "（本月）本牧场治愈率", value: String(fm.cure), unit: "%", delta: "+0.8 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(fm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
-const farmOutLeadCard: MetricCard = {
-  topic: "发病率", label: "（本月）本牧场发病率", value: String(fm.sick), unit: "%", trend: "down", delta: "-0.2 pp",
-  icon: Stethoscope, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "spark",
-};
-const farmOutCalvingCard: MetricCard = {
-  topic: "产犊总数", label: "（本月）产犊总数", value: String(fm.calving), unit: "头", trend: "up", delta: "+12 头",
-  icon: Baby, anchor: "topic-calving-total", good: true, absolute: true, tone: "#FF8A3D", visual: "spark",
-};
+
+/** 牧场级·外部：数据概览指标卡 */
+const farmOutBizCards: MetricCard[] = [
+  { topic: "病牛数", label: "（本月）病牛数", value: "148", unit: "头", trend: "down", delta: "-9 头", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, absolute: true, tone: "#FF8A3D", visual: "spark" },
+  { topic: "休药 / 过抗头数", label: "（本月）休药 / 过抗头数", value: "76", unit: "头", trend: "down", delta: "-4 头", icon: Pill, anchor: "topic-treatdays-trend", good: true, absolute: true, tone: "var(--state-alert)", visual: "clock" },
+  { topic: "治愈数", label: "（本月）治愈数", value: "132", unit: "头次", trend: "up", delta: "+11 头次", icon: Activity, anchor: "topic-treatdays-trend", good: true, absolute: true, tone: "var(--state-success)", visual: "bars" },
+  { topic: "死淘总数", label: "（本月）死淘总数", value: String(fm.deathCull), unit: "头", trend: "down", delta: "-3 头", icon: Beef, anchor: "topic-culling-trend", good: true, absolute: true, tone: "var(--state-danger)", visual: "truck" },
+  { topic: "产犊总数", label: "（本月）产犊总数", value: String(fm.calving), unit: "头", trend: "up", delta: "+12 头", icon: Baby, anchor: "topic-premature-trend", good: true, absolute: true, tone: "var(--brand)", visual: "bars" },
+  { topic: "早产率", label: "（本月）早产率", value: String(fm.pretermRate), unit: "%", trend: "down", delta: "-0.2 pp", icon: Baby, anchor: "topic-premature-trend", good: true, tone: "#2E8CF0", visual: "ring" },
+];
+
+
 
 type WorkOrderType = "disease" | "vaccine" | "deworm" | "hoof" | "postpartum" | "drying" | "general";
 type PendingRequest = {
@@ -440,7 +471,7 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
   const isExec = scope === "group" || scope === "region" || scope === "farm-out";
-  const showAttendance = !isExec || scope === "farm-out";
+  const showAttendance = !isExec;
   const visibleCards =
     isExec
       ? (() => {
@@ -451,7 +482,8 @@ function HomePage() {
 
               : scope === "region"
                 ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
-                : [map.get("总存栏数"), applyTimeScope(farmOutCalvingCard), map.get("早产率"), applyTimeScope(farmOutLeadCard), map.get("治愈率"), map.get("死淘总数")];
+                : farmOutBizCards.map(applyTimeScope);
+
           return execOrder.filter(Boolean) as MetricCard[];
         })()
       : baseCards;
@@ -542,13 +574,16 @@ function HomePage() {
               </div>
             </div>
 
-            {/* 2 · 预警 / 集团视角牧场统计 */}
+            {/* 2 · 预警 / 集团视角牧场统计 / 牧场外部健康占比 */}
+            {scope === "farm-out" ? (
+              <SemiArcStat title="牛只健康占比" data={FARM_HEALTH_DIST} centerLabel="存栏总数" />
+            ) : (
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
                 <span className="text-caption text-text-tertiary">
-                  {isExec ? (scope === "group" ? "牧场分布" : scope === "region" ? `${CURRENT_REGION} · 牧场分布` : "实时预警") : "实时预警"}
+                  {isExec ? (scope === "group" ? "牧场分布" : `${CURRENT_REGION} · 牧场分布`) : "实时预警"}
                 </span>
-                {(!isExec || scope === "farm-out") && (
+                {!isExec && (
                   <button
                     type="button"
                     onClick={() => scrollToTopic("topic-alert")}
@@ -559,7 +594,7 @@ function HomePage() {
                 )}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2.5">
-                {isExec && scope !== "farm-out" ? (
+                {isExec ? (
                   (() => {
                     const fc = farmCountFor(scope === "group" ? null : CURRENT_REGION);
                     return [
@@ -631,8 +666,15 @@ function HomePage() {
                 )}
               </div>
             </div>
+            )}
 
-            {!showAttendance && <CattleTypeDonut />}
+            {!showAttendance &&
+              (scope === "farm-out" ? (
+                <SemiArcStat title="牛只类型分布" data={FARM_TYPE_DIST} centerLabel="存栏总数" />
+              ) : (
+                <CattleTypeDonut />
+              ))}
+
 
 
             {showAttendance && (
@@ -684,7 +726,7 @@ function HomePage() {
 
 
         {(() => {
-          const execFrame = scope === "group" || scope === "region";
+          const execFrame = isExec;
 
           const cardsGrid = (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
@@ -804,6 +846,7 @@ function HomePage() {
           }
 
           const region = scope === "region" ? CURRENT_REGION : null;
+          const farmScope = scope === "farm-out" ? CURRENT_FARM : null;
           const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
             <section>
               <div className="flex items-center justify-between gap-2 mb-4">
@@ -863,10 +906,10 @@ function HomePage() {
                 {cardsGrid}
               </Frame>
               <Frame title="数据看板">
-                <GroupExecSection scopeRegion={region} part="charts" />
+                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" />
               </Frame>
               <Frame title="排名情况">
-                <GroupExecSection scopeRegion={region} part="rank" />
+                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="rank" />
               </Frame>
             </div>
           );
