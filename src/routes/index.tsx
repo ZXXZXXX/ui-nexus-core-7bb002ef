@@ -450,7 +450,7 @@ function HomePage() {
             className={`grid grid-cols-1 divide-y divide-border lg:divide-y-0 lg:divide-x ${
               showAttendance
                 ? "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(340px,1.3fr)]"
-                : "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)]"
+                : "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(280px,1fr)]"
             }`}
           >
             {/* 1 · 问候 */}
