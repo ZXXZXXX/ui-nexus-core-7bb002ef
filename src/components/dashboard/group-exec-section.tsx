@@ -413,12 +413,6 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
           {perHead.map((v, i) => (
             <circle key={i} cx={cx(i)} cy={ly(v)} r={hover === i ? 5 : 3.5} fill="var(--effect-ai-purple)" />
           ))}
-          <text x={padL - 8} y={padT + 4} textAnchor="end" fontSize="11" fill="var(--text-tertiary)">
-            万元
-          </text>
-          <text x={W - padR + 8} y={padT + 4} fontSize="11" fill="var(--text-tertiary)">
-            元/头
-          </text>
         </svg>
         {hover !== null && (
           <div
