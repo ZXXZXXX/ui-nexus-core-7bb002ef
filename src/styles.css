@@ -230,6 +230,20 @@
     margin-top: 4px;
   }
 
+  /* cmdk 搜索框：内嵌于弹层顶部，取消描边/焦点环，避免被圆角容器裁切 */
+  input[cmdk-input],
+  input[cmdk-input]:focus,
+  input[cmdk-input]:focus-visible,
+  .m-scope input[cmdk-input],
+  .m-scope input[cmdk-input]:focus,
+  .m-scope input[cmdk-input]:focus-visible {
+
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
 
 }
 
