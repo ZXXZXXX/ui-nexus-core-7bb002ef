@@ -210,12 +210,12 @@ function CattleTypeDonut() {
 
 /** 集团高管视角：数据概览指标卡（本月 / 本年） */
 const groupBizCards: MetricCard[] = [
-  { topic: "存栏总数", label: "（至今日）牛只存栏总数", value: "29,500", unit: "头", trend: "up", delta: "+286 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars" },
-  { topic: "泌乳牛数", label: "（至今日）泌乳牛存栏", value: "16,180", unit: "头", trend: "up", delta: "+142 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "bars" },
-  { topic: "干奶牛数", label: "（至今日）干奶牛存栏", value: "3,240", unit: "头", trend: "down", delta: "-36 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--effect-ai-cyan)", visual: "bars" },
-  { topic: "青年牛 / 犊牛数", label: "（至今日）青年牛 / 犊牛存栏", value: "6,120 / 3,960", unit: "头", trend: "up", delta: "+180 头", icon: Baby, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "bars" },
-  { topic: "治疗中牛只数", label: "（至今日）治疗中牛只", value: "812", unit: "头", trend: "down", delta: "-34 头", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, tone: "var(--state-danger)", visual: "spark" },
-  { topic: "休药过抗牛只数", label: "（至今日）休药过抗牛只", value: "264", unit: "头", trend: "up", delta: "+18 头", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "clock" },
+  { topic: "发病数", label: "（本月）发病数", value: "826", unit: "头次", trend: "down", delta: "-42 头次", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, tone: "#FF8A3D", visual: "spark", absolute: true },
+  { topic: "治愈数", label: "（本月）治愈数", value: "764", unit: "头次", trend: "up", delta: "+58 头次", icon: Activity, anchor: "topic-treatdays-trend", good: true, tone: "var(--state-success)", visual: "bars", absolute: true },
+  { topic: "死淘总数", label: "（本月）死淘总数", value: "148", unit: "头", trend: "down", delta: "-12 头", icon: Beef, anchor: "topic-culling-trend", good: true, tone: "var(--state-danger)", visual: "truck", absolute: true },
+  { topic: "产犊总数", label: "（本月）产犊总数", value: "1,120", unit: "头", trend: "up", delta: "+64 头", icon: Baby, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars", absolute: true },
+  { topic: "早产率", label: "（本月）早产率", value: "3.6", unit: "%", trend: "down", delta: "-0.4 pp", icon: Baby, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "ring" },
+  { topic: "总药费", label: "（本月）总药费", value: "122.1", unit: "万元", trend: "up", delta: "+2.8 %", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "spark" },
 ];
 
 
