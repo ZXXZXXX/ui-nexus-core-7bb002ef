@@ -275,7 +275,7 @@ export function LineTrend({
   const padB = 30;
   const padT = 10;
   const maxV = Math.max(...series.flatMap((s) => s.points), 1);
-  const nice = Math.ceil(maxV / 5) * 5 || 5;
+  const nice = maxV <= 5 ? Math.max(Math.ceil(maxV * 1.2 * 10) / 10, 0.5) : Math.ceil(maxV / 5) * 5;
   const x = (i: number) => padL + (i * (w - padL - padR)) / Math.max(labels.length - 1, 1);
   const y = (v: number) => padT + (1 - v / nice) * (h - padT - padB);
   return (
@@ -324,7 +324,7 @@ export function LineTrend({
               fill="var(--text-tertiary)"
               fontSize="13"
             >
-              {Math.round(nice * (1 - t))}
+              {nice <= 5 ? (nice * (1 - t)).toFixed(1) : Math.round(nice * (1 - t))}
             </text>
           </g>
         ))}
