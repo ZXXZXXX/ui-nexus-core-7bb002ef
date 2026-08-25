@@ -522,7 +522,7 @@ function StackedColumns({
 
   return (
     <div className="w-full overflow-x-auto">
-      <div className="relative min-w-[640px]">
+      <div className="relative min-w-[420px]">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <g key={t}>
