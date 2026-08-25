@@ -701,28 +701,47 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
   );
 }
 
-/* ---------------- 发病治愈平均诊疗天数趋势 ---------------- */
+/* ---------------- 发病率 / 治愈率 / 平均诊疗天数趋势 ---------------- */
 
 function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
+  const sickRate = factors.map((k) => Number((all.sick * (0.94 + (k - 1) * 0.5)).toFixed(1)));
+  const cureRate = factors.map((k) => Number(Math.min(all.cure * (1.02 - (k - 1) * 0.12), 100).toFixed(1)));
 
   return (
     <SectionCard
       id="topic-treatdays-trend"
-      title="发病治愈平均诊疗天数趋势"
+      title="发病治愈趋势"
       desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <p className="text-body-sm text-text-secondary mb-4">治愈病例从发病到治愈的平均诊疗天数（天）</p>
-      <LineTrend
-        labels={labels}
-        unit=" 天"
-        series={[{ name: "平均诊疗天数", color: "var(--effect-ai-cyan)", points: days }]}
-        height={240}
-      />
+      <p className="text-body-sm text-text-secondary mb-4">按月统计发病率、治愈率（%）与治愈病例平均诊疗天数（天）</p>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div>
+          <div className="text-body-sm text-text-secondary mb-2">发病率 / 治愈率（%）</div>
+          <LineTrend
+            labels={labels}
+            unit="%"
+            height={220}
+            series={[
+              { name: "发病率", color: "var(--state-warning)", points: sickRate },
+              { name: "治愈率", color: "var(--brand)", points: cureRate, dashed: true },
+            ]}
+          />
+        </div>
+        <div>
+          <div className="text-body-sm text-text-secondary mb-2">平均诊疗天数（天）</div>
+          <LineTrend
+            labels={labels}
+            unit=" 天"
+            height={220}
+            series={[{ name: "平均诊疗天数", color: "var(--effect-ai-cyan)", points: days }]}
+          />
+        </div>
+      </div>
     </SectionCard>
   );
 }
