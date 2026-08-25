@@ -708,7 +708,6 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
-  const cure = factors.map((k) => Number(Math.min(99, all.cure / k ** 0.2).toFixed(1)));
 
   return (
     <SectionCard
@@ -718,22 +717,17 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <p className="text-body-sm text-text-secondary mb-4">治愈病例从发病到治愈的平均诊疗天数，对照同期治愈率</p>
+      <p className="text-body-sm text-text-secondary mb-4">治愈病例从发病到治愈的平均诊疗天数（天）</p>
       <LineTrend
         labels={labels}
-        series={[
-          { name: "平均诊疗天数（天）", color: "var(--effect-ai-cyan)", points: days },
-          { name: "治愈率（%）", color: "var(--state-success)", points: cure },
-        ]}
+        unit=" 天"
+        series={[{ name: "平均诊疗天数", color: "var(--effect-ai-cyan)", points: days }]}
         height={240}
       />
-      <ChartLegend items={[
-        { name: "平均诊疗天数（天）", color: "var(--effect-ai-cyan)", line: true },
-        { name: "治愈率（%）", color: "var(--state-success)", line: true },
-      ]} />
     </SectionCard>
   );
 }
+
 
 
 /* ---------------- 四、全景指标对标排行 ---------------- */
