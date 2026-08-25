@@ -100,7 +100,7 @@ function CattlePage() {
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
               <Input placeholder="搜索耳号 / 编号" className="h-9 w-56 pl-9 text-body-sm" />
             </div>
-            <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal"><SlidersHorizontal className="h-3.5 w-3.5" /> 精细筛选</Button>
+            <Button variant="outline" size="icon" title="筛选与列设置" aria-label="筛选与列设置" className="h-9 w-9 shrink-0"><SlidersHorizontal className="h-4 w-4" /></Button>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal" onClick={() => setImportOpen(true)}>
