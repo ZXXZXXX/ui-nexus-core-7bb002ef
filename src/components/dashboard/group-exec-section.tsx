@@ -436,6 +436,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
           </div>
         )}
       </div>
+      </div>
     </div>
   );
 }
