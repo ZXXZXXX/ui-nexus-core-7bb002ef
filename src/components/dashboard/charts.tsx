@@ -251,7 +251,7 @@ export function BarList({
   );
 }
 
-export type Series = { name: string; color: string; points: number[] };
+export type Series = { name: string; color: string; points: number[]; dashed?: boolean };
 
 export function LineTrend({
   labels,
@@ -336,6 +336,7 @@ export function LineTrend({
               strokeWidth="2"
               strokeLinejoin="round"
               strokeLinecap="round"
+              strokeDasharray={s.dashed ? "6 5" : undefined}
               points={s.points.map((p, i) => `${x(i)},${y(p)}`).join(" ")}
             />
             {s.points.map((p, i) => (
@@ -392,7 +393,10 @@ export function LineTrend({
       <div className="mt-2 flex flex-wrap items-center gap-4">
         {series.map((s) => (
           <span key={s.name} className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
-            <span className="h-1.5 w-4 rounded-full" style={{ background: s.color }} />
+            <span
+              className="h-1.5 w-4 rounded-full"
+              style={s.dashed ? { backgroundImage: `repeating-linear-gradient(90deg, ${s.color} 0 5px, transparent 5px 9px)` } : { background: s.color }}
+            />
             {s.name}
             {unit && <span className="text-text-tertiary">（{unit}）</span>}
           </span>
