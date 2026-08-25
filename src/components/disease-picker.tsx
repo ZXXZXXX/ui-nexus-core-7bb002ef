@@ -85,7 +85,7 @@ export function DiseasePicker({
         <div className="p-4 space-y-2 overflow-y-auto flex-1">
           {list.length === 0 ? (
             <div className="text-center py-12 text-body-sm text-text-tertiary">
-              无匹配疾病
+              {matchedSymptoms.length === 0 ? "请先选择症状" : "无匹配疾病"}
             </div>
           ) : (
             list.map((d) => {
