@@ -269,14 +269,6 @@ const farmOutCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-disease": { topic: "治愈率", label: "（本月）本牧场治愈率", value: String(fm.cure), unit: "%", delta: "+0.8 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(fm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
-const farmOutLeadCard: MetricCard = {
-  topic: "发病率", label: "（本月）本牧场发病率", value: String(fm.sick), unit: "%", trend: "down", delta: "-0.2 pp",
-  icon: Stethoscope, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "spark",
-};
-const farmOutCalvingCard: MetricCard = {
-  topic: "产犊总数", label: "（本月）产犊总数", value: String(fm.calving), unit: "头", trend: "up", delta: "+12 头",
-  icon: Baby, anchor: "topic-calving-total", good: true, absolute: true, tone: "#FF8A3D", visual: "spark",
-};
 
 /** 牧场级·外部：数据概览指标卡 */
 const farmOutBizCards: MetricCard[] = [
