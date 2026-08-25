@@ -1694,6 +1694,31 @@ export function WorkOrderPage({
         </DialogContent>
       </Dialog>
 
+      {createKind && (
+        <CreateWorkOrderDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          title={title}
+          kind={createKind}
+          onCreate={({ targets, targetLabel, rx }) => {
+            const now = new Date();
+            const p2 = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+            const stamp = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}`;
+            const seq = createdOrders.length + 1;
+            const order: WorkOrder = {
+              id: `${createPrefix ?? "WO"}${p2(now.getMonth() + 1)}${p2(now.getDate())}${p2(90 + seq)}`,
+              target: targets.length > 3 ? `${targets.slice(0, 3).join("、")} 等 ${targets.length} 项` : targetLabel,
+              event: rx.name,
+              desc: rx.summary || rx.desc || `${rx.name}（${rx.code}），疗程 ${rx.duration} 天。`,
+              proposer: "当前用户",
+              status: "待诊断",
+              createdAt: stamp,
+            };
+            setCreatedOrders((prev) => [order, ...prev]);
+            setActive("待诊断");
+          }}
+        />
+      )}
     </TooltipProvider>
   );
 }
