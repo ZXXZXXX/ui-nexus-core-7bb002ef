@@ -158,7 +158,7 @@ function SymptomKBPage() {
                     <span className="truncate">{s.name}</span>
                   </div>
                   <div className="truncate">
-                    <span className={`tag ${s.urgency === "高" ? "tag-danger" : "tag-warning"}`}>{s.urgency}</span>
+                    <span className={`tag ${s.urgency === "高" ? "tag-danger" : s.urgency === "中" ? "tag-warning" : "tag-info"}`}>{s.urgency}</span>
                   </div>
                   <div className="flex items-center gap-1 min-w-0 overflow-hidden">
                     {s.related.slice(0, 2).map((r) => (
