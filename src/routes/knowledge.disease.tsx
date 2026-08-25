@@ -756,15 +756,6 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
                 </Button>
               </div>
             ))}
-            <RxSearchSelect
-              selected={value.prescriptions}
-              onAdd={(rx) =>
-                onChange({
-                  ...value,
-                  prescriptions: [...value.prescriptions, { code: rx.code, name: rx.name, level: "备选" }],
-                })
-              }
-            />
 
           </div>
         </SectionCard>
