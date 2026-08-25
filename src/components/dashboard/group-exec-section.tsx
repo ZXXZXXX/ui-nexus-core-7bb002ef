@@ -341,34 +341,34 @@ const ALL_PER_HEAD = [31.2, 32.5, 34.8, 31.9, 30.4, 32.8, 37.6, 39.2, 34.1, 31.6
 
 function DrugComboChart({ months, totalFee, perHead }: { months: string[]; totalFee: number[]; perHead: number[] }) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 640;
-  const H = 240;
-  const padL = 28;
-  const padR = 28;
-  const padT = 22;
-  const padB = 26;
+  const W = 900;
+  const H = 300;
+  const padL = 40;
+  const padR = 40;
+  const padT = 24;
+  const padB = 34;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
   const maxBar = Math.max(...totalFee) * 1.15;
   const maxLine = Math.max(...perHead) * 1.25;
   const minLine = Math.min(...perHead) * 0.7;
   const step = iw / months.length;
-  const bw = Math.min(34, step * 0.42);
+  const bw = Math.min(44, step * 0.45);
   const cx = (i: number) => padL + step * i + step / 2;
   const ly = (v: number) => padT + ih - ((v - minLine) / (maxLine - minLine)) * ih;
   const path = perHead.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
 
   return (
     <div className="relative w-full">
-      <span className="pointer-events-none absolute left-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
+      <span className="pointer-events-none absolute left-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
         万元
       </span>
-      <span className="pointer-events-none absolute right-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
+      <span className="pointer-events-none absolute right-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
         元/头
       </span>
       <div className="w-full overflow-x-auto">
       <div className="relative" style={{ minWidth: months.length > 6 ? 720 : undefined }}>
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: 280 }}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <line
               key={t}
@@ -403,7 +403,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
                   onMouseEnter={() => setHover(i)}
                   onMouseLeave={() => setHover(null)}
                 />
-                <text x={cx(i)} y={H - 10} textAnchor="middle" className="text-caption" fill="var(--text-tertiary)" fontSize="11">
+                <text x={cx(i)} y={H - 12} textAnchor="middle" fill="var(--text-tertiary)" fontSize="13">
                   {m}
                 </text>
               </g>
