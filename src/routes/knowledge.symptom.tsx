@@ -24,10 +24,12 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
-import { Activity, Plus, Search, Pencil, Trash2, X, MoreHorizontal } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Activity, Plus, Search, Pencil, Trash2, X, MoreHorizontal, ChevronsUpDown, Check } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { KB_SYMPTOMS, diseaseName } from "@/lib/disease-kb";
+import { KB_SYMPTOMS, KB_DISEASES, diseaseName } from "@/lib/disease-kb";
 
 export const Route = createFileRoute("/knowledge/symptom")({
   head: () => ({ meta: [{ title: "症状知识库 — 奇点智牧" }] }),
@@ -35,6 +37,65 @@ export const Route = createFileRoute("/knowledge/symptom")({
 });
 
 type Symptom = { id: string; name: string; related: string[]; urgency: string };
+
+function DiseaseMultiSelect({ value, onChange }: { value: string[]; onChange: (v: string[]) => void }) {
+  const [open, setOpen] = useState(false);
+  const options = useMemo(() => KB_DISEASES.map((d) => ({ id: d.id, name: d.name })), []);
+  const toggle = (name: string) =>
+    onChange(value.includes(name) ? value.filter((v) => v !== name) : [...value, name]);
+
+  return (
+    <div className="space-y-1.5">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            className="w-full justify-between font-normal text-body-sm"
+          >
+            <span className={value.length ? "text-foreground" : "text-text-tertiary"}>
+              {value.length ? `已选 ${value.length} 个疾病` : "搜索并选择关联疾病"}
+            </span>
+            <ChevronsUpDown className="h-3.5 w-3.5 text-text-tertiary shrink-0" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="p-0 w-[var(--radix-popover-trigger-width)]">
+          <Command
+            filter={(v, s) => (v.toLowerCase().includes(s.toLowerCase()) ? 1 : 0)}
+          >
+            <CommandInput placeholder="输入疾病名称或编码搜索" />
+            <CommandList className="max-h-64">
+              <CommandEmpty>未找到匹配的疾病</CommandEmpty>
+              <CommandGroup>
+                {options.map((o) => (
+                  <CommandItem key={o.id} value={`${o.name} ${o.id}`} onSelect={() => toggle(o.name)}>
+                    <Check
+                      className={`mr-2 h-3.5 w-3.5 ${value.includes(o.name) ? "opacity-100 text-primary" : "opacity-0"}`}
+                    />
+                    <span className="flex-1 truncate">{o.name}</span>
+                    <span className="text-caption text-text-tertiary font-mono ml-2">{o.id}</span>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {value.map((n) => (
+            <span key={n} className="tag tag-muted inline-flex items-center gap-1">
+              {n}
+              <button type="button" onClick={() => toggle(n)} className="text-text-tertiary hover:text-foreground">
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const seed: Symptom[] = KB_SYMPTOMS.map((s) => ({
   id: s.id,
