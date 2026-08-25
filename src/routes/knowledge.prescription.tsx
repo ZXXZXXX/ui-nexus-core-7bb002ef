@@ -1094,6 +1094,7 @@ function AltDrugEditor({
         {variable ? (
           <VariableDoseTable
             varKind={variableKind}
+            drugSpec={drug.spec}
             value={drug.varDose ?? []}
             onChange={(varDose) => onChange({ varDose })}
           />
@@ -1102,14 +1103,14 @@ function AltDrugEditor({
             <span className="text-body-sm text-text-secondary shrink-0">
               具体剂量<span className="text-[var(--state-danger)] ml-0.5">*</span>
             </span>
-            <Input
-              value={drug.dose ?? ""}
-              onChange={(e) => onChange({ dose: e.target.value })}
-              className="h-9 w-40 text-body"
-              placeholder={base.fixedDose || "如 5ml/次"}
+            <DoseInput
+              spec={drug.spec}
+              value={drug.dose}
+              onChange={(dose) => onChange({ dose })}
             />
           </div>
         )}
+
       </div>
     </div>
   );
