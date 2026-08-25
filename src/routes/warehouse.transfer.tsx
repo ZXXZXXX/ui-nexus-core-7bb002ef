@@ -86,6 +86,8 @@ const columns: ListColumn<TransferRow>[] = [
   },
 ];
 
+type DraftLine = { code: string; name: string; spec: string; unit: string; qty: number };
+
 function TransferPage() {
   const [data, setData] = useState<TransferRow[]>(initial);
   const [open, setOpen] = useState(false);
@@ -93,6 +95,7 @@ function TransferPage() {
   const [itemId, setItemId] = useState("");
   const [itemKw, setItemKw] = useState("");
   const [qty, setQty] = useState("");
+  const [lines, setLines] = useState<DraftLine[]>([]);
   const [from, setFrom] = useState("1 号库（一级）");
   const [to, setTo] = useState("2 号库（二级）");
   const [inboundAt, setInboundAt] = useState(() => stamp());
@@ -107,32 +110,45 @@ function TransferPage() {
   }, [itemKw]);
 
   const reset = () => {
-    setItemId(""); setItemKw(""); setQty("");
+    setItemId(""); setItemKw(""); setQty(""); setLines([]);
     setInboundAt(stamp()); setRemark("");
   };
 
-  const submit = () => {
+  const addLine = () => {
     if (!item) return toast.error("请选择药品");
     if (!qty || Number(qty) <= 0) return toast.error("请输入有效的调拨数量");
-    const nextId = `TR-2026-${String(143 + (data.length - initial.length)).padStart(4, "0")}`;
-    setData((d) => [
-      {
-        id: nextId,
-        code: item.id,
-        name: item.name,
-        spec: item.spec,
-        qty: Number(qty),
-        unit: item.unit,
-        inboundAt,
-        operator: "超级管理员",
-        remark: remark || `${from} → ${to}`,
-      },
-      ...d,
-    ]);
-    toast.success("调拨记录已登记");
+    setLines((ls) => {
+      const idx = ls.findIndex((l) => l.code === item.id);
+      if (idx >= 0) {
+        const next = [...ls];
+        next[idx] = { ...next[idx], qty: next[idx].qty + Number(qty) };
+        return next;
+      }
+      return [...ls, { code: item.id, name: item.name, spec: item.spec, unit: item.unit, qty: Number(qty) }];
+    });
+    setItemId(""); setItemKw(""); setQty("");
+  };
+
+  const submit = () => {
+    if (lines.length === 0) return toast.error("请先添加至少一种药品");
+    const base = 143 + (data.length - initial.length);
+    const rows: TransferRow[] = lines.map((l, i) => ({
+      id: `TR-2026-${String(base + i).padStart(4, "0")}`,
+      code: l.code,
+      name: l.name,
+      spec: l.spec,
+      qty: l.qty,
+      unit: l.unit,
+      inboundAt,
+      operator: "超级管理员",
+      remark: remark || `${from} → ${to}`,
+    }));
+    setData((d) => [...rows.reverse(), ...d]);
+    toast.success(`已登记 ${rows.length} 条调拨记录`);
     reset();
     setOpen(false);
   };
+
 
   return (
     <>
