@@ -379,7 +379,8 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? [applyTimeScope(groupLeadCard), map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), applyTimeScope(groupTailCard), map.get("总药费支出")]
+              ? groupBizCards
+
               : scope === "region"
                 ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
                 : [map.get("总存栏数"), applyTimeScope(farmOutCalvingCard), map.get("早产率"), applyTimeScope(farmOutLeadCard), map.get("治愈率"), map.get("死淘总数")];
