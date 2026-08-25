@@ -156,6 +156,10 @@ const GROUP_OPTIONS: CattleGroup[] = ["泌乳牛", "青年牛", "干奶牛", "�
 
 const seed: Disease[] = KB_DISEASES.map((d, i) => {
   const type = TYPES.find((t) => t.name === d.type && t.categoryCode === d.cat);
+  const rxCodes = [
+    ...(d.rx ?? []),
+    ...PRESCRIPTION_SEED.filter((r) => r.diseaseCode === d.id).map((r) => r.code),
+  ].filter((c, idx, arr) => arr.indexOf(c) === idx);
   return {
     id: d.id.replace("DZ-", "D-"),
     code: d.id,
@@ -165,24 +169,18 @@ const seed: Disease[] = KB_DISEASES.map((d, i) => {
     alias: d.abbr,
     aliases: [],
     presentation: `${d.catName} · ${d.type}，常见症状 ${d.symptoms.length} 项，易感牛群：${d.groups.join("、") || "未标注"}。`,
-    treatable: true,
+    // 无关联处方 = 不治疗（走放弃治疗兜底）
+    treatable: rxCodes.length > 0,
     groups: (d.groups.length ? d.groups : ["泌乳牛"]) as CattleGroup[],
     status: d.status === "启用" ? "启用" : "停用",
     order: i + 1,
     symptoms: d.symptoms.map((code, idx) => ({ code, name: symptomName(code), core: idx < 3 })),
-    prescriptions: (() => {
-      const codes = [
-        ...(d.rx ?? []),
-        ...PRESCRIPTION_SEED.filter((r) => r.diseaseCode === d.id).map((r) => r.code),
-      ].filter((c, i, arr) => arr.indexOf(c) === i);
-      return codes.map((code, idx) => ({
-        code,
-        name: PRESCRIPTION_SEED.find((r) => r.code === code)?.name ?? code,
-        level: (idx === 0 ? "首选" : "备选") as PrescriptionRef["level"],
-        defaultRx: idx === 0,
-      }));
-    })(),
-
+    prescriptions: rxCodes.map((code, idx) => ({
+      code,
+      name: PRESCRIPTION_SEED.find((r) => r.code === code)?.name ?? code,
+      level: (idx === 0 ? "首选" : "备选") as PrescriptionRef["level"],
+      defaultRx: idx === 0,
+    })),
   } satisfies Disease;
 });
 
