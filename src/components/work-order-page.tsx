@@ -84,6 +84,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+import { CreateWorkOrderDialog, type CreateRxKind } from "@/components/create-work-order-dialog";
+
 const WORK_TYPES = ["疾病治疗", "产后护理", "修蹄工单", "普修工单", "干奶工单", "疫苗免疫", "驱虫工单"];
 
 export type ReviewConclusion = {
