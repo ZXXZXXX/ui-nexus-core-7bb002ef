@@ -359,7 +359,14 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
   const path = perHead.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="relative w-full">
+      <span className="pointer-events-none absolute left-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
+        万元
+      </span>
+      <span className="pointer-events-none absolute right-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
+        元/头
+      </span>
+      <div className="w-full overflow-x-auto">
       <div className="relative min-w-[720px]">
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
@@ -406,12 +413,6 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
           {perHead.map((v, i) => (
             <circle key={i} cx={cx(i)} cy={ly(v)} r={hover === i ? 5 : 3.5} fill="var(--effect-ai-purple)" />
           ))}
-          <text x={padL - 8} y={padT + 4} textAnchor="end" fontSize="11" fill="var(--text-tertiary)">
-            万元
-          </text>
-          <text x={W - padR + 8} y={padT + 4} fontSize="11" fill="var(--text-tertiary)">
-            元/头
-          </text>
         </svg>
         {hover !== null && (
           <div
@@ -434,6 +435,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
