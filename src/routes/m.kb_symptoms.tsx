@@ -32,7 +32,7 @@ const SYMPTOMS: Symptom[] = KB_SYMPTOMS.map((s) => ({
 function urgencyTone(u: string) {
   if (u === "高") return "bg-[var(--state-danger)]/12 text-[var(--state-danger)]";
   if (u === "中") return "bg-[var(--state-warning)]/20 text-[var(--state-alert)]";
-  return "bg-surface-subtle text-text-secondary";
+  return "bg-[var(--state-info)]/12 text-[var(--state-info)]";
 }
 
 function SymptomKBMobile() {
