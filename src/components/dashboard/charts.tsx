@@ -260,6 +260,7 @@ export function LineTrend({
   unit = "",
   activeIndex,
   onPointClick,
+  formatValue,
 }: {
   labels: string[];
   series: Series[];
@@ -267,7 +268,9 @@ export function LineTrend({
   unit?: string;
   activeIndex?: number;
   onPointClick?: (index: number) => void;
+  formatValue?: (value: number, series: Series, index: number) => string;
 }) {
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const w = 640;
   const h = height;
   const padL = 42;
@@ -278,8 +281,10 @@ export function LineTrend({
   const nice = maxV <= 5 ? Math.max(Math.ceil(maxV * 1.2 * 10) / 10, 0.5) : Math.ceil(maxV / 5) * 5;
   const x = (i: number) => padL + (i * (w - padL - padR)) / Math.max(labels.length - 1, 1);
   const y = (v: number) => padT + (1 - v / nice) * (h - padT - padB);
+  const fmt = (v: number, s: Series, i: number) =>
+    formatValue ? formatValue(v, s, i) : `${Number.isInteger(v) ? v : v.toFixed(1)}${unit}`;
   return (
-    <div className="w-full overflow-hidden">
+    <div className="w-full relative" onMouseLeave={() => setHoverIndex(null)}>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }}>
         <defs>
           <linearGradient id="trend-active-col" x1="0" y1="0" x2="0" y2="1">
