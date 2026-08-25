@@ -278,12 +278,20 @@ function inRange(s: string, range: DateRange): boolean {
 
 export function WorkOrderPage({
   title,
-  orders,
+  orders: baseOrders,
+  createKind,
+  createPrefix,
 }: {
   title: string;
   orders: WorkOrder[];
+  /** 支持新建工单时传入对应处方类型 */
+  createKind?: CreateRxKind;
+  createPrefix?: string;
 }) {
   const role = usePcRole();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createdOrders, setCreatedOrders] = useState<WorkOrder[]>([]);
+  const orders = useMemo(() => [...createdOrders, ...baseOrders], [createdOrders, baseOrders]);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const [active, setActive] = useState<StatusKey>("待诊断");
