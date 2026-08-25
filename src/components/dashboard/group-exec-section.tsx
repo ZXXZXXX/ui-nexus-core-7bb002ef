@@ -343,6 +343,7 @@ function DrugComboChart({
   barColor = "var(--brand)",
   lineColor = "var(--effect-ai-purple)",
   extraRows,
+  barHeadroom = 1.15,
 }: {
   months: string[];
   totalFee: number[];
@@ -354,6 +355,7 @@ function DrugComboChart({
   barColor?: string;
   lineColor?: string;
   extraRows?: (i: number) => { label: string; value: string }[];
+  barHeadroom?: number;
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const W = 640;
@@ -364,7 +366,7 @@ function DrugComboChart({
   const padB = 30;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
-  const maxBar = Math.max(...totalFee) * 1.15;
+  const maxBar = Math.max(...totalFee) * barHeadroom;
   const lineCap = lineUnit === "%" ? 100 : Infinity;
   const maxLine = Math.min(Math.max(...perHead) * 1.25, lineCap);
   const minLine = Math.min(...perHead) * 0.7;
@@ -758,6 +760,7 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
         lineUnit="%"
         barLabel="发病数"
         lineLabel="治愈率"
+        barHeadroom={1}
         barColor="var(--state-warning)"
         lineColor="var(--brand)"
         extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
