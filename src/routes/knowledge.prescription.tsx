@@ -1589,7 +1589,14 @@ function VariableDoseTable({
   const add = () => onChange([...value, { option: "", dose: "" }]);
 
   const placeholder =
-    varKind === "weight" ? "如 400-600kg" : varKind === "quarter" ? "如 1-2 个" : "选项";
+    varKind === "quarter" ? "如 1-2 个" : "选项";
+
+  const parseWeight = (s: string) => {
+    const m = String(s || "").match(/(\d+(?:\.\d+)?)?\s*-\s*(\d+(?:\.\d+)?)?/);
+    return { min: m?.[1] ?? "", max: m?.[2] ?? "" };
+  };
+  const buildWeight = (min: string, max: string) =>
+    min || max ? `${min}-${max}kg` : "";
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -1599,12 +1606,43 @@ function VariableDoseTable({
           className="group flex items-center gap-2"
         >
 
-          <Input
-            value={row.option}
-            onChange={(e) => update(i, { option: e.target.value })}
-            placeholder={placeholder}
-            className="h-9 w-28 text-body-sm"
-          />
+          {varKind === "weight" ? (
+            (() => {
+              const { min, max } = parseWeight(row.option);
+              return (
+                <div className="flex items-center gap-1">
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    value={min}
+                    onChange={(e) => update(i, { option: buildWeight(e.target.value, max) })}
+                    placeholder="最小"
+                    className="h-9 w-20 text-body-sm"
+                  />
+                  <span className="text-body-sm text-text-tertiary">-</span>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    value={max}
+                    onChange={(e) => update(i, { option: buildWeight(min, e.target.value) })}
+                    placeholder="最大"
+                    className="h-9 w-20 text-body-sm"
+                  />
+                  <span className="h-9 inline-flex items-center px-2 rounded-md bg-[var(--fill-tertiary,transparent)] text-body-sm text-text-tertiary border border-border">
+                    kg
+                  </span>
+                </div>
+              );
+            })()
+          ) : (
+            <Input
+              value={row.option}
+              onChange={(e) => update(i, { option: e.target.value })}
+              placeholder={placeholder}
+              className="h-9 w-28 text-body-sm"
+            />
+          )}
+
           <span className="text-body-sm text-text-tertiary">→</span>
           <DoseInput
             spec={drugSpec}
