@@ -321,7 +321,7 @@ function PostpartumRankSection({ scopeRegion, scopeFarm }: { scopeRegion?: strin
       ) : (
         <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
       )}
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
         {BUCKETS.map((b) => (
           <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
             <span className="h-2.5 w-2.5 rounded-sm" style={{ background: b.color }} />
@@ -473,7 +473,7 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} />
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
           总药费支出
@@ -495,7 +495,7 @@ function StackedColumns({
   labels,
   series,
   unit = "",
-  height = 260,
+  height = 240,
   decimals = 1,
 }: {
   labels: string[];
@@ -505,18 +505,18 @@ function StackedColumns({
   decimals?: number;
 }) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 900;
+  const W = 640;
   const H = height;
-  const padL = 52;
-  const padR = 20;
-  const padT = 16;
-  const padB = 32;
+  const padL = 42;
+  const padR = 28;
+  const padT = 12;
+  const padB = 30;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
   const totals = labels.map((_, i) => series.reduce((s, se) => s + (se.points[i] ?? 0), 0));
   const max = Math.max(...totals, 1) * 1.15;
   const step = iw / labels.length;
-  const bw = Math.min(34, step * 0.52);
+  const bw = Math.min(40, step * 0.5);
   const cx = (i: number) => padL + step * i + step / 2;
   const fmt = (v: number) => v.toFixed(decimals);
 
@@ -527,7 +527,7 @@ function StackedColumns({
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <g key={t}>
               <line x1={padL} x2={W - padR} y1={padT + ih * t} y2={padT + ih * t} stroke="var(--border)" strokeWidth="1" />
-              <text x={padL - 8} y={padT + ih * t + 4} textAnchor="end" fontSize="11" fill="var(--text-tertiary)">
+              <text x={padL - 8} y={padT + ih * t + 5} textAnchor="end" fontSize="13" fill="var(--text-tertiary)">
                 {fmt(max * (1 - t))}
               </text>
             </g>
@@ -563,7 +563,7 @@ function StackedColumns({
                   onMouseEnter={() => setHover(i)}
                   onMouseLeave={() => setHover(null)}
                 />
-                <text x={cx(i)} y={H - 10} textAnchor="middle" fontSize="11" fill="var(--text-tertiary)">
+                <text x={cx(i)} y={H - 8} textAnchor="middle" fontSize="13" fill="var(--text-tertiary)">
                   {m}
                 </text>
               </g>
@@ -579,7 +579,7 @@ function StackedColumns({
           >
             <div className="text-caption text-text-tertiary mb-1">{labels[hover]}</div>
             {series.map((se) => (
-              <div key={se.name} className="flex items-center gap-2 text-caption text-text-secondary">
+              <div key={se.name} className="flex items-center gap-2 text-body-sm text-text-secondary">
                 <span className="h-2 w-2 rounded-sm" style={{ background: se.color }} />
                 <span className="tabular-nums">
                   {se.name} {fmt(se.points[hover] ?? 0)}
@@ -600,11 +600,11 @@ function StackedColumns({
 
 function ChartLegend({ items }: { items: { name: string; color: string; line?: boolean }[] }) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
       {items.map((it) => (
-        <span key={it.name} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+        <span key={it.name} className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span
-            className={it.line ? "h-0.5 w-4 rounded-full" : "h-2.5 w-2.5 rounded-sm"}
+            className={it.line ? "h-1.5 w-4 rounded-full" : "h-1.5 w-4 rounded-full"}
             style={{ background: it.color }}
           />
           {it.name}
