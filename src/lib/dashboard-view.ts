@@ -41,7 +41,7 @@ function base(overrides: Partial<TopicVisibility> = {}): TopicVisibility {
 
 export const defaultConfig: Record<ReportScope, TopicVisibility> = {
   "farm-in": base({ ops: false, culling: false }),
-  "farm-out": base({ drug: false, workorder: false, alert: false, ops: true }),
+  "farm-out": base({ herd: false, drug: false, workorder: false, alert: false, ops: true }),
   region: base(),
   group: base(),
 };
