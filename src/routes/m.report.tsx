@@ -185,6 +185,11 @@ const KB_SYMPTOM_NAMES: string[] = Array.from(
   new Set(KB_SYMPTOMS.filter((s) => s.status === "启用").map((s) => s.name))
 );
 // 修蹄工单症状池：肢蹄病类疾病涉及的症状
+// 症状名称 -> 描述词，用于搜索时的粗略匹配
+const KB_SYMPTOM_DESC = new Map(
+  KB_SYMPTOMS.map((s) => [s.name, [s.name, s.desc, s.id].filter(Boolean).join(" ")])
+);
+const symptomMatchText = (t: string) => KB_SYMPTOM_DESC.get(t);
 const KB_HOOF_SYMPTOMS: string[] = Array.from(
   new Set(
     KB_DISEASES.filter((d) => d.cat === "DL-06").flatMap((d) => diseaseSymptomNames(d))
@@ -1145,6 +1150,9 @@ function ReportPage() {
                         setSymptoms(next);
                       }}
                       presets={cfg.tags.presets}
+                      disableCreate
+                      matchText={symptomMatchText}
+                      placeholder="输入症状名称或描述词搜索"
                     />
                   </Section>
                 )}
