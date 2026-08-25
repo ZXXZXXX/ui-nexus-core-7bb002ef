@@ -900,6 +900,7 @@ function StatsPage() {
         section: activeSection,
         name: saveName.trim(),
         category: builderCat ?? inferCategory(saveSource),
+        dimensions: CATEGORY_DIMENSIONS[builderCat ?? inferCategory(saveSource)],
         desc: saveDesc.trim() || describeFilters(saveSource),
         icon: BarChart3,
         tone: "var(--brand)",
@@ -1028,13 +1029,8 @@ function StatsPage() {
   );
 
   const cat = builderCat ?? "cattle";
-  const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug" | "cattle") => {
-    if (cat === "cattle") return d === "cattle";
-    if (cat === "disease") return d === "disease";
-    if (cat === "drug") return d === "drug";
-    // 人员分析：牧场 + 人员
-    return d === "staff" || d === "farm";
-  };
+  const builderDims = editingTemplate?.dimensions ?? CATEGORY_DIMENSIONS[cat];
+  const showDim = (d: DimensionKey) => builderDims.includes(d);
 
   const builderDrawer = (
     <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -1845,15 +1841,20 @@ function StatsPage() {
                       {t.formula ?? describeFilters(t.filters)}
                     </TableCell>
                     <TableCell>
-                      <span
-                        className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
-                        style={{
-                          background: `color-mix(in oklab, ${TPL_CATEGORY_TONE[t.category]} 12%, transparent)`,
-                          color: TPL_CATEGORY_TONE[t.category],
-                        }}
-                      >
-                        {TPL_CATEGORY_LABEL[t.category]}
-                      </span>
+                      <div className="flex flex-wrap gap-1.5 min-w-[180px]">
+                        {(t.dimensions ?? CATEGORY_DIMENSIONS[t.category]).map((dim) => (
+                          <span
+                            key={dim}
+                            className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
+                            style={{
+                              background: `color-mix(in oklab, ${DIMENSION_TONE[dim]} 12%, transparent)`,
+                              color: DIMENSION_TONE[dim],
+                            }}
+                          >
+                            {DIMENSION_LABEL[dim]}
+                          </span>
+                        ))}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right tabular-nums text-body-sm">
                       {countActive(t.filters)}
