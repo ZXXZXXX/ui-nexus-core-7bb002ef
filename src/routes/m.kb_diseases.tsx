@@ -178,6 +178,16 @@ function DiseaseDetailSheet({ item, onClose }: { item: Disease; onClose: () => v
           <span className="text-caption text-text-tertiary">近 7 天 {item.recent7d} 头</span>
         </div>
 
+        <Section label="易感牛群">
+          <div className="flex flex-wrap gap-1.5">
+            {(item.groups.length ? item.groups : ["未标注"]).map((g) => (
+              <span key={g} className="text-body-sm px-2 py-1 rounded-md bg-surface-subtle text-text-secondary">
+                {g}
+              </span>
+            ))}
+          </div>
+        </Section>
+
         <Section label="典型表现">
           <p className="text-body-sm text-text-secondary leading-relaxed">{item.desc}</p>
         </Section>
