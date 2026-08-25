@@ -703,9 +703,19 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
       {value.treatable ? (
         <SectionCard title="适用处方" icon={<Pill className="h-4 w-4 text-primary" />}>
           <div className="space-y-2">
+            <RxSearchSelect
+              selected={value.prescriptions}
+              onAdd={(rx) =>
+                onChange({
+                  ...value,
+                  prescriptions: [...value.prescriptions, { code: rx.code, name: rx.name, level: "备选" }],
+                })
+              }
+            />
             {value.prescriptions.length === 0 && (
               <div className="text-body-sm text-text-tertiary py-2">暂未配置处方</div>
             )}
+
             {value.prescriptions.map((p, idx) => (
               <div key={p.code + idx} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
                 <span className="font-mono text-body-sm text-text-secondary w-24 shrink-0">{p.code}</span>
