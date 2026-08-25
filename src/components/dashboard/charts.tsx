@@ -261,6 +261,7 @@ export function LineTrend({
   activeIndex,
   onPointClick,
   formatValue,
+  extraRows,
 }: {
   labels: string[];
   series: Series[];
@@ -269,6 +270,7 @@ export function LineTrend({
   activeIndex?: number;
   onPointClick?: (index: number) => void;
   formatValue?: (value: number, series: Series, index: number) => string;
+  extraRows?: (index: number) => { label: string; value: string }[];
 }) {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const w = 640;
@@ -424,6 +426,15 @@ export function LineTrend({
                 <span className="text-body-sm text-foreground tabular-nums ml-auto">
                   {fmt(s.points[hoverIndex] ?? 0, s, hoverIndex)}
                 </span>
+              </div>
+            ))}
+            {extraRows?.(hoverIndex).map((r) => (
+              <div
+                key={r.label}
+                className="flex items-center gap-2 whitespace-nowrap border-t border-border pt-1 mt-1"
+              >
+                <span className="text-body-sm text-text-secondary">{r.label}</span>
+                <span className="text-body-sm text-foreground tabular-nums ml-auto">{r.value}</span>
               </div>
             ))}
           </div>

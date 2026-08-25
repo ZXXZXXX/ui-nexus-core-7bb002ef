@@ -720,28 +720,18 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div>
-          <div className="text-body-sm text-text-secondary mb-2">发病率 / 治愈率（%）</div>
-          <LineTrend
-            labels={labels}
-            unit="%"
-            height={220}
-            series={[
-              { name: "发病率", color: "var(--state-warning)", points: sickRate },
-              { name: "治愈率", color: "var(--brand)", points: cureRate, dashed: true },
-            ]}
-          />
-        </div>
-        <div>
-          <div className="text-body-sm text-text-secondary mb-2">平均诊疗天数（天）</div>
-          <LineTrend
-            labels={labels}
-            unit=" 天"
-            height={220}
-            series={[{ name: "平均诊疗天数", color: "var(--effect-ai-cyan)", points: days }]}
-          />
-        </div>
+      <div>
+        <div className="text-body-sm text-text-secondary mb-2">发病率 / 治愈率（%）</div>
+        <LineTrend
+          labels={labels}
+          unit="%"
+          height={240}
+          series={[
+            { name: "发病率", color: "var(--state-warning)", points: sickRate },
+            { name: "治愈率", color: "var(--brand)", points: cureRate, dashed: true },
+          ]}
+          extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
+        />
       </div>
     </SectionCard>
   );
