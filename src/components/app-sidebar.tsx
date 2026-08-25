@@ -71,7 +71,7 @@ const groups: NavGroup[] = [
     children: [
       { title: "药品档案", url: "/warehouse/drug" },
       { title: "药品库存", url: "/warehouse" },
-      { title: "调拨转库", url: "/warehouse/transfer" },
+      { title: "调拨记录", url: "/warehouse/transfer" },
       { title: "取药记录", url: "/warehouse/dispense" },
       { title: "损耗管理", url: "/warehouse/loss" },
     ],
