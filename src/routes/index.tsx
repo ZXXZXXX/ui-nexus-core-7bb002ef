@@ -671,8 +671,15 @@ function HomePage() {
                 )}
               </div>
             </div>
+            )}
 
-            {!showAttendance && <CattleTypeDonut />}
+            {!showAttendance &&
+              (scope === "farm-out" ? (
+                <SemiArcStat title="牛只类型分布" data={FARM_TYPE_DIST} centerLabel="存栏总数" />
+              ) : (
+                <CattleTypeDonut />
+              ))}
+
 
 
             {showAttendance && (
