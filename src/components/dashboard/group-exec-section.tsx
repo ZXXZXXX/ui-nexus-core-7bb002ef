@@ -353,7 +353,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
   const maxLine = Math.max(...perHead) * 1.25;
   const minLine = Math.min(...perHead) * 0.7;
   const step = iw / months.length;
-  const bw = Math.min(30, step * 0.5);
+  const bw = Math.min(34, step * 0.34);
   const cx = (i: number) => padL + step * i + step / 2;
   const ly = (v: number) => padT + ih - ((v - minLine) / (maxLine - minLine)) * ih;
   const path = perHead.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
@@ -367,7 +367,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
         元/头
       </span>
       <div className="w-full overflow-x-auto">
-      <div className="relative min-w-[720px]">
+      <div className="relative" style={{ minWidth: months.length > 6 ? 720 : undefined }}>
         <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <line
