@@ -229,10 +229,10 @@ function SymptomKBPage() {
                 <Input value={editing.urgency} onChange={(e) => setEditing({ ...editing, urgency: e.target.value })} />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-body-sm text-text-secondary">关联疾病（顿号分隔）</Label>
-                <Input
-                  value={editing.related.join("、")}
-                  onChange={(e) => setEditing({ ...editing, related: e.target.value.split(/[、,，]/).map((t) => t.trim()).filter(Boolean) })}
+                <Label className="text-body-sm text-text-secondary">关联疾病</Label>
+                <DiseaseMultiSelect
+                  value={editing.related}
+                  onChange={(related) => setEditing({ ...editing, related })}
                 />
               </div>
             </div>
