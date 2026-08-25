@@ -697,7 +697,7 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <p className="text-body-sm text-text-secondary mb-4">按月统计死亡率（实线）与淘汰率（虚线），口径为当月死淘头数 / 存栏</p>
+      <p className="text-body-sm text-text-secondary mb-4">{"\n"}</p>
       <LineTrend
         labels={labels}
         unit="%"
