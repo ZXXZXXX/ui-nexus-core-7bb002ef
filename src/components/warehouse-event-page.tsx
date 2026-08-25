@@ -27,7 +27,7 @@ import {
 import {
   Plus,
   Search,
-  Settings2,
+  SlidersHorizontal,
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
@@ -382,11 +382,13 @@ export function WarehouseEventPage<S extends string>({
               </div>
               <Button
                 variant="outline"
-                size="sm"
-                className="h-9 gap-1.5 text-body-sm font-normal"
+                size="icon"
+                title="筛选与列设置"
+                aria-label="筛选与列设置"
+                className="h-9 w-9 shrink-0"
                 onClick={() => setAdvOpen((v) => !v)}
               >
-                <Settings2 className="h-3.5 w-3.5" /> 筛选与列设置
+                <SlidersHorizontal className="h-4 w-4" />
               </Button>
             </div>
           </div>

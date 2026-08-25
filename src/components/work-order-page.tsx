@@ -54,7 +54,7 @@ import {
   Filter,
   Check,
   X,
-  Settings2,
+  SlidersHorizontal,
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
@@ -737,7 +737,7 @@ export function WorkOrderPage({
                 className="h-9 w-9 shrink-0"
                 onClick={() => setAdvOpen((v) => !v)}
               >
-                <Settings2 className="h-4 w-4" />
+                <SlidersHorizontal className="h-4 w-4" />
               </Button>
 
 
