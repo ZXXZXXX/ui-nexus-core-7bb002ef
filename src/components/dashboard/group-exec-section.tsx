@@ -548,6 +548,7 @@ function StackedColumns({
                       y={accTop}
                       width={bw}
                       height={Math.max(h, 0)}
+                      rx={4}
                       fill={se.color}
                       opacity={active ? 0.92 : 0.32}
                     />
