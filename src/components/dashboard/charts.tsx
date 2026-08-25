@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useId, type ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 
 export const PALETTE = [
@@ -596,6 +596,7 @@ export function SmoothAreaTrend({
   unit = "",
   height = 240,
   decimals = 2,
+  name = "趋势",
   formatValue,
 }: {
   labels: string[];
@@ -604,6 +605,7 @@ export function SmoothAreaTrend({
   unit?: string;
   height?: number;
   decimals?: number;
+  name?: string;
   formatValue?: (v: number, i: number) => string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
@@ -716,7 +718,7 @@ export function SmoothAreaTrend({
       <div className="mt-2 flex flex-wrap items-center gap-4">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-1.5 w-4 rounded-full" style={{ background: color }} />
-          早产率{unit && <span className="text-text-tertiary">（{unit}）</span>}
+          {name}{unit && <span className="text-text-tertiary">（{unit}）</span>}
         </span>
       </div>
     </div>
