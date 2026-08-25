@@ -1060,9 +1060,11 @@ export function GroupExecSection({
   return (
     <div className="space-y-6">
       {showCharts && (scopeFarm ? (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch [&>*]:h-full">
-          <HerdSection />
-          <PostpartumRankSection scopeFarm={scopeFarm} />
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+          <DeathCullTrendSection scopeRegion={scopeRegion} />
+          <PostpartumTrendSection scopeRegion={scopeRegion} />
+          <TreatmentDaysTrendSection scopeRegion={scopeRegion} />
+          <PrematureRateTrendSection scopeRegion={scopeRegion} />
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
@@ -1075,6 +1077,7 @@ export function GroupExecSection({
           </div>
         </div>
       ))}
+
       {showCharts && scopeRegion && !scopeFarm ? (
         <WorkOrderSection farms={GROUP_FARMS.filter((f) => f.region === scopeRegion).map((f) => f.farm)} />
       ) : null}
