@@ -62,56 +62,59 @@ function RxSearchSelect({
   selected: PrescriptionRef[];
   onAdd: (rx: { code: string; name: string }) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const options = useMemo(
-    () =>
-      PRESCRIPTION_SEED.filter((r) => r.enabled !== false).map((r) => ({
-        code: r.code,
-        name: r.name,
-        category: r.category,
-      })),
-    [],
-  );
+  const [kw, setKw] = useState("");
   const picked = new Set(selected.map((s) => s.code));
+  const results = useMemo(() => {
+    const q = kw.trim().toLowerCase();
+    if (!q) return [];
+    return PRESCRIPTION_SEED.filter((r) => r.enabled !== false)
+      .filter((r) =>
+        `${r.name} ${r.code} ${r.category}`.toLowerCase().includes(q),
+      )
+      .slice(0, 20);
+  }, [kw]);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" role="combobox" className="h-8 gap-1.5 text-body-sm font-normal">
-          <Plus className="h-3.5 w-3.5" /> 搜索并关联处方
-          <ChevronsUpDown className="h-3.5 w-3.5 text-text-tertiary" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="p-0 w-[420px]">
-        <Command filter={(v, s) => (v.toLowerCase().includes(s.toLowerCase()) ? 1 : 0)}>
-          <CommandInput placeholder="输入处方名称 / 编号 / 分类搜索" />
-          <CommandList className="max-h-72">
-            <CommandEmpty>未找到匹配的处方</CommandEmpty>
-            <CommandGroup>
-              {options.map((o) => (
-                <CommandItem
-                  key={o.code}
-                  value={`${o.name} ${o.code} ${o.category}`}
-                  onSelect={() => {
-                    if (!picked.has(o.code)) onAdd({ code: o.code, name: o.name });
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={`mr-2 h-3.5 w-3.5 ${picked.has(o.code) ? "opacity-100 text-primary" : "opacity-0"}`}
-                  />
-                  <span className="flex-1 truncate">{o.name}</span>
-                  <span className="text-caption text-text-tertiary ml-2 truncate max-w-[96px]">{o.category}</span>
-                  <span className="text-caption text-text-tertiary font-mono ml-2">{o.code}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <div className="space-y-2">
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
+        <Input
+          value={kw}
+          onChange={(e) => setKw(e.target.value)}
+          placeholder="搜索处方名称 / 编号 / 分类，点击添加"
+          className="h-8 pl-8 text-body-sm"
+        />
+      </div>
+      {kw.trim() && (
+        <div className="rounded-md border border-border divide-y divide-border max-h-56 overflow-auto">
+          {results.length === 0 && (
+            <div className="px-3 py-2 text-body-sm text-text-tertiary">未找到匹配的处方</div>
+          )}
+          {results.map((o) => (
+            <div key={o.code} className="flex items-center gap-2 px-3 py-2">
+              <span className="font-mono text-caption text-text-tertiary w-24 shrink-0">{o.code}</span>
+              <span className="flex-1 min-w-0 truncate text-body-sm text-foreground">{o.name}</span>
+              <span className="text-caption text-text-tertiary truncate max-w-[96px]">{o.category}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2 text-body-sm shrink-0"
+                disabled={picked.has(o.code)}
+                onClick={() => {
+                  onAdd({ code: o.code, name: o.name });
+                  setKw("");
+                }}
+              >
+                {picked.has(o.code) ? "已添加" : "添加"}
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
+
 
 
 export const Route = createFileRoute("/knowledge/disease")({
