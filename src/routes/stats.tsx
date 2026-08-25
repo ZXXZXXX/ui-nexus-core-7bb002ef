@@ -392,6 +392,7 @@ const DEFAULT_FILTERS: Filters = {
 
 // ============ Templates ============
 type TplCategory = "cattle" | "disease" | "drug" | "staff";
+type DimensionKey = "farm" | "cattle" | "disease" | "prescription" | "order" | "calving" | "drug" | "staff";
 
 const TPL_CATEGORY_LABEL: Record<TplCategory, string> = {
   cattle: "牛只",
@@ -405,6 +406,62 @@ const TPL_CATEGORY_TONE: Record<TplCategory, string> = {
   disease: "var(--effect-ai-purple)",
   drug: "var(--state-success)",
   staff: "var(--effect-ai-cyan)",
+};
+
+const DIMENSION_LABEL: Record<DimensionKey, string> = {
+  farm: "牧场",
+  cattle: "牛只",
+  disease: "疾病",
+  prescription: "处方",
+  order: "工单",
+  calving: "产犊",
+  drug: "药品",
+  staff: "人员",
+};
+
+const DIMENSION_TONE: Record<DimensionKey, string> = {
+  farm: "var(--effect-ai-purple)",
+  cattle: "var(--brand)",
+  disease: "var(--state-danger)",
+  prescription: "var(--effect-ai-purple)",
+  order: "var(--state-warning)",
+  calving: "var(--effect-ai-purple)",
+  drug: "var(--state-success)",
+  staff: "var(--effect-ai-cyan)",
+};
+
+const CATEGORY_DIMENSIONS: Record<TplCategory, DimensionKey[]> = {
+  cattle: ["farm", "cattle", "calving", "order"],
+  disease: ["farm", "cattle", "disease", "prescription", "order", "drug"],
+  drug: ["farm", "drug", "prescription", "disease", "order"],
+  staff: ["farm", "staff", "disease", "calving", "order"],
+};
+
+const SECTION_CATEGORY: Record<string, TplCategory> = {
+  culling: "cattle",
+  calving: "cattle",
+  udder: "disease",
+  disease: "disease",
+  postpartum: "disease",
+  immune: "cattle",
+};
+
+const SECTION_DIMENSIONS: Record<string, DimensionKey[]> = {
+  culling: ["farm", "cattle"],
+  calving: ["farm", "calving", "cattle"],
+  udder: ["farm", "disease", "cattle"],
+  disease: ["farm", "disease", "cattle"],
+  postpartum: ["farm", "disease", "calving", "cattle"],
+  immune: ["farm", "order", "cattle"],
+};
+
+const SECTION_FILTER_PRESET: Record<string, Partial<Filters>> = {
+  culling: { cowStatuses: ["死淘"] },
+  calving: {},
+  udder: { diseaseCat: "乳房疾病" },
+  disease: { woTypes: ["disease"] },
+  postpartum: { woTypes: ["postpartum"] },
+  immune: { woTypes: ["vaccine"] },
 };
 
 const CATEGORY_CARDS: {
@@ -461,6 +518,7 @@ type Template = {
   creator: string;
   createdAt: string;
   section?: string;
+  dimensions?: DimensionKey[];
   formula?: string;
   metricNo?: number;
 };
@@ -575,19 +633,16 @@ const DEFAULT_TEMPLATES: Template[] = [
 const METRIC_TEMPLATES: Template[] = METRIC_SECTIONS.flatMap((sec) =>
   sec.metrics.map((m) => ({
     id: `m-${m.no}`,
-    category: (sec.key === "calving"
-      ? "cattle"
-      : sec.key === "immune"
-        ? "drug"
-        : "disease") as TplCategory,
+    category: SECTION_CATEGORY[sec.key] ?? "cattle",
     name: m.name,
     desc: m.formula,
     formula: m.formula,
     metricNo: m.no,
     section: sec.key,
+    dimensions: SECTION_DIMENSIONS[sec.key] ?? CATEGORY_DIMENSIONS[SECTION_CATEGORY[sec.key] ?? "cattle"],
     icon: BarChart3,
     tone: sec.tone,
-    filters: { ...DEFAULT_FILTERS, dateRange: "30d" },
+    filters: { ...DEFAULT_FILTERS, dateRange: "30d", ...(SECTION_FILTER_PRESET[sec.key] ?? {}) },
     usage: 20 + ((m.no * 37) % 180),
     creator: "系统预置",
     createdAt: "2026-07-01 09:00",
@@ -845,6 +900,7 @@ function StatsPage() {
         section: activeSection,
         name: saveName.trim(),
         category: builderCat ?? inferCategory(saveSource),
+        dimensions: CATEGORY_DIMENSIONS[builderCat ?? inferCategory(saveSource)],
         desc: saveDesc.trim() || describeFilters(saveSource),
         icon: BarChart3,
         tone: "var(--brand)",
@@ -973,13 +1029,8 @@ function StatsPage() {
   );
 
   const cat = builderCat ?? "cattle";
-  const showDim = (d: "farm" | "staff" | "disease" | "prescription" | "order" | "calving" | "drug" | "cattle") => {
-    if (cat === "cattle") return d === "cattle";
-    if (cat === "disease") return d === "disease";
-    if (cat === "drug") return d === "drug";
-    // 人员分析：牧场 + 人员
-    return d === "staff" || d === "farm";
-  };
+  const builderDims = editingTemplate?.dimensions ?? CATEGORY_DIMENSIONS[cat];
+  const showDim = (d: DimensionKey) => builderDims.includes(d);
 
   const builderDrawer = (
     <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
@@ -1790,15 +1841,20 @@ function StatsPage() {
                       {t.formula ?? describeFilters(t.filters)}
                     </TableCell>
                     <TableCell>
-                      <span
-                        className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
-                        style={{
-                          background: `color-mix(in oklab, ${TPL_CATEGORY_TONE[t.category]} 12%, transparent)`,
-                          color: TPL_CATEGORY_TONE[t.category],
-                        }}
-                      >
-                        {TPL_CATEGORY_LABEL[t.category]}
-                      </span>
+                      <div className="flex flex-wrap gap-1.5 min-w-[180px]">
+                        {(t.dimensions ?? CATEGORY_DIMENSIONS[t.category]).map((dim) => (
+                          <span
+                            key={dim}
+                            className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
+                            style={{
+                              background: `color-mix(in oklab, ${DIMENSION_TONE[dim]} 12%, transparent)`,
+                              color: DIMENSION_TONE[dim],
+                            }}
+                          >
+                            {DIMENSION_LABEL[dim]}
+                          </span>
+                        ))}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right tabular-nums text-body-sm">
                       {countActive(t.filters)}
