@@ -29,6 +29,7 @@ import {
   type RelatedOrder,
 } from "@/components/related-order-picker";
 import { DiseasePicker } from "@/components/disease-picker";
+import { KB_DISEASES, diseaseSymptomNames, KB_SYMPTOMS } from "@/lib/disease-kb";
 import { useRole } from "@/lib/mobile-role";
 import { toast } from "sonner";
 
@@ -178,17 +179,25 @@ type WorkTypeConfig = {
   allowDisease: boolean;
 };
 
+// ===== 标准知识库（《症状标准数据》《疾病标准数据》）联动 =====
+// 症状池：标准症状库（启用状态），去重后按编码顺序
+const KB_SYMPTOM_NAMES: string[] = Array.from(
+  new Set(KB_SYMPTOMS.filter((s) => s.status === "启用").map((s) => s.name))
+);
+// 修蹄工单症状池：肢蹄病类疾病涉及的症状
+const KB_HOOF_SYMPTOMS: string[] = Array.from(
+  new Set(
+    KB_DISEASES.filter((d) => d.cat === "DL-06").flatMap((d) => diseaseSymptomNames(d))
+  )
+);
+
 const workTypeConfig: Record<WorkType, WorkTypeConfig> = {
   疾病治疗: {
     tags: {
       label: "症状标签",
       required: true,
       // 仅为临床观察到的体征（症状），不含诊断结论
-      presets: [
-        "体温升高", "采食下降", "反刍减少", "精神沉郁", "卧地不起",
-        "阴道分泌物恶臭", "分泌物含脓", "恶露异常", "外阴红肿",
-        "乳房红肿", "乳汁异常", "跛行", "腹泻", "鼻液增多", "咳嗽", "外伤出血",
-      ],
+      presets: KB_SYMPTOM_NAMES,
     },
     allowDisease: true,
   },
@@ -197,10 +206,7 @@ const workTypeConfig: Record<WorkType, WorkTypeConfig> = {
       label: "症状标签",
       required: true,
       // 仅处理牛蹄变形/过长需要修蹄的情况；蹄病治疗走「疾病治疗」工单
-      presets: [
-        "蹄过长", "蹄形不正", "蹄壁裂纹", "副蹄过长",
-        "行走姿势异常", "步态不稳", "频繁抬蹄", "轻度跛行",
-      ],
+      presets: KB_HOOF_SYMPTOMS,
     },
     allowDisease: true,
   },
@@ -292,7 +298,7 @@ const C = (name: string, type: string, record: string): PlanCareItem => ({
 });
 
 // 疾病治疗（子宫炎类）
-const diseaseKB_disease: DiseaseEntry[] = [
+const diseaseKB_local: DiseaseEntry[] = [
   {
     name: "产道创伤",
     symptoms: ["阴道黏膜层撕裂", "助产 3 分及以上", "外伤出血"],
@@ -341,6 +347,32 @@ const diseaseKB_disease: DiseaseEntry[] = [
   },
 ];
 
+
+// 疾病治疗知识库 = 标准疾病库（含标准症状映射）+ 已有标准处方
+// 未维护标准处方的疾病，给出默认「对症治疗」处方，由兽医现场补充
+const localPlanByName = new Map(diseaseKB_local.map((d) => [d.name, d.plans]));
+const defaultPlans = (name: string): DiseasePlan[] => [
+  {
+    id: "p0",
+    rx: "处方 1 · 对症治疗",
+    desc: `暂未维护「${name}」的标准处方，请由兽医按现场情况开具用药并记录。`,
+    items: [
+      C("症状复核", "检查", "图片视频"),
+      C("对症处置", "护理", "文字记录"),
+    ],
+    duration: "3 天",
+  },
+];
+
+const diseaseKB_disease: DiseaseEntry[] = KB_DISEASES.filter(
+  (d) => d.status === "启用" && d.cat !== "DL-06"
+).map((d) => ({
+  name: d.name,
+  symptoms: diseaseSymptomNames(d),
+  plans: localPlanByName.get(d.name) ?? defaultPlans(d.name),
+}));
+
+// 修蹄：标准肢蹄病 + 原「修蹄处理」五步法
 // 修蹄工单：只覆盖「牛蹄变形需修蹄」的场景（蹄病治疗走「疾病治疗」工单）
 // 结论固定为「修蹄处理」，仅一个处方，含五步修蹄法的护理任务
 const diseaseKB_hoof: DiseaseEntry[] = [
@@ -437,9 +469,18 @@ const diseaseKB_postpartum: DiseaseEntry[] = [
 
 
 
+const diseaseKB_hoofAll: DiseaseEntry[] = [
+  ...diseaseKB_hoof,
+  ...KB_DISEASES.filter((d) => d.status === "启用" && d.cat === "DL-06").map((d) => ({
+    name: d.name,
+    symptoms: diseaseSymptomNames(d),
+    plans: localPlanByName.get(d.name) ?? defaultPlans(d.name),
+  })),
+];
+
 const diseaseKBByType: Record<WorkType, DiseaseEntry[]> = {
   疾病治疗: diseaseKB_disease,
-  修蹄: diseaseKB_hoof,
+  修蹄: diseaseKB_hoofAll,
   干奶: diseaseKB_drying,
   产后护理: diseaseKB_postpartum,
 
