@@ -392,6 +392,7 @@ const DEFAULT_FILTERS: Filters = {
 
 // ============ Templates ============
 type TplCategory = "cattle" | "disease" | "drug" | "staff";
+type DimensionKey = "farm" | "cattle" | "disease" | "prescription" | "order" | "calving" | "drug" | "staff";
 
 const TPL_CATEGORY_LABEL: Record<TplCategory, string> = {
   cattle: "牛只",
@@ -405,6 +406,62 @@ const TPL_CATEGORY_TONE: Record<TplCategory, string> = {
   disease: "var(--effect-ai-purple)",
   drug: "var(--state-success)",
   staff: "var(--effect-ai-cyan)",
+};
+
+const DIMENSION_LABEL: Record<DimensionKey, string> = {
+  farm: "牧场",
+  cattle: "牛只",
+  disease: "疾病",
+  prescription: "处方",
+  order: "工单",
+  calving: "产犊",
+  drug: "药品",
+  staff: "人员",
+};
+
+const DIMENSION_TONE: Record<DimensionKey, string> = {
+  farm: "var(--effect-ai-purple)",
+  cattle: "var(--brand)",
+  disease: "var(--state-danger)",
+  prescription: "var(--effect-ai-purple)",
+  order: "var(--state-warning)",
+  calving: "var(--effect-ai-purple)",
+  drug: "var(--state-success)",
+  staff: "var(--effect-ai-cyan)",
+};
+
+const CATEGORY_DIMENSIONS: Record<TplCategory, DimensionKey[]> = {
+  cattle: ["farm", "cattle", "calving", "order"],
+  disease: ["farm", "cattle", "disease", "prescription", "order", "drug"],
+  drug: ["farm", "drug", "prescription", "disease", "order"],
+  staff: ["farm", "staff", "disease", "calving", "order"],
+};
+
+const SECTION_CATEGORY: Record<string, TplCategory> = {
+  culling: "cattle",
+  calving: "cattle",
+  udder: "disease",
+  disease: "disease",
+  postpartum: "disease",
+  immune: "cattle",
+};
+
+const SECTION_DIMENSIONS: Record<string, DimensionKey[]> = {
+  culling: ["farm", "cattle"],
+  calving: ["farm", "calving", "cattle"],
+  udder: ["farm", "disease", "cattle"],
+  disease: ["farm", "disease", "cattle"],
+  postpartum: ["farm", "disease", "calving", "cattle"],
+  immune: ["farm", "order", "cattle"],
+};
+
+const SECTION_FILTER_PRESET: Record<string, Partial<Filters>> = {
+  culling: { cowStatuses: ["死淘"] },
+  calving: {},
+  udder: { diseaseCat: "乳房疾病" },
+  disease: { woTypes: ["disease"] },
+  postpartum: { woTypes: ["postpartum"] },
+  immune: { woTypes: ["vaccine"] },
 };
 
 const CATEGORY_CARDS: {
@@ -461,6 +518,7 @@ type Template = {
   creator: string;
   createdAt: string;
   section?: string;
+  dimensions?: DimensionKey[];
   formula?: string;
   metricNo?: number;
 };
@@ -575,19 +633,16 @@ const DEFAULT_TEMPLATES: Template[] = [
 const METRIC_TEMPLATES: Template[] = METRIC_SECTIONS.flatMap((sec) =>
   sec.metrics.map((m) => ({
     id: `m-${m.no}`,
-    category: (sec.key === "calving"
-      ? "cattle"
-      : sec.key === "immune"
-        ? "drug"
-        : "disease") as TplCategory,
+    category: SECTION_CATEGORY[sec.key] ?? "cattle",
     name: m.name,
     desc: m.formula,
     formula: m.formula,
     metricNo: m.no,
     section: sec.key,
+    dimensions: SECTION_DIMENSIONS[sec.key] ?? CATEGORY_DIMENSIONS[SECTION_CATEGORY[sec.key] ?? "cattle"],
     icon: BarChart3,
     tone: sec.tone,
-    filters: { ...DEFAULT_FILTERS, dateRange: "30d" },
+    filters: { ...DEFAULT_FILTERS, dateRange: "30d", ...(SECTION_FILTER_PRESET[sec.key] ?? {}) },
     usage: 20 + ((m.no * 37) % 180),
     creator: "系统预置",
     createdAt: "2026-07-01 09:00",
