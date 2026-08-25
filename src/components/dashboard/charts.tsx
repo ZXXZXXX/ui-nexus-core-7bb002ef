@@ -280,7 +280,8 @@ export function LineTrend({
   const padB = 30;
   const padT = 10;
   const maxV = Math.max(...series.flatMap((s) => s.points), 1);
-  const nice = maxV <= 5 ? Math.max(Math.ceil(maxV * 1.2 * 10) / 10, 0.5) : Math.ceil(maxV / 5) * 5;
+  const rawNice = maxV <= 5 ? Math.max(Math.ceil(maxV * 1.2 * 10) / 10, 0.5) : Math.ceil(maxV / 5) * 5;
+  const nice = unit === "%" ? Math.min(rawNice, 100) : rawNice;
   const x = (i: number) => padL + (i * (w - padL - padR)) / Math.max(labels.length - 1, 1);
   const y = (v: number) => padT + (1 - v / nice) * (h - padT - padB);
   const fmt = (v: number, s: Series, i: number) =>
