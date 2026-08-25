@@ -999,8 +999,10 @@ export function GroupExecSection({
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-          <PostpartumRankSection scopeRegion={scopeRegion} />
+          <PostpartumTrendSection scopeRegion={scopeRegion} />
           <DrugTrendSection scopeRegion={scopeRegion} />
+          <DeathCullTrendSection scopeRegion={scopeRegion} />
+          <TreatmentDaysTrendSection scopeRegion={scopeRegion} />
         </div>
       ))}
       {showCharts && scopeRegion && !scopeFarm ? (
