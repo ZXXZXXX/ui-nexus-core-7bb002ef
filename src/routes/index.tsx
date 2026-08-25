@@ -564,6 +564,9 @@ function HomePage() {
               </div>
             </div>
 
+            {!showAttendance && <CattleTypeDonut />}
+
+
             {showAttendance && (
               <>
                 {/* 3 · 出勤 */}
