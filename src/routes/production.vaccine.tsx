@@ -14,5 +14,5 @@ const orders = makeOrders("YM", [
 
 export const Route = createFileRoute("/production/vaccine")({
   head: () => ({ meta: [{ title: "疫苗免疫 — 奇点智牧" }] }),
-  component: () => <WorkOrderPage title="疫苗免疫" orders={orders} />,
+  component: () => <WorkOrderPage title="疫苗免疫" orders={orders} createKind="immune" createPrefix="YM" />,
 });
