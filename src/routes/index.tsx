@@ -162,7 +162,7 @@ function CattleTypeDonut() {
   return (
     <div className="flex flex-col justify-between px-5 py-4">
       <span className="text-caption text-text-tertiary">牛只类型分布</span>
-      <div className="mt-1 flex items-center gap-4">
+      <div className="mt-1 flex items-center justify-center">
         <div className="relative h-[86px] w-[160px] shrink-0">
           <svg viewBox="0 0 160 82" className="h-full w-full">
             {arcs.map((a, i) => (
@@ -185,16 +185,14 @@ function CattleTypeDonut() {
               {(active ? active.value : total).toLocaleString()}
             </span>
             <span className="mt-1 text-caption text-text-tertiary">
-              {active ? active.key : "存栏总数"}
+              {active
+                ? `${active.key} · ${((active.value / total) * 100).toFixed(1)}%`
+                : "存栏总数"}
             </span>
           </div>
         </div>
-        {active && (
-          <span className="text-caption text-text-tertiary">
-            {`${active.key} ${active.value.toLocaleString()} 头 · ${((active.value / total) * 100).toFixed(1)}%`}
-          </span>
-        )}
       </div>
+
     </div>
   );
 }
