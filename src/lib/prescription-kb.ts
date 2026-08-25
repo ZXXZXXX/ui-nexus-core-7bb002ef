@@ -1,4 +1,66 @@
-[
+// 标准处方数据（来源：晟安标准处方，78 条处方主数据 / 128 条用药明细）
+// 由《处方标准数据》导入生成，请勿手工大批量改写。
+
+export type RxSeedDrug = {
+  id: string;
+  drugs: { name: string; spec: string }[];
+  drugType?: string;
+  routes: string[];
+  days: number;
+  freq: { n: number; m: number };
+  slotOn: boolean;
+  slot: { morning: number; noon: number; evening: number };
+  variable: boolean;
+  variableKind?: "weight" | "quarter" | "custom";
+  fixedDose?: string;
+  varDose?: { option: string; dose: string }[];
+  doseNote?: string;
+};
+
+export type RxSeedTask = {
+  id: string;
+  name: string;
+  type: string;
+  action: string;
+  record: string;
+  days: number;
+  freq: { n: number; m: number };
+  slotOn: boolean;
+  slot: { morning: number; noon: number; evening: number };
+};
+
+export type RxSeed = {
+  id: string;
+  code: string;
+  kind: "disease" | "postpartum" | "drying" | "immune" | "deworm" | "hoof";
+  category: string;
+  subType: string;
+  diseaseCode?: string;
+  intro?: string;
+  name: string;
+  desc?: string;
+  duration: number;
+  summaryAuto: boolean;
+  summary?: string;
+  extra?: string;
+  drugs: RxSeedDrug[];
+  tasks: RxSeedTask[];
+  review: {
+    on: boolean;
+    days: number;
+    freq: { n: number; m: number };
+    slotOn: boolean;
+    slot: { morning: number; noon: number; evening: number };
+    desc: string;
+    transferOn: boolean;
+    deadline: "24h" | "48h";
+  };
+  author: string;
+  updated: string;
+  enabled: boolean;
+};
+
+export const PRESCRIPTION_SEED: RxSeed[] = [
   {
     "id": "1",
     "code": "RX-000001",
@@ -8195,4 +8257,18 @@
     "updated": "2026-08-25",
     "enabled": true
   }
-]
+];
+
+/** 所有用药明细中出现过的药品（去重），用于药品选择器 */
+export const RX_DRUG_CATALOG: { name: string; spec: string }[] = (() => {
+  const map = new Map<string, { name: string; spec: string }>();
+  for (const rx of PRESCRIPTION_SEED) {
+    for (const d of rx.drugs) {
+      for (const g of d.drugs) {
+        const k = `${g.name}｜${g.spec}`;
+        if (!map.has(k)) map.set(k, g);
+      }
+    }
+  }
+  return [...map.values()];
+})();
