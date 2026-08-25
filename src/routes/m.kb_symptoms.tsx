@@ -4,6 +4,7 @@ import { Activity, Search, TrendingUp, ChevronRight, X } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { useFarm } from "@/lib/farm-store";
 import { KB_SYMPTOMS, diseaseName, recent7d } from "@/lib/disease-kb";
+import { StatScopeCard, symptomStats } from "@/components/stat-scope-card";
 
 export const Route = createFileRoute("/m/kb_symptoms")({
   head: () => ({ meta: [{ title: "症状库 · 奇点智牧" }] }),
@@ -158,8 +159,9 @@ function SymptomDetailSheet({ item, onClose }: { item: Symptom; onClose: () => v
           </button>
         </div>
 
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-caption text-text-tertiary">近 7 天 {item.recent7d} 头次</span>
+        <div className="mb-3 space-y-2">
+          <div className="text-caption text-text-tertiary">近 7 天 {item.recent7d} 头次</div>
+          <StatScopeCard metrics={symptomStats(item.id)} />
         </div>
 
         <Section label="具体描述">

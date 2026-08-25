@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppHeader } from "@/components/app-header";
+import { StatScopeCard, symptomStats } from "@/components/stat-scope-card";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -250,6 +251,7 @@ function SymptomKBPage() {
           </SheetHeader>
           {viewing && (
             <div className="mt-4 space-y-3">
+              <StatScopeCard metrics={symptomStats(viewing.id)} />
               <ViewRow label="编号" value={viewing.id} mono />
               <ViewRow label="名称" value={viewing.name} />
               <ViewRow label="紧急程度" value={viewing.urgency} />
