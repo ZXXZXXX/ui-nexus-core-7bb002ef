@@ -535,25 +535,25 @@ function StackedColumns({
           {labels.map((m, i) => {
             const active = hover === null || hover === i;
             let accTop = padT + ih;
+            const vis = series.map((se) => se.points[i] ?? 0);
+            const firstIdx = vis.findIndex((v) => v > 0);
+            const lastIdx = vis.reduce((acc, v, k) => (v > 0 ? k : acc), -1);
             return (
               <g key={m}>
-                {series.map((se) => {
-                  const v = se.points[i] ?? 0;
+                {series.map((se, si) => {
+                  const v = vis[si];
                   const h = (v / max) * ih;
                   accTop -= h;
-                  return (
-                    <rect
-                      key={se.name}
-                      x={cx(i) - bw / 2}
-                      y={accTop}
-                      width={bw}
-                      height={Math.max(h, 0)}
-                      rx={4}
-                      fill={se.color}
-                      opacity={active ? 0.92 : 0.32}
-                    />
-                  );
+                  if (h <= 0) return null;
+                  const x = cx(i) - bw / 2;
+                  const y = accTop;
+                  const r = Math.min(4, bw / 2, h);
+                  const rt = si === lastIdx ? r : 0;
+                  const rb = si === firstIdx ? r : 0;
+                  const d = `M ${x} ${y + rt} Q ${x} ${y} ${x + rt} ${y} L ${x + bw - rt} ${y} Q ${x + bw} ${y} ${x + bw} ${y + rt} L ${x + bw} ${y + h - rb} Q ${x + bw} ${y + h} ${x + bw - rb} ${y + h} L ${x + rb} ${y + h} Q ${x} ${y + h} ${x} ${y + h - rb} Z`;
+                  return <path key={se.name} d={d} fill={se.color} opacity={active ? 0.92 : 0.32} />;
                 })}
+
                 <rect
                   x={padL + step * i}
                   y={padT}
