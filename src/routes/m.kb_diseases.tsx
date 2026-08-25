@@ -30,6 +30,7 @@ type Disease = {
   cat: string;
   severity: "高" | "中" | "低";
   desc: string;
+  groups: string[];
   symptoms: string[];
   prescriptions: Prescription[];
   recent7d: number; // 近7天发病头数
