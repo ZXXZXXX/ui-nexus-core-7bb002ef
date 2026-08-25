@@ -189,11 +189,11 @@ function CattleTypeDonut() {
             </span>
           </div>
         </div>
-        <span className="text-caption text-text-tertiary">
-          {active
-            ? `${active.key} ${active.value.toLocaleString()} 头 · ${((active.value / total) * 100).toFixed(1)}%`
-            : "悬停查看各类型占比"}
-        </span>
+        {active && (
+          <span className="text-caption text-text-tertiary">
+            {`${active.key} ${active.value.toLocaleString()} 头 · ${((active.value / total) * 100).toFixed(1)}%`}
+          </span>
+        )}
       </div>
     </div>
   );
