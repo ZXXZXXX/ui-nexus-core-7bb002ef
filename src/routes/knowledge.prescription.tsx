@@ -1495,15 +1495,91 @@ function MultiDrugPicker({
 }
 
 
+// ---------- 剂量单位（由药品规格自动生成，用户只填数量） ----------
+
+function specUnits(spec?: string): string[] {
+  const out: string[] = [];
+  if (spec) {
+    const pack = spec.match(/\/\s*([^/\s]+)\s*$/)?.[1];
+    if (pack) out.push(pack);
+    const ms = spec.match(/\d+(?:\.\d+)?\s*(ml|mL|L|g|mg|IU|万IU|片|粒|头份)/g) ?? [];
+    for (const m of ms) {
+      const u = m.replace(/[\d.\s]/g, "");
+      if (!out.includes(u)) out.push(u);
+    }
+  }
+  return out.length ? out : ["ml"];
+}
+
+function parseDose(v?: string) {
+  const m = (v ?? "").trim().match(/^(\d+(?:\.\d+)?)\s*(.*?)(?:\/次)?$/);
+  return { qty: m?.[1] ?? "", unit: (m?.[2] ?? "").trim() };
+}
+
+function DoseInput({
+  spec,
+  value,
+  onChange,
+  perTime = true,
+  className,
+}: {
+  spec?: string;
+  value?: string;
+  onChange: (v: string) => void;
+  perTime?: boolean;
+  className?: string;
+}) {
+  const units = specUnits(spec);
+  const parsed = parseDose(value);
+  const unit = parsed.unit && units.includes(parsed.unit) ? parsed.unit : units[0];
+  const emit = (qty: string, u: string) =>
+    onChange(qty ? `${qty}${u}${perTime ? "/次" : ""}` : "");
+
+  return (
+    <div className={cn("flex items-center", className)}>
+      <Input
+        value={parsed.qty}
+        inputMode="decimal"
+        onChange={(e) => emit(e.target.value.replace(/[^\d.]/g, ""), unit)}
+        className="h-9 w-20 text-body rounded-r-none"
+        placeholder="数量"
+      />
+      {units.length > 1 ? (
+        <Select value={unit} onValueChange={(u) => emit(parsed.qty, u)}>
+          <SelectTrigger className="h-9 w-[76px] rounded-l-none border-l-0 text-body-sm bg-surface-subtle/60 text-text-secondary">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {units.map((u) => (
+              <SelectItem key={u} value={u}>
+                {u}
+                {perTime ? "/次" : ""}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      ) : (
+        <span className="h-9 inline-flex items-center px-3 rounded-r-md border border-l-0 border-input bg-surface-subtle/60 text-body-sm text-text-secondary whitespace-nowrap">
+          {unit}
+          {perTime ? "/次" : ""}
+        </span>
+      )}
+    </div>
+  );
+}
+
 function VariableDoseTable({
   varKind,
+  drugSpec,
   value,
   onChange,
 }: {
   varKind?: VarKind;
+  drugSpec?: string;
   value: DoseMap;
   onChange: (v: DoseMap) => void;
 }) {
+
   const update = (i: number, p: Partial<{ option: string; dose: string }>) =>
     onChange(value.map((row, idx) => (idx === i ? { ...row, ...p } : row)));
   const remove = (i: number) => onChange(value.filter((_, idx) => idx !== i));
