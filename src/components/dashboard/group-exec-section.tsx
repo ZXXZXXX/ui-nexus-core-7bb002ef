@@ -462,7 +462,7 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
     <SectionCard
       id="topic-drug-trend"
       title="药费支出趋势"
-      desc={scopeRegion ? `${scopeRegion} · ${period}` : period}
+      desc={`${scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <PeriodTabs
