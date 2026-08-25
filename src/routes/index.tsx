@@ -278,6 +278,18 @@ const farmOutCalvingCard: MetricCard = {
   icon: Baby, anchor: "topic-calving-total", good: true, absolute: true, tone: "#FF8A3D", visual: "spark",
 };
 
+/** 牧场级·外部：数据概览指标卡 */
+const farmOutBizCards: MetricCard[] = [
+  { topic: "病牛数", label: "（本月）病牛数", value: "148", unit: "头", trend: "down", delta: "-9 头", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, absolute: true, tone: "#FF8A3D", visual: "spark" },
+  { topic: "休药 / 过抗头数", label: "（本月）休药 / 过抗头数", value: "76", unit: "头", trend: "down", delta: "-4 头", icon: Pill, anchor: "topic-treatdays-trend", good: true, absolute: true, tone: "var(--state-alert)", visual: "clock" },
+  { topic: "治愈数", label: "（本月）治愈数", value: "132", unit: "头次", trend: "up", delta: "+11 头次", icon: Activity, anchor: "topic-treatdays-trend", good: true, absolute: true, tone: "var(--state-success)", visual: "bars" },
+  { topic: "死淘总数", label: "（本月）死淘总数", value: String(fm.deathCull), unit: "头", trend: "down", delta: "-3 头", icon: Beef, anchor: "topic-culling-trend", good: true, absolute: true, tone: "var(--state-danger)", visual: "truck" },
+  { topic: "产犊总数", label: "（本月）产犊总数", value: String(fm.calving), unit: "头", trend: "up", delta: "+12 头", icon: Baby, anchor: "topic-premature-trend", good: true, absolute: true, tone: "var(--brand)", visual: "bars" },
+  { topic: "早产率", label: "（本月）早产率", value: String(fm.pretermRate), unit: "%", trend: "down", delta: "-0.2 pp", icon: Baby, anchor: "topic-premature-trend", good: true, tone: "#2E8CF0", visual: "ring" },
+];
+
+
+
 type WorkOrderType = "disease" | "vaccine" | "deworm" | "hoof" | "postpartum" | "drying" | "general";
 type PendingRequest = {
   id: string;
