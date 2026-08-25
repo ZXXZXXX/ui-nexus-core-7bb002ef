@@ -508,7 +508,7 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
         />
       }
     >
-      <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} />
+      <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
@@ -550,7 +550,7 @@ function StackedColumns({
   const iw = W - padL - padR;
   const ih = H - padT - padB;
   const totals = labels.map((_, i) => series.reduce((s, se) => s + (se.points[i] ?? 0), 0));
-  const max = Math.max(...totals, 1) * 1.15;
+  const max = Math.max(...totals, 0.01);
   const step = iw / labels.length;
   const bw = Math.min(40, step * 0.5);
   const cx = (i: number) => padL + step * i + step / 2;
