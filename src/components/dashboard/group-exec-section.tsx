@@ -332,7 +332,29 @@ const ALL_MONTHS = ["6月", "7月", "8月", "9月", "10月", "11月", "12月", "
 const ALL_TOTAL_FEE = [96.4, 101.2, 108.6, 99.3, 94.8, 102.5, 118.7, 124.3, 106.1, 98.7, 105.4, 112.8]; // 万元
 const ALL_PER_HEAD = [31.2, 32.5, 34.8, 31.9, 30.4, 32.8, 37.6, 39.2, 34.1, 31.6, 33.7, 36.1]; // 元/头
 
-function DrugComboChart({ months, totalFee, perHead }: { months: string[]; totalFee: number[]; perHead: number[] }) {
+function DrugComboChart({
+  months,
+  totalFee,
+  perHead,
+  barUnit = "万元",
+  lineUnit = "元/头",
+  barLabel = "总药费",
+  lineLabel = "单头药费",
+  barColor = "var(--brand)",
+  lineColor = "var(--effect-ai-purple)",
+  extraRows,
+}: {
+  months: string[];
+  totalFee: number[];
+  perHead: number[];
+  barUnit?: string;
+  lineUnit?: string;
+  barLabel?: string;
+  lineLabel?: string;
+  barColor?: string;
+  lineColor?: string;
+  extraRows?: (i: number) => { label: string; value: string }[];
+}) {
   const [hover, setHover] = useState<number | null>(null);
   const W = 640;
   const H = 240;
@@ -356,10 +378,10 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
   return (
     <div className="relative w-full">
       <span className="pointer-events-none absolute left-0 top-0 z-20 rounded bg-card/90 px-1 text-body-sm" style={{ color: "var(--text-tertiary)" }}>
-        万元
+        {barUnit}
       </span>
       <span className="pointer-events-none absolute right-0 top-0 z-20 rounded bg-card/90 px-1 text-body-sm" style={{ color: "var(--text-tertiary)" }}>
-        元/头
+        {lineUnit}
       </span>
       <div className="w-full overflow-x-auto">
       <div className="relative min-w-[420px]" style={{ minWidth: months.length > 6 ? 720 : undefined }}>
@@ -393,7 +415,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
                   width={bw}
                   height={h}
                   rx={4}
-                  fill="var(--brand)"
+                  fill={barColor}
                   opacity={hover === null || active ? 0.9 : 0.35}
                 />
                 <rect
@@ -411,9 +433,9 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
               </g>
             );
           })}
-          <path d={path} fill="none" stroke="var(--effect-ai-purple)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
+          <path d={path} fill="none" stroke={lineColor} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
           {perHead.map((v, i) => (
-            <circle key={i} cx={cx(i)} cy={ly(v)} r={hover === i ? 5 : 3.5} fill="var(--effect-ai-purple)" />
+            <circle key={i} cx={cx(i)} cy={ly(v)} r={hover === i ? 5 : 3.5} fill={lineColor} />
           ))}
         </svg>
         {hover !== null && (
@@ -431,10 +453,17 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
             }}
           >
             <div className="text-caption text-text-tertiary">{months[hover]}</div>
-            <div className="text-body-sm text-foreground tabular-nums">总药费 {totalFee[hover]} 万元</div>
-            <div className="text-body-sm tabular-nums" style={{ color: "var(--effect-ai-purple)" }}>
-              单头药费 {perHead[hover]} 元/头
+            <div className="text-body-sm text-foreground tabular-nums">
+              {barLabel} {totalFee[hover]} {barUnit}
             </div>
+            <div className="text-body-sm tabular-nums" style={{ color: lineColor }}>
+              {lineLabel} {perHead[hover]} {lineUnit}
+            </div>
+            {extraRows?.(hover).map((r) => (
+              <div key={r.label} className="text-body-sm text-text-secondary tabular-nums">
+                {r.label} {r.value}
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -709,7 +738,7 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
-  const sickRate = factors.map((k) => Number((all.sick * (0.94 + (k - 1) * 0.5)).toFixed(1)));
+  const sickCount = factors.map((k) => Math.round(all.sick * (0.94 + (k - 1) * 0.5) * 62));
   const cureRate = factors.map((k) => Number(Math.min(all.cure * (1.02 - (k - 1) * 0.12), 100).toFixed(1)));
 
   return (
@@ -720,18 +749,27 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <div>
-        <div className="text-body-sm text-text-secondary mb-2">发病率 / 治愈率（%）</div>
-        <LineTrend
-          labels={labels}
-          unit="%"
-          height={240}
-          series={[
-            { name: "发病率", color: "var(--state-warning)", points: sickRate },
-            { name: "治愈率", color: "var(--brand)", points: cureRate, dashed: true },
-          ]}
-          extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
-        />
+      <DrugComboChart
+        months={labels}
+        totalFee={sickCount}
+        perHead={cureRate}
+        barUnit="头次"
+        lineUnit="%"
+        barLabel="发病数"
+        lineLabel="治愈率"
+        barColor="var(--state-warning)"
+        lineColor="var(--brand)"
+        extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
+      />
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+        <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
+          <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--state-warning)" }} />
+          发病数（头次）
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
+          <span className="h-1.5 w-4 rounded-full" style={{ background: "var(--brand)" }} />
+          治愈率（%）
+        </span>
       </div>
     </SectionCard>
   );
