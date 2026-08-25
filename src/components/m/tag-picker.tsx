@@ -17,6 +17,7 @@ export function TagPicker({
   disableCreate = false,
   triggerLabel,
   drawerTitle = "选择标签",
+  matchText,
 }: {
   selected: string[];
   onChange: (next: string[]) => void;
@@ -29,6 +30,8 @@ export function TagPicker({
   disableCreate?: boolean;
   triggerLabel?: string;
   drawerTitle?: string;
+  /** 额外匹配文本（如症状描述词），用于粗略匹配 */
+  matchText?: (tag: string) => string | undefined;
 }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -45,8 +48,12 @@ export function TagPicker({
 
   const filtered = useMemo(() => {
     if (!kw) return pool;
-    return pool.filter((t) => t.toLowerCase().includes(lower));
-  }, [pool, kw, lower]);
+    return pool.filter(
+      (t) =>
+        t.toLowerCase().includes(lower) ||
+        (matchText?.(t) ?? "").toLowerCase().includes(lower)
+    );
+  }, [pool, kw, lower, matchText]);
 
   const exactExists = pool.some((t) => t.toLowerCase() === lower);
   const canCreate = !disableCreate && !!kw && !exactExists;
