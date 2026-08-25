@@ -399,6 +399,36 @@ export function LineTrend({
         ))}
 
       </svg>
+      {hoverIndex != null && (
+        <div
+          className="pointer-events-none absolute z-20 -translate-y-1/2 rounded-lg border border-border bg-popover px-3 py-2 shadow-lg"
+          style={{
+            left: `calc(${(x(hoverIndex) / w) * 100}% ${hoverIndex > labels.length / 2 ? "- 8px" : "+ 8px"})`,
+            transform: `translate(${hoverIndex > labels.length / 2 ? "-100%" : "0"}, -50%)`,
+            top: "50%",
+          }}
+        >
+          <div className="text-caption text-text-tertiary mb-1">{labels[hoverIndex]}</div>
+          <div className="space-y-1">
+            {series.map((s) => (
+              <div key={s.name} className="flex items-center gap-2 whitespace-nowrap">
+                <span
+                  className="h-1.5 w-4 rounded-full shrink-0"
+                  style={
+                    s.dashed
+                      ? { backgroundImage: `repeating-linear-gradient(90deg, ${s.color} 0 5px, transparent 5px 9px)` }
+                      : { background: s.color }
+                  }
+                />
+                <span className="text-body-sm text-text-secondary">{s.name}</span>
+                <span className="text-body-sm text-foreground tabular-nums ml-auto">
+                  {fmt(s.points[hoverIndex] ?? 0, s, hoverIndex)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="mt-2 flex flex-wrap items-center gap-4">
         {series.map((s) => (
           <span key={s.name} className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
