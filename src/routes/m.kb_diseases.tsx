@@ -46,11 +46,13 @@ const DISEASES: Disease[] = KB_DISEASES.map((d) => ({
   desc: `${d.type} · 常见症状 ${d.symptoms.length} 项，详见下方症状列表。`,
   groups: d.groups,
   symptoms: d.symptoms.map(symptomName),
-  prescriptions: (d.rx ?? []).flatMap((code) => {
+  prescriptions: (d.rx ?? []).flatMap((code, idx) => {
     const r = PRESCRIPTION_SEED.find((x) => x.code === code);
     if (!r) return [];
     return [{
       name: r.name,
+      tier: (idx === 0 ? "首选" : "备选") as Prescription["tier"],
+      scenario: r.intro || r.desc || `${r.category}${r.subType ? " · " + r.subType : ""}`,
       course: `${r.category}${r.subType ? " · " + r.subType : ""} · 疗程 ${r.duration} 天`,
       drugs: r.drugs.map((g) => ({
         name: g.drugs.map((x) => x.name).join(" / "),
