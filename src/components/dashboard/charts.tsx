@@ -357,29 +357,33 @@ export function LineTrend({
             ))}
           </g>
         ))}
-        {onPointClick &&
-          labels.map((l, i) => (
-            <g key={`hit-${l}-${i}`} onClick={() => onPointClick(i)} className="cursor-pointer">
-              {activeIndex === i && (
-                <line
-                  x1={x(i)}
-                  x2={x(i)}
-                  y1={padT}
-                  y2={h - padB}
-                  stroke="var(--brand)"
-                  strokeDasharray="3 4"
-                  opacity="0.5"
-                />
-              )}
-              <rect
-                x={x(i) - (w - padL - padR) / Math.max(labels.length - 1, 1) / 2}
-                y={padT}
-                width={(w - padL - padR) / Math.max(labels.length - 1, 1)}
-                height={h - padT - padB}
-                fill="transparent"
+        {labels.map((l, i) => (
+          <g
+            key={`hit-${l}-${i}`}
+            onClick={onPointClick ? () => onPointClick(i) : undefined}
+            onMouseEnter={() => setHoverIndex(i)}
+            className={onPointClick ? "cursor-pointer" : undefined}
+          >
+            {(activeIndex === i || hoverIndex === i) && (
+              <line
+                x1={x(i)}
+                x2={x(i)}
+                y1={padT}
+                y2={h - padB}
+                stroke="var(--brand)"
+                strokeDasharray="3 4"
+                opacity="0.5"
               />
-            </g>
-          ))}
+            )}
+            <rect
+              x={x(i) - (w - padL - padR) / Math.max(labels.length - 1, 1) / 2}
+              y={padT}
+              width={(w - padL - padR) / Math.max(labels.length - 1, 1)}
+              height={h - padT - padB}
+              fill="transparent"
+            />
+          </g>
+        ))}
         {labels.map((l, i) => (
           <text
             key={l}
