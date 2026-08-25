@@ -1603,12 +1603,13 @@ function VariableDoseTable({
             className="h-9 w-28 text-body-sm"
           />
           <span className="text-body-sm text-text-tertiary">→</span>
-          <Input
+          <DoseInput
+            spec={drugSpec}
             value={row.dose}
-            onChange={(e) => update(i, { dose: e.target.value })}
-            placeholder="如 20ml"
-            className="h-9 w-20 text-body-sm text-primary font-medium"
+            onChange={(dose) => update(i, { dose })}
+            perTime={false}
           />
+
 
           <button
             type="button"
