@@ -599,8 +599,7 @@ export function WorkOrderPage({
         );
       }
       case "objType": {
-        const isCow = o.target.trim().startsWith("#");
-        return <span className="tag tag-muted">{isCow ? "牛只" : "牛舍/群体"}</span>;
+        return <span className="tag tag-muted">牛只</span>;
       }
       case "diagnosis": {
         const diseaseName = o.event ? o.event.split(" · ")[0] : "";
