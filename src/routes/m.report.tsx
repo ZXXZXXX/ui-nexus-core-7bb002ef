@@ -858,37 +858,6 @@ function ReportPage() {
             >
 
 
-              {!lockMode && (
-                <div className="mb-2.5 inline-flex rounded-full border border-border bg-surface-subtle p-0.5">
-                  {[
-                    { v: "cow" as const, label: "按牛只" },
-                    { v: "barn" as const, label: "按牛舍" },
-                  ].map((opt) => {
-                    const active = mode === opt.v;
-                    return (
-                      <button
-                        key={opt.v}
-                        type="button"
-                        onClick={() => {
-                          if (mode === opt.v) return;
-                          setMode(opt.v);
-                          setTargets([]);
-                          setBarns([]);
-                          setAddQuery("");
-                          setBarnAddQuery("");
-                        }}
-                        className={`h-8 min-w-[72px] px-3 rounded-full text-body-sm transition-colors ${
-                          active
-                            ? "bg-card text-foreground border border-border shadow-sm"
-                            : "text-text-tertiary"
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
               {barnMode ? (
                 <div className="space-y-2">
                   {barns.map((b) => (
