@@ -365,7 +365,8 @@ function DrugComboChart({
   const iw = W - padL - padR;
   const ih = H - padT - padB;
   const maxBar = Math.max(...totalFee) * 1.15;
-  const maxLine = Math.max(...perHead) * 1.25;
+  const lineCap = lineUnit === "%" ? 100 : Infinity;
+  const maxLine = Math.min(Math.max(...perHead) * 1.25, lineCap);
   const minLine = Math.min(...perHead) * 0.7;
   const step = iw / months.length;
   const bw = Math.min(40, step * 0.5);
