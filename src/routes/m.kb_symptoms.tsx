@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Activity, Search, TrendingUp, ChevronRight, X } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { useFarm } from "@/lib/farm-store";
+import { KB_SYMPTOMS, diseaseName, recent7d } from "@/lib/disease-kb";
 
 export const Route = createFileRoute("/m/kb_symptoms")({
   head: () => ({ meta: [{ title: "症状库 · 奇点智牧" }] }),
@@ -18,16 +19,14 @@ type Symptom = {
   recent7d: number; // 近 7 天出现头次
 };
 
-const SYMPTOMS: Symptom[] = [
-  { id: "SY-01", name: "持续高烧", urgency: "高", desc: "直肠温度持续 ≥ 40.0℃ 超过 12 小时,常伴随精神沉郁、采食减少、呼吸加快。", related: ["乳房炎", "呼吸道疾病", "口蹄疫"], recent7d: 14 },
-  { id: "SY-04", name: "乳房红肿", urgency: "高", desc: "一个或多个乳区肿胀、发热、触痛,乳汁出现絮状物或血色。", related: ["乳房炎"], recent7d: 11 },
-  { id: "SY-06", name: "产奶量骤降", urgency: "高", desc: "24 小时内单产下降 ≥ 20%,且无饲喂、应激等明显诱因。", related: ["乳房炎", "酮病"], recent7d: 9 },
-  { id: "SY-02", name: "跛行", urgency: "中", desc: "行走时步态不稳、患肢负重明显减少,严重者三脚站立。", related: ["蹄叶炎", "关节炎", "趾间皮炎"], recent7d: 8 },
-  { id: "SY-05", name: "腹泻", urgency: "中", desc: "粪便稀薄、水样或含黏液血丝,排便次数增加。", related: ["瘤胃酸中毒", "犊牛腹泻"], recent7d: 6 },
-  { id: "SY-03", name: "食欲减退", urgency: "中", desc: "连续两餐采食量低于平均值 30%,反刍次数减少。", related: ["瘤胃酸中毒", "酮病"], recent7d: 5 },
-  { id: "SY-07", name: "口腔水疱", urgency: "高", desc: "唇、舌、齿龈出现水疱或破溃,流涎增多。", related: ["口蹄疫"], recent7d: 2 },
-  { id: "SY-08", name: "体温偏低", urgency: "中", desc: "直肠温度 < 37.5℃,常见于围产期产后瘫痪。", related: ["产后瘫痪", "酮病"], recent7d: 1 },
-];
+const SYMPTOMS: Symptom[] = KB_SYMPTOMS.map((s) => ({
+  id: s.id,
+  name: s.name,
+  urgency: s.diseases.length >= 8 ? "高" : s.diseases.length >= 3 ? "中" : "低",
+  desc: s.desc,
+  related: s.diseases.map(diseaseName),
+  recent7d: recent7d(s.id),
+}));
 
 function urgencyTone(u: string) {
   if (u === "高") return "bg-[var(--state-danger)]/12 text-[var(--state-danger)]";
