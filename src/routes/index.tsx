@@ -185,24 +185,11 @@ function CattleTypeDonut() {
             </span>
           </div>
         </div>
-        <div className="min-w-0 flex-1 space-y-1.5">
-          {CATTLE_TYPE_DIST.map((d, i) => (
-            <div
-              key={d.key}
-              onMouseEnter={() => setHover(i)}
-              onMouseLeave={() => setHover(null)}
-              className="flex items-center gap-2 text-caption"
-              style={{ opacity: hover === null || hover === i ? 1 : 0.5 }}
-            >
-              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: d.color }} />
-              <span className="text-text-tertiary whitespace-nowrap">{d.key}</span>
-              <span className="ml-auto tabular-nums text-text-primary">{d.value.toLocaleString()}</span>
-              <span className="w-10 text-right tabular-nums text-text-tertiary">
-                {((d.value / total) * 100).toFixed(1)}%
-              </span>
-            </div>
-          ))}
-        </div>
+        <span className="text-caption text-text-tertiary">
+          {active
+            ? `${active.key} ${active.value.toLocaleString()} 头 · ${((active.value / total) * 100).toFixed(1)}%`
+            : "悬停查看各类型占比"}
+        </span>
       </div>
     </div>
   );
