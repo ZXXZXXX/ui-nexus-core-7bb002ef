@@ -1070,7 +1070,9 @@ export function GroupExecSection({
           <PostpartumTrendSection scopeRegion={scopeRegion} />
           <DrugTrendSection scopeRegion={scopeRegion} />
           <TreatmentDaysTrendSection scopeRegion={scopeRegion} />
-          <PrematureRateTrendSection scopeRegion={scopeRegion} />
+          <div className="xl:col-span-2">
+            <PrematureRateTrendSection scopeRegion={scopeRegion} />
+          </div>
         </div>
       ))}
       {showCharts && scopeRegion && !scopeFarm ? (
