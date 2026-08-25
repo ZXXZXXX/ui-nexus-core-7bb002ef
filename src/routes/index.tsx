@@ -589,9 +589,9 @@ function HomePage() {
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
                 <span className="text-caption text-text-tertiary">
-                  {isExec ? (scope === "group" ? "牧场分布" : scope === "region" ? `${CURRENT_REGION} · 牧场分布` : "实时预警") : "实时预警"}
+                  {isExec ? (scope === "group" ? "牧场分布" : `${CURRENT_REGION} · 牧场分布`) : "实时预警"}
                 </span>
-                {(!isExec || scope === "farm-out") && (
+                {!isExec && (
                   <button
                     type="button"
                     onClick={() => scrollToTopic("topic-alert")}
@@ -602,7 +602,7 @@ function HomePage() {
                 )}
               </div>
               <div className="mt-3 grid grid-cols-3 gap-2.5">
-                {isExec && scope !== "farm-out" ? (
+                {isExec ? (
                   (() => {
                     const fc = farmCountFor(scope === "group" ? null : CURRENT_REGION);
                     return [
