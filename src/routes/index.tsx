@@ -110,7 +110,7 @@ const metricCards: MetricCard[] = [
 
 /** 集团管理者视角下的指标卡口径覆盖 */
 const groupCardOverride: Record<string, Partial<MetricCard>> = {
-  "topic-herd": { topic: "总存栏数", label: "（至今日）集团总存栏", value: "29500", unit: "头", delta: "+286 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
+  "topic-herd": { topic: "总存栏数", label: "（至今日）集团总存栏", value: "29,500", unit: "头", delta: "+286 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
   "topic-calving": { topic: "早产率", label: "（本月）早产率", value: "3.96", unit: "%", delta: "-0.4 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: "344", unit: "头", delta: "-21 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
   "topic-disease": { topic: "治愈率", label: "（本月）治愈率", value: "91.4", unit: "%", delta: "+1.6 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
@@ -129,6 +129,17 @@ const groupTailCard: MetricCard = {
   icon: Pill, anchor: "topic-panorama", good: false,
   tone: "var(--effect-ai-purple)", visual: "spark",
 };
+
+/** 集团高管视角：数据概览关注业务存量数据 */
+const groupBizCards: MetricCard[] = [
+  { topic: "存栏总数", label: "（至今日）牛只存栏总数", value: "29,500", unit: "头", trend: "up", delta: "+286 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars" },
+  { topic: "泌乳牛数", label: "（至今日）泌乳牛存栏", value: "16,180", unit: "头", trend: "up", delta: "+142 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "bars" },
+  { topic: "干奶牛数", label: "（至今日）干奶牛存栏", value: "3,240", unit: "头", trend: "down", delta: "-36 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--effect-ai-cyan)", visual: "bars" },
+  { topic: "青年牛 / 犊牛数", label: "（至今日）青年牛 / 犊牛存栏", value: "6,120 / 3,960", unit: "头", trend: "up", delta: "+180 头", icon: Baby, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "bars" },
+  { topic: "治疗中牛只数", label: "（至今日）治疗中牛只", value: "812", unit: "头", trend: "down", delta: "-34 头", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, tone: "var(--state-danger)", visual: "spark" },
+  { topic: "休药过抗牛只数", label: "（至今日）休药过抗牛只", value: "264", unit: "头", trend: "up", delta: "+18 头", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "clock" },
+];
+
 
 
 
@@ -368,7 +379,8 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? [applyTimeScope(groupLeadCard), map.get("治愈率"), map.get("早产率"), map.get("死淘总数"), applyTimeScope(groupTailCard), map.get("总药费支出")]
+              ? groupBizCards
+
               : scope === "region"
                 ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
                 : [map.get("总存栏数"), applyTimeScope(farmOutCalvingCard), map.get("早产率"), applyTimeScope(farmOutLeadCard), map.get("治愈率"), map.get("死淘总数")];
