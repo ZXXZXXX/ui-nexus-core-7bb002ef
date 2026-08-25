@@ -170,12 +170,18 @@ const seed: Disease[] = KB_DISEASES.map((d, i) => {
     status: d.status === "启用" ? "启用" : "停用",
     order: i + 1,
     symptoms: d.symptoms.map((code, idx) => ({ code, name: symptomName(code), core: idx < 3 })),
-    prescriptions: (d.rx ?? []).map((code, idx) => ({
-      code,
-      name: PRESCRIPTION_SEED.find((r) => r.code === code)?.name ?? code,
-      level: (idx === 0 ? "首选" : "备选") as PrescriptionRef["level"],
-      defaultRx: idx === 0,
-    })),
+    prescriptions: (() => {
+      const codes = [
+        ...(d.rx ?? []),
+        ...PRESCRIPTION_SEED.filter((r) => r.diseaseCode === d.id).map((r) => r.code),
+      ].filter((c, i, arr) => arr.indexOf(c) === i);
+      return codes.map((code, idx) => ({
+        code,
+        name: PRESCRIPTION_SEED.find((r) => r.code === code)?.name ?? code,
+        level: (idx === 0 ? "首选" : "备选") as PrescriptionRef["level"],
+        defaultRx: idx === 0,
+      }));
+    })(),
 
   } satisfies Disease;
 });
@@ -848,14 +854,23 @@ function DetailView({ value }: { value: Disease }) {
           <div className="text-body-sm text-text-tertiary">暂无</div>
         ) : (
           <div className="space-y-1.5">
-            {value.prescriptions.map((p) => (
-              <div key={p.code} className="flex items-center gap-2 text-body">
-                <span className="text-foreground">{p.name}</span>
-                <span className="font-mono text-body-sm text-text-tertiary">{p.code}</span>
-                <span className={`tag ${p.level === "首选" ? "tag-success" : p.level === "备选" ? "tag-muted" : "tag-warning"}`}>{p.level}</span>
-                {p.defaultRx && <span className="tag tag-brand">默认</span>}
-              </div>
-            ))}
+            {value.prescriptions.map((p) => {
+              const seed = PRESCRIPTION_SEED.find((r) => r.code === p.code);
+              return (
+                <div key={p.code} className="rounded-md bg-surface-subtle px-3 py-2.5 space-y-1.5">
+                  <div className="flex items-center gap-2 text-body">
+                    <span className="text-foreground">{p.name}</span>
+                    <span className="font-mono text-body-sm text-text-tertiary">{p.code}</span>
+                    <span className={`tag ${p.level === "首选" ? "tag-success" : p.level === "备选" ? "tag-muted" : "tag-warning"}`}>{p.level}</span>
+                    {p.defaultRx && <span className="tag tag-brand">默认</span>}
+                    {seed && <span className="text-caption text-text-tertiary">疗程 {seed.duration} 天</span>}
+                  </div>
+                  {seed?.summary && (
+                    <div className="text-body-sm text-text-secondary whitespace-pre-wrap">{seed.summary}</div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </SectionCard>
