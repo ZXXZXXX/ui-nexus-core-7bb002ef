@@ -30,6 +30,7 @@ type Disease = {
   cat: string;
   severity: "高" | "中" | "低";
   desc: string;
+  groups: string[];
   symptoms: string[];
   prescriptions: Prescription[];
   recent7d: number; // 近7天发病头数
@@ -40,7 +41,8 @@ const DISEASES: Disease[] = KB_DISEASES.map((d) => ({
   name: d.name,
   cat: d.catName,
   severity: severityOf(d),
-  desc: `${d.type} · 易感牛群：${d.groups.join("、") || "未标注"}。常见症状 ${d.symptoms.length} 项，详见下方症状列表。`,
+  desc: `${d.type} · 常见症状 ${d.symptoms.length} 项，详见下方症状列表。`,
+  groups: d.groups,
   symptoms: d.symptoms.map(symptomName),
   prescriptions: [],
   recent7d: recent7d(d.id),
@@ -175,6 +177,16 @@ function DiseaseDetailSheet({ item, onClose }: { item: Disease; onClose: () => v
         <div className="flex items-center gap-2 mb-3">
           <span className="text-caption text-text-tertiary">近 7 天 {item.recent7d} 头</span>
         </div>
+
+        <Section label="易感牛群">
+          <div className="flex flex-wrap gap-1.5">
+            {(item.groups.length ? item.groups : ["未标注"]).map((g) => (
+              <span key={g} className="text-body-sm px-2 py-1 rounded-md bg-surface-subtle text-text-secondary">
+                {g}
+              </span>
+            ))}
+          </div>
+        </Section>
 
         <Section label="典型表现">
           <p className="text-body-sm text-text-secondary leading-relaxed">{item.desc}</p>
