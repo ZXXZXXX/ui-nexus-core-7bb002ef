@@ -691,6 +691,7 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
         labels={labels}
         unit="%"
         height={240}
+        formatValue={(v) => `${v.toFixed(2)}%（${Math.round((v / 100) * herd).toLocaleString()} 头）`}
         series={[
           { name: "死亡率", color: "var(--state-danger)", points: deathRate },
           { name: "淘汰率", color: "var(--state-warning)", points: cullRate, dashed: true },

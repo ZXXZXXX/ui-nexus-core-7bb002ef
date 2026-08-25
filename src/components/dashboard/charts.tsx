@@ -260,6 +260,7 @@ export function LineTrend({
   unit = "",
   activeIndex,
   onPointClick,
+  formatValue,
 }: {
   labels: string[];
   series: Series[];
@@ -267,7 +268,9 @@ export function LineTrend({
   unit?: string;
   activeIndex?: number;
   onPointClick?: (index: number) => void;
+  formatValue?: (value: number, series: Series, index: number) => string;
 }) {
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const w = 640;
   const h = height;
   const padL = 42;
@@ -278,8 +281,10 @@ export function LineTrend({
   const nice = maxV <= 5 ? Math.max(Math.ceil(maxV * 1.2 * 10) / 10, 0.5) : Math.ceil(maxV / 5) * 5;
   const x = (i: number) => padL + (i * (w - padL - padR)) / Math.max(labels.length - 1, 1);
   const y = (v: number) => padT + (1 - v / nice) * (h - padT - padB);
+  const fmt = (v: number, s: Series, i: number) =>
+    formatValue ? formatValue(v, s, i) : `${Number.isInteger(v) ? v : v.toFixed(1)}${unit}`;
   return (
-    <div className="w-full overflow-hidden">
+    <div className="w-full relative" onMouseLeave={() => setHoverIndex(null)}>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }}>
         <defs>
           <linearGradient id="trend-active-col" x1="0" y1="0" x2="0" y2="1">
@@ -352,29 +357,33 @@ export function LineTrend({
             ))}
           </g>
         ))}
-        {onPointClick &&
-          labels.map((l, i) => (
-            <g key={`hit-${l}-${i}`} onClick={() => onPointClick(i)} className="cursor-pointer">
-              {activeIndex === i && (
-                <line
-                  x1={x(i)}
-                  x2={x(i)}
-                  y1={padT}
-                  y2={h - padB}
-                  stroke="var(--brand)"
-                  strokeDasharray="3 4"
-                  opacity="0.5"
-                />
-              )}
-              <rect
-                x={x(i) - (w - padL - padR) / Math.max(labels.length - 1, 1) / 2}
-                y={padT}
-                width={(w - padL - padR) / Math.max(labels.length - 1, 1)}
-                height={h - padT - padB}
-                fill="transparent"
+        {labels.map((l, i) => (
+          <g
+            key={`hit-${l}-${i}`}
+            onClick={onPointClick ? () => onPointClick(i) : undefined}
+            onMouseEnter={() => setHoverIndex(i)}
+            className={onPointClick ? "cursor-pointer" : undefined}
+          >
+            {(activeIndex === i || hoverIndex === i) && (
+              <line
+                x1={x(i)}
+                x2={x(i)}
+                y1={padT}
+                y2={h - padB}
+                stroke="var(--brand)"
+                strokeDasharray="3 4"
+                opacity="0.5"
               />
-            </g>
-          ))}
+            )}
+            <rect
+              x={x(i) - (w - padL - padR) / Math.max(labels.length - 1, 1) / 2}
+              y={padT}
+              width={(w - padL - padR) / Math.max(labels.length - 1, 1)}
+              height={h - padT - padB}
+              fill="transparent"
+            />
+          </g>
+        ))}
         {labels.map((l, i) => (
           <text
             key={l}
@@ -390,6 +399,36 @@ export function LineTrend({
         ))}
 
       </svg>
+      {hoverIndex != null && (
+        <div
+          className="pointer-events-none absolute z-20 -translate-y-1/2 rounded-lg border border-border bg-popover px-3 py-2 shadow-lg"
+          style={{
+            left: `calc(${(x(hoverIndex) / w) * 100}% ${hoverIndex > labels.length / 2 ? "- 8px" : "+ 8px"})`,
+            transform: `translate(${hoverIndex > labels.length / 2 ? "-100%" : "0"}, -50%)`,
+            top: "50%",
+          }}
+        >
+          <div className="text-caption text-text-tertiary mb-1">{labels[hoverIndex]}</div>
+          <div className="space-y-1">
+            {series.map((s) => (
+              <div key={s.name} className="flex items-center gap-2 whitespace-nowrap">
+                <span
+                  className="h-1.5 w-4 rounded-full shrink-0"
+                  style={
+                    s.dashed
+                      ? { backgroundImage: `repeating-linear-gradient(90deg, ${s.color} 0 5px, transparent 5px 9px)` }
+                      : { background: s.color }
+                  }
+                />
+                <span className="text-body-sm text-text-secondary">{s.name}</span>
+                <span className="text-body-sm text-foreground tabular-nums ml-auto">
+                  {fmt(s.points[hoverIndex] ?? 0, s, hoverIndex)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="mt-2 flex flex-wrap items-center gap-4">
         {series.map((s) => (
           <span key={s.name} className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
