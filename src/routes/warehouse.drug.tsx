@@ -308,14 +308,14 @@ function DrugArchivePage() {
 
         <Card className="border-border bg-card overflow-hidden">
           <div className="flex items-center gap-4 px-6 h-12 text-table-header text-text-secondary border-b border-border bg-surface-subtle">
-            <div className="grid grid-cols-[120px_minmax(0,1.6fr)_minmax(0,1fr)_100px_100px_100px] gap-4 flex-1 min-w-0">
+            <div className="grid grid-cols-[120px_minmax(0,1.6fr)_minmax(0,1fr)_100px_110px_90px_90px] gap-4 flex-1 min-w-0">
               <div>商品编码</div>
               <div>药品展示名称</div>
               <div>规格型号</div>
-              <div>默认给药方式</div>
+              <div>类型</div>
+              <div>默认用药方式</div>
               <div>休药期</div>
-              <div>状态</div>
-
+              <div>启用状态</div>
             </div>
             <div className="w-[140px] text-right shrink-0">操作</div>
           </div>
