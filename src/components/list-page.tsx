@@ -238,21 +238,24 @@ export function ListPage<T>({
 
           <Button
             variant="outline"
-            size="sm"
-            className="h-9 gap-1.5 text-body-sm font-normal"
+            size="icon"
+            title="筛选与列设置"
+            aria-label="筛选与列设置"
+            className="relative h-9 w-9 shrink-0"
             onClick={() => {
               setDraft(filters);
               setDraftVisible(visible);
               setFilterOpen(true);
             }}
           >
-            <SlidersHorizontal className="h-3.5 w-3.5" /> 筛选与列设置
+            <SlidersHorizontal className="h-4 w-4" />
             {activeFilterCount > 0 && (
-              <span className="ml-0.5 rounded bg-brand-subtle px-1.5 text-caption text-primary tabular-nums">
+              <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-4 text-center tabular-nums">
                 {activeFilterCount}
               </span>
             )}
           </Button>
+
 
 
           <div className="ml-auto flex items-center gap-2 shrink-0">
