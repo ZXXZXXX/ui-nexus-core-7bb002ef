@@ -130,6 +130,17 @@ const groupTailCard: MetricCard = {
   tone: "var(--effect-ai-purple)", visual: "spark",
 };
 
+/** 集团高管视角：数据概览关注业务存量数据 */
+const groupBizCards: MetricCard[] = [
+  { topic: "存栏总数", label: "（至今日）牛只存栏总数", value: "29500", unit: "头", trend: "up", delta: "+286 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars" },
+  { topic: "泌乳牛数", label: "（至今日）泌乳牛存栏", value: "16180", unit: "头", trend: "up", delta: "+142 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "bars" },
+  { topic: "干奶牛数", label: "（至今日）干奶牛存栏", value: "3240", unit: "头", trend: "down", delta: "-36 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--effect-ai-cyan)", visual: "bars" },
+  { topic: "青年牛 / 犊牛数", label: "（至今日）青年牛 / 犊牛存栏", value: "6120 / 3960", unit: "头", trend: "up", delta: "+180 头", icon: Baby, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "bars" },
+  { topic: "治疗中牛只数", label: "（至今日）治疗中牛只", value: "812", unit: "头", trend: "down", delta: "-34 头", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, tone: "var(--state-danger)", visual: "spark" },
+  { topic: "休药过抗牛只数", label: "（至今日）休药过抗牛只", value: "264", unit: "头", trend: "up", delta: "+18 头", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "clock" },
+];
+
+
 
 
 
