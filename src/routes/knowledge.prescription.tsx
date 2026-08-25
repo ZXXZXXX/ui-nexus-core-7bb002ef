@@ -48,6 +48,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { StatScopeCard, prescriptionStats } from "@/components/stat-scope-card";
+import { PRESCRIPTION_SEED, RX_DRUG_CATALOG } from "@/lib/prescription-kb";
 
 export const Route = createFileRoute("/knowledge/prescription")({
   head: () => ({ meta: [{ title: "处方管理 — 奇点智牧" }] }),
@@ -75,8 +76,8 @@ const defaultSlot = (freq: number): TimeSlot => {
 
 type Freq = { n: number; m: number }; // n 天 m 次
 
-type Route1 = "肌肉注射" | "静脉注射" | "乳注" | "口服" | "局部用药" | "皮下注射";
-const ROUTE_OPTS: Route1[] = ["肌肉注射", "静脉注射", "乳注", "口服", "局部用药", "皮下注射"];
+type Route1 = "肌肉注射" | "静脉注射" | "乳注" | "口服" | "局部用药" | "皮下注射" | "子宫灌注";
+const ROUTE_OPTS: Route1[] = ["肌肉注射", "静脉注射", "皮下注射", "乳注", "子宫灌注", "口服", "局部用药"];
 
 type VarKind = "weight" | "quarter" | "custom";
 const VAR_LABEL: Record<VarKind, string> = {
@@ -161,24 +162,13 @@ type Rx = {
   review: ReviewCfg;
   author: string;
   updated: string;
+  diseaseCode?: string;
+  enabled?: boolean;
 };
 
 // ---------- catalog ----------
 
-const DRUG_CATALOG: DrugRef[] = [
-  { name: "头孢噻呋钠", spec: "1g/瓶" },
-  { name: "头孢噻呋钠", spec: "4g/瓶" },
-  { name: "青霉素 G 钠", spec: "400 万 IU/瓶" },
-  { name: "青霉素 G 钠", spec: "800 万 IU/瓶" },
-  { name: "氟尼辛葡甲胺", spec: "50mg/ml × 100ml" },
-  { name: "地塞米松", spec: "5mg/ml × 10ml" },
-  { name: "丙二醇", spec: "500ml/瓶" },
-  { name: "50% 葡萄糖", spec: "500ml/袋" },
-  { name: "乳房灌注 头孢洛宁", spec: "5g/支" },
-  { name: "土霉素", spec: "宫内灌注剂 5g/支" },
-  { name: "口蹄疫疫苗 A 型", spec: "5ml/瓶" },
-  { name: "PGF2α", spec: "5mg/ml × 5ml" },
-];
+const DRUG_CATALOG: DrugRef[] = RX_DRUG_CATALOG;
 
 const drugKey = (d: DrugRef) => `${d.name}｜${d.spec}`;
 
