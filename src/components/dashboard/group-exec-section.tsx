@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { BarChart3, Layers, Download, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
-import { SectionCard, PeriodTabs, LineTrend } from "./charts";
+import { SectionCard, PeriodTabs, LineTrend, SmoothAreaTrend } from "./charts";
 import { WorkOrderSection } from "./workorder-section";
 import { HerdSection } from "./herd-section";
 
@@ -735,6 +735,37 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
   );
 }
 
+/* ---------------- 早产率变化趋势 ---------------- */
+
+function PrematureRateTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+  const { period, setPeriod, labels, factors } = usePeriod();
+  const { all } = useScopeRatio(scopeRegion);
+  const base = ((all.pp30 || 2) * 1.6) / 2 + 3.2;
+  const points = factors.map((k) => Number((base * k).toFixed(2)));
+  const calvings = factors.map((k) => Math.round((all.herd / 12) * 0.32 * k));
+
+  return (
+    <SectionCard
+      id="topic-premature-trend"
+      title="早产率变化趋势"
+      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+    >
+      <SmoothAreaTrend
+        labels={labels}
+        points={points}
+        unit="%"
+        name="早产率"
+        color="var(--chart-blue, #3B82F6)"
+        formatValue={(v, i) =>
+          `${v.toFixed(2)}%（${Math.round((v / 100) * calvings[i]).toLocaleString()} / ${calvings[i].toLocaleString()} 产犊）`
+        }
+      />
+    </SectionCard>
+  );
+}
+
 /* ---------------- 发病率 / 治愈率 / 平均诊疗天数趋势 ---------------- */
 
 function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
@@ -1039,6 +1070,7 @@ export function GroupExecSection({
           <PostpartumTrendSection scopeRegion={scopeRegion} />
           <DrugTrendSection scopeRegion={scopeRegion} />
           <TreatmentDaysTrendSection scopeRegion={scopeRegion} />
+          <PrematureRateTrendSection scopeRegion={scopeRegion} />
         </div>
       ))}
       {showCharts && scopeRegion && !scopeFarm ? (
