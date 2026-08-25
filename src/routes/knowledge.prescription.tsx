@@ -343,7 +343,7 @@ function PrescriptionPage() {
 
   return (
     <>
-      <AppHeader title="处方管理" breadcrumb={["诊疗知识库", "处方管理"]} />
+      <AppHeader title="处方管理" breadcrumb={["诊疗管理", "处方管理"]} />
       <main className="flex-1 px-6 py-6 space-y-4">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2">

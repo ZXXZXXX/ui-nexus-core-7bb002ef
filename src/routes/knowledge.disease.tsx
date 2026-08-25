@@ -285,7 +285,7 @@ function DiseaseKBPage() {
 
   return (
     <>
-      <AppHeader title="疾病知识库" breadcrumb={["诊疗知识库", "疾病知识库"]} />
+      <AppHeader title="疾病知识库" breadcrumb={["诊疗管理", "疾病知识库"]} />
       <main className="flex-1 px-6 py-6 space-y-4">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="flex items-center gap-2">
