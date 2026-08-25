@@ -250,6 +250,7 @@ function SymptomKBPage() {
           </SheetHeader>
           {viewing && (
             <div className="mt-4 space-y-3">
+              <StatScopeCard metrics={symptomStats(viewing.id)} />
               <ViewRow label="编号" value={viewing.id} mono />
               <ViewRow label="名称" value={viewing.name} />
               <ViewRow label="紧急程度" value={viewing.urgency} />
