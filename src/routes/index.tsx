@@ -479,7 +479,7 @@ function HomePage() {
         topicOrder.indexOf(cardTopicByAnchor[b.anchor]),
     );
   const isExec = scope === "group" || scope === "region" || scope === "farm-out";
-  const showAttendance = !isExec || scope === "farm-out";
+  const showAttendance = !isExec;
   const visibleCards =
     isExec
       ? (() => {
@@ -490,7 +490,8 @@ function HomePage() {
 
               : scope === "region"
                 ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
-                : [map.get("总存栏数"), applyTimeScope(farmOutCalvingCard), map.get("早产率"), applyTimeScope(farmOutLeadCard), map.get("治愈率"), map.get("死淘总数")];
+                : farmOutBizCards.map(applyTimeScope);
+
           return execOrder.filter(Boolean) as MetricCard[];
         })()
       : baseCards;
