@@ -490,9 +490,8 @@ function ReportPage() {
 
   const [kind] = useState<ReportKind>("health");
 
-  // 上报模式：扫到牛舍且无指定牛只 → 默认以牛舍为对象；从现场上报入口进入时支持手动切换
-  const lockMode = !!search.barn || !!search.target;
-  const [mode, setMode] = useState<"cow" | "barn">(
+  // 上报对象仅支持按牛只；扫到牛舍时仍以牛舍为对象
+  const [mode] = useState<"cow" | "barn">(
     !!search.barn && !search.target ? "barn" : "cow"
   );
   const barnMode = mode === "barn";
