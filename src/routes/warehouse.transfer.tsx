@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Plus, Search, X } from "lucide-react";
+import { ListPage, type ListColumn } from "@/components/list-page";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -18,252 +21,259 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Truck, PackageCheck, Clock } from "lucide-react";
-import {
-  WarehouseEventPage,
-  type StatusConfig,
-  type WarehouseEvent,
-} from "@/components/warehouse-event-page";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/warehouse/transfer")({
-  head: () => ({ meta: [{ title: "调拨转库 — 奇点智牧" }] }),
+  head: () => ({
+    meta: [
+      { title: "调拨记录 — 奇点智牧" },
+      { name: "description", content: "查看牧场药品调拨入库记录，含商品编码、规格型号、调拨数量与登记人员。" },
+      { property: "og:title", content: "调拨记录 — 奇点智牧" },
+      { property: "og:description", content: "牧场药品调拨入库台账。" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: TransferPage,
 });
 
-type TStatus = "待出库" | "运输中" | "已入库";
+type TransferRow = {
+  id: string;
+  code: string; // 商品编码
+  name: string; // 药品展示名称
+  spec: string; // 规格型号
+  qty: number; // 调拨数量
+  unit: string;
+  inboundAt: string; // 入库时间
+  operator: string; // 登记人员
+  remark: string; // 备注信息
+};
 
-const statuses: StatusConfig<TStatus>[] = [
-  { key: "待出库", label: "待出库", icon: Clock, tone: "warning" },
-  { key: "运输中", label: "运输中", icon: Truck, tone: "info" },
-  { key: "已入库", label: "已入库", icon: PackageCheck, tone: "success" },
+const ITEMS = [
+  { id: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", unit: "支" },
+  { id: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", unit: "支" },
+  { id: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml:1g/瓶", unit: "瓶" },
+  { id: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", unit: "罐" },
+  { id: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", unit: "桶" },
 ];
 
-const initialData: WarehouseEvent<TStatus>[] = [
-  {
-    id: "TR-2026-0142",
-    lines: [
-      { item: "乳房炎抗生素 5mg", qty: "20 盒" },
-      { item: "一次性注射器 10ml", qty: "200 支" },
-    ],
-    desc: "昨日用量超预期，从 1 号库紧急补一批至 2 号库。",
-    status: "待出库",
-    operator: "王建国",
-    operatedAt: "2026-05-19 10:24",
-    from: "1 号库（一级）",
-    to: "2 号库（二级）",
-  },
-  {
-    id: "TR-2026-0141",
-    lines: [{ item: "免疫疫苗 A 型", qty: "60 支" }],
-    desc: "5 月口蹄疫加强免疫备货，1 号库 → 2 号库。",
-    status: "运输中",
-    operator: "王建国",
-    operatedAt: "2026-05-19 09:08",
-    from: "1 号库（一级）",
-    to: "2 号库（二级）",
-  },
-  {
-    id: "TR-2026-0140",
-    lines: [
-      { item: "广谱驱虫药", qty: "15 盒" },
-      { item: "驱虫滴剂", qty: "30 瓶" },
-    ],
-    desc: "季度体内驱虫批次，1 号库 → 2 号库。",
-    status: "已入库",
-    operator: "王建国",
-    operatedAt: "2026-05-18 16:42",
-    from: "1 号库（一级）",
-    to: "2 号库（二级）",
-  },
-  {
-    id: "TR-2026-0139",
-    lines: [{ item: "修蹄耗材包", qty: "8 套" }],
-    desc: "1 号牛舍集中修蹄，物资 1 号库 → 2 号库。",
-    status: "已入库",
-    operator: "王建国",
-    operatedAt: "2026-05-18 11:30",
-    from: "1 号库（一级）",
-    to: "2 号库（二级）",
-  },
+const initial: TransferRow[] = [
+  { id: "TR-2026-0142", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", qty: 20, unit: "支", inboundAt: "2026-05-19 10:24", operator: "王建国", remark: "昨日用量超预期，1 号库紧急补货至 2 号库" },
+  { id: "TR-2026-0141", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支", inboundAt: "2026-05-19 09:08", operator: "王建国", remark: "5 月加强免疫备货" },
+  { id: "TR-2026-0140", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml:1g/瓶", qty: 15, unit: "瓶", inboundAt: "2026-05-18 16:42", operator: "孙库管", remark: "季度体内驱虫批次" },
+  { id: "TR-2026-0139", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶", inboundAt: "2026-05-18 11:30", operator: "孙库管", remark: "" },
 ];
 
-type Line = { item: string; qty: string };
+const columns: ListColumn<TransferRow>[] = [
+  { key: "code", label: "商品编码", required: true, render: (r) => <span className="font-mono text-body text-foreground">{r.code}</span> },
+  { key: "name", label: "药品展示名称", required: true, render: (r) => <span className="text-body text-foreground truncate">{r.name}</span> },
+  { key: "spec", label: "规格型号", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.spec}</span> },
+  {
+    key: "qty", label: "调拨数量", filter: "number", value: (r) => r.qty,
+    render: (r) => (
+      <span className="text-body tabular-nums text-foreground">
+        {r.qty} <span className="text-caption text-text-tertiary">{r.unit}</span>
+      </span>
+    ),
+  },
+  { key: "inboundAt", label: "入库时间", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.inboundAt}</span> },
+  { key: "operator", label: "登记人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
+  {
+    key: "remark", label: "备注信息",
+    render: (r) => (
+      <span className="text-body-sm text-text-secondary truncate">{r.remark || "—"}</span>
+    ),
+  },
+];
 
 function TransferPage() {
-  const [data, setData] = useState<WarehouseEvent<TStatus>[]>(initialData);
-  const [createOpen, setCreateOpen] = useState(false);
+  const [data, setData] = useState<TransferRow[]>(initial);
+  const [open, setOpen] = useState(false);
 
-  const handleCreate = (e: WarehouseEvent<TStatus>) => {
-    setData((d) => [e, ...d]);
-    setCreateOpen(false);
+  const [itemId, setItemId] = useState("");
+  const [itemKw, setItemKw] = useState("");
+  const [qty, setQty] = useState("");
+  const [from, setFrom] = useState("1 号库（一级）");
+  const [to, setTo] = useState("2 号库（二级）");
+  const [inboundAt, setInboundAt] = useState(() => stamp());
+  const [remark, setRemark] = useState("");
+
+  const item = ITEMS.find((i) => i.id === itemId);
+
+  const itemMatches = useMemo(() => {
+    const kw = itemKw.trim().toLowerCase();
+    if (!kw) return ITEMS;
+    return ITEMS.filter((i) => i.name.toLowerCase().includes(kw) || i.id.toLowerCase().includes(kw));
+  }, [itemKw]);
+
+  const reset = () => {
+    setItemId(""); setItemKw(""); setQty("");
+    setInboundAt(stamp()); setRemark("");
+  };
+
+  const submit = () => {
+    if (!item) return toast.error("请选择药品");
+    if (!qty || Number(qty) <= 0) return toast.error("请输入有效的调拨数量");
+    const nextId = `TR-2026-${String(143 + (data.length - initial.length)).padStart(4, "0")}`;
+    setData((d) => [
+      {
+        id: nextId,
+        code: item.id,
+        name: item.name,
+        spec: item.spec,
+        qty: Number(qty),
+        unit: item.unit,
+        inboundAt,
+        operator: "超级管理员",
+        remark: remark || `${from} → ${to}`,
+      },
+      ...d,
+    ]);
+    toast.success("调拨记录已登记");
+    reset();
+    setOpen(false);
   };
 
   return (
     <>
-      <WarehouseEventPage<TStatus>
-        title="调拨转库"
-        breadcrumb={["仓库管理", "调拨转库"]}
-        statuses={statuses}
-        hideTabs
-      events={data}
-        searchPlaceholder="按调拨单号 / 物资 / 描述搜索"
-        createLabel="新建调拨"
-        onCreate={() => setCreateOpen(true)}
-        detailNote="出库与入库状态由第三方仓储系统自动同步，无需手动确认。"
+      <ListPage<TransferRow>
+        title="调拨记录"
+        breadcrumb={["仓库管理", "调拨记录"]}
+        rows={data}
+        columns={columns}
+        searchKeys={["name", "code"]}
+        searchPlaceholder="按药品名称 / 商品编码搜索"
+        primaryAction={{ label: "新建调拨", icon: <Plus className="h-3.5 w-3.5" />, onClick: () => setOpen(true) }}
+        getRowKey={(r) => r.id}
+        rowActions={() => (
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">
+            查看
+          </Button>
+        )}
       />
 
-      <CreateDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        onSubmit={handleCreate}
-        nextId={`TR-2026-${String(143 + (data.length - initialData.length)).padStart(4, "0")}`}
-      />
-    </>
-  );
-}
+      <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none p-0 flex flex-col gap-0">
+          <SheetHeader className="px-6 py-4 border-b border-border">
+            <SheetTitle className="text-card-title text-foreground text-left">新建调拨</SheetTitle>
+            <SheetDescription className="text-caption text-text-tertiary text-left">
+              登记药品调拨入库信息，提交后归档至调拨台账。
+            </SheetDescription>
+          </SheetHeader>
 
-function CreateDialog({
-  open,
-  onOpenChange,
-  onSubmit,
-  nextId,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  onSubmit: (t: WarehouseEvent<TStatus>) => void;
-  nextId: string;
-}) {
-  const [lines, setLines] = useState<Line[]>([{ item: "", qty: "" }]);
-  const [from, setFrom] = useState("1 号库（一级）");
-  const [to, setTo] = useState("2 号库（二级）");
-  const [operatedAt, setOperatedAt] = useState(() => {
-    const d = new Date();
-    const pad = (n: number) => String(n).padStart(2, "0");
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  });
-  const [note, setNote] = useState("");
-
-  const reset = () => {
-    setLines([{ item: "", qty: "" }]);
-    setNote("");
-  };
-
-  const update = (i: number, k: keyof Line, v: string) => {
-    setLines((ls) => ls.map((l, idx) => (idx === i ? { ...l, [k]: v } : l)));
-  };
-
-  const canSubmit = lines.every((l) => l.item.trim() && l.qty.trim()) && from && to && from !== to;
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) reset(); }}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader>
-          <DialogTitle className="text-section-title">新建调拨</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-caption text-text-tertiary">来源库</Label>
-              <Select value={from} onValueChange={setFrom}>
-                <SelectTrigger className="h-9 bg-card"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1 号库（一级）">1 号库（一级）</SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+            <div className="space-y-2">
+              <Label className="text-body-sm">
+                药品 <span className="text-[var(--state-danger)]">*</span>
+              </Label>
+              {item ? (
+                <div className="flex items-center justify-between h-9 px-3 rounded-md border border-border bg-surface-subtle">
+                  <span className="text-body-sm text-foreground">
+                    {item.name} <span className="text-text-tertiary">· {item.id} · {item.spec}</span>
+                  </span>
+                  <button onClick={() => { setItemId(""); setItemKw(""); }} className="text-text-tertiary hover:text-foreground">
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
+                  <Input
+                    value={itemKw}
+                    onChange={(e) => setItemKw(e.target.value)}
+                    placeholder="搜索药品名称 / 商品编码"
+                    className="h-9 pl-9 text-body-sm"
+                  />
+                  <div className="mt-1.5 max-h-40 overflow-y-auto rounded-md border border-border bg-card">
+                    {itemMatches.length === 0 ? (
+                      <div className="px-3 py-2 text-caption text-text-tertiary">无匹配项</div>
+                    ) : (
+                      itemMatches.map((i) => (
+                        <button
+                          key={i.id}
+                          onClick={() => { setItemId(i.id); setItemKw(""); }}
+                          className="w-full px-3 py-2 text-left text-body-sm text-foreground hover:bg-surface-subtle"
+                        >
+                          {i.name}
+                          <span className="text-text-tertiary"> · {i.id} · {i.spec}</span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-caption text-text-tertiary">目标库</Label>
-              <Select value={to} onValueChange={setTo}>
-                <SelectTrigger className="h-9 bg-card"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2 号库（二级）">2 号库（二级）</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label className="text-body-sm">来源库</Label>
+                <Select value={from} onValueChange={setFrom}>
+                  <SelectTrigger className="h-9 bg-card"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1 号库（一级）">1 号库（一级）</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-body-sm">目标库</Label>
+                <Select value={to} onValueChange={setTo}>
+                  <SelectTrigger className="h-9 bg-card"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2 号库（二级）">2 号库（二级）</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-body-sm">
+                  调拨数量 <span className="text-[var(--state-danger)]">*</span>
+                </Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={qty}
+                    onChange={(e) => setQty(e.target.value.replace(/[^\d.]/g, ""))}
+                    inputMode="decimal"
+                    placeholder="请输入数量"
+                    className="h-9 text-body-sm"
+                  />
+                  <span className="text-body-sm text-text-tertiary w-8">{item?.unit ?? "—"}</span>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-body-sm">入库时间</Label>
+                <Input
+                  value={inboundAt}
+                  onChange={(e) => setInboundAt(e.target.value)}
+                  placeholder="YYYY-MM-DD HH:mm"
+                  className="h-9 text-body-sm tabular-nums"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5 col-span-2">
-              <Label className="text-caption text-text-tertiary">操作时间</Label>
-              <Input
-                value={operatedAt}
-                onChange={(e) => setOperatedAt(e.target.value)}
-                placeholder="YYYY-MM-DD HH:mm"
-                className="h-9 bg-card"
+
+            <div className="space-y-2">
+              <Label className="text-body-sm">备注信息</Label>
+              <Textarea
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+                placeholder="可填写调拨原因、注意事项等"
+                className="min-h-[72px] text-body-sm"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-caption text-text-tertiary">物资明细</Label>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-7 px-2 text-body-sm text-primary hover:bg-brand-subtle hover:text-primary gap-1"
-                onClick={() => setLines((ls) => [...ls, { item: "", qty: "" }])}
-              >
-                <Plus className="h-3.5 w-3.5" /> 增加一行
-              </Button>
-            </div>
-            <div className="space-y-2">
-              {lines.map((l, i) => (
-                <div key={i} className="grid grid-cols-[1fr_120px_32px] gap-2 items-center">
-                  <Input
-                    value={l.item}
-                    onChange={(e) => update(i, "item", e.target.value)}
-                    placeholder="物资名称"
-                    className="h-9 bg-card"
-                  />
-                  <Input
-                    value={l.qty}
-                    onChange={(e) => update(i, "qty", e.target.value)}
-                    placeholder="数量"
-                    className="h-9 bg-card"
-                  />
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-9 w-8 text-text-tertiary hover:text-[var(--state-danger)]"
-                    disabled={lines.length === 1}
-                    onClick={() => setLines((ls) => ls.filter((_, idx) => idx !== i))}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label className="text-caption text-text-tertiary">备注</Label>
-            <Textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              placeholder="可填写调拨原因、注意事项等"
-              className="min-h-[72px] bg-card"
-            />
-          </div>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
-          <Button
-            disabled={!canSubmit}
-            className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-            onClick={() =>
-              onSubmit({
-                id: nextId,
-                lines,
-                desc: `${from} → ${to}${note ? "。" + note : ""}`,
-                operator: "王建国",
-                operatedAt,
-                status: "待出库",
-                from,
-                to,
-              })
-            }
-          >
-            生成调拨单
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <SheetFooter className="px-6 py-4 border-t border-border flex-row justify-end gap-2">
+            <Button variant="outline" onClick={() => setOpen(false)}>取消</Button>
+            <Button className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground" onClick={submit}>
+              提交
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+    </>
   );
+}
+
+function stamp() {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
