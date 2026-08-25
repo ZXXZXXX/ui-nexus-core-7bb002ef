@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Stethoscope, Search, TrendingUp, ChevronRight, X, FileText } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { useFarm } from "@/lib/farm-store";
+import { PRESCRIPTION_SEED } from "@/lib/prescription-kb";
 import { KB_DISEASES, symptomName, severityOf, recent7d } from "@/lib/disease-kb";
 import { StatScopeCard, diseaseStats } from "@/components/stat-scope-card";
 
@@ -45,7 +46,23 @@ const DISEASES: Disease[] = KB_DISEASES.map((d) => ({
   desc: `${d.type} · 常见症状 ${d.symptoms.length} 项，详见下方症状列表。`,
   groups: d.groups,
   symptoms: d.symptoms.map(symptomName),
-  prescriptions: [],
+  prescriptions: (d.rx ?? []).flatMap((code, idx) => {
+    const r = PRESCRIPTION_SEED.find((x) => x.code === code);
+    if (!r) return [];
+    return [{
+      name: r.name,
+      tier: (idx === 0 ? "首选" : "备选") as Prescription["tier"],
+      scenario: r.intro || r.desc || `${r.category}${r.subType ? " · " + r.subType : ""}`,
+      course: `${r.category}${r.subType ? " · " + r.subType : ""} · 疗程 ${r.duration} 天`,
+      drugs: r.drugs.map((g) => ({
+        name: g.drugs.map((x) => x.name).join(" / "),
+        usage: [g.fixedDose, g.routes.join("、"), `${g.freq.m}天${g.freq.n}次`, `连用${g.days}天`]
+          .filter(Boolean)
+          .join("，"),
+      })),
+      notes: r.review?.on ? `复查：${r.review.desc || `连续 ${r.review.days} 天`}` : undefined,
+    }];
+  }),
   recent7d: recent7d(d.id),
 }));
 

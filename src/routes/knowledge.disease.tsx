@@ -170,7 +170,13 @@ const seed: Disease[] = KB_DISEASES.map((d, i) => {
     status: d.status === "启用" ? "启用" : "停用",
     order: i + 1,
     symptoms: d.symptoms.map((code, idx) => ({ code, name: symptomName(code), core: idx < 3 })),
-    prescriptions: [],
+    prescriptions: (d.rx ?? []).map((code, idx) => ({
+      code,
+      name: PRESCRIPTION_SEED.find((r) => r.code === code)?.name ?? code,
+      level: (idx === 0 ? "首选" : "备选") as PrescriptionRef["level"],
+      defaultRx: idx === 0,
+    })),
+
   } satisfies Disease;
 });
 
