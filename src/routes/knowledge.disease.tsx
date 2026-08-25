@@ -43,6 +43,76 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { StatScopeCard, diseaseStats } from "@/components/stat-scope-card";
 import { KB_CATEGORIES, KB_DISEASES, symptomName } from "@/lib/disease-kb";
+import { PRESCRIPTION_SEED } from "@/lib/prescription-kb";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
+
+function RxSearchSelect({
+  selected,
+  onAdd,
+}: {
+  selected: PrescriptionRef[];
+  onAdd: (rx: { code: string; name: string }) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const options = useMemo(
+    () =>
+      PRESCRIPTION_SEED.filter((r) => r.enabled !== false).map((r) => ({
+        code: r.code,
+        name: r.name,
+        category: r.category,
+      })),
+    [],
+  );
+  const picked = new Set(selected.map((s) => s.code));
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" role="combobox" className="h-8 gap-1.5 text-body-sm font-normal">
+          <Plus className="h-3.5 w-3.5" /> 搜索并关联处方
+          <ChevronsUpDown className="h-3.5 w-3.5 text-text-tertiary" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="p-0 w-[420px]">
+        <Command filter={(v, s) => (v.toLowerCase().includes(s.toLowerCase()) ? 1 : 0)}>
+          <CommandInput placeholder="输入处方名称 / 编号 / 分类搜索" />
+          <CommandList className="max-h-72">
+            <CommandEmpty>未找到匹配的处方</CommandEmpty>
+            <CommandGroup>
+              {options.map((o) => (
+                <CommandItem
+                  key={o.code}
+                  value={`${o.name} ${o.code} ${o.category}`}
+                  onSelect={() => {
+                    if (!picked.has(o.code)) onAdd({ code: o.code, name: o.name });
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={`mr-2 h-3.5 w-3.5 ${picked.has(o.code) ? "opacity-100 text-primary" : "opacity-0"}`}
+                  />
+                  <span className="flex-1 truncate">{o.name}</span>
+                  <span className="text-caption text-text-tertiary ml-2 truncate max-w-[96px]">{o.category}</span>
+                  <span className="text-caption text-text-tertiary font-mono ml-2">{o.code}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 
 export const Route = createFileRoute("/knowledge/disease")({
   head: () => ({ meta: [{ title: "疾病知识库 — 奇点智牧" }] }),
