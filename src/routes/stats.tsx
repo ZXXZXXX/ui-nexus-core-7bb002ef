@@ -66,6 +66,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { METRIC_SECTIONS, SECTION_BY_KEY } from "@/lib/health-metrics";
 
 export const Route = createFileRoute("/stats")({
   head: () => ({
@@ -459,6 +460,9 @@ type Template = {
   usage?: number;
   creator: string;
   createdAt: string;
+  section?: string;
+  formula?: string;
+  metricNo?: number;
 };
 
 
@@ -567,6 +571,28 @@ const DEFAULT_TEMPLATES: Template[] = [
     createdAt: "2026-07-15 09:05",
   },
 ];
+
+const METRIC_TEMPLATES: Template[] = METRIC_SECTIONS.flatMap((sec) =>
+  sec.metrics.map((m) => ({
+    id: `m-${m.no}`,
+    category: (sec.key === "calving"
+      ? "cattle"
+      : sec.key === "immune"
+        ? "drug"
+        : "disease") as TplCategory,
+    name: m.name,
+    desc: m.formula,
+    formula: m.formula,
+    metricNo: m.no,
+    section: sec.key,
+    icon: BarChart3,
+    tone: sec.tone,
+    filters: { ...DEFAULT_FILTERS, dateRange: "30d" },
+    usage: 20 + ((m.no * 37) % 180),
+    creator: "系统预置",
+    createdAt: "2026-07-01 09:00",
+  })),
+);
 
 // ============ Mock result data ============
 type Row = {
@@ -734,8 +760,9 @@ function resultColumns(cat: TplCategory, f: Filters): ResultCol[] {
 // ============ Page ============
 function StatsPage() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-  const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
-  const [view, setView] = useState<"templates" | "result">("templates");
+  const [templates, setTemplates] = useState<Template[]>([...METRIC_TEMPLATES, ...DEFAULT_TEMPLATES]);
+  const [view, setView] = useState<"sections" | "templates" | "result">("sections");
+  const [activeSection, setActiveSection] = useState<string>("custom");
   const [resultFilters, setResultFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [resultTitle, setResultTitle] = useState("筛选结果");
   const [resultCat, setResultCat] = useState<TplCategory>("cattle");
@@ -815,6 +842,7 @@ function StatsPage() {
     setTemplates((prev) => [
       {
         id: `t-${Date.now()}`,
+        section: activeSection,
         name: saveName.trim(),
         category: builderCat ?? inferCategory(saveSource),
         desc: saveDesc.trim() || describeFilters(saveSource),
@@ -860,8 +888,10 @@ function StatsPage() {
             describeFilters(t.filters).toLowerCase().includes(k),
         )
       : templates;
-    return [...list].sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
-  }, [templates, query]);
+    return [...list]
+      .filter((t) => (t.section ?? "custom") === activeSection)
+      .sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
+  }, [templates, query, activeSection]);
 
   const editingTemplate = templates.find((t) => t.id === editingId) ?? null;
 
