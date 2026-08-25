@@ -674,8 +674,9 @@ function PostpartumTrendSection({ scopeRegion }: { scopeRegion?: string | null }
 function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
   const { period, setPeriod, labels, factors } = usePeriod();
   const { all } = useScopeRatio(scopeRegion);
-  const death = factors.map((k) => Math.round(all.death * k));
-  const cull = factors.map((k) => Math.round(all.cull * k));
+  const herd = all.herd || 1;
+  const deathRate = factors.map((k) => Number(((all.death * k) / herd * 100).toFixed(2)));
+  const cullRate = factors.map((k) => Number(((all.cull * k) / herd * 100).toFixed(2)));
 
   return (
     <SectionCard
@@ -685,20 +686,16 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <p className="text-body-sm text-text-secondary mb-4">按月统计死亡与淘汰头数，柱高为死淘合计</p>
-      <StackedColumns
+      <p className="text-body-sm text-text-secondary mb-4">按月统计死亡率（实线）与淘汰率（虚线），口径为当月死淘头数 / 存栏</p>
+      <LineTrend
         labels={labels}
-        unit=" 头"
-        decimals={0}
+        unit="%"
+        height={240}
         series={[
-          { name: "死亡", color: "var(--state-danger)", points: death },
-          { name: "淘汰", color: "var(--state-warning)", points: cull },
+          { name: "死亡率", color: "var(--state-danger)", points: deathRate },
+          { name: "淘汰率", color: "var(--state-warning)", points: cullRate, dashed: true },
         ]}
       />
-      <ChartLegend items={[
-        { name: "死亡", color: "var(--state-danger)" },
-        { name: "淘汰", color: "var(--state-warning)" },
-      ]} />
     </SectionCard>
   );
 }
@@ -994,9 +991,9 @@ export function GroupExecSection({
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
+          <DeathCullTrendSection scopeRegion={scopeRegion} />
           <PostpartumTrendSection scopeRegion={scopeRegion} />
           <DrugTrendSection scopeRegion={scopeRegion} />
-          <DeathCullTrendSection scopeRegion={scopeRegion} />
           <TreatmentDaysTrendSection scopeRegion={scopeRegion} />
         </div>
       ))}

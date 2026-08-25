@@ -251,7 +251,7 @@ export function BarList({
   );
 }
 
-export type Series = { name: string; color: string; points: number[] };
+export type Series = { name: string; color: string; points: number[]; dashed?: boolean };
 
 export function LineTrend({
   labels,
@@ -275,7 +275,7 @@ export function LineTrend({
   const padB = 30;
   const padT = 10;
   const maxV = Math.max(...series.flatMap((s) => s.points), 1);
-  const nice = Math.ceil(maxV / 5) * 5 || 5;
+  const nice = maxV <= 5 ? Math.max(Math.ceil(maxV * 1.2 * 10) / 10, 0.5) : Math.ceil(maxV / 5) * 5;
   const x = (i: number) => padL + (i * (w - padL - padR)) / Math.max(labels.length - 1, 1);
   const y = (v: number) => padT + (1 - v / nice) * (h - padT - padB);
   return (
@@ -324,7 +324,7 @@ export function LineTrend({
               fill="var(--text-tertiary)"
               fontSize="13"
             >
-              {Math.round(nice * (1 - t))}
+              {nice <= 5 ? (nice * (1 - t)).toFixed(1) : Math.round(nice * (1 - t))}
             </text>
           </g>
         ))}
@@ -336,6 +336,7 @@ export function LineTrend({
               strokeWidth="2"
               strokeLinejoin="round"
               strokeLinecap="round"
+              strokeDasharray={s.dashed ? "6 5" : undefined}
               points={s.points.map((p, i) => `${x(i)},${y(p)}`).join(" ")}
             />
             {s.points.map((p, i) => (
@@ -392,7 +393,10 @@ export function LineTrend({
       <div className="mt-2 flex flex-wrap items-center gap-4">
         {series.map((s) => (
           <span key={s.name} className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
-            <span className="h-1.5 w-4 rounded-full" style={{ background: s.color }} />
+            <span
+              className="h-1.5 w-4 rounded-full"
+              style={s.dashed ? { backgroundImage: `repeating-linear-gradient(90deg, ${s.color} 0 5px, transparent 5px 9px)` } : { background: s.color }}
+            />
             {s.name}
             {unit && <span className="text-text-tertiary">（{unit}）</span>}
           </span>
