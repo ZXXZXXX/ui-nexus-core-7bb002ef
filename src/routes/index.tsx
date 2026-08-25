@@ -582,7 +582,10 @@ function HomePage() {
               </div>
             </div>
 
-            {/* 2 · 预警 / 集团视角牧场统计 */}
+            {/* 2 · 预警 / 集团视角牧场统计 / 牧场外部健康占比 */}
+            {scope === "farm-out" ? (
+              <SemiArcStat title="牛只健康占比" data={FARM_HEALTH_DIST} centerLabel="存栏总数" />
+            ) : (
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
                 <span className="text-caption text-text-tertiary">
