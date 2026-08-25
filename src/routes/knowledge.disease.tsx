@@ -636,15 +636,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
             {value.prescriptions.map((p, idx) => (
               <div key={p.code + idx} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
                 <span className="font-mono text-body-sm text-text-secondary w-24 shrink-0">{p.code}</span>
-                <Input
-                  value={p.name}
-                  onChange={(e) => {
-                    const next = [...value.prescriptions];
-                    next[idx] = { ...p, name: e.target.value };
-                    onChange({ ...value, prescriptions: next });
-                  }}
-                  className="h-8"
-                />
+                <span className="flex-1 min-w-0 truncate text-body-sm text-foreground">{p.name || "—"}</span>
                 <Select
                   value={p.level}
                   onValueChange={(v) => {
@@ -681,22 +673,16 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
                 </Button>
               </div>
             ))}
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 gap-1.5 text-body-sm font-normal"
-              onClick={() =>
+            <RxSearchSelect
+              selected={value.prescriptions}
+              onAdd={(rx) =>
                 onChange({
                   ...value,
-                  prescriptions: [
-                    ...value.prescriptions,
-                    { code: `RX-${String(900000 + value.prescriptions.length).padStart(6, "0")}`, name: "", level: "备选" },
-                  ],
+                  prescriptions: [...value.prescriptions, { code: rx.code, name: rx.name, level: "备选" }],
                 })
               }
-            >
-              <Plus className="h-3.5 w-3.5" /> 关联处方
-            </Button>
+            />
+
           </div>
         </SectionCard>
       ) : (
