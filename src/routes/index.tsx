@@ -138,16 +138,39 @@ const CATTLE_TYPE_DIST = [
   { key: "犊牛", value: 3960, color: "#FF8A3D" },
 ];
 
-function CattleTypeDonut() {
+/** 牧场级·外部：牛只类型分布（本牧场口径） */
+const FARM_TYPE_DIST = [
+  { key: "泌乳牛", value: 2280, color: "var(--brand)" },
+  { key: "干奶牛", value: 430, color: "#2E8CF0" },
+  { key: "青年牛", value: 860, color: "var(--effect-ai-cyan)" },
+  { key: "犊牛", value: 490, color: "#FF8A3D" },
+];
+
+/** 牧场级·外部：牛只健康占比 */
+const FARM_HEALTH_DIST = [
+  { key: "健康", value: 3812, color: "var(--brand)" },
+  { key: "治疗中", value: 148, color: "var(--state-danger)" },
+  { key: "休药 / 过抗", value: 76, color: "var(--state-alert)" },
+  { key: "观察中", value: 24, color: "#2E8CF0" },
+];
+
+function SemiArcStat({
+  title,
+  data,
+  centerLabel,
+}: {
+  title: string;
+  data: { key: string; value: number; color: string }[];
+  centerLabel: string;
+}) {
   const [hover, setHover] = useState<number | null>(null);
-  const total = CATTLE_TYPE_DIST.reduce((s, d) => s + d.value, 0);
+  const total = data.reduce((s, d) => s + d.value, 0);
   const cx = 80;
   const cy = 74;
   const R = 58;
-  const active = hover === null ? null : CATTLE_TYPE_DIST[hover];
-  // 半圆：从 180° 到 360°（顺时针经过顶部）
+  const active = hover === null ? null : data[hover];
   let acc = 0;
-  const arcs = CATTLE_TYPE_DIST.map((d) => {
+  const arcs = data.map((d) => {
     const start = 180 + (acc / total) * 180;
     acc += d.value;
     const end = 180 + (acc / total) * 180;
@@ -161,7 +184,7 @@ function CattleTypeDonut() {
   });
   return (
     <div className="flex flex-col justify-between px-5 py-4">
-      <span className="text-caption text-text-tertiary">牛只类型分布</span>
+      <span className="text-caption text-text-tertiary">{title}</span>
       <div className="mt-1 flex items-center justify-center">
         <div className="relative h-[86px] w-[160px] shrink-0">
           <svg viewBox="0 0 160 82" className="h-full w-full">
@@ -187,15 +210,19 @@ function CattleTypeDonut() {
             <span className="mt-1 text-caption text-text-tertiary">
               {active
                 ? `${active.key} · ${((active.value / total) * 100).toFixed(1)}%`
-                : "存栏总数"}
+                : centerLabel}
             </span>
           </div>
         </div>
       </div>
-
     </div>
   );
 }
+
+function CattleTypeDonut() {
+  return <SemiArcStat title="牛只类型分布" data={CATTLE_TYPE_DIST} centerLabel="存栏总数" />;
+}
+
 
 
 /** 集团高管视角：数据概览指标卡（本月 / 本年） */
