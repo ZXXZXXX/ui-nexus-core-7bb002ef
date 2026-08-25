@@ -1,11 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { CheckCircle2, ClipboardList, XCircle, Clock, Search, X } from "lucide-react";
-import {
-  WarehouseEventPage,
-  type StatusConfig,
-  type WarehouseEvent,
-} from "@/components/warehouse-event-page";
+import { Search, X, Plus } from "lucide-react";
+import { ListPage, type ListColumn } from "@/components/list-page";
 import {
   Sheet,
   SheetContent,
@@ -27,20 +23,27 @@ export const Route = createFileRoute("/warehouse/loss")({
   component: LossPage,
 });
 
-type LStatus = "待生效" | "已生效";
-
-const statuses: StatusConfig<LStatus>[] = [
-  { key: "待生效", label: "待生效", icon: Clock, tone: "brand" },
-  { key: "已生效", label: "已生效", icon: CheckCircle2, tone: "success" },
-];
+type LossRow = {
+  id: string;
+  code: string; // 商品编码
+  name: string; // 药品展示名称
+  spec: string; // 规格型号
+  qty: number; // 损耗数量
+  unit: string;
+  reason: string; // 损耗原因
+  shared: boolean; // 是否均摊
+  createdAt: string; // 登记时间
+  operator: string; // 登记人员
+  value: number; // 药品估值
+};
 
 // 物品/药品候选
 const ITEMS = [
-  { id: "DR-0108", name: "乳房炎抗生素 5mg", unit: "支" },
-  { id: "DR-0214", name: "口蹄疫疫苗 A 型", unit: "支" },
-  { id: "DR-0306", name: "驱虫剂 伊维菌素", unit: "瓶" },
-  { id: "DR-0412", name: "营养补充剂 复合维生素", unit: "罐" },
-  { id: "DR-0521", name: "消毒液 戊二醛", unit: "L" },
+  { id: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", unit: "支", price: 62.5 },
+  { id: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", unit: "支", price: 60.0 },
+  { id: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml:1g/瓶", unit: "瓶", price: 38.75 },
+  { id: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", unit: "罐", price: 90.0 },
+  { id: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", unit: "L", price: 44.0 },
 ];
 
 // 仓库候选（牧场 + 仓库）
@@ -61,45 +64,41 @@ const REASON_TAGS = [
   "其他",
 ];
 
-const initial: WarehouseEvent<LStatus>[] = [
+const initial: LossRow[] = [
+  { id: "LS-1086", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 8, unit: "支", reason: "冷链断电", shared: true, createdAt: "2026-05-12 10:18", operator: "孙库管", value: 480.0 },
+  { id: "LS-1085", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 2, unit: "罐", reason: "运输破损", shared: false, createdAt: "2026-05-11 15:30", operator: "王仓管", value: 180.0 },
+  { id: "LS-1084", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 5, unit: "L", reason: "过期失效", shared: true, createdAt: "2026-05-10 09:00", operator: "孙库管", value: 220.0 },
+  { id: "LS-1083", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", qty: 1, unit: "支", reason: "误开未用", shared: false, createdAt: "2026-05-09 14:42", operator: "李雨晴", value: 62.5 },
+];
+
+const money = (n: number) =>
+  `¥ ${n.toLocaleString("zh-CN", { minimumFractionDigits: 4, maximumFractionDigits: 4 })}`;
+
+const columns: ListColumn<LossRow>[] = [
+  { key: "code", label: "商品编码", required: true, render: (r) => <span className="font-mono text-body text-foreground">{r.code}</span> },
+  { key: "name", label: "药品展示名称", required: true, render: (r) => <span className="text-body text-foreground truncate">{r.name}</span> },
+  { key: "spec", label: "规格型号", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.spec}</span> },
   {
-    id: "LS-1086",
-    lines: [{ item: "口蹄疫疫苗 A 型", qty: "8 支" }],
-    desc: "[出库前 · 冷链断电] 冷链断电导致失效，估损 ¥ 480。",
-    status: "待生效",
-    operator: "孙库管",
-    operatedAt: "2026-05-12 10:18",
+    key: "qty", label: "损耗数量", filter: "number", value: (r) => r.qty,
+    render: (r) => <span className="text-body tabular-nums text-foreground">{r.qty} <span className="text-caption text-text-tertiary">{r.unit}</span></span>,
   },
+  { key: "reason", label: "损耗原因", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.reason}</span> },
   {
-    id: "LS-1085",
-    lines: [{ item: "营养补充剂", qty: "2 罐" }],
-    desc: "[出库后 · 运输破损 · 需补领] 运输过程中外箱破损渗漏，估损 ¥ 180。",
-    status: "已生效",
-    operator: "王仓管",
-    operatedAt: "2026-05-11 15:30",
+    key: "shared", label: "是否均摊", filter: "select", value: (r) => (r.shared ? "是" : "否"),
+    render: (r) => <span className={r.shared ? "tag tag-muted text-primary" : "tag tag-muted text-text-tertiary"}>{r.shared ? "是" : "否"}</span>,
   },
+  { key: "createdAt", label: "登记时间", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.createdAt}</span> },
+  { key: "operator", label: "登记人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
   {
-    id: "LS-1084",
-    lines: [{ item: "消毒液 戊二醛", qty: "5 L" }],
-    desc: "[出库前 · 过期失效] 过期销毁登记，估损 ¥ 220。",
-    status: "待生效",
-    operator: "孙库管",
-    operatedAt: "2026-05-10 09:00",
-  },
-  {
-    id: "LS-1083",
-    lines: [{ item: "乳房炎抗生素", qty: "1 盒" }],
-    desc: "[出库后 · 误开未用 · 无需补领] 误开未使用，已退回登记。",
-    status: "已生效",
-    operator: "李雨晴",
-    operatedAt: "2026-05-09 14:42",
+    key: "value", label: "药品估值", filter: "number", value: (r) => r.value,
+    render: (r) => <span className="text-body tabular-nums text-foreground">{money(r.value)}</span>,
   },
 ];
 
 type Stage = "before" | "after";
 
 function LossPage() {
-  const [data, setData] = useState<WarehouseEvent<LStatus>[]>(initial);
+  const [data, setData] = useState<LossRow[]>(initial);
   const [open, setOpen] = useState(false);
 
   // 表单状态
@@ -110,6 +109,7 @@ function LossPage() {
   const [qty, setQty] = useState<string>("");
   const [stage, setStage] = useState<Stage>("before");
   const [reasons, setReasons] = useState<string[]>([]);
+  const [shared, setShared] = useState<boolean>(false);
   const [needRefill, setNeedRefill] = useState<boolean>(false);
   const [remark, setRemark] = useState("");
 
@@ -134,38 +134,35 @@ function LossPage() {
     setItemId(""); setItemKw("");
     setWarehouseId(""); setWarehouseKw("");
     setQty(""); setStage("before");
-    setReasons([]); setNeedRefill(false); setRemark("");
+    setReasons([]); setShared(false); setNeedRefill(false); setRemark("");
   };
 
   const submit = () => {
     if (!item) return toast.error("请选择物品/药品");
     if (!warehouse) return toast.error("请选择所属牧场/仓库");
     if (!qty || Number(qty) <= 0) return toast.error("请输入有效的损耗数量");
-    if (stage === "after" && reasons.length === 0 && !needRefill) {
-      // allow no refill, but ensure user thought about it
-    }
 
-    const tags = [
-      stage === "before" ? "出库前" : "出库后",
-      ...(reasons.length ? [reasons.join("/")] : []),
-      ...(stage === "after" ? [needRefill ? "需补领" : "无需补领"] : []),
-    ];
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, "0");
     const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
     const nextId = `LS-${1087 + (data.length - initial.length)}`;
 
-    const newRecord: WarehouseEvent<LStatus> = {
+    const newRecord: LossRow = {
       id: nextId,
-      lines: [{ item: item.name, qty: `${qty} ${item.unit}` }],
-      desc: `[${tags.join(" · ")}] ${remark || `于 ${warehouse.label} 登记损耗`}`,
-      status: "待生效",
+      code: item.id,
+      name: item.name,
+      spec: item.spec,
+      qty: Number(qty),
+      unit: item.unit,
+      reason: reasons.length ? reasons.join("/") : stage === "before" ? "出库前损耗" : "出库后损耗",
+      shared,
+      createdAt: stamp,
       operator: "超级管理员",
-      operatedAt: stamp,
+      value: Number(qty) * item.price,
     };
 
     setData((d) => [newRecord, ...d]);
-    toast.success("损耗已记录");
+    toast.success(`损耗已记录${remark ? "（含备注）" : ""}${needRefill ? " · 需补领" : ""}`);
     reset();
     setOpen(false);
   };
@@ -176,13 +173,20 @@ function LossPage() {
 
   return (
     <>
-      <WarehouseEventPage<LStatus>
+      <ListPage<LossRow>
         title="损耗管理"
         breadcrumb={["仓库管理", "损耗管理"]}
-        statuses={statuses}
-        events={data}
-        searchPlaceholder="按损耗单号 / 物资 / 描述搜索"
-        hideTabs
+        rows={data}
+        columns={columns}
+        searchKeys={["name", "code"]}
+        searchPlaceholder="按药品名称 / 商品编码搜索"
+        primaryAction={{ label: "记录损耗", icon: <Plus className="h-3.5 w-3.5" />, onClick: () => setOpen(true) }}
+        getRowKey={(r) => r.id}
+        rowActions={() => (
+          <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">
+            查看
+          </Button>
+        )}
       />
 
       <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
@@ -296,6 +300,11 @@ function LossPage() {
                 />
                 <span className="text-body-sm text-text-tertiary w-8">{item?.unit || ""}</span>
               </div>
+              {item && qty && Number(qty) > 0 && (
+                <div className="text-caption text-text-tertiary">
+                  预计估值：{money(Number(qty) * item.price)}
+                </div>
+              )}
             </div>
 
             {/* 损耗发生环节 */}
@@ -345,6 +354,25 @@ function LossPage() {
                   );
                 })}
               </div>
+            </div>
+
+            {/* 是否均摊 */}
+            <div className="space-y-2">
+              <Label className="text-body-sm">是否均摊</Label>
+              <RadioGroup
+                value={shared ? "yes" : "no"}
+                onValueChange={(v) => setShared(v === "yes")}
+                className="flex items-center gap-6"
+              >
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <RadioGroupItem value="yes" id="shared-yes" />
+                  <span className="text-body-sm">均摊至牛群成本</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <RadioGroupItem value="no" id="shared-no" />
+                  <span className="text-body-sm">不均摊</span>
+                </label>
+              </RadioGroup>
             </div>
 
             {/* 是否需要补领（仅出库后） */}
