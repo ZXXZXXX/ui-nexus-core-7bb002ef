@@ -341,19 +341,19 @@ const ALL_PER_HEAD = [31.2, 32.5, 34.8, 31.9, 30.4, 32.8, 37.6, 39.2, 34.1, 31.6
 
 function DrugComboChart({ months, totalFee, perHead }: { months: string[]; totalFee: number[]; perHead: number[] }) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 900;
-  const H = 260;
-  const padL = 56;
-  const padR = 56;
-  const padT = 16;
-  const padB = 32;
+  const W = 640;
+  const H = 240;
+  const padL = 28;
+  const padR = 28;
+  const padT = 22;
+  const padB = 26;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
   const maxBar = Math.max(...totalFee) * 1.15;
   const maxLine = Math.max(...perHead) * 1.25;
   const minLine = Math.min(...perHead) * 0.7;
   const step = iw / months.length;
-  const bw = Math.min(34, step * 0.34);
+  const bw = Math.min(34, step * 0.42);
   const cx = (i: number) => padL + step * i + step / 2;
   const ly = (v: number) => padT + ih - ((v - minLine) / (maxLine - minLine)) * ih;
   const path = perHead.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
@@ -368,7 +368,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
       </span>
       <div className="w-full overflow-x-auto">
       <div className="relative" style={{ minWidth: months.length > 6 ? 720 : undefined }}>
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" style={{ height: 280 }}>
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <line
               key={t}
