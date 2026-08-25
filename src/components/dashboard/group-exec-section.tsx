@@ -341,19 +341,19 @@ const ALL_PER_HEAD = [31.2, 32.5, 34.8, 31.9, 30.4, 32.8, 37.6, 39.2, 34.1, 31.6
 
 function DrugComboChart({ months, totalFee, perHead }: { months: string[]; totalFee: number[]; perHead: number[] }) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 900;
-  const H = 300;
-  const padL = 40;
-  const padR = 40;
-  const padT = 24;
-  const padB = 34;
+  const W = 640;
+  const H = 240;
+  const padL = 42;
+  const padR = 28;
+  const padT = 12;
+  const padB = 30;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
   const maxBar = Math.max(...totalFee) * 1.15;
   const maxLine = Math.max(...perHead) * 1.25;
   const minLine = Math.min(...perHead) * 0.7;
   const step = iw / months.length;
-  const bw = Math.min(44, step * 0.45);
+  const bw = Math.min(40, step * 0.5);
   const cx = (i: number) => padL + step * i + step / 2;
   const ly = (v: number) => padT + ih - ((v - minLine) / (maxLine - minLine)) * ih;
   const path = perHead.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
@@ -403,7 +403,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
                   onMouseEnter={() => setHover(i)}
                   onMouseLeave={() => setHover(null)}
                 />
-                <text x={cx(i)} y={H - 12} textAnchor="middle" fill="var(--text-tertiary)" fontSize="13">
+                <text x={cx(i)} y={H - 8} textAnchor="middle" fill="var(--text-tertiary)" fontSize="13">
                   {m}
                 </text>
               </g>
