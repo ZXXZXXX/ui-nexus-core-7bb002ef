@@ -215,7 +215,7 @@ const groupBizCards: MetricCard[] = [
   { topic: "死淘总数", label: "（本月）死淘总数", value: "148", unit: "头", trend: "down", delta: "-12 头", icon: Beef, anchor: "topic-culling-trend", good: true, tone: "var(--state-danger)", visual: "truck", absolute: true },
   { topic: "产犊总数", label: "（本月）产犊总数", value: "1,120", unit: "头", trend: "up", delta: "+64 头", icon: Baby, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars", absolute: true },
   { topic: "早产率", label: "（本月）早产率", value: "3.6", unit: "%", trend: "down", delta: "-0.4 pp", icon: Baby, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "ring" },
-  { topic: "总药费", label: "（本月）总药费", value: "122.1", unit: "万元", trend: "up", delta: "+2.8 %", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "spark" },
+  { topic: "总药费", label: "（本月）总药费", value: "122.1", unit: "万元", trend: "up", delta: "+2.8 %", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "spark", absolute: true },
 ];
 
 
@@ -457,7 +457,7 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? groupBizCards
+              ? groupBizCards.map(applyTimeScope)
 
               : scope === "region"
                 ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
@@ -848,7 +848,27 @@ function HomePage() {
             <div className="space-y-6">
               <Frame
                 title="数据概览"
-                extra={<span className="text-caption text-text-tertiary">统计至昨日</span>}
+                extra={
+                  <div className="flex items-center gap-3">
+                    <span className="text-caption text-text-tertiary">统计至昨日</span>
+                    <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+                      {([["month", "本月"], ["year", "本年"]] as const).map(([v, l]) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => setTimeScope(v)}
+                          className={`rounded-md px-3 py-1 text-caption transition-colors ${
+                            timeScope === v
+                              ? "bg-[var(--brand-subtle)] text-[var(--brand)] font-medium"
+                              : "text-text-tertiary hover:text-text-primary"
+                          }`}
+                        >
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                }
               >
                 {cardsGrid}
               </Frame>
