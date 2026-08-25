@@ -42,6 +42,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuIte
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { StatScopeCard, diseaseStats } from "@/components/stat-scope-card";
+import { KB_CATEGORIES, KB_DISEASES, symptomName } from "@/lib/disease-kb";
 
 export const Route = createFileRoute("/knowledge/disease")({
   head: () => ({ meta: [{ title: "疾病知识库 — 奇点智牧" }] }),
@@ -54,7 +55,7 @@ type DiseaseCategory = { code: string; name: string };
 type DiseaseType = { id: string; name: string; seq: string; categoryCode: string };
 type SymptomRef = { code: string; name: string; core?: boolean };
 type PrescriptionRef = { code: string; name: string; level: "首选" | "备选" | "特殊处方"; defaultRx?: boolean };
-type CattleGroup = "泌乳牛" | "干奶牛" | "围产牛" | "犊牛" | "育成牛";
+type CattleGroup = "泌乳牛" | "青年牛" | "干奶牛" | "围产牛" | "犊牛" | "育成牛";
 
 type Disease = {
   id: string;
@@ -74,153 +75,41 @@ type Disease = {
   prescriptions: PrescriptionRef[];
 };
 
-const CATEGORIES: DiseaseCategory[] = [
-  { code: "DL-01", name: "子宫炎类" },
-  { code: "DL-02", name: "产后代谢病类" },
-  { code: "DL-03", name: "乳房炎类" },
-  { code: "DL-04", name: "消化道类" },
-  { code: "DL-05", name: "其他类" },
-  { code: "DL-06", name: "上呼吸道类" },
-  { code: "DL-07", name: "肢蹄病类" },
-];
+const CATEGORIES: DiseaseCategory[] = KB_CATEGORIES.map((c) => ({ code: c.code, name: c.name }));
 
-const TYPES: DiseaseType[] = [
-  { id: "T-001", name: "乳房炎", seq: "001", categoryCode: "DL-03" },
-  { id: "T-002", name: "真胃变位", seq: "002", categoryCode: "DL-02" },
-  { id: "T-003", name: "其他四肢疾病", seq: "003", categoryCode: "DL-07" },
-  { id: "T-004", name: "子宫炎", seq: "004", categoryCode: "DL-01" },
-  { id: "T-005", name: "瘤胃酸中毒", seq: "005", categoryCode: "DL-04" },
-  { id: "T-006", name: "酮病", seq: "006", categoryCode: "DL-02" },
-];
+const TYPES: DiseaseType[] = (() => {
+  const map = new Map<string, DiseaseType>();
+  KB_DISEASES.forEach((d) => {
+    const key = `${d.cat}|${d.type}`;
+    if (!map.has(key)) {
+      const seq = String(map.size + 1).padStart(3, "0");
+      map.set(key, { id: `T-${seq}`, name: d.type, seq, categoryCode: d.cat });
+    }
+  });
+  return [...map.values()];
+})();
 
-const GROUP_OPTIONS: CattleGroup[] = ["泌乳牛", "干奶牛", "围产牛", "犊牛", "育成牛"];
+const GROUP_OPTIONS: CattleGroup[] = ["泌乳牛", "青年牛", "干奶牛", "围产牛", "犊牛", "育成牛"];
 
-const seed: Disease[] = [
-  {
-    id: "D-001001",
-    code: "DZ-001001",
-    typeId: "T-001",
-    subSeq: "001",
-    name: "乳房炎一级",
-    alias: "",
-    aliases: ["隐性乳房炎"],
-    presentation: "乳汁外观正常,但体细胞升高,乳房无明显红肿。",
-    treatable: true,
-    groups: ["泌乳牛"],
-    status: "启用",
-    order: 1,
-    symptoms: [
-      { code: "SY-010", name: "体细胞升高", core: true },
-      { code: "SY-011", name: "乳汁略有絮片" },
-    ],
-    prescriptions: [
-      { code: "RX-000001", name: "乳房炎一级基础方案", level: "首选", defaultRx: true },
-    ],
-  },
-  {
-    id: "D-001002",
-    code: "DZ-001002",
-    typeId: "T-001",
-    subSeq: "002",
-    name: "乳房炎二级",
-    aliases: ["临床乳房炎"],
-    presentation: "乳房红肿热痛,乳汁絮片、颜色异常,产量下降。",
-    treatable: true,
-    groups: ["泌乳牛"],
-    status: "启用",
-    order: 2,
-    symptoms: [
-      { code: "SY-012", name: "乳房红肿", core: true },
-      { code: "SY-013", name: "乳汁絮片", core: true },
-      { code: "SY-014", name: "产量下降" },
-    ],
-    prescriptions: [
-      { code: "RX-000002", name: "乳房炎二级抗菌方案", level: "首选", defaultRx: true },
-      { code: "RX-000003", name: "乳房炎二级备选方案", level: "备选" },
-    ],
-  },
-  {
-    id: "D-001003",
-    code: "DZ-001003",
-    typeId: "T-001",
-    subSeq: "003",
-    name: "乳房炎三级",
-    aliases: ["急性重症乳房炎"],
-    presentation: "全身症状明显,发热、食欲下降,乳房严重红肿,乳汁水样或血样。",
-    treatable: true,
-    groups: ["泌乳牛"],
-    status: "启用",
-    order: 3,
-    symptoms: [
-      { code: "SY-015", name: "全身发热", core: true },
-      { code: "SY-016", name: "乳汁水样", core: true },
-      { code: "SY-017", name: "食欲废绝" },
-    ],
-    prescriptions: [
-      { code: "RX-000004", name: "乳房炎三级重症方案", level: "首选", defaultRx: true },
-    ],
-  },
-  {
-    id: "D-002001",
-    code: "DZ-002001",
-    typeId: "T-002",
-    subSeq: "001",
-    name: "真胃左移",
-    alias: "LDA",
-    aliases: ["左移真胃变位"],
-    presentation: "食欲下降,产奶量骤减,左侧腹壁叩诊呈钢管音。",
-    treatable: true,
-    groups: ["泌乳牛", "围产牛"],
-    status: "启用",
-    order: 1,
-    symptoms: [
-      { code: "SY-020", name: "钢管音(左)", core: true },
-      { code: "SY-021", name: "食欲下降" },
-    ],
-    prescriptions: [
-      { code: "RX-000010", name: "真胃左移手术方案", level: "首选", defaultRx: true },
-    ],
-  },
-  {
-    id: "D-003001",
-    code: "DZ-003001",
-    typeId: "T-003",
-    subSeq: "001",
-    name: "腐蹄病",
-    aliases: ["蹄间腐烂"],
-    presentation: "蹄间皮肤红肿溃烂,恶臭,跛行明显。",
-    treatable: true,
-    groups: ["泌乳牛", "干奶牛"],
-    status: "启用",
-    order: 1,
-    symptoms: [
-      { code: "SY-030", name: "跛行", core: true },
-      { code: "SY-031", name: "蹄间恶臭" },
-    ],
-    prescriptions: [
-      { code: "RX-000020", name: "腐蹄病清创方案", level: "首选", defaultRx: true },
-    ],
-  },
-  {
-    id: "D-004001",
-    code: "DZ-004001",
-    typeId: "T-004",
-    subSeq: "001",
-    name: "子宫炎",
+const seed: Disease[] = KB_DISEASES.map((d, i) => {
+  const type = TYPES.find((t) => t.name === d.type && t.categoryCode === d.cat);
+  return {
+    id: d.id.replace("DZ-", "D-"),
+    code: d.id,
+    typeId: type?.id ?? "T-001",
+    subSeq: d.id.slice(-3),
+    name: d.name,
+    alias: d.abbr,
     aliases: [],
-    presentation: "阴道排出脓性或褐色恶臭分泌物,全身症状可有可无。",
+    presentation: `${d.catName} · ${d.type}，常见症状 ${d.symptoms.length} 项，易感牛群：${d.groups.join("、") || "未标注"}。`,
     treatable: true,
-    groups: ["泌乳牛", "围产牛"],
-    status: "启用",
-    order: 1,
-    symptoms: [
-      { code: "SY-040", name: "阴道脓性分泌物", core: true },
-    ],
-    prescriptions: [
-      { code: "RX-000030", name: "子宫炎冲洗方案", level: "首选", defaultRx: true },
-    ],
-  },
-];
+    groups: (d.groups.length ? d.groups : ["泌乳牛"]) as CattleGroup[],
+    status: d.status === "启用" ? "启用" : "停用",
+    order: i + 1,
+    symptoms: d.symptoms.map((code, idx) => ({ code, name: symptomName(code), core: idx < 3 })),
+    prescriptions: [],
+  } satisfies Disease;
+});
 
 // ---------- 工具 ----------
 
