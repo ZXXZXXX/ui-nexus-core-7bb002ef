@@ -47,5 +47,5 @@ const orders = makeOrders("XT", [
 
 export const Route = createFileRoute("/production/hoof")({
   head: () => ({ meta: [{ title: "修蹄工单 — 奇点智牧" }] }),
-  component: () => <WorkOrderPage title="修蹄工单" orders={orders} />,
+  component: () => <WorkOrderPage title="修蹄工单" orders={orders} createKind="hoof" createPrefix="XT" />,
 });

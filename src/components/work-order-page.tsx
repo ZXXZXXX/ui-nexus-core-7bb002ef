@@ -84,6 +84,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
+import { CreateWorkOrderDialog, type CreateRxKind } from "@/components/create-work-order-dialog";
+
 const WORK_TYPES = ["疾病治疗", "产后护理", "修蹄工单", "普修工单", "干奶工单", "疫苗免疫", "驱虫工单"];
 
 export type ReviewConclusion = {
@@ -278,12 +280,20 @@ function inRange(s: string, range: DateRange): boolean {
 
 export function WorkOrderPage({
   title,
-  orders,
+  orders: baseOrders,
+  createKind,
+  createPrefix,
 }: {
   title: string;
   orders: WorkOrder[];
+  /** 支持新建工单时传入对应处方类型 */
+  createKind?: CreateRxKind;
+  createPrefix?: string;
 }) {
   const role = usePcRole();
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createdOrders, setCreatedOrders] = useState<WorkOrder[]>([]);
+  const orders = useMemo(() => [...createdOrders, ...baseOrders], [createdOrders, baseOrders]);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const [active, setActive] = useState<StatusKey>("待诊断");
@@ -741,12 +751,15 @@ export function WorkOrderPage({
               </Button>
 
 
-              <Button
-                size="sm"
-                className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-              >
-                <Plus className="h-3.5 w-3.5" /> 新建工单
-              </Button>
+              {createKind && (
+                <Button
+                  size="sm"
+                  onClick={() => setCreateOpen(true)}
+                  className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
+                >
+                  <Plus className="h-3.5 w-3.5" /> 新建工单
+                </Button>
+              )}
 
 
             </div>
@@ -1681,6 +1694,31 @@ export function WorkOrderPage({
         </DialogContent>
       </Dialog>
 
+      {createKind && (
+        <CreateWorkOrderDialog
+          open={createOpen}
+          onOpenChange={setCreateOpen}
+          title={title}
+          kind={createKind}
+          onCreate={({ targets, targetLabel, rx }) => {
+            const now = new Date();
+            const p2 = (n: number) => (n < 10 ? `0${n}` : `${n}`);
+            const stamp = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}`;
+            const seq = createdOrders.length + 1;
+            const order: WorkOrder = {
+              id: `${createPrefix ?? "WO"}${p2(now.getMonth() + 1)}${p2(now.getDate())}${p2(90 + seq)}`,
+              target: targets.length > 3 ? `${targets.slice(0, 3).join("、")} 等 ${targets.length} 项` : targetLabel,
+              event: rx.name,
+              desc: rx.summary || rx.desc || `${rx.name}（${rx.code}），疗程 ${rx.duration} 天。`,
+              proposer: "当前用户",
+              status: "待诊断",
+              createdAt: stamp,
+            };
+            setCreatedOrders((prev) => [order, ...prev]);
+            setActive("待诊断");
+          }}
+        />
+      )}
     </TooltipProvider>
   );
 }

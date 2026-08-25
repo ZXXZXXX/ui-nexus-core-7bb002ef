@@ -14,5 +14,5 @@ const orders = makeOrders("QC", [
 
 export const Route = createFileRoute("/production/deworm")({
   head: () => ({ meta: [{ title: "驱虫工单 — 奇点智牧" }] }),
-  component: () => <WorkOrderPage title="驱虫工单" orders={orders} />,
+  component: () => <WorkOrderPage title="驱虫工单" orders={orders} createKind="deworm" createPrefix="QC" />,
 });
