@@ -242,17 +242,19 @@ const groupBizCards: MetricCard[] = [
 
 /** 区域管理者视角：与集团口径一致，但只统计本区域 */
 const rm = regionMetrics(CURRENT_REGION);
+const regionSickCount = Math.round((rm.herd * rm.sick) / 100);
+const regionCureCount = Math.round((regionSickCount * rm.cure) / 100);
 const regionCardOverride: Record<string, Partial<MetricCard>> = {
   "topic-herd": { topic: "总存栏数", label: `（至今日）${CURRENT_REGION}总存栏`, value: String(rm.herd), unit: "头", delta: "+96 头", trend: "up", good: true, tone: "var(--brand)", visual: "bars" },
   "topic-calving": { topic: "早产率", label: "（本月）区域早产率", value: String(rm.pretermRate), unit: "%", delta: "-0.3 pp", trend: "down", good: true, absolute: false, tone: "#2E8CF0", visual: "ring" },
   "topic-culling": { topic: "死淘总数", label: "（本月）死亡 + 淘汰", value: String(rm.deathCull), unit: "头", delta: "-8 头", trend: "down", good: true, tone: "var(--state-danger)", visual: "truck" },
-  "topic-disease": { topic: "治愈率", label: "（本月）区域治愈率", value: String(rm.cure), unit: "%", delta: "+1.2 pp", trend: "up", good: true, absolute: false, tone: "var(--state-success)", visual: "ring" },
+  "topic-disease": { topic: "治愈数", label: "（本月）区域治愈数", value: String(regionCureCount), unit: "头次", delta: "+26 头次", trend: "up", good: true, absolute: true, tone: "var(--state-success)", visual: "bars" },
   "topic-drug": { topic: "总药费支出", label: "（本月）区域总药费", value: (rm.drugFee / 10000).toFixed(1), unit: "万元", delta: "+2.8 %", trend: "up", good: false, absolute: false, tone: "var(--effect-ai-purple)", visual: "spark" },
   "topic-vaccine": { topic: "平均诊疗天数", label: "（本月）平均诊疗天数", value: String(rm.days), unit: "天", delta: "-0.2 天", trend: "down", good: true, absolute: false, tone: "var(--effect-ai-cyan)", visual: "clock" },
 };
 const regionLeadCard: MetricCard = {
-  topic: "发病率", label: "（本月）区域发病率", value: String(rm.sick), unit: "%", trend: "down", delta: "-0.2 pp",
-  icon: Stethoscope, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "spark",
+  topic: "发病数", label: "（本月）区域发病数", value: String(regionSickCount), unit: "头次", trend: "down", delta: "-18 头次",
+  icon: Stethoscope, anchor: "topic-panorama", good: true, absolute: true, tone: "#FF8A3D", visual: "spark",
 };
 const regionTailCard: MetricCard = {
   topic: "工单完成率", label: "（本月）工单完成率", value: "92.6", unit: "%", trend: "up", delta: "+1.8 pp",
@@ -481,7 +483,7 @@ function HomePage() {
               ? groupBizCards.map(applyTimeScope)
 
               : scope === "region"
-                ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
+                ? [applyTimeScope(regionLeadCard), map.get("治愈数"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
                 : farmOutBizCards.map(applyTimeScope);
 
           return execOrder.filter(Boolean) as MetricCard[];
