@@ -48,6 +48,7 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { StatScopeCard, prescriptionStats } from "@/components/stat-scope-card";
+import { PRESCRIPTION_SEED, RX_DRUG_CATALOG } from "@/lib/prescription-kb";
 
 export const Route = createFileRoute("/knowledge/prescription")({
   head: () => ({ meta: [{ title: "处方管理 — 奇点智牧" }] }),
@@ -75,8 +76,8 @@ const defaultSlot = (freq: number): TimeSlot => {
 
 type Freq = { n: number; m: number }; // n 天 m 次
 
-type Route1 = "肌肉注射" | "静脉注射" | "乳注" | "口服" | "局部用药" | "皮下注射";
-const ROUTE_OPTS: Route1[] = ["肌肉注射", "静脉注射", "乳注", "口服", "局部用药", "皮下注射"];
+type Route1 = "肌肉注射" | "静脉注射" | "乳注" | "口服" | "局部用药" | "皮下注射" | "子宫灌注";
+const ROUTE_OPTS: Route1[] = ["肌肉注射", "静脉注射", "皮下注射", "乳注", "子宫灌注", "口服", "局部用药"];
 
 type VarKind = "weight" | "quarter" | "custom";
 const VAR_LABEL: Record<VarKind, string> = {
@@ -161,24 +162,13 @@ type Rx = {
   review: ReviewCfg;
   author: string;
   updated: string;
+  diseaseCode?: string;
+  enabled?: boolean;
 };
 
 // ---------- catalog ----------
 
-const DRUG_CATALOG: DrugRef[] = [
-  { name: "头孢噻呋钠", spec: "1g/瓶" },
-  { name: "头孢噻呋钠", spec: "4g/瓶" },
-  { name: "青霉素 G 钠", spec: "400 万 IU/瓶" },
-  { name: "青霉素 G 钠", spec: "800 万 IU/瓶" },
-  { name: "氟尼辛葡甲胺", spec: "50mg/ml × 100ml" },
-  { name: "地塞米松", spec: "5mg/ml × 10ml" },
-  { name: "丙二醇", spec: "500ml/瓶" },
-  { name: "50% 葡萄糖", spec: "500ml/袋" },
-  { name: "乳房灌注 头孢洛宁", spec: "5g/支" },
-  { name: "土霉素", spec: "宫内灌注剂 5g/支" },
-  { name: "口蹄疫疫苗 A 型", spec: "5ml/瓶" },
-  { name: "PGF2α", spec: "5mg/ml × 5ml" },
-];
+const DRUG_CATALOG: DrugRef[] = RX_DRUG_CATALOG;
 
 const drugKey = (d: DrugRef) => `${d.name}｜${d.spec}`;
 
@@ -228,164 +218,8 @@ function newTask(): TaskDetail {
 
 // ---------- 种子 ----------
 
-const seed: Rx[] = [
-  {
-    id: "1",
-    code: "RX-000001",
-    kind: "disease",
-    category: "乳房炎",
-    subType: "乳房炎一级",
-    intro: "急性临床型乳房炎，全身症状明显。",
-    name: "乳房炎标准处方 A",
-    desc: "急性临床型 · 发热或食欲下降",
-    duration: 5,
-    summaryAuto: true,
-    extra: "热敷 + 频繁挤奶；泌乳期可用",
-    drugs: [
-      {
-        id: "d1",
-        drugs: [{ name: "头孢噻呋钠", spec: "1g/瓶" }, { name: "头孢噻呋钠", spec: "4g/瓶" }],
-        drugType: "处方药",
-        routes: ["肌肉注射"],
-        days: 5,
-        freq: { n: 1, m: 1 },
-        slotOn: false,
-        slot: { morning: 1, noon: 0, evening: 0 },
-        variable: true,
-        variableKind: "weight",
-        varDose: [
-          { option: "400-600kg", dose: "3ml" },
-          { option: "600-800kg", dose: "4ml" },
-        ],
-      },
-      {
-        id: "d2",
-        drugs: [{ name: "氟尼辛葡甲胺", spec: "50mg/ml × 100ml" }],
-        drugType: "处方药",
-        routes: ["静脉注射"],
-        days: 2,
-        freq: { n: 1, m: 1 },
-        slotOn: false,
-        slot: { morning: 1, noon: 0, evening: 0 },
-        variable: false,
-        fixedDose: "20ml",
-      },
-    ],
-    tasks: [
-      {
-        id: "t1",
-        name: "直肠体温",
-        type: "检查",
-        action: "每日测量并记录直肠温度",
-        record: "数字输入",
-        days: 5,
-        freq: { n: 1, m: 1 },
-        slotOn: false,
-        slot: { morning: 1, noon: 0, evening: 0 },
-      },
-    ],
-    review: { ...defaultReview("disease") },
-    author: "李雨晴",
-    updated: "2026-04-20",
-  },
-  {
-    id: "2",
-    code: "RX-000002",
-    kind: "hoof",
-    category: "蹄病",
-    subType: "腐蹄病",
-    name: "蹄叶炎康复处方",
-    duration: 7,
-    summaryAuto: true,
-    drugs: [
-      {
-        id: "d1",
-        drugs: [{ name: "氟尼辛葡甲胺", spec: "50mg/ml × 100ml" }],
-        drugType: "处方药",
-        routes: ["静脉注射"],
-        days: 3,
-        freq: { n: 1, m: 1 },
-        slotOn: false,
-        slot: { morning: 1, noon: 0, evening: 0 },
-        variable: false,
-        fixedDose: "20ml",
-      },
-    ],
-    tasks: [
-      {
-        id: "t1",
-        name: "局部修蹄",
-        type: "外科处置",
-        action: "削薄患蹄暴露病灶并粘贴蹄垫",
-        record: "图片视频",
-        days: 1,
-        freq: { n: 1, m: 1 },
-        slotOn: false,
-        slot: { morning: 1, noon: 0, evening: 0 },
-      },
-    ],
-    review: { ...defaultReview("hoof") },
-    author: "赵兽医",
-    updated: "2026-03-28",
-  },
-  {
-    id: "3",
-    code: "RX-000003",
-    kind: "drying",
-    category: "干奶",
-    subType: "常规干奶",
-    name: "干奶处方（长效封闭）",
-    duration: 1,
-    summaryAuto: true,
-    drugs: [
-      {
-        id: "d1",
-        drugs: [{ name: "乳房灌注 头孢洛宁", spec: "5g/支" }],
-        drugType: "处方药",
-        routes: ["乳注"],
-        days: 1,
-        freq: { n: 1, m: 1 },
-        slotOn: false,
-        slot: { morning: 1, noon: 0, evening: 0 },
-        variable: false,
-        fixedDose: "每乳区 1 支",
-      },
-    ],
-    tasks: [],
-    review: { ...defaultReview("drying") },
-    author: "李雨晴",
-    updated: "2026-04-01",
-  },
-  {
-    id: "4",
-    code: "RX-000004",
-    kind: "immune",
-    category: "免疫",
-    subType: "口蹄疫强制免疫",
-    name: "口蹄疫紧急处方",
-    duration: 1,
-    summaryAuto: true,
-    extra: "按当地兽医主管部门要求执行",
-    drugs: [
-      {
-        id: "d1",
-        drugs: [{ name: "口蹄疫疫苗 A 型", spec: "5ml/瓶" }],
-        drugType: "生物制品",
-        routes: ["肌肉注射"],
-        days: 1,
-        freq: { n: 1, m: 1 },
-        slotOn: false,
-        slot: { morning: 1, noon: 0, evening: 0 },
-        variable: false,
-        fixedDose: "2ml",
-      },
-    ],
-    tasks: [],
-    review: { ...defaultReview("immune") },
-    author: "陈晓东",
-    updated: "2026-04-12",
-  },
-];
+const seed: Rx[] = PRESCRIPTION_SEED as unknown as Rx[];
+
 
 // ---------- 摘要拼接 ----------
 
