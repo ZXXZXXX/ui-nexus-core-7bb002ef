@@ -942,6 +942,7 @@ function DrugDetailRow({
             <>
               <VariableDoseTable
                 varKind={value.variableKind}
+                drugSpec={value.drugs[0]?.spec}
                 value={value.varDose ?? []}
                 onChange={(varDose) => onChange({ varDose })}
               />
@@ -952,14 +953,15 @@ function DrugDetailRow({
               <span className="text-body-sm text-text-secondary shrink-0">
                 具体剂量<span className="text-[var(--state-danger)] ml-0.5">*</span>
               </span>
-              <Input
-                value={value.fixedDose ?? ""}
-                onChange={(e) => onChange({ fixedDose: e.target.value })}
-                className="h-9 w-40 text-body"
-                placeholder="如 5ml/次"
+              <DoseInput
+                spec={value.drugs[0]?.spec}
+                value={value.fixedDose}
+                onChange={(fixedDose) => onChange({ fixedDose })}
               />
+              <span className="text-caption text-text-tertiary">单位由药品规格自动带出</span>
             </div>
           )}
+
         </div>
 
         {/* 替代药品用法与剂量 */}
