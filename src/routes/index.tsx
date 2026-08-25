@@ -765,7 +765,12 @@ function HomePage() {
 
           return (
             <div className="space-y-6">
-              <Frame title="数据概览" extra={timeSelector}>{cardsGrid}</Frame>
+              <Frame
+                title="数据概览"
+                extra={<span className="text-caption text-text-tertiary">统计至昨日</span>}
+              >
+                {cardsGrid}
+              </Frame>
               <Frame title="数据看板">
                 <GroupExecSection scopeRegion={region} part="charts" />
               </Frame>
