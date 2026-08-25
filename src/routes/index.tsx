@@ -726,7 +726,7 @@ function HomePage() {
 
 
         {(() => {
-          const execFrame = scope === "group" || scope === "region";
+          const execFrame = isExec;
 
           const cardsGrid = (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
@@ -846,6 +846,7 @@ function HomePage() {
           }
 
           const region = scope === "region" ? CURRENT_REGION : null;
+          const farmScope = scope === "farm-out" ? CURRENT_FARM : null;
           const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
             <section>
               <div className="flex items-center justify-between gap-2 mb-4">
@@ -905,10 +906,10 @@ function HomePage() {
                 {cardsGrid}
               </Frame>
               <Frame title="数据看板">
-                <GroupExecSection scopeRegion={region} part="charts" />
+                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" />
               </Frame>
               <Frame title="排名情况">
-                <GroupExecSection scopeRegion={region} part="rank" />
+                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="rank" />
               </Frame>
             </div>
           );
