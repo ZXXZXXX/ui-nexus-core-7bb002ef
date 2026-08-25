@@ -86,6 +86,8 @@ const columns: ListColumn<TransferRow>[] = [
   },
 ];
 
+type DraftLine = { code: string; name: string; spec: string; unit: string; qty: number };
+
 function TransferPage() {
   const [data, setData] = useState<TransferRow[]>(initial);
   const [open, setOpen] = useState(false);
@@ -93,6 +95,7 @@ function TransferPage() {
   const [itemId, setItemId] = useState("");
   const [itemKw, setItemKw] = useState("");
   const [qty, setQty] = useState("");
+  const [lines, setLines] = useState<DraftLine[]>([]);
   const [from, setFrom] = useState("1 号库（一级）");
   const [to, setTo] = useState("2 号库（二级）");
   const [inboundAt, setInboundAt] = useState(() => stamp());
@@ -107,32 +110,45 @@ function TransferPage() {
   }, [itemKw]);
 
   const reset = () => {
-    setItemId(""); setItemKw(""); setQty("");
+    setItemId(""); setItemKw(""); setQty(""); setLines([]);
     setInboundAt(stamp()); setRemark("");
   };
 
-  const submit = () => {
+  const addLine = () => {
     if (!item) return toast.error("请选择药品");
     if (!qty || Number(qty) <= 0) return toast.error("请输入有效的调拨数量");
-    const nextId = `TR-2026-${String(143 + (data.length - initial.length)).padStart(4, "0")}`;
-    setData((d) => [
-      {
-        id: nextId,
-        code: item.id,
-        name: item.name,
-        spec: item.spec,
-        qty: Number(qty),
-        unit: item.unit,
-        inboundAt,
-        operator: "超级管理员",
-        remark: remark || `${from} → ${to}`,
-      },
-      ...d,
-    ]);
-    toast.success("调拨记录已登记");
+    setLines((ls) => {
+      const idx = ls.findIndex((l) => l.code === item.id);
+      if (idx >= 0) {
+        const next = [...ls];
+        next[idx] = { ...next[idx], qty: next[idx].qty + Number(qty) };
+        return next;
+      }
+      return [...ls, { code: item.id, name: item.name, spec: item.spec, unit: item.unit, qty: Number(qty) }];
+    });
+    setItemId(""); setItemKw(""); setQty("");
+  };
+
+  const submit = () => {
+    if (lines.length === 0) return toast.error("请先添加至少一种药品");
+    const base = 143 + (data.length - initial.length);
+    const rows: TransferRow[] = lines.map((l, i) => ({
+      id: `TR-2026-${String(base + i).padStart(4, "0")}`,
+      code: l.code,
+      name: l.name,
+      spec: l.spec,
+      qty: l.qty,
+      unit: l.unit,
+      inboundAt,
+      operator: "超级管理员",
+      remark: remark || `${from} → ${to}`,
+    }));
+    setData((d) => [...rows.reverse(), ...d]);
+    toast.success(`已登记 ${rows.length} 条调拨记录`);
     reset();
     setOpen(false);
   };
+
 
   return (
     <>
@@ -231,6 +247,7 @@ function TransferPage() {
                   <Input
                     value={qty}
                     onChange={(e) => setQty(e.target.value.replace(/[^\d.]/g, ""))}
+                    onKeyDown={(e) => { if (e.key === "Enter") addLine(); }}
                     inputMode="decimal"
                     placeholder="请输入数量"
                     className="h-9 text-body-sm"
@@ -248,6 +265,43 @@ function TransferPage() {
                 />
               </div>
             </div>
+
+            <Button variant="outline" className="w-full h-9 text-body-sm" onClick={addLine}>
+              <Plus className="h-3.5 w-3.5 mr-1" /> 添加至调拨清单
+            </Button>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-body-sm">调拨清单</Label>
+                <span className="text-caption text-text-tertiary">共 {lines.length} 种药品</span>
+              </div>
+              {lines.length === 0 ? (
+                <div className="rounded-md border border-dashed border-border px-3 py-6 text-center text-caption text-text-tertiary">
+                  暂未添加药品，可连续添加多种药品，提交后自动拆分为多条记录
+                </div>
+              ) : (
+                <div className="rounded-md border border-border divide-y divide-border">
+                  {lines.map((l) => (
+                    <div key={l.code} className="flex items-center justify-between px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-body-sm text-foreground truncate">{l.name}</div>
+                        <div className="text-caption text-text-tertiary truncate">{l.code} · {l.spec}</div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-body-sm tabular-nums text-foreground">{l.qty} {l.unit}</span>
+                        <button
+                          onClick={() => setLines((ls) => ls.filter((x) => x.code !== l.code))}
+                          className="text-text-tertiary hover:text-foreground"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
 
             <div className="space-y-2">
               <Label className="text-body-sm">备注信息</Label>
