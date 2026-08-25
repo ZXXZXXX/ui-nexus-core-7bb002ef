@@ -66,6 +66,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "sonner";
+import { METRIC_SECTIONS, SECTION_BY_KEY } from "@/lib/health-metrics";
 
 export const Route = createFileRoute("/stats")({
   head: () => ({
@@ -459,6 +460,9 @@ type Template = {
   usage?: number;
   creator: string;
   createdAt: string;
+  section?: string;
+  formula?: string;
+  metricNo?: number;
 };
 
 
@@ -567,6 +571,28 @@ const DEFAULT_TEMPLATES: Template[] = [
     createdAt: "2026-07-15 09:05",
   },
 ];
+
+const METRIC_TEMPLATES: Template[] = METRIC_SECTIONS.flatMap((sec) =>
+  sec.metrics.map((m) => ({
+    id: `m-${m.no}`,
+    category: (sec.key === "calving"
+      ? "cattle"
+      : sec.key === "immune"
+        ? "drug"
+        : "disease") as TplCategory,
+    name: m.name,
+    desc: m.formula,
+    formula: m.formula,
+    metricNo: m.no,
+    section: sec.key,
+    icon: BarChart3,
+    tone: sec.tone,
+    filters: { ...DEFAULT_FILTERS, dateRange: "30d" },
+    usage: 20 + ((m.no * 37) % 180),
+    creator: "系统预置",
+    createdAt: "2026-07-01 09:00",
+  })),
+);
 
 // ============ Mock result data ============
 type Row = {
@@ -734,8 +760,9 @@ function resultColumns(cat: TplCategory, f: Filters): ResultCol[] {
 // ============ Page ============
 function StatsPage() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
-  const [templates, setTemplates] = useState<Template[]>(DEFAULT_TEMPLATES);
-  const [view, setView] = useState<"templates" | "result">("templates");
+  const [templates, setTemplates] = useState<Template[]>([...METRIC_TEMPLATES, ...DEFAULT_TEMPLATES]);
+  const [view, setView] = useState<"sections" | "templates" | "result">("sections");
+  const [activeSection, setActiveSection] = useState<string>("custom");
   const [resultFilters, setResultFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [resultTitle, setResultTitle] = useState("筛选结果");
   const [resultCat, setResultCat] = useState<TplCategory>("cattle");
@@ -815,6 +842,7 @@ function StatsPage() {
     setTemplates((prev) => [
       {
         id: `t-${Date.now()}`,
+        section: activeSection,
         name: saveName.trim(),
         category: builderCat ?? inferCategory(saveSource),
         desc: saveDesc.trim() || describeFilters(saveSource),
@@ -860,8 +888,10 @@ function StatsPage() {
             describeFilters(t.filters).toLowerCase().includes(k),
         )
       : templates;
-    return [...list].sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
-  }, [templates, query]);
+    return [...list]
+      .filter((t) => (t.section ?? "custom") === activeSection)
+      .sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
+  }, [templates, query, activeSection]);
 
   const editingTemplate = templates.find((t) => t.id === editingId) ?? null;
 
@@ -1593,16 +1623,112 @@ function StatsPage() {
   );
 
 
-  if (view === "templates") {
+  if (view === "sections") {
+    const sectionCards = [
+      ...METRIC_SECTIONS.map((sec) => ({
+        key: sec.key,
+        title: sec.title,
+        desc: sec.desc,
+        icon: sec.icon,
+        tone: sec.tone,
+        count: templates.filter((t) => t.section === sec.key).length,
+      })),
+      {
+        key: "custom",
+        title: "自定义分析",
+        desc: "自建的多维筛选模板，支持时间、牧场、疾病、处方、工单、人员组合分析。",
+        icon: BarChart3,
+        tone: "var(--brand)",
+        count: templates.filter((t) => (t.section ?? "custom") === "custom").length,
+      },
+    ];
     return (
       <>
         <AppHeader title="统计分析" breadcrumb={["首页", "统计分析"]} />
         <main className="flex-1 px-6 py-6 space-y-5 bg-white">
+          <div>
+            <div className="text-card-title font-medium text-foreground">指标板块</div>
+            <div className="text-caption text-text-tertiary mt-0.5">
+              共 {sectionCards.length} 个板块 · {templates.length} 个指标模板，选择板块查看其下全部指标
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {sectionCards.map((sec) => {
+              const Icon = sec.icon;
+              const preview = templates
+                .filter((t) => (t.section ?? "custom") === sec.key)
+                .slice(0, 3);
+              return (
+                <Card
+                  key={sec.key}
+                  onClick={() => {
+                    setActiveSection(sec.key);
+                    setQuery("");
+                    setView("templates");
+                  }}
+                  className="p-5 border-border bg-white cursor-pointer transition-shadow hover:shadow-md"
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ background: `color-mix(in oklab, ${sec.tone} 12%, transparent)`, color: sec.tone }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-body font-medium text-foreground truncate">{sec.title}</div>
+                        <span className="text-caption text-text-tertiary whitespace-nowrap">{sec.count} 项指标</span>
+                      </div>
+                      <div className="text-caption text-text-tertiary mt-1 line-clamp-2">{sec.desc}</div>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {preview.map((t) => (
+                      <span
+                        key={t.id}
+                        className="px-2 py-0.5 rounded-md bg-surface-subtle text-caption text-text-secondary"
+                      >
+                        {t.name}
+                      </span>
+                    ))}
+                    {sec.count > preview.length && (
+                      <span className="px-2 py-0.5 text-caption text-text-tertiary">
+                        +{sec.count - preview.length}
+                      </span>
+                    )}
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+        </main>
+        {saveDialog}
+        {catDialog}
+        {builderDrawer}
+      </>
+    );
+  }
+
+  const sectionTitle =
+    activeSection === "custom" ? "自定义分析" : (SECTION_BY_KEY[activeSection]?.title ?? "统计分析");
+
+  if (view === "templates") {
+    return (
+      <>
+        <AppHeader title="统计分析" breadcrumb={["首页", "统计分析", sectionTitle]} />
+        <main className="flex-1 px-6 py-6 space-y-5 bg-white">
           <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <div className="text-card-title font-medium text-foreground">我的报表模板</div>
-              <div className="text-caption text-text-tertiary mt-0.5">
-                共 {templates.length} 个模板 · 支持时间、操作人员、疾病、处方、工单、产犊、药品多维度筛选
+            <div className="flex items-center gap-3 min-w-0">
+              <Button variant="outline" size="sm" className="h-9 shrink-0" onClick={() => setView("sections")}>
+                <ArrowLeft className="h-3.5 w-3.5 mr-1" />
+                返回板块
+              </Button>
+              <div className="min-w-0">
+                <div className="text-card-title font-medium text-foreground">{sectionTitle}</div>
+                <div className="text-caption text-text-tertiary mt-0.5">
+                  共 {visibleTemplates.length} 个指标模板 · 支持时间、牧场、牛只、疾病、处方等多维度筛选
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -1627,6 +1753,7 @@ function StatsPage() {
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
                   <TableHead>模板名称</TableHead>
+                  <TableHead className="min-w-[280px]">计算方式</TableHead>
                   <TableHead>维度</TableHead>
                   <TableHead className="text-right">条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
@@ -1658,6 +1785,9 @@ function StatsPage() {
                           <div className="text-body-sm font-medium text-foreground truncate">{t.name}</div>
                         </div>
                       </div>
+                    </TableCell>
+                    <TableCell className="text-body-sm text-text-secondary max-w-[420px]">
+                      {t.formula ?? describeFilters(t.filters)}
                     </TableCell>
                     <TableCell>
                       <span
@@ -1708,7 +1838,7 @@ function StatsPage() {
                 ))}
                 {visibleTemplates.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className="py-14 text-center text-body-sm text-text-tertiary">
+                    <TableCell colSpan={8} className="py-14 text-center text-body-sm text-text-tertiary">
                       没有匹配的模板
                     </TableCell>
                   </TableRow>
