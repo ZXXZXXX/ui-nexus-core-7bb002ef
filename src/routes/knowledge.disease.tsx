@@ -44,16 +44,6 @@ import { toast } from "sonner";
 import { StatScopeCard, diseaseStats } from "@/components/stat-scope-card";
 import { KB_CATEGORIES, KB_DISEASES, symptomName } from "@/lib/disease-kb";
 import { PRESCRIPTION_SEED } from "@/lib/prescription-kb";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { Check, ChevronsUpDown } from "lucide-react";
 
 function RxSearchSelect({
   selected,
