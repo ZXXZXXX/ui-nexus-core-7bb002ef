@@ -300,13 +300,6 @@ function PostpartumRankSection({ scopeRegion, scopeFarm }: { scopeRegion?: strin
         </span>
       }
     >
-      <p className="text-body-sm text-text-secondary mb-4">
-        {scopeFarm
-          ? "本牧场近 12 个月产后淘汰率对比"
-          : region
-            ? "该区域下各牧场产后淘汰率对比"
-            : "点击某区域可下钻查看该区域下所有牧场排名"}
-      </p>
       {scopeFarm ? (
         <LineTrend
           labels={rows.map((r) => r.key)}
@@ -660,7 +653,6 @@ function PostpartumTrendSection({ scopeRegion }: { scopeRegion?: string | null }
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <p className="text-body-sm text-text-secondary mb-4">按产后 0-30 / 31-60 / 61-90 天分段堆积，柱高为 0-90 天累计淘汰率</p>
       <StackedColumns
         labels={labels}
         unit="%"
@@ -697,7 +689,6 @@ function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null })
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <p className="text-body-sm text-text-secondary mb-4">{"\n"}</p>
       <LineTrend
         labels={labels}
         unit="%"
@@ -729,7 +720,6 @@ function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | nul
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
-      <p className="text-body-sm text-text-secondary mb-4">按月统计发病率、治愈率（%）与治愈病例平均诊疗天数（天）</p>
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
           <div className="text-body-sm text-text-secondary mb-2">发病率 / 治愈率（%）</div>
@@ -925,15 +915,6 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
         </div>
       }
     >
-      <p className="text-body-sm text-text-secondary mb-4">
-        {scopeFarm
-          ? "本牧场近 12 个月各项关键指标统计"
-          : scopeRegion
-            ? "该区域下各牧场按死淘、药费、产后淘汰率横向对比"
-            : viewMode === "farm"
-              ? "集团下所有牧场按死淘、药费、产后淘汰率横向对比"
-              : "集团下各区域按死淘、药费、产后淘汰率横向对比"}
-      </p>
 
       <div className="overflow-x-auto">
         <table className="w-full min-w-[1300px] text-body-sm">
