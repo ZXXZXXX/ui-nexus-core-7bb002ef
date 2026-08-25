@@ -247,6 +247,7 @@ function TransferPage() {
                   <Input
                     value={qty}
                     onChange={(e) => setQty(e.target.value.replace(/[^\d.]/g, ""))}
+                    onKeyDown={(e) => { if (e.key === "Enter") addLine(); }}
                     inputMode="decimal"
                     placeholder="请输入数量"
                     className="h-9 text-body-sm"
@@ -264,6 +265,43 @@ function TransferPage() {
                 />
               </div>
             </div>
+
+            <Button variant="outline" className="w-full h-9 text-body-sm" onClick={addLine}>
+              <Plus className="h-3.5 w-3.5 mr-1" /> 添加至调拨清单
+            </Button>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-body-sm">调拨清单</Label>
+                <span className="text-caption text-text-tertiary">共 {lines.length} 种药品</span>
+              </div>
+              {lines.length === 0 ? (
+                <div className="rounded-md border border-dashed border-border px-3 py-6 text-center text-caption text-text-tertiary">
+                  暂未添加药品，可连续添加多种药品，提交后自动拆分为多条记录
+                </div>
+              ) : (
+                <div className="rounded-md border border-border divide-y divide-border">
+                  {lines.map((l) => (
+                    <div key={l.code} className="flex items-center justify-between px-3 py-2">
+                      <div className="min-w-0">
+                        <div className="text-body-sm text-foreground truncate">{l.name}</div>
+                        <div className="text-caption text-text-tertiary truncate">{l.code} · {l.spec}</div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-body-sm tabular-nums text-foreground">{l.qty} {l.unit}</span>
+                        <button
+                          onClick={() => setLines((ls) => ls.filter((x) => x.code !== l.code))}
+                          className="text-text-tertiary hover:text-foreground"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
 
             <div className="space-y-2">
               <Label className="text-body-sm">备注信息</Label>
