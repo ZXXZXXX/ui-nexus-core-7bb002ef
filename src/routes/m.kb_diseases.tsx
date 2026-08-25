@@ -174,8 +174,9 @@ function DiseaseDetailSheet({ item, onClose }: { item: Disease; onClose: () => v
           </button>
         </div>
 
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-caption text-text-tertiary">近 7 天 {item.recent7d} 头</span>
+        <div className="mb-3 space-y-2">
+          <div className="text-caption text-text-tertiary">近 7 天 {item.recent7d} 头</div>
+          <StatScopeCard metrics={diseaseStats(item.id)} />
         </div>
 
         <Section label="易感牛群">
