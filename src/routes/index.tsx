@@ -130,7 +130,85 @@ const groupTailCard: MetricCard = {
   tone: "var(--effect-ai-purple)", visual: "spark",
 };
 
-/** 集团高管视角：数据概览关注业务存量数据 */
+/** 牛只类型分布（顶部 banner 环形图） */
+const CATTLE_TYPE_DIST = [
+  { key: "泌乳牛", value: 16180, color: "var(--brand)" },
+  { key: "干奶牛", value: 3240, color: "#2E8CF0" },
+  { key: "青年牛", value: 6120, color: "var(--effect-ai-cyan)" },
+  { key: "犊牛", value: 3960, color: "#FF8A3D" },
+];
+
+function CattleTypeDonut() {
+  const [hover, setHover] = useState<number | null>(null);
+  const total = CATTLE_TYPE_DIST.reduce((s, d) => s + d.value, 0);
+  const R = 42;
+  const C = 2 * Math.PI * R;
+  let offset = 0;
+  const active = hover === null ? null : CATTLE_TYPE_DIST[hover];
+  return (
+    <div className="flex flex-col justify-between px-5 py-4">
+      <span className="text-caption text-text-tertiary">牛只类型分布</span>
+      <div className="mt-2 flex items-center gap-4">
+        <div className="relative h-[112px] w-[112px] shrink-0">
+          <svg viewBox="0 0 112 112" className="h-full w-full -rotate-90">
+            {CATTLE_TYPE_DIST.map((d, i) => {
+              const len = (d.value / total) * C;
+              const dash = `${len - 2} ${C - len + 2}`;
+              const el = (
+                <circle
+                  key={d.key}
+                  cx={56}
+                  cy={56}
+                  r={R}
+                  fill="none"
+                  stroke={d.color}
+                  strokeWidth={hover === i ? 16 : 13}
+                  strokeDasharray={dash}
+                  strokeDashoffset={-offset}
+                  strokeLinecap="round"
+                  className="cursor-pointer transition-all"
+                  style={{ opacity: hover === null || hover === i ? 1 : 0.35 }}
+                  onMouseEnter={() => setHover(i)}
+                  onMouseLeave={() => setHover(null)}
+                />
+              );
+              offset += len;
+              return el;
+            })}
+          </svg>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[18px] font-semibold leading-none tabular-nums text-text-primary">
+              {(active ? active.value : total).toLocaleString()}
+            </span>
+            <span className="mt-1 text-caption text-text-tertiary">
+              {active ? active.key : "存栏总数"}
+            </span>
+          </div>
+        </div>
+        <div className="min-w-0 flex-1 space-y-1.5">
+          {CATTLE_TYPE_DIST.map((d, i) => (
+            <div
+              key={d.key}
+              onMouseEnter={() => setHover(i)}
+              onMouseLeave={() => setHover(null)}
+              className="flex items-center gap-2 text-caption"
+              style={{ opacity: hover === null || hover === i ? 1 : 0.5 }}
+            >
+              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: d.color }} />
+              <span className="text-text-tertiary whitespace-nowrap">{d.key}</span>
+              <span className="ml-auto tabular-nums text-text-primary">{d.value.toLocaleString()}</span>
+              <span className="w-10 text-right tabular-nums text-text-tertiary">
+                {((d.value / total) * 100).toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** 集团高管视角：数据概览指标卡（本月 / 本年） */
 const groupBizCards: MetricCard[] = [
   { topic: "存栏总数", label: "（至今日）牛只存栏总数", value: "29,500", unit: "头", trend: "up", delta: "+286 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars" },
   { topic: "泌乳牛数", label: "（至今日）泌乳牛存栏", value: "16,180", unit: "头", trend: "up", delta: "+142 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "bars" },
