@@ -26,18 +26,18 @@ export function DiseasePicker({
 
   const list = useMemo(() => {
     const kw = q.trim().toLowerCase();
-    const base = kw
-      ? diseases.filter(
+    const hit = (d: DiseaseItem) =>
+      d.symptoms.filter((s) => matchedSymptoms.includes(s)).length;
+    const base = diseases
+      .filter((d) => hit(d) > 0)
+      .sort((a, b) => hit(b) - hit(a));
+    return kw
+      ? base.filter(
           (d) =>
             d.name.toLowerCase().includes(kw) ||
             d.symptoms.some((s) => s.toLowerCase().includes(kw))
         )
-      : [...diseases].sort((a, b) => {
-          const ai = a.symptoms.filter((s) => matchedSymptoms.includes(s)).length;
-          const bi = b.symptoms.filter((s) => matchedSymptoms.includes(s)).length;
-          return bi - ai;
-        });
-    return base;
+      : base;
   }, [diseases, q, matchedSymptoms]);
 
   if (!open) return null;
@@ -85,7 +85,7 @@ export function DiseasePicker({
         <div className="p-4 space-y-2 overflow-y-auto flex-1">
           {list.length === 0 ? (
             <div className="text-center py-12 text-body-sm text-text-tertiary">
-              无匹配疾病
+              {matchedSymptoms.length === 0 ? "请先选择症状" : "无匹配疾病"}
             </div>
           ) : (
             list.map((d) => {
