@@ -119,7 +119,7 @@ export function TagPicker({
             <span>{hotLabel}</span>
           </div>
           <div className="flex flex-wrap gap-2 max-h-[88px] overflow-hidden">
-            {presets.map((t) => {
+            {presets.slice(0, 24).map((t) => {
               const active = selected.includes(t);
               return (
                 <button
