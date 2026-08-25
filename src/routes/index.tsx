@@ -130,14 +130,92 @@ const groupTailCard: MetricCard = {
   tone: "var(--effect-ai-purple)", visual: "spark",
 };
 
-/** 集团高管视角：数据概览关注业务存量数据 */
+/** 牛只类型分布（顶部 banner 环形图） */
+const CATTLE_TYPE_DIST = [
+  { key: "泌乳牛", value: 16180, color: "var(--brand)" },
+  { key: "干奶牛", value: 3240, color: "#2E8CF0" },
+  { key: "青年牛", value: 6120, color: "var(--effect-ai-cyan)" },
+  { key: "犊牛", value: 3960, color: "#FF8A3D" },
+];
+
+function CattleTypeDonut() {
+  const [hover, setHover] = useState<number | null>(null);
+  const total = CATTLE_TYPE_DIST.reduce((s, d) => s + d.value, 0);
+  const R = 42;
+  const C = 2 * Math.PI * R;
+  let offset = 0;
+  const active = hover === null ? null : CATTLE_TYPE_DIST[hover];
+  return (
+    <div className="flex flex-col justify-between px-5 py-4">
+      <span className="text-caption text-text-tertiary">牛只类型分布</span>
+      <div className="mt-2 flex items-center gap-4">
+        <div className="relative h-[112px] w-[112px] shrink-0">
+          <svg viewBox="0 0 112 112" className="h-full w-full -rotate-90">
+            {CATTLE_TYPE_DIST.map((d, i) => {
+              const len = (d.value / total) * C;
+              const dash = `${len - 2} ${C - len + 2}`;
+              const el = (
+                <circle
+                  key={d.key}
+                  cx={56}
+                  cy={56}
+                  r={R}
+                  fill="none"
+                  stroke={d.color}
+                  strokeWidth={hover === i ? 16 : 13}
+                  strokeDasharray={dash}
+                  strokeDashoffset={-offset}
+                  strokeLinecap="round"
+                  className="cursor-pointer transition-all"
+                  style={{ opacity: hover === null || hover === i ? 1 : 0.35 }}
+                  onMouseEnter={() => setHover(i)}
+                  onMouseLeave={() => setHover(null)}
+                />
+              );
+              offset += len;
+              return el;
+            })}
+          </svg>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[18px] font-semibold leading-none tabular-nums text-text-primary">
+              {(active ? active.value : total).toLocaleString()}
+            </span>
+            <span className="mt-1 text-caption text-text-tertiary">
+              {active ? active.key : "存栏总数"}
+            </span>
+          </div>
+        </div>
+        <div className="min-w-0 flex-1 space-y-1.5">
+          {CATTLE_TYPE_DIST.map((d, i) => (
+            <div
+              key={d.key}
+              onMouseEnter={() => setHover(i)}
+              onMouseLeave={() => setHover(null)}
+              className="flex items-center gap-2 text-caption"
+              style={{ opacity: hover === null || hover === i ? 1 : 0.5 }}
+            >
+              <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: d.color }} />
+              <span className="text-text-tertiary whitespace-nowrap">{d.key}</span>
+              <span className="ml-auto tabular-nums text-text-primary">{d.value.toLocaleString()}</span>
+              <span className="w-10 text-right tabular-nums text-text-tertiary">
+                {((d.value / total) * 100).toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** 集团高管视角：数据概览指标卡（本月 / 本年） */
 const groupBizCards: MetricCard[] = [
-  { topic: "存栏总数", label: "（至今日）牛只存栏总数", value: "29,500", unit: "头", trend: "up", delta: "+286 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars" },
-  { topic: "泌乳牛数", label: "（至今日）泌乳牛存栏", value: "16,180", unit: "头", trend: "up", delta: "+142 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "bars" },
-  { topic: "干奶牛数", label: "（至今日）干奶牛存栏", value: "3,240", unit: "头", trend: "down", delta: "-36 头", icon: Beef, anchor: "topic-panorama", good: true, tone: "var(--effect-ai-cyan)", visual: "bars" },
-  { topic: "青年牛 / 犊牛数", label: "（至今日）青年牛 / 犊牛存栏", value: "6,120 / 3,960", unit: "头", trend: "up", delta: "+180 头", icon: Baby, anchor: "topic-panorama", good: true, tone: "#FF8A3D", visual: "bars" },
-  { topic: "治疗中牛只数", label: "（至今日）治疗中牛只", value: "812", unit: "头", trend: "down", delta: "-34 头", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, tone: "var(--state-danger)", visual: "spark" },
-  { topic: "休药过抗牛只数", label: "（至今日）休药过抗牛只", value: "264", unit: "头", trend: "up", delta: "+18 头", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "clock" },
+  { topic: "发病数", label: "（本月）发病数", value: "826", unit: "头次", trend: "down", delta: "-42 头次", icon: Stethoscope, anchor: "topic-treatdays-trend", good: true, tone: "#FF8A3D", visual: "spark", absolute: true },
+  { topic: "治愈数", label: "（本月）治愈数", value: "764", unit: "头次", trend: "up", delta: "+58 头次", icon: Activity, anchor: "topic-treatdays-trend", good: true, tone: "var(--state-success)", visual: "bars", absolute: true },
+  { topic: "死淘总数", label: "（本月）死淘总数", value: "148", unit: "头", trend: "down", delta: "-12 头", icon: Beef, anchor: "topic-culling-trend", good: true, tone: "var(--state-danger)", visual: "truck", absolute: true },
+  { topic: "产犊总数", label: "（本月）产犊总数", value: "1,120", unit: "头", trend: "up", delta: "+64 头", icon: Baby, anchor: "topic-panorama", good: true, tone: "var(--brand)", visual: "bars", absolute: true },
+  { topic: "早产率", label: "（本月）早产率", value: "3.6", unit: "%", trend: "down", delta: "-0.4 pp", icon: Baby, anchor: "topic-panorama", good: true, tone: "#2E8CF0", visual: "ring" },
+  { topic: "总药费", label: "（本月）总药费", value: "122.1", unit: "万元", trend: "up", delta: "+2.8 %", icon: Pill, anchor: "topic-drug-trend", good: false, tone: "var(--effect-ai-purple)", visual: "spark", absolute: true },
 ];
 
 
@@ -379,7 +457,7 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? groupBizCards
+              ? groupBizCards.map(applyTimeScope)
 
               : scope === "region"
                 ? [applyTimeScope(regionLeadCard), map.get("治愈率"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
@@ -450,7 +528,7 @@ function HomePage() {
             className={`grid grid-cols-1 divide-y divide-border lg:divide-y-0 lg:divide-x ${
               showAttendance
                 ? "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(340px,1.3fr)]"
-                : "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)]"
+                : "lg:grid-cols-[minmax(260px,1fr)_minmax(320px,1.2fr)_minmax(280px,1fr)]"
             }`}
           >
             {/* 1 · 问候 */}
@@ -563,6 +641,9 @@ function HomePage() {
                 )}
               </div>
             </div>
+
+            {!showAttendance && <CattleTypeDonut />}
+
 
             {showAttendance && (
               <>
@@ -767,7 +848,27 @@ function HomePage() {
             <div className="space-y-6">
               <Frame
                 title="数据概览"
-                extra={<span className="text-caption text-text-tertiary">统计至昨日</span>}
+                extra={
+                  <div className="flex items-center gap-3">
+                    <span className="text-caption text-text-tertiary">统计至昨日</span>
+                    <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+                      {([["month", "本月"], ["year", "本年"]] as const).map(([v, l]) => (
+                        <button
+                          key={v}
+                          type="button"
+                          onClick={() => setTimeScope(v)}
+                          className={`rounded-md px-3 py-1 text-caption transition-colors ${
+                            timeScope === v
+                              ? "bg-[var(--brand-subtle)] text-[var(--brand)] font-medium"
+                              : "text-text-tertiary hover:text-text-primary"
+                          }`}
+                        >
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                }
               >
                 {cardsGrid}
               </Frame>
