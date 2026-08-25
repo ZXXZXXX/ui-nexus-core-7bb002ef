@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Activity, Plus, Search, Pencil, Trash2, X, MoreHorizontal } from "lucide-react";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { KB_SYMPTOMS, diseaseName } from "@/lib/disease-kb";
 
 export const Route = createFileRoute("/knowledge/symptom")({
   head: () => ({ meta: [{ title: "症状知识库 — 奇点智牧" }] }),
@@ -34,16 +35,12 @@ export const Route = createFileRoute("/knowledge/symptom")({
 
 type Symptom = { id: string; name: string; related: string[]; urgency: string };
 
-const seed: Symptom[] = [
-  { id: "SY-01", name: "持续高烧", related: ["呼吸道疾病", "乳房炎", "口蹄疫"], urgency: "高" },
-  { id: "SY-02", name: "跛行", related: ["蹄叶炎", "关节炎"], urgency: "中" },
-  { id: "SY-03", name: "食欲减退", related: ["瘤胃酸中毒", "酮病"], urgency: "中" },
-  { id: "SY-04", name: "乳房红肿", related: ["乳房炎"], urgency: "高" },
-  { id: "SY-05", name: "腹泻", related: ["瘤胃酸中毒", "犊牛腹泻症"], urgency: "中" },
-  { id: "SY-06", name: "产奶量骤降", related: ["乳房炎", "酮病"], urgency: "高" },
-  { id: "SY-07", name: "口腔水疱", related: ["口蹄疫"], urgency: "高" },
-  { id: "SY-08", name: "体温偏低", related: ["产后瘫痪", "酮病"], urgency: "中" },
-];
+const seed: Symptom[] = KB_SYMPTOMS.map((s) => ({
+  id: s.id,
+  name: s.name,
+  related: s.diseases.map(diseaseName),
+  urgency: s.diseases.length >= 8 ? "高" : s.diseases.length >= 3 ? "中" : "低",
+}));
 
 function SymptomKBPage() {
   const [list, setList] = useState<Symptom[]>(seed);
