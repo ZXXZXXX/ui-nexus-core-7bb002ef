@@ -342,28 +342,28 @@ const ALL_PER_HEAD = [31.2, 32.5, 34.8, 31.9, 30.4, 32.8, 37.6, 39.2, 34.1, 31.6
 function DrugComboChart({ months, totalFee, perHead }: { months: string[]; totalFee: number[]; perHead: number[] }) {
   const [hover, setHover] = useState<number | null>(null);
   const W = 900;
-  const H = 260;
-  const padL = 56;
-  const padR = 56;
-  const padT = 16;
-  const padB = 32;
+  const H = 300;
+  const padL = 40;
+  const padR = 40;
+  const padT = 24;
+  const padB = 34;
   const iw = W - padL - padR;
   const ih = H - padT - padB;
   const maxBar = Math.max(...totalFee) * 1.15;
   const maxLine = Math.max(...perHead) * 1.25;
   const minLine = Math.min(...perHead) * 0.7;
   const step = iw / months.length;
-  const bw = Math.min(34, step * 0.34);
+  const bw = Math.min(44, step * 0.45);
   const cx = (i: number) => padL + step * i + step / 2;
   const ly = (v: number) => padT + ih - ((v - minLine) / (maxLine - minLine)) * ih;
   const path = perHead.map((v, i) => `${i === 0 ? "M" : "L"} ${cx(i)} ${ly(v)}`).join(" ");
 
   return (
     <div className="relative w-full">
-      <span className="pointer-events-none absolute left-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
+      <span className="pointer-events-none absolute left-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
         万元
       </span>
-      <span className="pointer-events-none absolute right-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 11 }}>
+      <span className="pointer-events-none absolute right-0 top-0 z-20 rounded bg-card/90 px-1 text-caption" style={{ color: "var(--text-tertiary)", fontSize: 13 }}>
         元/头
       </span>
       <div className="w-full overflow-x-auto">
@@ -403,7 +403,7 @@ function DrugComboChart({ months, totalFee, perHead }: { months: string[]; total
                   onMouseEnter={() => setHover(i)}
                   onMouseLeave={() => setHover(null)}
                 />
-                <text x={cx(i)} y={H - 10} textAnchor="middle" className="text-caption" fill="var(--text-tertiary)" fontSize="11">
+                <text x={cx(i)} y={H - 12} textAnchor="middle" fill="var(--text-tertiary)" fontSize="13">
                   {m}
                 </text>
               </g>
