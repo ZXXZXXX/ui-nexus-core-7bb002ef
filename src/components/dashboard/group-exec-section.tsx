@@ -487,6 +487,255 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
   );
 }
 
+/* ---------------- 通用：堆积竖直柱状图 ---------------- */
+
+type StackSeries = { name: string; color: string; points: number[] };
+
+function StackedColumns({
+  labels,
+  series,
+  unit = "",
+  height = 260,
+  decimals = 1,
+}: {
+  labels: string[];
+  series: StackSeries[];
+  unit?: string;
+  height?: number;
+  decimals?: number;
+}) {
+  const [hover, setHover] = useState<number | null>(null);
+  const W = 900;
+  const H = height;
+  const padL = 52;
+  const padR = 20;
+  const padT = 16;
+  const padB = 32;
+  const iw = W - padL - padR;
+  const ih = H - padT - padB;
+  const totals = labels.map((_, i) => series.reduce((s, se) => s + (se.points[i] ?? 0), 0));
+  const max = Math.max(...totals, 1) * 1.15;
+  const step = iw / labels.length;
+  const bw = Math.min(34, step * 0.52);
+  const cx = (i: number) => padL + step * i + step / 2;
+  const fmt = (v: number) => v.toFixed(decimals);
+
+  return (
+    <div className="w-full overflow-x-auto">
+      <div className="relative min-w-[640px]">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
+          {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+            <g key={t}>
+              <line x1={padL} x2={W - padR} y1={padT + ih * t} y2={padT + ih * t} stroke="var(--border)" strokeWidth="1" />
+              <text x={padL - 8} y={padT + ih * t + 4} textAnchor="end" fontSize="11" fill="var(--text-tertiary)">
+                {fmt(max * (1 - t))}
+              </text>
+            </g>
+          ))}
+          {labels.map((m, i) => {
+            const active = hover === null || hover === i;
+            let accTop = padT + ih;
+            return (
+              <g key={m}>
+                {series.map((se) => {
+                  const v = se.points[i] ?? 0;
+                  const h = (v / max) * ih;
+                  accTop -= h;
+                  return (
+                    <rect
+                      key={se.name}
+                      x={cx(i) - bw / 2}
+                      y={accTop}
+                      width={bw}
+                      height={Math.max(h, 0)}
+                      fill={se.color}
+                      opacity={active ? 0.92 : 0.32}
+                    />
+                  );
+                })}
+                <rect
+                  x={padL + step * i}
+                  y={padT}
+                  width={step}
+                  height={ih}
+                  fill="transparent"
+                  onMouseEnter={() => setHover(i)}
+                  onMouseLeave={() => setHover(null)}
+                />
+                <text x={cx(i)} y={H - 10} textAnchor="middle" fontSize="11" fill="var(--text-tertiary)">
+                  {m}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+        {hover !== null && (
+          <div
+            className={`pointer-events-none absolute z-10 whitespace-nowrap rounded-lg border border-border bg-card px-3 py-2 shadow-card ${
+              hover >= labels.length - 2 ? "-translate-x-full" : hover <= 1 ? "translate-x-0" : "-translate-x-1/2"
+            }`}
+            style={{ left: `${((cx(hover) / W) * 100).toFixed(2)}%`, top: 12 }}
+          >
+            <div className="text-caption text-text-tertiary mb-1">{labels[hover]}</div>
+            {series.map((se) => (
+              <div key={se.name} className="flex items-center gap-2 text-caption text-text-secondary">
+                <span className="h-2 w-2 rounded-sm" style={{ background: se.color }} />
+                <span className="tabular-nums">
+                  {se.name} {fmt(se.points[hover] ?? 0)}
+                  {unit}
+                </span>
+              </div>
+            ))}
+            <div className="mt-1 text-body-sm tabular-nums text-foreground">
+              合计 {fmt(totals[hover])}
+              {unit}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ChartLegend({ items }: { items: { name: string; color: string; line?: boolean }[] }) {
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-5">
+      {items.map((it) => (
+        <span key={it.name} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
+          <span
+            className={it.line ? "h-0.5 w-4 rounded-full" : "h-2.5 w-2.5 rounded-sm"}
+            style={{ background: it.color }}
+          />
+          {it.name}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** 区域/集团口径缩放系数 */
+function useScopeRatio(scopeRegion?: string | null) {
+  return useMemo(() => {
+    const all = agg("集团", "", GROUP_FARMS);
+    if (!scopeRegion) return { rate: 1, count: 1, all };
+    const rg = agg(scopeRegion, "", GROUP_FARMS.filter((f) => f.region === scopeRegion));
+    return { rate: rg.pp90 / (all.pp90 || 1), count: rg.herd / (all.herd || 1), all: rg };
+  }, [scopeRegion]);
+}
+
+function usePeriod() {
+  const [period, setPeriod] = useState("近 6 个月");
+  const n = period === "近 6 个月" ? 6 : 12;
+  const labels = ALL_MONTHS.slice(-n);
+  const factors = MONTH_FACTORS.slice(-n);
+  return { period, setPeriod, labels, factors };
+}
+
+/* ---------------- 产后淘汰率趋势 ---------------- */
+
+function PostpartumTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+  const { period, setPeriod, labels, factors } = usePeriod();
+  const { all } = useScopeRatio(scopeRegion);
+  const s30 = factors.map((k) => Number((all.pp30 * k).toFixed(2)));
+  const s60 = factors.map((k, i) => Number(Math.max(all.pp60 * k - s30[i], 0).toFixed(2)));
+  const s90 = factors.map((k, i) => Number(Math.max(all.pp90 * k - all.pp60 * k, 0).toFixed(2)));
+
+  return (
+    <SectionCard
+      id="topic-pp-rank"
+      title="产后淘汰率趋势"
+      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+    >
+      <p className="text-body-sm text-text-secondary mb-4">按产后 0-30 / 31-60 / 61-90 天分段堆积，柱高为 0-90 天累计淘汰率</p>
+      <StackedColumns
+        labels={labels}
+        unit="%"
+        decimals={2}
+        series={[
+          { name: "0-30 天", color: BUCKETS[0].color, points: s30 },
+          { name: "31-60 天", color: BUCKETS[1].color, points: s60 },
+          { name: "61-90 天", color: BUCKETS[2].color, points: s90 },
+        ]}
+      />
+      <ChartLegend items={[
+        { name: "0-30 天", color: BUCKETS[0].color },
+        { name: "31-60 天", color: BUCKETS[1].color },
+        { name: "61-90 天", color: BUCKETS[2].color },
+      ]} />
+    </SectionCard>
+  );
+}
+
+/* ---------------- 牛只死淘变化趋势 ---------------- */
+
+function DeathCullTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+  const { period, setPeriod, labels, factors } = usePeriod();
+  const { all } = useScopeRatio(scopeRegion);
+  const death = factors.map((k) => Math.round(all.death * k));
+  const cull = factors.map((k) => Math.round(all.cull * k));
+
+  return (
+    <SectionCard
+      id="topic-deathcull-trend"
+      title="牛只死淘变化趋势"
+      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+    >
+      <p className="text-body-sm text-text-secondary mb-4">按月统计死亡与淘汰头数，柱高为死淘合计</p>
+      <StackedColumns
+        labels={labels}
+        unit=" 头"
+        decimals={0}
+        series={[
+          { name: "死亡", color: "var(--state-danger)", points: death },
+          { name: "淘汰", color: "var(--state-warning)", points: cull },
+        ]}
+      />
+      <ChartLegend items={[
+        { name: "死亡", color: "var(--state-danger)" },
+        { name: "淘汰", color: "var(--state-warning)" },
+      ]} />
+    </SectionCard>
+  );
+}
+
+/* ---------------- 发病治愈平均诊疗天数趋势 ---------------- */
+
+function TreatmentDaysTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
+  const { period, setPeriod, labels, factors } = usePeriod();
+  const { all } = useScopeRatio(scopeRegion);
+  const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
+  const cure = factors.map((k) => Number(Math.min(99, all.cure / k ** 0.2).toFixed(1)));
+
+  return (
+    <SectionCard
+      id="topic-treatdays-trend"
+      title="发病治愈平均诊疗天数趋势"
+      desc={scopeRegion ? `${scopeRegion} · ${period}` : `全部牧场 · ${period}`}
+      icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+    >
+      <p className="text-body-sm text-text-secondary mb-4">治愈病例从发病到治愈的平均诊疗天数，对照同期治愈率</p>
+      <LineTrend
+        labels={labels}
+        series={[
+          { name: "平均诊疗天数（天）", color: "var(--effect-ai-cyan)", points: days },
+          { name: "治愈率（%）", color: "var(--state-success)", points: cure },
+        ]}
+        height={240}
+      />
+      <ChartLegend items={[
+        { name: "平均诊疗天数（天）", color: "var(--effect-ai-cyan)", line: true },
+        { name: "治愈率（%）", color: "var(--state-success)", line: true },
+      ]} />
+    </SectionCard>
+  );
+}
+
+
 /* ---------------- 四、全景指标对标排行 ---------------- */
 
 type SortKey =
