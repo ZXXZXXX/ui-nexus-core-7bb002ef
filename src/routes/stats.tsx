@@ -1771,10 +1771,6 @@ function StatsPage() {
         <main className="flex-1 px-6 py-6 space-y-5 bg-white">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 min-w-0">
-              <Button variant="outline" size="sm" className="h-9 shrink-0" onClick={() => setView("sections")}>
-                <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-                返回板块
-              </Button>
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground">{sectionTitle}</div>
                 <div className="text-caption text-text-tertiary mt-0.5">
