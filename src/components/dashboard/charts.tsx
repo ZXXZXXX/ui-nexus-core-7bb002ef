@@ -586,3 +586,139 @@ export function GaugeArc({
     </div>
   );
 }
+
+/* ---------------- 平滑面积趋势图 ---------------- */
+
+export function SmoothAreaTrend({
+  labels,
+  points,
+  color = "var(--primary)",
+  unit = "",
+  height = 240,
+  decimals = 2,
+  formatValue,
+}: {
+  labels: string[];
+  points: number[];
+  color?: string;
+  unit?: string;
+  height?: number;
+  decimals?: number;
+  formatValue?: (v: number, i: number) => string;
+}) {
+  const [hover, setHover] = useState<number | null>(null);
+  const w = 640;
+  const h = height;
+  const padL = 42;
+  const padR = 28;
+  const padT = 14;
+  const padB = 30;
+  const maxV = Math.max(...points, 0.1);
+  const nice = maxV <= 5 ? Math.ceil(maxV * 1.25 * 10) / 10 : Math.ceil((maxV * 1.15) / 5) * 5;
+  const x = (i: number) => padL + (i * (w - padL - padR)) / Math.max(labels.length - 1, 1);
+  const y = (v: number) => padT + (1 - v / nice) * (h - padT - padB);
+  const uid = useId().replace(/:/g, "");
+
+  // Catmull-Rom -> cubic bezier
+  const pts = points.map((v, i) => [x(i), y(v)] as const);
+  let d = pts.length ? `M ${pts[0][0]} ${pts[0][1]}` : "";
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const c1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const c2y = p2[1] - (p3[1] - p1[1]) / 6;
+    d += ` C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2[0]} ${p2[1]}`;
+  }
+  const baseY = h - padB;
+  const area = pts.length ? `${d} L ${pts[pts.length - 1][0]} ${baseY} L ${pts[0][0]} ${baseY} Z` : "";
+  const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => Number((nice * t).toFixed(decimals)));
+  const fmt = (v: number, i: number) => (formatValue ? formatValue(v, i) : `${v.toFixed(decimals)}${unit}`);
+
+  return (
+    <div className="w-full relative" onMouseLeave={() => setHover(null)}>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full" style={{ height }}>
+        <defs>
+          <linearGradient id={`grad-${uid}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.22" />
+            <stop offset="100%" stopColor={color} stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
+        {ticks.map((t) => (
+          <g key={t}>
+            <line x1={padL} y1={y(t)} x2={w - padR} y2={y(t)} stroke="var(--border-secondary)" strokeWidth="1" />
+            <text x={padL - 8} y={y(t) + 4} textAnchor="end" fontSize="13" fill="var(--text-tertiary)">
+              {t}
+            </text>
+          </g>
+        ))}
+        <path d={area} fill={`url(#grad-${uid})`} />
+        <path d={d} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+        {hover !== null && (
+          <line
+            x1={x(hover)}
+            y1={padT}
+            x2={x(hover)}
+            y2={baseY}
+            stroke={color}
+            strokeWidth="1"
+            strokeDasharray="4 4"
+            opacity="0.5"
+          />
+        )}
+        {points.map((v, i) => (
+          <circle
+            key={i}
+            cx={x(i)}
+            cy={y(v)}
+            r={hover === i ? 5 : 3.5}
+            fill="var(--bg-canvas, #fff)"
+            stroke={color}
+            strokeWidth="2"
+          />
+        ))}
+        {labels.map((l, i) => (
+          <text key={l} x={x(i)} y={h - 8} textAnchor="middle" fontSize="13" fill="var(--text-tertiary)">
+            {l}
+          </text>
+        ))}
+        {labels.map((_, i) => (
+          <rect
+            key={`hit-${i}`}
+            x={x(i) - (w - padL - padR) / Math.max(labels.length - 1, 1) / 2}
+            y={0}
+            width={(w - padL - padR) / Math.max(labels.length - 1, 1)}
+            height={h}
+            fill="transparent"
+            onMouseEnter={() => setHover(i)}
+          />
+        ))}
+      </svg>
+      {hover !== null && (
+        <div
+          className="pointer-events-none absolute z-10 rounded-lg border border-border-secondary bg-bg-elevated px-3 py-2 shadow-md"
+          style={{
+            left: `${(x(hover) / w) * 100}%`,
+            top: 8,
+            transform: hover >= labels.length - 2 ? "translateX(-100%)" : "translateX(8px)",
+          }}
+        >
+          <div className="text-caption text-text-tertiary">{labels[hover]}</div>
+          <div className="mt-1 flex items-center gap-1.5 text-body-sm text-text-primary">
+            <span className="h-1.5 w-4 rounded-full" style={{ background: color }} />
+            {fmt(points[hover], hover)}
+          </div>
+        </div>
+      )}
+      <div className="mt-2 flex flex-wrap items-center gap-4">
+        <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
+          <span className="h-1.5 w-4 rounded-full" style={{ background: color }} />
+          早产率{unit && <span className="text-text-tertiary">（{unit}）</span>}
+        </span>
+      </div>
+    </div>
+  );
+}
