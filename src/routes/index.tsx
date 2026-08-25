@@ -141,42 +141,46 @@ const CATTLE_TYPE_DIST = [
 function CattleTypeDonut() {
   const [hover, setHover] = useState<number | null>(null);
   const total = CATTLE_TYPE_DIST.reduce((s, d) => s + d.value, 0);
-  const R = 42;
-  const C = 2 * Math.PI * R;
-  let offset = 0;
+  const cx = 80;
+  const cy = 74;
+  const R = 58;
   const active = hover === null ? null : CATTLE_TYPE_DIST[hover];
+  // 半圆：从 180° 到 360°（顺时针经过顶部）
+  let acc = 0;
+  const arcs = CATTLE_TYPE_DIST.map((d) => {
+    const start = 180 + (acc / total) * 180;
+    acc += d.value;
+    const end = 180 + (acc / total) * 180;
+    const pt = (deg: number) => {
+      const r = (deg * Math.PI) / 180;
+      return [cx + R * Math.cos(r), cy + R * Math.sin(r)] as const;
+    };
+    const [x1, y1] = pt(start + 0.8);
+    const [x2, y2] = pt(end - 0.8);
+    return { d, path: `M ${x1} ${y1} A ${R} ${R} 0 0 1 ${x2} ${y2}` };
+  });
   return (
     <div className="flex flex-col justify-between px-5 py-4">
       <span className="text-caption text-text-tertiary">牛只类型分布</span>
-      <div className="mt-2 flex items-center gap-4">
-        <div className="relative h-[112px] w-[112px] shrink-0">
-          <svg viewBox="0 0 112 112" className="h-full w-full -rotate-90">
-            {CATTLE_TYPE_DIST.map((d, i) => {
-              const len = (d.value / total) * C;
-              const dash = `${len - 2} ${C - len + 2}`;
-              const el = (
-                <circle
-                  key={d.key}
-                  cx={56}
-                  cy={56}
-                  r={R}
-                  fill="none"
-                  stroke={d.color}
-                  strokeWidth={hover === i ? 16 : 13}
-                  strokeDasharray={dash}
-                  strokeDashoffset={-offset}
-                  strokeLinecap="round"
-                  className="cursor-pointer transition-all"
-                  style={{ opacity: hover === null || hover === i ? 1 : 0.35 }}
-                  onMouseEnter={() => setHover(i)}
-                  onMouseLeave={() => setHover(null)}
-                />
-              );
-              offset += len;
-              return el;
-            })}
+      <div className="mt-1 flex items-center gap-4">
+        <div className="relative h-[86px] w-[160px] shrink-0">
+          <svg viewBox="0 0 160 82" className="h-full w-full">
+            {arcs.map((a, i) => (
+              <path
+                key={a.d.key}
+                d={a.path}
+                fill="none"
+                stroke={a.d.color}
+                strokeWidth={hover === i ? 17 : 14}
+                strokeLinecap="round"
+                className="cursor-pointer transition-all"
+                style={{ opacity: hover === null || hover === i ? 1 : 0.35 }}
+                onMouseEnter={() => setHover(i)}
+                onMouseLeave={() => setHover(null)}
+              />
+            ))}
           </svg>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center">
             <span className="text-[18px] font-semibold leading-none tabular-nums text-text-primary">
               {(active ? active.value : total).toLocaleString()}
             </span>
@@ -194,6 +198,7 @@ function CattleTypeDonut() {
     </div>
   );
 }
+
 
 /** 集团高管视角：数据概览指标卡（本月 / 本年） */
 const groupBizCards: MetricCard[] = [
