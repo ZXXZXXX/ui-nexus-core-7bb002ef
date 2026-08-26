@@ -372,7 +372,7 @@ function DiseaseKBPage() {
                   <div className="text-body-sm text-text-secondary truncate">{t?.name ?? "—"}</div>
                   <div className="text-body-sm text-text-secondary truncate">{cat?.name ?? "—"}</div>
                   <div className="truncate">
-                    <span className={`tag ${d.treatable ? "tag-muted" : "tag-warning"}`}>{d.treatable ? "是" : "否"}</span>
+                    <span className={`tag ${d.treatable ? "tag-warning" : "tag-muted"}`}>{d.treatable ? "是" : "否"}</span>
                   </div>
                   <div className="truncate">
                     <span className={`tag ${statusTagClass(d.status)}`}>{d.status}</span>
