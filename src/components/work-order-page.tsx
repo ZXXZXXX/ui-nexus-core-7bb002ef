@@ -3,7 +3,7 @@ import { usePcRole, canExamine } from "@/lib/pc-role";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { exportCsv } from "@/lib/export-csv";
-import { WorkOrderExportButton, type ExportOptions } from "@/components/work-order-export-dialog";
+import { WorkOrderExportButton } from "@/components/work-order-export-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -607,22 +607,14 @@ export function WorkOrderPage({
 
   const exportCols = ALL_COLS.filter((c) => c.key !== "action");
 
-  const handleExport = ({ dateField: df, from, to, keys }: ExportOptions) => {
+  const handleExport = ({ keys }: { keys: string[] }) => {
     const cols = exportCols.filter((c) => keys.includes(c.key));
-    const start = from ? parseTime(from) : 0;
-    const end = to ? parseTime(to) + 86400000 - 1 : Number.MAX_SAFE_INTEGER;
-    const rows = filtered.filter((o) => {
-      const v = df === "createdAt" ? o.createdAt : df === "reviewedAt" ? o.reviewedAt : o.executedAt;
-      const t = parseTime(v);
-      if (!t) return !from && !to;
-      return t >= start && t <= end;
-    });
     exportCsv(
       title,
       cols.map((c) => c.label),
-      rows.map((o) => cols.map((c) => textCell(o, c.key))),
+      filtered.map((o) => cols.map((c) => textCell(o, c.key))),
     );
-    return rows.length;
+    return filtered.length;
   };
 
   const renderCell = (o: WorkOrder, key: ColKey) => {
@@ -797,7 +789,7 @@ export function WorkOrderPage({
               <WorkOrderExportButton
                 columns={exportCols.map((c) => ({ key: c.key, label: c.label }))}
                 defaultKeys={exportCols.filter((c) => visible[c.key]).map((c) => c.key)}
-                defaultDateField={dateField}
+                count={filtered.length}
                 onExport={handleExport}
               />
 
