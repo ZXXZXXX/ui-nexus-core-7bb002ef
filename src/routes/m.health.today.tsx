@@ -890,7 +890,10 @@ function TodayTasksPage() {
               <Link
                 key={t.id}
                 to="/m/events/$type/$id"
-                params={{ type: "exam", id: t.target.replace("#", "") }}
+                params={{
+                  type: t.type === "转群/转栏" ? "transfer" : "exam",
+                  id: t.target.replace("#", ""),
+                }}
                 search={{ item: t.type }}
                 className={cls}
               >
