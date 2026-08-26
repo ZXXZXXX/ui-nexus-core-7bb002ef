@@ -825,9 +825,8 @@ function HomePage() {
                     <div className="min-w-0 h-full [&>*]:h-full">
                       <WorkOrderSection />
                     </div>
-                  ) : key === "alert" ? (
-                    <AlertSection />
                   ) : isExec ? (
+
                     <GroupExecSection
                       scopeRegion={scope === "group" ? null : scope === "region" ? CURRENT_REGION : null}
                       scopeFarm={scope === "farm-out" ? CURRENT_FARM : null}
