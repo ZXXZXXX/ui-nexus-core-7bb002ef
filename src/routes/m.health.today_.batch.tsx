@@ -2,6 +2,8 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { useMemo, useState } from "react";
 import {
   ChevronLeft,
+  Camera,
+  X,
   Search,
   Check,
   CheckCircle2,
@@ -48,6 +50,82 @@ function StatusBadge({ done }: { done: boolean }) {
   );
 }
 
+const SIMPLE_CONCLUSIONS: Record<string, string[]> = {
+  "孕检": ["已孕", "空怀", "可疑"],
+  "转群/转栏": ["已完成转群", "未转群"],
+};
+
+function SimpleForm({
+  options,
+  value,
+  onChange,
+  photos,
+  onPhotos,
+}: {
+  options: string[];
+  value: string | null;
+  onChange: (v: string) => void;
+  photos: number;
+  onPhotos: (n: number) => void;
+}) {
+  return (
+    <div className="px-3.5 pb-3.5 pt-0 space-y-3 border-t border-border/60">
+      <div className="pt-3">
+        <div className="text-caption text-text-tertiary mb-1.5">
+          结论 <span className="text-[var(--state-error)]">*</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {options.map((o) => (
+            <button
+              key={o}
+              type="button"
+              onClick={() => onChange(o)}
+              className={`h-8 px-3 rounded-full text-body-sm border transition-colors ${
+                value === o
+                  ? "border-primary bg-[color-mix(in_oklab,var(--primary)_10%,transparent)] text-primary"
+                  : "border-border text-text-secondary"
+              }`}
+            >
+              {o}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <div className="text-caption text-text-tertiary mb-1.5">现场照片</div>
+        <div className="flex flex-wrap gap-2">
+          {Array.from({ length: photos }).map((_, i) => (
+            <div
+              key={i}
+              className="relative h-16 w-16 rounded-lg bg-surface-subtle border border-border overflow-hidden flex items-center justify-center"
+            >
+              <Camera className="h-4 w-4 text-text-tertiary" />
+              <button
+                type="button"
+                onClick={() => onPhotos(photos - 1)}
+                className="absolute top-0 right-0 h-4 w-4 rounded-bl-lg bg-black/50 text-white inline-flex items-center justify-center"
+                aria-label="删除"
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
+            </div>
+          ))}
+          {photos < 3 && (
+            <button
+              type="button"
+              onClick={() => onPhotos(photos + 1)}
+              className="h-16 w-16 rounded-lg border border-dashed border-border text-text-tertiary inline-flex flex-col items-center justify-center gap-0.5"
+            >
+              <Camera className="h-4 w-4" />
+              <span className="text-caption">拍照</span>
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BatchExecutePage() {
   const { ids, done } = useSearch({ from: "/m/health/today_/batch" });
   const navigate = useNavigate();
@@ -63,6 +141,12 @@ function BatchExecutePage() {
   }, [ids]);
 
   const [q, setQ] = useState("");
+  // 孕检 / 转群转栏：仅需结论 + 照片，直接在本页内录入
+  const [simple, setSimple] = useState<
+    Record<string, { conclusion: string | null; photos: number }>
+  >({});
+  const simpleDone = (t: HomeTask) =>
+    !!simple[t.id]?.conclusion && (simple[t.id]?.photos ?? 0) > 0;
 
   const visibleTasks = useMemo(() => {
     const kw = q.trim().toLowerCase();
@@ -74,7 +158,10 @@ function BatchExecutePage() {
     );
   }, [tasks, q]);
 
-  const doneCount = tasks.filter((t) => doneSet.has(t.id)).length;
+  const isSimple = (t: HomeTask) => !!SIMPLE_CONCLUSIONS[t.type];
+  const taskDone = (t: HomeTask) =>
+    isSimple(t) ? simpleDone(t) : doneSet.has(t.id);
+  const doneCount = tasks.filter(taskDone).length;
   const allDone = tasks.length > 0 && doneCount === tasks.length;
 
   const goExecute = (id: string) => {
@@ -138,7 +225,8 @@ function BatchExecutePage() {
           visibleTasks.map((t) => {
             const meta = typeMeta[t.type] ?? typeMeta["疾病治疗"];
             const Icon = meta.icon;
-            const isDone = doneSet.has(t.id);
+            const simpleMode = isSimple(t);
+            const isDone = taskDone(t);
             const barn = inferBarn(t);
 
             return (
@@ -153,8 +241,11 @@ function BatchExecutePage() {
                 {/* Header（已完成不可点击） */}
                 <button
                   type="button"
-                  disabled={isDone}
-                  onClick={() => goExecute(t.id)}
+                  disabled={isDone && !simpleMode}
+                  onClick={() => {
+                    if (simpleMode) return;
+                    goExecute(t.id);
+                  }}
                   className="w-full text-left px-3.5 py-3 flex items-center gap-2 active:bg-surface-subtle disabled:pointer-events-none disabled:opacity-80"
                 >
                   <span
@@ -179,9 +270,36 @@ function BatchExecutePage() {
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <StatusBadge done={isDone} />
-                    {!isDone && <ChevronRight className="h-4 w-4 text-text-tertiary" />}
+                    {!isDone && !simpleMode && (
+                      <ChevronRight className="h-4 w-4 text-text-tertiary" />
+                    )}
                   </div>
                 </button>
+                {simpleMode && (
+                  <SimpleForm
+                    options={SIMPLE_CONCLUSIONS[t.type]!}
+                    value={simple[t.id]?.conclusion ?? null}
+                    onChange={(v) =>
+                      setSimple((prev) => ({
+                        ...prev,
+                        [t.id]: {
+                          conclusion: v,
+                          photos: prev[t.id]?.photos ?? 0,
+                        },
+                      }))
+                    }
+                    photos={simple[t.id]?.photos ?? 0}
+                    onPhotos={(n) =>
+                      setSimple((prev) => ({
+                        ...prev,
+                        [t.id]: {
+                          conclusion: prev[t.id]?.conclusion ?? null,
+                          photos: Math.max(0, n),
+                        },
+                      }))
+                    }
+                  />
+                )}
               </article>
             );
           })
