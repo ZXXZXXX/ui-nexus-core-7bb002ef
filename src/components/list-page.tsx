@@ -234,21 +234,63 @@ export function ListPage<T>({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="inline-flex h-9 items-center rounded-md border border-border bg-card p-0.5">
-                {RANGES.map((r) => (
-                  <button
-                    key={r.key}
-                    onClick={() => setRange(r.key)}
-                    className={`h-8 px-2 rounded text-body-sm transition-colors ${
-                      range === r.key
-                        ? "bg-brand-subtle text-primary font-medium"
-                        : "text-text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {r.label}
-                  </button>
-                ))}
-              </div>
+              {dateRangeMode ? (
+                <div className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-card px-2">
+                  <input
+                    type="date"
+                    value={from}
+                    max={to || undefined}
+                    onChange={(e) => {
+                      setFrom(e.target.value);
+                      onDateRangeChange?.({ from: e.target.value, to });
+                    }}
+                    aria-label="开始日期"
+                    className="h-7 bg-transparent text-body-sm text-foreground outline-none"
+                  />
+                  <span className="text-text-tertiary">-</span>
+                  <input
+                    type="date"
+                    value={to}
+                    min={from || undefined}
+                    onChange={(e) => {
+                      setTo(e.target.value);
+                      onDateRangeChange?.({ from, to: e.target.value });
+                    }}
+                    aria-label="结束日期"
+                    className="h-7 bg-transparent text-body-sm text-foreground outline-none"
+                  />
+                  {(from || to) && (
+                    <button
+                      onClick={() => {
+                        setFrom("");
+                        setTo("");
+                        onDateRangeChange?.({ from: "", to: "" });
+                      }}
+                      aria-label="重置时间范围"
+                      className="text-text-tertiary hover:text-foreground"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="inline-flex h-9 items-center rounded-md border border-border bg-card p-0.5">
+                  {RANGES.map((r) => (
+                    <button
+                      key={r.key}
+                      onClick={() => setRange(r.key)}
+                      className={`h-8 px-2 rounded text-body-sm transition-colors ${
+                        range === r.key
+                          ? "bg-brand-subtle text-primary font-medium"
+                          : "text-text-secondary hover:text-foreground"
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
             </div>
           )}
 
