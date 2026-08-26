@@ -402,7 +402,7 @@ function HomePage() {
   const [activeRequest, setActiveRequest] = useState<PendingRequest | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [attendanceOpen, setAttendanceOpen] = useState(false);
-  const [timeScope, setTimeScope] = useState<"today" | "month" | "quarter" | "year">("month");
+  const [timeScope, setTimeScope] = useState<"yesterday" | "month" | "year">("month");
   const alertsRef = useRef<HTMLDivElement | null>(null);
 
   const { scope, config } = useDashboardView();
