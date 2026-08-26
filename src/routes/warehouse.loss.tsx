@@ -78,11 +78,11 @@ const columns: ListColumn<LossRow>[] = [
   { key: "code", label: "商品编码", required: true, render: (r) => <span className="font-mono text-body text-foreground">{r.code}</span> },
   { key: "name", label: "药品展示名称", required: true, render: (r) => <span className="text-body text-foreground truncate">{r.name}</span> },
   { key: "spec", label: "规格型号", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.spec}</span> },
-  { key: "unit", label: "基础单位", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.unit}</span> },
   {
     key: "qty", label: "损耗数量", filter: "number", value: (r) => r.qty,
     render: (r) => <span className="text-body tabular-nums text-foreground">{r.qty}</span>,
   },
+  { key: "unit", label: "基础单位", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.unit}</span> },
   { key: "reason", label: "损耗原因", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.reason}</span> },
   {
     key: "shared", label: "是否均摊", filter: "select", value: (r) => (r.shared ? "是" : "否"),

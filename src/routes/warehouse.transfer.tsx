@@ -68,11 +68,11 @@ const columns: ListColumn<TransferRow>[] = [
   { key: "code", label: "商品编码", required: true, render: (r) => <span className="font-mono text-body text-foreground">{r.code}</span> },
   { key: "name", label: "药品展示名称", required: true, render: (r) => <span className="text-body text-foreground truncate">{r.name}</span> },
   { key: "spec", label: "规格型号", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.spec}</span> },
-  { key: "unit", label: "基础单位", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.unit}</span> },
   {
     key: "qty", label: "调拨数量", filter: "number", value: (r) => r.qty,
     render: (r) => <span className="text-body tabular-nums text-foreground">{r.qty}</span>,
   },
+  { key: "unit", label: "基础单位", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.unit}</span> },
   { key: "inboundAt", label: "入库时间", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.inboundAt}</span> },
   { key: "operator", label: "登记人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
   {
