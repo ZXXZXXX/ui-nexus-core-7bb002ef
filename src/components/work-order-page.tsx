@@ -3,7 +3,7 @@ import { usePcRole, canExamine } from "@/lib/pc-role";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { exportCsv } from "@/lib/export-csv";
-import { ExportConfirmButton } from "@/components/export-confirm";
+import { WorkOrderExportButton, type ExportOptions } from "@/components/work-order-export-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -794,7 +794,12 @@ export function WorkOrderPage({
                 ))}
               </div>
 
-              <ExportConfirmButton onConfirm={handleExport} count={filtered.length} />
+              <WorkOrderExportButton
+                columns={exportCols.map((c) => ({ key: c.key, label: c.label }))}
+                defaultKeys={exportCols.filter((c) => visible[c.key]).map((c) => c.key)}
+                defaultDateField={dateField}
+                onExport={handleExport}
+              />
 
               <Button
                 variant="outline"
