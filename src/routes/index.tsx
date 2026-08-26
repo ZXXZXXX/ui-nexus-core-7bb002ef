@@ -740,6 +740,24 @@ function HomePage() {
               {children}
             </section>
           );
+          const timeTabs = (
+            <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+              {([["yesterday", "至昨日"], ["month", "本月"], ["year", "本年"]] as const).map(([v, l]) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setTimeScope(v)}
+                  className={`rounded-md px-3 py-1 text-caption transition-colors ${
+                    timeScope === v
+                      ? "bg-[var(--brand-subtle)] text-[var(--brand)] font-medium"
+                      : "text-text-tertiary hover:text-text-primary"
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          );
           const cardsGrid = (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
 
