@@ -193,6 +193,13 @@ export function ListPage<T>({
   const optionsFor = (col: ListColumn<T>) =>
     col.options ?? Array.from(new Set(rows.map((r) => raw(col, r)).filter(Boolean)));
 
+  const exportCurrent = () =>
+    exportCsv(
+      title,
+      shown.filter((c) => c.key !== "action").map((c) => c.label),
+      data.map((row) => shown.filter((c) => c.key !== "action").map((c) => raw(c, row))),
+    );
+
   const gridStyle = {
     gridTemplateColumns: `repeat(${Math.max(shown.length, 1)}, minmax(0, 1fr))`,
   };
