@@ -43,6 +43,7 @@ import {
   taskChipStyle,
   typeMeta,
   taskCardContent,
+  BASIC_EVENT_TYPES,
   type HomeTask,
   type TaskChip,
 } from "@/routes/m.homepage";
