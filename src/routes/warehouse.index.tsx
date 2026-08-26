@@ -99,7 +99,7 @@ const columns: ListColumn<Row>[] = [
   },
   { key: "spec", label: "规格型号", render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.spec}</span> },
   { key: "unit", label: "计量单位", filter: "select", render: (i) => <span className="text-body-sm text-text-secondary">{i.unit}</span> },
-  { key: "expiry", label: "效期", date: true, filter: "date", render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.expiry}</span> },
+  { key: "expiry", label: "效期", filter: "date", render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.expiry}</span> },
   {
     key: "stock", label: "当前库存量", filter: "number", value: (i) => i.stock,
     render: (item) => (
@@ -117,10 +117,10 @@ const columns: ListColumn<Row>[] = [
   { key: "maker", label: "生产厂家", filter: "select", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.maker}</span> },
   { key: "approvalNo", label: "批准文号", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.approvalNo}</span> },
   { key: "batchNo", label: "生产批号", defaultHidden: true, render: (i) => <span className="font-mono text-body-sm text-text-secondary">{i.batchNo}</span> },
-  { key: "prodDate", label: "生产日期", date: true, filter: "date", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.prodDate}</span> },
+  { key: "prodDate", label: "生产日期", filter: "date", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.prodDate}</span> },
   { key: "shelfLife", label: "保质期", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary">{i.shelfLife}</span> },
   {
-    key: "updatedAt", label: "更新时间", date: true, filter: "date", defaultHidden: true,
+    key: "updatedAt", label: "更新时间", filter: "date", defaultHidden: true,
     render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.updatedAt}</span>,
   },
 ];
@@ -140,16 +140,14 @@ function ExportDialog({
   open,
   onOpenChange,
   exportCurrent,
-  period,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   exportCurrent: () => void;
-  period: { from: string; to: string };
 }) {
   const [mode, setMode] = useState<"current" | "ledger">("current");
-  const [from, setFrom] = useState(period.from);
-  const [to, setTo] = useState(period.to);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const [skus, setSkus] = useState<string[]>(inventory.map((i) => i.sku));
   const [extra, setExtra] = useState<string[]>([]);
 
@@ -288,9 +286,8 @@ function ExportDialog({
 }
 
 function InventoryPage() {
-  const [period, setPeriod] = useState({ from: "", to: "" });
   const [exportOpen, setExportOpen] = useState(false);
-  const rows = useMemo(() => buildRows(period.from, period.to), [period]);
+  const rows = useMemo(() => buildRows("", ""), []);
 
   return (
     <>
@@ -303,8 +300,6 @@ function InventoryPage() {
         searchPlaceholder="按 SKU / 药品名称搜索"
         primaryAction={{ label: "新增类别" }}
         getRowKey={(i) => i.sku}
-        dateRangeMode
-        onDateRangeChange={setPeriod}
         renderExport={(exportCurrent) => (
           <>
             <Button
@@ -321,7 +316,6 @@ function InventoryPage() {
               open={exportOpen}
               onOpenChange={setExportOpen}
               exportCurrent={exportCurrent}
-              period={period}
             />
           </>
         )}
