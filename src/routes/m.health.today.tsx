@@ -152,6 +152,9 @@ function AssigneeBadge({ name }: { name: string }) {
   );
 }
 
+/** 基础事件中支持批量执行的类型（互斥，一次只能批量处理一类） */
+const BATCH_EVENT_TYPES = ["孕检", "转群/转栏"];
+
 function TodayTasksPage() {
   const role = useRole();
   const navigate = useNavigate();
@@ -175,6 +178,7 @@ function TodayTasksPage() {
   const [mineOnly, setMineOnly] = useState(false);
 
   const [selectMode, setSelectMode] = useState(false);
+  const [typeConflict, setTypeConflict] = useState<{ current: string; next: string } | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [done, setDone] = useState<"batch" | null>(null);
   const [assignSheetOpen, setAssignSheetOpen] = useState(false);
@@ -305,19 +309,52 @@ function TodayTasksPage() {
       return next;
     });
 
-  const toggle = (id: string) =>
+  // 基础事件下仅「孕检」「转群/转栏」可批量选择，且两类互斥
+  const isBasicEvent = kindFilter === "基础事件";
+  const selectableTask = (t: HomeTask) =>
+    !isBasicEvent || BATCH_EVENT_TYPES.includes(t.type);
+  const selectedEventType = useMemo(() => {
+    if (!isBasicEvent) return null;
+    const first = tabTasks.find((t) => selected.has(t.id));
+    return first?.type ?? null;
+  }, [isBasicEvent, tabTasks, selected]);
+
+  const toggle = (id: string) => {
+    const task = tabTasks.find((t) => t.id === id);
+    if (task && !selectableTask(task)) return;
+    if (
+      task &&
+      isBasicEvent &&
+      !selected.has(id) &&
+      selectedEventType &&
+      selectedEventType !== task.type
+    ) {
+      setTypeConflict({ current: selectedEventType, next: task.type });
+      return;
+    }
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return next;
     });
+  };
 
 
-  const allSelected = tasks.length > 0 && selected.size === tasks.length;
+  const selectableTasks = useMemo(
+    () =>
+      tasks.filter(
+        (t) =>
+          selectableTask(t) &&
+          (!isBasicEvent || !selectedEventType || t.type === selectedEventType),
+      ),
+    [tasks, isBasicEvent, selectedEventType],
+  );
+  const allSelected =
+    selectableTasks.length > 0 && selected.size === selectableTasks.length;
   const toggleAll = () => {
     if (allSelected) setSelected(new Set());
-    else setSelected(new Set(tasks.map((t) => t.id)));
+    else setSelected(new Set(selectableTasks.map((t) => t.id)));
   };
 
   const exitSelect = () => {
@@ -872,8 +909,15 @@ function TodayTasksPage() {
               <button
                 key={t.id}
                 type="button"
+                disabled={!selectableTask(t)}
                 onClick={() => toggle(t.id)}
-                className={cls + " w-full text-left"}
+                className={
+                  cls +
+                  " w-full text-left" +
+                  (selectableTask(t)
+                    ? ""
+                    : " opacity-45 grayscale pointer-events-none")
+                }
               >
                 {inner}
               </button>
@@ -930,7 +974,11 @@ function TodayTasksPage() {
       {selectMode && tasks.length > 0 && (() => {
         const selectedTasks = tasks.filter((t) => selected.has(t.id));
         const subText =
-          count === 0
+          isBasicEvent
+            ? count === 0
+              ? "仅「孕检」「转群/转栏」可批量处理"
+              : `批量${selectedEventType ?? ""}`
+            : count === 0
             ? "勾选要一次处理的任务"
             : canAssign
               ? "可指定责任人或直接执行"
@@ -1150,6 +1198,32 @@ function TodayTasksPage() {
           </div>
         </div>
       )}
+      {/* 基础事件类型互斥提示 */}
+      {typeConflict && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-6"
+          onClick={() => setTypeConflict(null)}
+        >
+          <div
+            className="w-full max-w-[320px] rounded-2xl bg-card p-5 space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-card-title text-foreground">不可混选</h3>
+            <p className="text-body-sm text-text-secondary leading-relaxed">
+              当前已选择「{typeConflict.current}」任务，无法同时选择「
+              {typeConflict.next}」。请分别批量处理。
+            </p>
+            <button
+              type="button"
+              onClick={() => setTypeConflict(null)}
+              className="w-full h-10 rounded-lg bg-primary text-primary-foreground text-body-sm"
+            >
+              我知道了
+            </button>
+          </div>
+        </div>
+      )}
+
     </MobileShell>
   );
 }
