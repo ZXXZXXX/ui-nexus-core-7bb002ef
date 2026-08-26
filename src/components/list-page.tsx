@@ -63,9 +63,14 @@ export type ListPageProps<T> = {
   getRowKey: (row: T, index: number) => string;
   onRowClick?: (row: T) => void;
   emptyText?: string;
+  /** 用日期范围选择器替代快捷时间段 */
+  dateRangeMode?: boolean;
+  /** 日期范围变化回调（yyyy-mm-dd，空串表示不限） */
+  onDateRangeChange?: (r: { from: string; to: string }) => void;
   /** extra content rendered above the toolbar */
   children?: ReactNode;
 };
+
 
 /* --------------------------------- helpers -------------------------------- */
 
