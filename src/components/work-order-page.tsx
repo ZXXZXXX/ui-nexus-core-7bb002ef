@@ -349,6 +349,8 @@ export function WorkOrderPage({
   const [keyword, setKeyword] = useState("");
   const [range, setRange] = useState<DateRange>("all");
   const [dateField, setDateField] = useState<"createdAt" | "reviewedAt" | "executedAt">("createdAt");
+  const [customStart, setCustomStart] = useState<string>("");
+  const [customEnd, setCustomEnd] = useState<string>("");
 
   const [advOpen, setAdvOpen] = useState(false);
   const [advProposer, setAdvProposer] = useState<string>("all");
