@@ -49,14 +49,29 @@ export function AppHeader({ title, breadcrumb }: AppHeaderProps) {
       <div className="flex h-11 items-center gap-3 px-6">
         {breadcrumb && breadcrumb.length > 0 && (
           <nav className="text-body-sm text-text-tertiary flex items-center gap-1.5">
-            {breadcrumb.map((b, i) => (
-              <span key={i} className="flex items-center gap-1.5">
-                {i > 0 && <span className="text-text-tertiary/60">/</span>}
-                <span className={i === breadcrumb.length - 1 ? "text-foreground" : ""}>{b}</span>
-              </span>
-            ))}
+            {breadcrumb.map((b, i) => {
+              const last = i === breadcrumb.length - 1;
+              const to = CRUMB_PATH[b];
+              return (
+                <span key={i} className="flex items-center gap-1.5">
+                  {i > 0 && <span className="text-text-tertiary/60">/</span>}
+                  {!last && to ? (
+                    <button
+                      type="button"
+                      onClick={() => navigate({ to })}
+                      className="hover:text-primary transition-colors"
+                    >
+                      {b}
+                    </button>
+                  ) : (
+                    <span className={last ? "text-foreground" : ""}>{b}</span>
+                  )}
+                </span>
+              );
+            })}
           </nav>
         )}
+
 
         <div className="ml-auto flex items-center gap-2">
           <Popover open={scopeOpen} onOpenChange={setScopeOpen}>
