@@ -870,7 +870,7 @@ function HomePage() {
             const showAlert = topicOrder.includes("alert");
             return (
               <div className="space-y-6">
-                <Frame title="数据概览">{cardsGrid}</Frame>
+                <Frame title="数据概览" extra={timeTabs}>{cardsGrid}</Frame>
                 <Frame title="数据看板">{topicGrid}</Frame>
                 {showAlert && (
                   <div id="topic-alert" className="scroll-mt-24">
