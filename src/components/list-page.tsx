@@ -67,6 +67,8 @@ export type ListPageProps<T> = {
   dateRangeMode?: boolean;
   /** 日期范围变化回调（yyyy-mm-dd，空串表示不限） */
   onDateRangeChange?: (r: { from: string; to: string }) => void;
+  /** 自定义导出入口：传入默认导出函数，返回替代按钮 */
+  renderExport?: (exportCurrent: () => void) => ReactNode;
   /** extra content rendered above the toolbar */
   children?: ReactNode;
 };
@@ -120,6 +122,7 @@ export function ListPage<T>({
   emptyText = "暂无数据",
   dateRangeMode = false,
   onDateRangeChange,
+  renderExport,
   children,
 
 }: ListPageProps<T>) {
@@ -189,6 +192,13 @@ export function ListPage<T>({
 
   const optionsFor = (col: ListColumn<T>) =>
     col.options ?? Array.from(new Set(rows.map((r) => raw(col, r)).filter(Boolean)));
+
+  const exportCurrent = () =>
+    exportCsv(
+      title,
+      shown.filter((c) => c.key !== "action").map((c) => c.label),
+      data.map((row) => shown.filter((c) => c.key !== "action").map((c) => raw(c, row))),
+    );
 
   const gridStyle = {
     gridTemplateColumns: `repeat(${Math.max(shown.length, 1)}, minmax(0, 1fr))`,
@@ -315,24 +325,20 @@ export function ListPage<T>({
             </div>
           )}
 
-          <Button
-            variant="outline"
-            size="icon"
-            title="导出当前筛选结果"
-            aria-label="导出当前筛选结果"
-            className="h-9 w-9 shrink-0"
-            onClick={() =>
-              exportCsv(
-                title,
-                shown.filter((c) => c.key !== "action").map((c) => c.label),
-                data.map((row) =>
-                  shown.filter((c) => c.key !== "action").map((c) => raw(c, row)),
-                ),
-              )
-            }
-          >
-            <Download className="h-4 w-4" />
-          </Button>
+          {renderExport ? (
+            renderExport(exportCurrent)
+          ) : (
+            <Button
+              variant="outline"
+              size="icon"
+              title="导出当前筛选结果"
+              aria-label="导出当前筛选结果"
+              className="h-9 w-9 shrink-0"
+              onClick={exportCurrent}
+            >
+              <Download className="h-4 w-4" />
+            </Button>
+          )}
 
           <Button
             variant="outline"
