@@ -1857,7 +1857,7 @@ function StatsPage() {
           </div>
 
           <Card className="border-border bg-white overflow-hidden">
-            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--bg-surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
+            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--bg-surface-subtle)]" containerClassName="h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
                   <TableHead className="sticky left-0 z-30 min-w-[220px] bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">模板名称</TableHead>
@@ -2032,7 +2032,7 @@ function StatsPage() {
           </div>
 
           <Card className="border-border bg-white overflow-hidden">
-            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--bg-surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
+            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--bg-surface-subtle)]" containerClassName="h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
                   {resultMetric ? (
