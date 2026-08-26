@@ -67,6 +67,19 @@ export function AlertSection({ bare = false }: { bare?: boolean }) {
           </div>
         ))}
       </div>
+  );
+
+  if (bare) return grid;
+
+  return (
+    <SectionCard
+      id="topic-alert"
+      title="预警告警专题"
+      desc={`${total} 条待关注`}
+      icon={<AlertTriangle className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+    >
+      {grid}
     </SectionCard>
   );
 }
+
