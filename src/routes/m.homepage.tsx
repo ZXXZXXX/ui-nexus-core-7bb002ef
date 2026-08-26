@@ -28,6 +28,7 @@ import {
   DoorOpen,
   Truck,
   ArrowLeftRight,
+  ArrowRightLeft,
 } from "lucide-react";
 import tasksDoneCelebrateAsset from "@/assets/today-task-complete-sparkles.svg.asset.json";
 const tasksDoneCelebrate = tasksDoneCelebrateAsset.url;
@@ -255,7 +256,7 @@ function MHomePage() {
 }
 
 // ---------------- 数据 ----------------
-export type TaskKind = "工单" | "基础检查" | "异常排查";
+export type TaskKind = "工单" | "基础事件" | "异常排查";
 export type HomeTask = {
   id: string;
   target: string;
@@ -264,7 +265,7 @@ export type HomeTask = {
   status: "待诊断" | "进行中";
   minutesAgo: number;
   kind?: TaskKind; // 缺省为「工单」
-  dueDate?: string; // 基础检查：平台给出的完成期限
+  dueDate?: string; // 基础事件：平台给出的完成期限
   cattleId?: string; // 异常排查：跳转牛只档案
 };
 
@@ -305,10 +306,14 @@ export const homeTasks: HomeTask[] = [
   { id: "HF-0707", target: "#01-24-2210", conclusion: "白线病 · 远轴侧蹄壁清创", type: "修蹄", status: "进行中", minutesAgo: 80 },
   { id: "HF-0708", target: "#01-24-2211", conclusion: "功能性蹄浴液喷蹄", type: "修蹄", status: "进行中", minutesAgo: 99 },
 
-  // 基础检查类（平台下发）
-  { id: "EX-0901", target: "#01-24-2311", conclusion: "结核病检测", type: "结核病检测", status: "进行中", minutesAgo: 10, kind: "基础检查", dueDate: "2026-08-10" },
-  { id: "EX-0902", target: "#01-24-2312", conclusion: "布病检测", type: "布病检测", status: "进行中", minutesAgo: 26, kind: "基础检查", dueDate: "2026-08-12" },
-  { id: "EX-0903", target: "#01-24-2313", conclusion: "妊娠检查", type: "妊娠检查", status: "进行中", minutesAgo: 44, kind: "基础检查", dueDate: "2026-08-08" },
+  // 基础事件类（平台下发：基础检查 + 转群/转栏）
+  { id: "EX-0901", target: "#01-24-2311", conclusion: "体温检查", type: "体温检查", status: "进行中", minutesAgo: 10, kind: "基础事件", dueDate: "2026-08-10" },
+  { id: "EX-0902", target: "#01-24-2312", conclusion: "酮病检查", type: "酮病检查", status: "进行中", minutesAgo: 26, kind: "基础事件", dueDate: "2026-08-12" },
+  { id: "EX-0903", target: "#01-24-2313", conclusion: "孕检", type: "孕检", status: "进行中", minutesAgo: 44, kind: "基础事件", dueDate: "2026-08-08" },
+  { id: "EX-0904", target: "#01-24-2325", conclusion: "子宫分泌物检查", type: "子宫分泌物检查", status: "进行中", minutesAgo: 52, kind: "基础事件", dueDate: "2026-08-11" },
+  { id: "EX-0905", target: "#01-24-2338", conclusion: "尿液 PH 值检查", type: "尿液 PH 值检查", status: "进行中", minutesAgo: 61, kind: "基础事件", dueDate: "2026-08-13" },
+  { id: "TR-0201", target: "#01-24-2352", conclusion: "由 3 号牛舍转入 泌乳一群（1 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 15, kind: "基础事件", dueDate: "2026-08-09" },
+  { id: "TR-0202", target: "#01-24-2364", conclusion: "由 病牛舍 转回 泌乳二群（2 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 33, kind: "基础事件", dueDate: "2026-08-10" },
   // 异常排查类（设备预警）
   { id: "AL-0101", target: "#01-24-2405", conclusion: "耳温异常", type: "耳温数据", status: "进行中", minutesAgo: 6, kind: "异常排查", cattleId: "01-24-2405" },
   { id: "AL-0102", target: "#01-24-2418", conclusion: "颈环异常", type: "颈环数据", status: "进行中", minutesAgo: 19, kind: "异常排查", cattleId: "01-24-2418" },
@@ -367,16 +372,29 @@ export const typeMeta: Record<string, { icon: typeof Pill; bg: string; text: str
   "疫苗免疫": { icon: Syringe, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "修蹄":     { icon: Footprints, bg: "bg-[#FFF5DF]", text: "text-[#F59E0B]" },
   "产后护理": { icon: Baby, bg: "bg-[#F3E8FF]", text: "text-[#9333EA]" },
-  // 基础检查类
-  "结核病检测": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
-  "布病检测":   { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
-  "妊娠检查":   { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  // 基础事件类
+  "体温检查":       { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "子宫分泌物检查": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "酮病检查":       { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "尿液 PH 值检查": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "孕检":           { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "转群/转栏":      { icon: ArrowRightLeft, bg: "bg-[#EEF2FF]", text: "text-[#6366F1]" },
   // 异常排查类（警示色）
   "耳温数据": { icon: AlertTriangle, bg: "bg-[#FEF2F2]", text: "text-[#DC2626]" },
   "颈环数据": { icon: AlertTriangle, bg: "bg-[#FEF2F2]", text: "text-[#DC2626]" },
   "奶量数据": { icon: AlertTriangle, bg: "bg-[#FEF2F2]", text: "text-[#DC2626]" },
 };
 
+
+/** 基础事件类可筛选的事件类型：牛只档案中的基础检查项目 + 转群/转栏 */
+export const BASIC_EVENT_TYPES = [
+  "体温检查",
+  "子宫分泌物检查",
+  "酮病检查",
+  "尿液 PH 值检查",
+  "孕检",
+  "转群/转栏",
+];
 
 // 疾病治疗工单的疾病名称 + 任务类型（用于统一卡片文案）
 export type TaskChip = "待诊断" | "待执行" | "待复查" | "待治愈" | "已完成";
@@ -454,10 +472,13 @@ export const ALERT_BRIEF: Record<string, string> = {
   "AL-0103": "今日产奶量较 7 日均值下降 24%（22.6kg）",
 };
 
-// 任务卡片「具体内容」（含基础检查 / 异常排查类）
+// 任务卡片「具体内容」（含基础事件 / 异常排查类）
 export function taskCardContent(t: HomeTask, chip: TaskChip | null) {
-  if (t.kind === "基础检查")
+  if (t.kind === "基础事件") {
+    if (t.type === "转群/转栏")
+      return `${t.conclusion}，请在${t.dueDate}前完成转群。`;
     return `平台下发${t.type}任务，请在${t.dueDate}前完成。`;
+  }
   if (t.kind === "异常排查") return ALERT_BRIEF[t.id] ?? t.conclusion;
   return taskContentByChip(t.id, chip, t.conclusion);
 }
@@ -530,7 +551,7 @@ function TodayTaskList({ role }: { role: Role }) {
         const isPeek = idx === 1;
         const meta = typeMeta[t.type] ?? typeMeta["疾病治疗"];
         const Icon = meta.icon;
-        const isExam = t.kind === "基础检查";
+        const isExam = t.kind === "基础事件";
         const isReview =
           t.type === "疾病治疗" && diseaseTaskMeta[t.id]?.task === "待复查";
         const isExecution =
