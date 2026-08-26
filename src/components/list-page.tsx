@@ -136,6 +136,9 @@ export function ListPage<T>({
   const [q, setQ] = useState("");
   const [dateKey, setDateKey] = useState(dateCols[0]?.key ?? "");
   const [range, setRange] = useState<QuickRange>("all");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [filterOpen, setFilterOpen] = useState(false);
