@@ -247,13 +247,14 @@ const toneStyles: Record<string, { bg: string; text: string; tag: string }> = {
   muted: { bg: "bg-surface-subtle", text: "text-text-tertiary", tag: "tag tag-muted" },
 };
 
-type DateRange = "all" | "today" | "7d" | "30d";
+type DateRange = "all" | "today" | "7d" | "30d" | "custom";
 
 const dateRanges: { key: DateRange; label: string }[] = [
   { key: "all", label: "全部" },
   { key: "today", label: "今天" },
   { key: "7d", label: "最近 7 天" },
   { key: "30d", label: "最近 30 天" },
+  { key: "custom", label: "自定义" },
 ];
 
 // 解析 "YYYY-MM-DD HH:mm" / "YYYY-MM-DD" / 任何 Date.parse 可识别格式
@@ -264,7 +265,14 @@ function parseTime(s?: string): number {
   return Number.isNaN(t) ? 0 : t;
 }
 
-function inRange(s: string, range: DateRange): boolean {
+function dayStart(d: Date): number {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+function dayEnd(d: Date): number {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999).getTime();
+}
+
+function inRange(s: string, range: DateRange, customStart?: string, customEnd?: string): boolean {
   if (range === "all") return true;
   const t = parseTime(s);
   if (!t) return false;
@@ -277,6 +285,17 @@ function inRange(s: string, range: DateRange): boolean {
   }
   if (range === "7d") return now - t <= 7 * day;
   if (range === "30d") return now - t <= 30 * day;
+  if (range === "custom") {
+    if (customStart) {
+      const start = dayStart(new Date(customStart));
+      if (t < start) return false;
+    }
+    if (customEnd) {
+      const end = dayEnd(new Date(customEnd));
+      if (t > end) return false;
+    }
+    return true;
+  }
   return true;
 }
 
