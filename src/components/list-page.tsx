@@ -63,9 +63,14 @@ export type ListPageProps<T> = {
   getRowKey: (row: T, index: number) => string;
   onRowClick?: (row: T) => void;
   emptyText?: string;
+  /** 用日期范围选择器替代快捷时间段 */
+  dateRangeMode?: boolean;
+  /** 日期范围变化回调（yyyy-mm-dd，空串表示不限） */
+  onDateRangeChange?: (r: { from: string; to: string }) => void;
   /** extra content rendered above the toolbar */
   children?: ReactNode;
 };
+
 
 /* --------------------------------- helpers -------------------------------- */
 
@@ -113,7 +118,10 @@ export function ListPage<T>({
   getRowKey,
   onRowClick,
   emptyText = "暂无数据",
+  dateRangeMode = false,
+  onDateRangeChange,
   children,
+
 }: ListPageProps<T>) {
   const searchCols = useMemo(
     () =>
@@ -128,6 +136,9 @@ export function ListPage<T>({
   const [q, setQ] = useState("");
   const [dateKey, setDateKey] = useState(dateCols[0]?.key ?? "");
   const [range, setRange] = useState<QuickRange>("all");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [filterOpen, setFilterOpen] = useState(false);
@@ -142,7 +153,8 @@ export function ListPage<T>({
 
   const data = useMemo(() => {
     const kw = q.trim().toLowerCase();
-    const from = rangeStart(range);
+    const start = dateRangeMode ? (from ? parseDate(from) : null) : rangeStart(range);
+    const end = dateRangeMode && to ? parseDate(to) : null;
     const dateCol = columns.find((c) => c.key === dateKey);
 
     return rows.filter((row) => {
@@ -150,9 +162,11 @@ export function ListPage<T>({
         const hit = searchCols.some((c) => raw(c, row).toLowerCase().includes(kw));
         if (!hit) return false;
       }
-      if (from !== null && dateCol) {
+      if ((start !== null || end !== null) && dateCol) {
         const t = parseDate(raw(dateCol, row));
-        if (t === null || t < from) return false;
+        if (t === null) return false;
+        if (start !== null && t < start) return false;
+        if (end !== null && t > end + 86399999) return false;
       }
       for (const [key, val] of Object.entries(filters)) {
         if (!val || val === "__all") continue;
@@ -165,7 +179,8 @@ export function ListPage<T>({
       }
       return true;
     });
-  }, [rows, q, range, dateKey, filters, columns, searchCols]);
+  }, [rows, q, range, dateKey, filters, columns, searchCols, dateRangeMode, from, to]);
+
 
   const optionsFor = (col: ListColumn<T>) =>
     col.options ?? Array.from(new Set(rows.map((r) => raw(col, r)).filter(Boolean)));
@@ -219,21 +234,63 @@ export function ListPage<T>({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="inline-flex h-9 items-center rounded-md border border-border bg-card p-0.5">
-                {RANGES.map((r) => (
-                  <button
-                    key={r.key}
-                    onClick={() => setRange(r.key)}
-                    className={`h-8 px-2 rounded text-body-sm transition-colors ${
-                      range === r.key
-                        ? "bg-brand-subtle text-primary font-medium"
-                        : "text-text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {r.label}
-                  </button>
-                ))}
-              </div>
+              {dateRangeMode ? (
+                <div className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-card px-2">
+                  <input
+                    type="date"
+                    value={from}
+                    max={to || undefined}
+                    onChange={(e) => {
+                      setFrom(e.target.value);
+                      onDateRangeChange?.({ from: e.target.value, to });
+                    }}
+                    aria-label="开始日期"
+                    className="h-7 bg-transparent text-body-sm text-foreground outline-none"
+                  />
+                  <span className="text-text-tertiary">-</span>
+                  <input
+                    type="date"
+                    value={to}
+                    min={from || undefined}
+                    onChange={(e) => {
+                      setTo(e.target.value);
+                      onDateRangeChange?.({ from, to: e.target.value });
+                    }}
+                    aria-label="结束日期"
+                    className="h-7 bg-transparent text-body-sm text-foreground outline-none"
+                  />
+                  {(from || to) && (
+                    <button
+                      onClick={() => {
+                        setFrom("");
+                        setTo("");
+                        onDateRangeChange?.({ from: "", to: "" });
+                      }}
+                      aria-label="重置时间范围"
+                      className="text-text-tertiary hover:text-foreground"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="inline-flex h-9 items-center rounded-md border border-border bg-card p-0.5">
+                  {RANGES.map((r) => (
+                    <button
+                      key={r.key}
+                      onClick={() => setRange(r.key)}
+                      className={`h-8 px-2 rounded text-body-sm transition-colors ${
+                        range === r.key
+                          ? "bg-brand-subtle text-primary font-medium"
+                          : "text-text-secondary hover:text-foreground"
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
             </div>
           )}
 
