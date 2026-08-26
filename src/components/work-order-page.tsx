@@ -247,13 +247,14 @@ const toneStyles: Record<string, { bg: string; text: string; tag: string }> = {
   muted: { bg: "bg-surface-subtle", text: "text-text-tertiary", tag: "tag tag-muted" },
 };
 
-type DateRange = "all" | "today" | "7d" | "30d";
+type DateRange = "all" | "today" | "7d" | "30d" | "custom";
 
 const dateRanges: { key: DateRange; label: string }[] = [
   { key: "all", label: "全部" },
   { key: "today", label: "今天" },
   { key: "7d", label: "最近 7 天" },
   { key: "30d", label: "最近 30 天" },
+  { key: "custom", label: "自定义" },
 ];
 
 // 解析 "YYYY-MM-DD HH:mm" / "YYYY-MM-DD" / 任何 Date.parse 可识别格式
@@ -264,7 +265,14 @@ function parseTime(s?: string): number {
   return Number.isNaN(t) ? 0 : t;
 }
 
-function inRange(s: string, range: DateRange): boolean {
+function dayStart(d: Date): number {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+}
+function dayEnd(d: Date): number {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999).getTime();
+}
+
+function inRange(s: string, range: DateRange, customStart?: string, customEnd?: string): boolean {
   if (range === "all") return true;
   const t = parseTime(s);
   if (!t) return false;
@@ -277,6 +285,17 @@ function inRange(s: string, range: DateRange): boolean {
   }
   if (range === "7d") return now - t <= 7 * day;
   if (range === "30d") return now - t <= 30 * day;
+  if (range === "custom") {
+    if (customStart) {
+      const start = dayStart(new Date(customStart));
+      if (t < start) return false;
+    }
+    if (customEnd) {
+      const end = dayEnd(new Date(customEnd));
+      if (t > end) return false;
+    }
+    return true;
+  }
   return true;
 }
 
@@ -330,6 +349,8 @@ export function WorkOrderPage({
   const [keyword, setKeyword] = useState("");
   const [range, setRange] = useState<DateRange>("all");
   const [dateField, setDateField] = useState<"createdAt" | "reviewedAt" | "executedAt">("createdAt");
+  const [customStart, setCustomStart] = useState<string>("");
+  const [customEnd, setCustomEnd] = useState<string>("");
 
   const [advOpen, setAdvOpen] = useState(false);
   const [advProposer, setAdvProposer] = useState<string>("all");
@@ -497,7 +518,7 @@ export function WorkOrderPage({
       .filter((o) => {
         const v = dateField === "createdAt" ? o.createdAt : dateField === "reviewedAt" ? o.reviewedAt : o.executedAt;
         if (range !== "all" && !v) return false;
-        return inRange(v ?? "", range);
+        return inRange(v ?? "", range, customStart, customEnd);
       })
       .filter((o) =>
         kw
@@ -525,9 +546,9 @@ export function WorkOrderPage({
           : key === "reviewedAt"
             ? parseTime(b.reviewedAt)
             : parseTime(b.executedAt);
-      return sortDir === "asc" ? va - vb : vb - va;
+    return sortDir === "asc" ? va - vb : vb - va;
     });
-  }, [orders, active, range, dateField, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
+  }, [orders, active, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
 
   const leftFrozenKeys: ColKey[] = ["id"];
   const rightFrozenKeys: ColKey[] = ["action"];
@@ -784,6 +805,23 @@ export function WorkOrderPage({
                     {r.label}
                   </button>
                 ))}
+                {range === "custom" && (
+                  <div className="flex items-center gap-1 pl-1 pr-1">
+                    <Input
+                      type="date"
+                      value={customStart}
+                      onChange={(e) => setCustomStart(e.target.value)}
+                      className="h-7 w-[136px] px-2 text-caption bg-card border-0 shadow-none focus-visible:ring-1 focus-visible:ring-primary"
+                    />
+                    <span className="text-caption text-text-tertiary">至</span>
+                    <Input
+                      type="date"
+                      value={customEnd}
+                      onChange={(e) => setCustomEnd(e.target.value)}
+                      className="h-7 w-[136px] px-2 text-caption bg-card border-0 shadow-none focus-visible:ring-1 focus-visible:ring-primary"
+                    />
+                  </div>
+                )}
               </div>
 
               <WorkOrderExportButton
