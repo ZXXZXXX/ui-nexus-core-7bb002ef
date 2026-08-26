@@ -67,6 +67,8 @@ export type ListPageProps<T> = {
   dateRangeMode?: boolean;
   /** 日期范围变化回调（yyyy-mm-dd，空串表示不限） */
   onDateRangeChange?: (r: { from: string; to: string }) => void;
+  /** 自定义导出入口：传入默认导出函数，返回替代按钮 */
+  renderExport?: (exportCurrent: () => void) => ReactNode;
   /** extra content rendered above the toolbar */
   children?: ReactNode;
 };
