@@ -240,6 +240,25 @@ export function ListPage<T>({
           <Button
             variant="outline"
             size="icon"
+            title="导出当前筛选结果"
+            aria-label="导出当前筛选结果"
+            className="h-9 w-9 shrink-0"
+            onClick={() =>
+              exportCsv(
+                title,
+                shown.filter((c) => c.key !== "action").map((c) => c.label),
+                data.map((row) =>
+                  shown.filter((c) => c.key !== "action").map((c) => raw(c, row)),
+                ),
+              )
+            }
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
             title="筛选与列设置"
             aria-label="筛选与列设置"
             className="relative h-9 w-9 shrink-0"
