@@ -20,6 +20,7 @@ import {
 import { MoreHorizontal, Pencil, Trash2, Download, Check } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { exportCsv } from "@/lib/export-csv";
+import { exportXlsx, type SheetData } from "@/lib/export-xlsx";
 
 export const Route = createFileRoute("/warehouse/")({
   head: () => ({ meta: [{ title: "库存管理 — 奇点智牧" }] }),
@@ -76,6 +77,36 @@ function buildRows(from: string, to: string): Row[] {
     const close = i.stock;
     return { ...i, inQty, outQty, close, open: close - inQty + outQty };
   });
+}
+
+/** 单个药品在时间范围内的每日出入库与结存 */
+function buildDaily(row: Row, from: string, to: string) {
+  const ms = moves.filter((m) => m.sku === row.sku);
+  const s = from ? Date.parse(from) : null;
+  const e = to ? Date.parse(to) + 86399999 : null;
+  const inRange = ms.filter((m) => {
+    const t = Date.parse(m.date);
+    return (s === null || t >= s) && (e === null || t <= e);
+  });
+  if (!inRange.length) {
+    const d = to || from || new Date().toISOString().slice(0, 10);
+    return [{ date: d, open: row.open, inQty: 0, outQty: 0, close: row.open }];
+  }
+  const dates = inRange.map((m) => Date.parse(m.date)).sort((a, b) => a - b);
+  const start = s ?? dates[0];
+  const end = e !== null ? e - 86399999 : dates[dates.length - 1];
+  const out: { date: string; open: number; inQty: number; outQty: number; close: number }[] = [];
+  let open = row.open;
+  for (let t = start; t <= end; t += 86400000) {
+    const date = new Date(t).toISOString().slice(0, 10);
+    const day = inRange.filter((m) => m.date === date);
+    const inQty = day.reduce((a, m) => a + m.in, 0);
+    const outQty = day.reduce((a, m) => a + m.out, 0);
+    const close = open + inQty - outQty;
+    out.push({ date, open, inQty, outQty, close });
+    open = close;
+  }
+  return out;
 }
 
 function statusTag(s: Status) {
@@ -159,18 +190,24 @@ function ExportDialog({
       exportCurrent();
     } else {
       const rangeText = `${from || "不限"} 至 ${to || "今日"}`;
+      const extras = LEDGER_OPTIONAL.filter((f) => extra.includes(f.key));
       const heads = [
-        "时间范围", "商品编码", "药品展示名称", "计量单位",
+        "时间范围", "日期", "商品编码", "药品展示名称", "计量单位",
         "期初库存", "期间存入", "期间发出", "期末结存",
-        ...LEDGER_OPTIONAL.filter((f) => extra.includes(f.key)).map((f) => f.label),
+        ...extras.map((f) => f.label),
       ];
-      const body = buildRows(from, to)
+      const sheets: SheetData[] = buildRows(from, to)
         .filter((r) => skus.includes(r.sku))
-        .map((r) => [
-          rangeText, r.sku, r.name, r.unit, r.open, r.inQty, r.outQty, r.close,
-          ...LEDGER_OPTIONAL.filter((f) => extra.includes(f.key)).map((f) => String(r[f.key])),
-        ]);
-      exportCsv("库存台账", heads, body);
+        .map((r) => ({
+          name: r.name,
+          heads,
+          body: buildDaily(r, from, to).map((d) => [
+            rangeText, d.date, r.sku, r.name, r.unit,
+            d.open, d.inQty, d.outQty, d.close,
+            ...extras.map((f) => String(r[f.key])),
+          ]),
+        }));
+      exportXlsx("库存台账", sheets);
     }
     onOpenChange(false);
   };
@@ -183,7 +220,7 @@ function ExportDialog({
         <DialogHeader className="px-5 py-4 border-b border-border">
           <DialogTitle className="text-section">导出数据</DialogTitle>
           <DialogDescription className="text-caption text-text-tertiary">
-            选择导出内容类型，台账可自定义时间范围、药品范围与展示字段
+            选择导出内容类型，台账按所选药品逐个生成工作表，含每日出入库结存
           </DialogDescription>
         </DialogHeader>
 
@@ -191,7 +228,7 @@ function ExportDialog({
           <div className="grid grid-cols-2 gap-2">
             {([
               { k: "current", t: "下载当前列表数据", d: "按当前筛选与显示列导出" },
-              { k: "ledger", t: "下载台账", d: "按时间范围导出出入库结存" },
+              { k: "ledger", t: "下载台账", d: "每个药品单独 sheet，逐日结存" },
             ] as const).map((o) => (
               <button
                 key={o.k}
