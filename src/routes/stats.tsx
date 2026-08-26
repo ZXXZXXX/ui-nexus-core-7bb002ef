@@ -2027,7 +2027,7 @@ function StatsPage() {
                       <TableHead className="min-w-[240px]">分母</TableHead>
                       <TableHead className="text-right">{resultMetric.name}</TableHead>
                     </>
-                  ) : resultCols.map((c) => (
+                  ) : resultCols.map((c, i) => (
                     <TableHead key={c.key} className={`${c.num ? "text-right" : ""} ${i === 0 ? "sticky left-0 z-30" : ""}`}>
                       {c.label}
                     </TableHead>
