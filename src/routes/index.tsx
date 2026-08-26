@@ -730,7 +730,20 @@ function HomePage() {
         {(() => {
           const execFrame = isExec;
 
-          const cardsGrid = (
+          const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
+            <section>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-1 rounded-full bg-primary" />
+                  <h3 className="text-section-title text-foreground">{title}</h3>
+                </div>
+                {extra}
+              </div>
+              {children}
+            </section>
+          );
+
+
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               {visibleCards.map((k) => {
                 const Icon = k.icon;
