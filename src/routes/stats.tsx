@@ -1990,24 +1990,28 @@ function StatsPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9"
-                onClick={() => {
-                  setFilters(resultFilters);
-                  setEditingId(null);
-                  setBuilderCat(inferCategory(resultFilters));
-                  setDrawerOpen(true);
-                }}
-              >
-                <Filter className="h-3.5 w-3.5 mr-1" />
-                调整筛选
-              </Button>
-              <Button variant="outline" size="sm" className="h-9" onClick={() => openSave(resultFilters)}>
-                <Save className="h-3.5 w-3.5 mr-1" />
-                保存为模板
-              </Button>
+              {!resultMetric && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9"
+                    onClick={() => {
+                      setFilters(resultFilters);
+                      setEditingId(null);
+                      setBuilderCat(inferCategory(resultFilters));
+                      setDrawerOpen(true);
+                    }}
+                  >
+                    <Filter className="h-3.5 w-3.5 mr-1" />
+                    调整筛选
+                  </Button>
+                  <Button variant="outline" size="sm" className="h-9" onClick={() => openSave(resultFilters)}>
+                    <Save className="h-3.5 w-3.5 mr-1" />
+                    保存为模板
+                  </Button>
+                </>
+              )}
               <Button
                 size="sm"
                 className="h-9 bg-primary hover:bg-[var(--brand-hover)]"
