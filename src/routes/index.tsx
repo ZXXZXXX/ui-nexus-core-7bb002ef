@@ -402,7 +402,7 @@ function HomePage() {
   const [activeRequest, setActiveRequest] = useState<PendingRequest | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [attendanceOpen, setAttendanceOpen] = useState(false);
-  const [timeScope, setTimeScope] = useState<"today" | "month" | "quarter" | "year">("month");
+  const [timeScope, setTimeScope] = useState<"yesterday" | "month" | "year">("month");
   const alertsRef = useRef<HTMLDivElement | null>(null);
 
   const { scope, config } = useDashboardView();
@@ -421,12 +421,10 @@ function HomePage() {
   const { factor, level, levels } = useDataLevel();
 
   /** 根据时间维度调整绝对数量指标的数值；存量/比率指标保持不变 */
-  const timeFactor =
-    timeScope === "today" ? 1 / 30 : timeScope === "quarter" ? 3 : timeScope === "year" ? 12 : 1;
+  const timeFactor = timeScope === "yesterday" ? 1 / 30 : timeScope === "year" ? 12 : 1;
   const timePrefix: Record<typeof timeScope, string> = {
-    today: "（今日）",
+    yesterday: "（至昨日）",
     month: "（本月）",
-    quarter: "（本季度）",
     year: "（本年）",
   };
 
@@ -446,7 +444,7 @@ function HomePage() {
   const formatMetricLabel = (c: MetricCard) => {
     // 时点/存量指标与最近完成类指标不随时间维度切换改变口径
     if (c.label.includes("至今日") || c.label.includes("最近一次")) return c.label;
-    return c.label.replace(/（今日|本月|本季度|本年）/, timePrefix[timeScope]);
+    return c.label.replace(/（(今日|至昨日|本月|本季度|本年)）/, timePrefix[timeScope]);
   };
 
   const applyTimeScope = (c: MetricCard) => ({
@@ -742,6 +740,24 @@ function HomePage() {
               {children}
             </section>
           );
+          const timeTabs = (
+            <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+              {([["yesterday", "至昨日"], ["month", "本月"], ["year", "本年"]] as const).map(([v, l]) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setTimeScope(v)}
+                  className={`rounded-md px-3 py-1 text-caption transition-colors ${
+                    timeScope === v
+                      ? "bg-[var(--brand-subtle)] text-[var(--brand)] font-medium"
+                      : "text-text-tertiary hover:text-text-primary"
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          );
           const cardsGrid = (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
 
@@ -854,7 +870,7 @@ function HomePage() {
             const showAlert = topicOrder.includes("alert");
             return (
               <div className="space-y-6">
-                <Frame title="数据概览">{cardsGrid}</Frame>
+                <Frame title="数据概览" extra={timeTabs}>{cardsGrid}</Frame>
                 <Frame title="数据看板">{topicGrid}</Frame>
                 {showAlert && (
                   <div id="topic-alert" className="scroll-mt-24">
@@ -873,49 +889,9 @@ function HomePage() {
 
 
 
-          const timeSelector = (
-            <Select
-              value={timeScope}
-              onValueChange={(v) => setTimeScope(v as typeof timeScope)}
-            >
-              <SelectTrigger className="h-8 w-[120px] border-border bg-card text-body-sm text-text-primary">
-                <SelectValue placeholder="选择时间" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">今日</SelectItem>
-                <SelectItem value="month">本月</SelectItem>
-                <SelectItem value="quarter">本季度</SelectItem>
-                <SelectItem value="year">本年</SelectItem>
-              </SelectContent>
-            </Select>
-          );
-
           return (
             <div className="space-y-6">
-              <Frame
-                title="数据概览"
-                extra={
-                  <div className="flex items-center gap-3">
-                    <span className="text-caption text-text-tertiary">统计至昨日</span>
-                    <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
-                      {([["month", "本月"], ["year", "本年"]] as const).map(([v, l]) => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => setTimeScope(v)}
-                          className={`rounded-md px-3 py-1 text-caption transition-colors ${
-                            timeScope === v
-                              ? "bg-[var(--brand-subtle)] text-[var(--brand)] font-medium"
-                              : "text-text-tertiary hover:text-text-primary"
-                          }`}
-                        >
-                          {l}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                }
-              >
+              <Frame title="数据概览" extra={timeTabs}>
                 {cardsGrid}
               </Frame>
               <Frame title="数据看板">
