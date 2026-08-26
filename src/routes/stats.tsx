@@ -431,10 +431,10 @@ const DIMENSION_TONE: Record<DimensionKey, string> = {
 };
 
 const CATEGORY_DIMENSIONS: Record<TplCategory, DimensionKey[]> = {
-  cattle: ["farm", "cattle", "calving", "order"],
-  disease: ["farm", "cattle", "disease", "prescription", "order", "drug"],
-  drug: ["farm", "drug", "prescription", "disease", "order"],
-  staff: ["farm", "staff", "disease", "calving", "order"],
+  cattle: ["farm", "cattle"],
+  disease: ["farm", "disease"],
+  drug: ["farm", "drug"],
+  staff: ["farm", "staff"],
 };
 
 const SECTION_CATEGORY: Record<string, TplCategory> = {
@@ -1327,12 +1327,6 @@ function StatsPage() {
                   </Select>
                 </FieldBlock>
                 <ChipGroup
-                  label="人员（可多选）"
-                  options={OPERATORS}
-                  selected={filters.operators}
-                  onToggle={(v) => toggleIn("operators", v)}
-                />
-                <ChipGroup
                   label="绩效类型（可多选）"
                   options={PERF_TYPES}
                   selected={filters.perfTypes}
@@ -1435,30 +1429,6 @@ function StatsPage() {
                 {filters.perfTypes.includes("工单") && (
                   <div className="pl-3 border-l-2 border-primary/30 space-y-4">
                     <div className="text-body-sm text-text-secondary">工单绩效</div>
-                    <div>
-                      <div className="text-body-sm text-text-secondary mb-2">工单类型（可多选）</div>
-                      <div className="flex flex-wrap gap-2">
-                        {(Object.keys(WO_TYPE_LABEL) as WorkOrderType[]).map((t) => {
-                          const active = filters.woTypes.includes(t);
-                          const Icon = WO_TYPE_ICON[t];
-                          return (
-                            <button
-                              key={t}
-                              onClick={() => toggleIn("woTypes", t)}
-                              className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-full text-body-sm border transition-colors ${
-                                active
-                                  ? "border-primary bg-brand-subtle text-primary"
-                                  : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
-                              }`}
-                            >
-                              <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
-                              {WO_TYPE_LABEL[t]}
-                              {active && <Check className="h-3 w-3" />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <RangeField
                         label="各类型工单完成次数"
