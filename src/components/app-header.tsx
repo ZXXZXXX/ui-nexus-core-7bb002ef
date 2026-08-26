@@ -27,7 +27,41 @@ interface AppHeaderProps {
   breadcrumb?: string[];
 }
 
+/** 面包屑文案 → 目标路由（无对应页面的层级不可点击） */
+const CRUMB_PATH: Record<string, string> = {
+  首页: "/",
+  基础档案: "/archive/farm",
+  牛场信息: "/archive/farm",
+  牛舍信息: "/archive/barn",
+  牛只信息: "/archive/cattle",
+  工单管理: "/production/disease",
+  疾病治疗: "/production/disease",
+  疫苗免疫: "/production/vaccine",
+  产后护理: "/production/postpartum",
+  修蹄工单: "/production/hoof",
+  干奶工单: "/production/drying",
+  驱虫工单: "/production/deworm",
+  普修工单: "/production/general",
+  药品管理: "/warehouse",
+  药品档案: "/warehouse/drug",
+  药品库存: "/warehouse",
+  调拨记录: "/warehouse/transfer",
+  取药记录: "/warehouse/dispense",
+  损耗管理: "/warehouse/loss",
+  诊疗管理: "/knowledge/disease",
+  疾病管理: "/knowledge/disease",
+  症状管理: "/knowledge/symptom",
+  处方管理: "/knowledge/prescription",
+  组织管理: "/organization/account",
+  账号管理: "/organization/account",
+  角色管理: "/organization/role",
+  租户管理: "/organization/tenant",
+  统计分析: "/stats",
+  反馈管理: "/feedback",
+};
+
 const currentUser = {
+
   name: "张磊",
   initial: "ZL",
   role: "场长",
