@@ -88,10 +88,10 @@ const columns: ListColumn<Row>[] = [
   },
   { key: "spec", label: "规格型号", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.spec}</span> },
   { key: "expiry", label: "效期", date: true, filter: "date", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.expiry}</span> },
-  { key: "open", label: "期初库存", filter: "number", value: (i) => i.open, render: (i) => num(i.open, "text-text-secondary") },
-  { key: "inQty", label: "期间存入", filter: "number", value: (i) => i.inQty, render: (i) => num(i.inQty, "text-[var(--state-success)]") },
-  { key: "outQty", label: "期间发出", filter: "number", value: (i) => i.outQty, render: (i) => num(i.outQty, "text-text-secondary") },
-  { key: "close", label: "期末结存", filter: "number", value: (i) => i.close, render: (i) => num(i.close, "font-medium") },
+  { key: "open", label: "期初库存", filter: "number", value: (i) => i.open, render: (i) => num(i.open, "text-foreground") },
+  { key: "inQty", label: "期间存入", filter: "number", value: (i) => i.inQty, render: (i) => num(i.inQty, "text-foreground") },
+  { key: "outQty", label: "期间发出", filter: "number", value: (i) => i.outQty, render: (i) => num(i.outQty, "text-foreground") },
+  { key: "close", label: "期末结存", filter: "number", value: (i) => i.close, render: (i) => num(i.close, "text-foreground") },
   {
     key: "stock", label: "当前库存量", filter: "number", value: (i) => i.stock,
     render: (item) => (
