@@ -153,7 +153,8 @@ export function ListPage<T>({
 
   const data = useMemo(() => {
     const kw = q.trim().toLowerCase();
-    const from = rangeStart(range);
+    const start = dateRangeMode ? (from ? parseDate(from) : null) : rangeStart(range);
+    const end = dateRangeMode && to ? parseDate(to) : null;
     const dateCol = columns.find((c) => c.key === dateKey);
 
     return rows.filter((row) => {
@@ -161,9 +162,11 @@ export function ListPage<T>({
         const hit = searchCols.some((c) => raw(c, row).toLowerCase().includes(kw));
         if (!hit) return false;
       }
-      if (from !== null && dateCol) {
+      if ((start !== null || end !== null) && dateCol) {
         const t = parseDate(raw(dateCol, row));
-        if (t === null || t < from) return false;
+        if (t === null) return false;
+        if (start !== null && t < start) return false;
+        if (end !== null && t > end + 86399999) return false;
       }
       for (const [key, val] of Object.entries(filters)) {
         if (!val || val === "__all") continue;
@@ -176,7 +179,8 @@ export function ListPage<T>({
       }
       return true;
     });
-  }, [rows, q, range, dateKey, filters, columns, searchCols]);
+  }, [rows, q, range, dateKey, filters, columns, searchCols, dateRangeMode, from, to]);
+
 
   const optionsFor = (col: ListColumn<T>) =>
     col.options ?? Array.from(new Set(rows.map((r) => raw(col, r)).filter(Boolean)));
