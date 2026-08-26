@@ -546,9 +546,9 @@ export function WorkOrderPage({
           : key === "reviewedAt"
             ? parseTime(b.reviewedAt)
             : parseTime(b.executedAt);
-      return sortDir === "asc" ? va - vb : vb - va;
+    return sortDir === "asc" ? va - vb : vb - va;
     });
-  }, [orders, active, range, dateField, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
+  }, [orders, active, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
 
   const leftFrozenKeys: ColKey[] = ["id"];
   const rightFrozenKeys: ColKey[] = ["action"];
