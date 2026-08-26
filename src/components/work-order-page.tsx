@@ -786,6 +786,17 @@ export function WorkOrderPage({
               <Button
                 variant="outline"
                 size="icon"
+                title="导出当前筛选结果"
+                aria-label="导出当前筛选结果"
+                className="h-9 w-9 shrink-0"
+                onClick={handleExport}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="outline"
+                size="icon"
                 title="筛选与列设置"
                 aria-label="筛选与列设置"
                 className="h-9 w-9 shrink-0"
