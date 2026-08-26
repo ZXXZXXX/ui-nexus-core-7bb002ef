@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Plus, X } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, X, Download } from "lucide-react";
+import { exportCsv } from "@/lib/export-csv";
 
 /* ---------------------------------- types --------------------------------- */
 
