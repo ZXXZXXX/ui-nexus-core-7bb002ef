@@ -3,7 +3,7 @@ import { usePcRole, canExamine } from "@/lib/pc-role";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { exportCsv } from "@/lib/export-csv";
-import { WorkOrderExportButton, type ExportOptions } from "@/components/work-order-export-dialog";
+import { WorkOrderExportButton } from "@/components/work-order-export-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
