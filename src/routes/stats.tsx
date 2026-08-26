@@ -1845,24 +1845,24 @@ function StatsPage() {
             </div>
           </div>
 
-          <Card className="border-border bg-white overflow-x-auto">
-            <Table>
+          <Card className="border-border bg-white overflow-hidden">
+            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
-                  <TableHead>模板名称</TableHead>
+                  <TableHead className="sticky left-0 z-30 min-w-[220px]">模板名称</TableHead>
                   <TableHead className="min-w-[280px]">计算方式</TableHead>
                   <TableHead>维度</TableHead>
                   <TableHead className="text-right">条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
                   <TableHead>创建人</TableHead>
                   <TableHead>创建时间</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
+                  <TableHead className="text-right sticky right-0 z-30">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {visibleTemplates.map((t) => (
-                  <TableRow key={t.id}>
-                    <TableCell>
+                  <TableRow key={t.id} className="group">
+                    <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]">
                       <div className="flex items-center gap-2 min-w-0">
                         <button
                           type="button"
@@ -1908,7 +1908,7 @@ function StatsPage() {
                     <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.createdAt}</TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
+                    <TableCell className="text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]">
                       <Button
                         size="sm"
                         variant="ghost"
@@ -2016,19 +2016,19 @@ function StatsPage() {
 
           </div>
 
-          <Card className="border-border bg-white overflow-x-auto">
-            <Table>
+          <Card className="border-border bg-white overflow-hidden">
+            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
                   {resultMetric ? (
                     <>
-                      <TableHead>牧场</TableHead>
+                      <TableHead className="sticky left-0 z-30">牧场</TableHead>
                       <TableHead className="min-w-[240px]">分子</TableHead>
                       <TableHead className="min-w-[240px]">分母</TableHead>
                       <TableHead className="text-right">{resultMetric.name}</TableHead>
                     </>
                   ) : resultCols.map((c) => (
-                    <TableHead key={c.key} className={c.num ? "text-right" : undefined}>
+                    <TableHead key={c.key} className={`${c.num ? "text-right" : ""} ${i === 0 ? "sticky left-0 z-30" : ""}`}>
                       {c.label}
                     </TableHead>
                   ))}
@@ -2036,8 +2036,8 @@ function StatsPage() {
               </TableHeader>
               <TableBody>
                 {resultMetric ? aggregatedMetricRows.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap">{r.farm}</TableCell>
+                  <TableRow key={r.id} className="group">
+                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]">{r.farm}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary">
                       <span className="tabular-nums text-foreground">{r.numerator.toLocaleString()}</span>
                       <span className="ml-2 text-caption text-text-tertiary">{r.numeratorLabel}</span>
@@ -2049,13 +2049,13 @@ function StatsPage() {
                     <TableCell className="text-right text-body-sm font-medium tabular-nums text-foreground">{r.value}</TableCell>
                   </TableRow>
                 )) : filteredRows.map((r) => (
-                    <TableRow key={r.id}>
-                      {resultCols.map((c) => (
+                    <TableRow key={r.id} className="group">
+                      {resultCols.map((c, i) => (
                         <TableCell
                           key={c.key}
                           className={`text-body-sm whitespace-nowrap ${
                             c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
-                          }`}
+                          } ${i === 0 ? "sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]" : ""}`}
                         >
                           {c.value(r)}
                         </TableCell>
