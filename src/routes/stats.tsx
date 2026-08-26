@@ -1874,7 +1874,7 @@ function StatsPage() {
               <TableBody>
                 {visibleTemplates.map((t) => (
                   <TableRow key={t.id} className="group">
-                    <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-muted/50 group-data-[state=selected]:bg-muted shadow-[1px_0_0_0_var(--border)]">
+                    <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[var(--bg-surface-subtle)] group-data-[state=selected]:bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">
                       <div className="flex items-center gap-2 min-w-0">
                         <button
                           type="button"
@@ -1920,7 +1920,7 @@ function StatsPage() {
                     <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.createdAt}</TableCell>
-                    <TableCell className="text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-muted/50 group-data-[state=selected]:bg-muted shadow-[-1px_0_0_0_var(--border)]">
+                    <TableCell className="text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-[var(--bg-surface-subtle)] group-data-[state=selected]:bg-[var(--bg-surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">
                       <Button
                         size="sm"
                         variant="ghost"
@@ -2049,7 +2049,7 @@ function StatsPage() {
               <TableBody>
                 {resultMetric ? aggregatedMetricRows.map((r) => (
                   <TableRow key={r.id} className="group">
-                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-muted/50 group-data-[state=selected]:bg-muted shadow-[1px_0_0_0_var(--border)]">{r.farm}</TableCell>
+                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-[var(--bg-surface-subtle)] group-data-[state=selected]:bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">{r.farm}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary">
                       <span className="tabular-nums text-foreground">{r.numerator.toLocaleString()}</span>
                       <span className="ml-2 text-caption text-text-tertiary">{r.numeratorLabel}</span>
@@ -2067,7 +2067,7 @@ function StatsPage() {
                           key={c.key}
                           className={`text-body-sm whitespace-nowrap ${
                             c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
-                          } ${i === 0 ? "sticky left-0 z-10 bg-white group-hover:bg-muted/50 group-data-[state=selected]:bg-muted shadow-[1px_0_0_0_var(--border)]" : ""}`}
+                          } ${i === 0 ? "sticky left-0 z-10 bg-white group-hover:bg-[var(--bg-surface-subtle)] group-data-[state=selected]:bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]" : ""}`}
                         >
                           {c.value(r)}
                         </TableCell>
