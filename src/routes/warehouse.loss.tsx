@@ -39,9 +39,9 @@ type LossRow = {
 
 // 物品/药品候选
 const ITEMS = [
-  { id: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", unit: "支", price: 62.5 },
+  { id: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", unit: "支", price: 62.5 },
   { id: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", unit: "支", price: 60.0 },
-  { id: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml:1g/瓶", unit: "瓶", price: 38.75 },
+  { id: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", unit: "瓶", price: 38.75 },
   { id: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", unit: "罐", price: 90.0 },
   { id: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", unit: "L", price: 44.0 },
 ];
@@ -68,7 +68,7 @@ const initial: LossRow[] = [
   { id: "LS-1086", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 8, unit: "支", reason: "冷链断电", shared: true, createdAt: "2026-05-12 10:18", operator: "孙库管", value: 480.0 },
   { id: "LS-1085", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 2, unit: "罐", reason: "运输破损", shared: false, createdAt: "2026-05-11 15:30", operator: "王仓管", value: 180.0 },
   { id: "LS-1084", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 5, unit: "L", reason: "过期失效", shared: true, createdAt: "2026-05-10 09:00", operator: "孙库管", value: 220.0 },
-  { id: "LS-1083", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", qty: 1, unit: "支", reason: "误开未用", shared: false, createdAt: "2026-05-09 14:42", operator: "李雨晴", value: 62.5 },
+  { id: "LS-1083", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 1, unit: "支", reason: "误开未用", shared: false, createdAt: "2026-05-09 14:42", operator: "李雨晴", value: 62.5 },
 ];
 
 const money = (n: number) =>

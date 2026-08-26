@@ -50,17 +50,17 @@ type TransferRow = {
 };
 
 const ITEMS = [
-  { id: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", unit: "支" },
+  { id: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", unit: "支" },
   { id: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", unit: "支" },
-  { id: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml:1g/瓶", unit: "瓶" },
+  { id: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", unit: "瓶" },
   { id: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", unit: "罐" },
   { id: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", unit: "桶" },
 ];
 
 const initial: TransferRow[] = [
-  { id: "TR-2026-0142", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml:5g/瓶", qty: 20, unit: "支", inboundAt: "2026-05-19 10:24", operator: "王建国", remark: "昨日用量超预期，1 号库紧急补货至 2 号库" },
+  { id: "TR-2026-0142", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20, unit: "支", inboundAt: "2026-05-19 10:24", operator: "王建国", remark: "昨日用量超预期，1 号库紧急补货至 2 号库" },
   { id: "TR-2026-0141", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支", inboundAt: "2026-05-19 09:08", operator: "王建国", remark: "5 月加强免疫备货" },
-  { id: "TR-2026-0140", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml:1g/瓶", qty: 15, unit: "瓶", inboundAt: "2026-05-18 16:42", operator: "孙库管", remark: "季度体内驱虫批次" },
+  { id: "TR-2026-0140", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15, unit: "瓶", inboundAt: "2026-05-18 16:42", operator: "孙库管", remark: "季度体内驱虫批次" },
   { id: "TR-2026-0139", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶", inboundAt: "2026-05-18 11:30", operator: "孙库管", remark: "" },
 ];
 

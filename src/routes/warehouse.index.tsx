@@ -35,12 +35,12 @@ type Item = {
 };
 
 const inventory: Item[] = [
-  { sku: "01-00063", name: "乳房炎抗生素 5mg", cat: "抗生素", spec: "100ml:5g/瓶", stock: 86, min: 50, unit: "盒", loc: "C-12", expiry: "2026-11", status: "物资正常", updatedAt: "2026-08-20", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010321", batchNo: "B24A0631", prodDate: "2024-11-08", shelfLife: "24 个月" },
+  { sku: "01-00063", name: "乳房炎抗生素 5mg", cat: "抗生素", spec: "100ml（含5g）/瓶", stock: 86, min: 50, unit: "盒", loc: "C-12", expiry: "2026-11", status: "物资正常", updatedAt: "2026-08-20", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010321", batchNo: "B24A0631", prodDate: "2024-11-08", shelfLife: "24 个月" },
   { sku: "02-00214", name: "口蹄疫疫苗 A 型", cat: "疫苗", spec: "50ml/瓶", stock: 12, min: 30, unit: "支", loc: "C-02", expiry: "2026-06", status: "余量紧张", updatedAt: "2026-08-19", supplier: "中牧生物", maker: "中牧实业股份有限公司", approvalNo: "兽药生字(2023)190024", batchNo: "V23F0912", prodDate: "2024-06-14", shelfLife: "24 个月" },
-  { sku: "03-00306", name: "伊维菌素注射液", cat: "驱虫药", spec: "100ml:1g/瓶", stock: 48, min: 20, unit: "瓶", loc: "C-05", expiry: "2026-07", status: "物资临期", updatedAt: "2026-08-14", supplier: "华牧兽药供应链", maker: "河北远征药业有限公司", approvalNo: "兽药字(2022)070118", batchNo: "Y22C0455", prodDate: "2024-07-01", shelfLife: "24 个月" },
+  { sku: "03-00306", name: "伊维菌素注射液", cat: "驱虫药", spec: "100ml（含1g）/瓶", stock: 48, min: 20, unit: "瓶", loc: "C-05", expiry: "2026-07", status: "物资临期", updatedAt: "2026-08-14", supplier: "华牧兽药供应链", maker: "河北远征药业有限公司", approvalNo: "兽药字(2022)070118", batchNo: "Y22C0455", prodDate: "2024-07-01", shelfLife: "24 个月" },
   { sku: "04-00412", name: "复合维生素注射液", cat: "营养类", spec: "10ml/支", stock: 120, min: 60, unit: "支", loc: "C-08", expiry: "2027-02", status: "物资正常", updatedAt: "2026-08-02", supplier: "瑞普生物", maker: "天津瑞普生物技术股份有限公司", approvalNo: "兽药字(2023)120507", batchNo: "N23K0088", prodDate: "2025-02-20", shelfLife: "24 个月" },
   { sku: "05-00521", name: "戊二醛消毒液", cat: "消毒类", spec: "5L/桶", stock: 18, min: 30, unit: "L", loc: "C-16", expiry: "2026-12", status: "余量紧张", updatedAt: "2026-07-21", supplier: "洁牧环境", maker: "山东洁牧生物科技有限公司", approvalNo: "兽药字(2024)150233", batchNo: "X24D0210", prodDate: "2024-12-05", shelfLife: "24 个月" },
-  { sku: "06-00633", name: "氟尼新葡甲胺注射液", cat: "解热镇痛", spec: "100ml:5g/瓶", stock: 64, min: 25, unit: "瓶", loc: "C-09", expiry: "2026-10", status: "物资正常", updatedAt: "2026-07-15", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010902", batchNo: "F24B0177", prodDate: "2024-10-16", shelfLife: "24 个月" },
+  { sku: "06-00633", name: "氟尼新葡甲胺注射液", cat: "解热镇痛", spec: "100ml（含5g）/瓶", stock: 64, min: 25, unit: "瓶", loc: "C-09", expiry: "2026-10", status: "物资正常", updatedAt: "2026-07-15", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010902", batchNo: "F24B0177", prodDate: "2024-10-16", shelfLife: "24 个月" },
 ];
 
 /** 出入库流水（用于计算期初 / 期间 / 期末） */
