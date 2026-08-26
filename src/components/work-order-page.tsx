@@ -57,7 +57,6 @@ import {
   Check,
   X,
   SlidersHorizontal,
-  Download,
   ArrowUp,
   ArrowDown,
   ArrowUpDown,

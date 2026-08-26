@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Plus, X, Download, CalendarDays } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, X, CalendarDays } from "lucide-react";
 import { exportCsv } from "@/lib/export-csv";
 import { ExportConfirmButton } from "@/components/export-confirm";
 
