@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Plus, X, Download } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, X, Download, CalendarDays } from "lucide-react";
 import { exportCsv } from "@/lib/export-csv";
 
 /* ---------------------------------- types --------------------------------- */
@@ -235,7 +235,8 @@ export function ListPage<T>({
                 </SelectContent>
               </Select>
               {dateRangeMode ? (
-                <div className="inline-flex h-9 items-center gap-1 rounded-md border border-border bg-card px-2">
+                <div className="group inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-card pl-2.5 pr-2 transition-colors hover:border-primary/40 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+                  <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary transition-colors group-focus-within:text-primary" />
                   <input
                     type="date"
                     value={from}
@@ -245,9 +246,9 @@ export function ListPage<T>({
                       onDateRangeChange?.({ from: e.target.value, to });
                     }}
                     aria-label="开始日期"
-                    className="h-7 bg-transparent text-body-sm text-foreground outline-none"
+                    className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
                   />
-                  <span className="text-text-tertiary">-</span>
+                  <span className="h-px w-2 shrink-0 bg-border" />
                   <input
                     type="date"
                     value={to}
@@ -257,7 +258,7 @@ export function ListPage<T>({
                       onDateRangeChange?.({ from, to: e.target.value });
                     }}
                     aria-label="结束日期"
-                    className="h-7 bg-transparent text-body-sm text-foreground outline-none"
+                    className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
                   />
                   {(from || to) && (
                     <button
@@ -267,12 +268,13 @@ export function ListPage<T>({
                         onDateRangeChange?.({ from: "", to: "" });
                       }}
                       aria-label="重置时间范围"
-                      className="text-text-tertiary hover:text-foreground"
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-surface-subtle hover:text-foreground"
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <X className="h-3 w-3" />
                     </button>
                   )}
                 </div>
+
               ) : (
                 <div className="inline-flex h-9 items-center rounded-md border border-border bg-card p-0.5">
                   {RANGES.map((r) => (
