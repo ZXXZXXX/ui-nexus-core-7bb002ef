@@ -55,6 +55,7 @@ const columns: ListColumn<Item>[] = [
       </div>
     ),
   },
+  { key: "unit", label: "计量单位", filter: "select", render: (i) => <span className="text-body-sm text-text-secondary">{i.unit}</span> },
   { key: "cat", label: "药品分类", filter: "select", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary">{i.cat}</span> },
   { key: "loc", label: "库位", defaultHidden: true, render: (i) => <span className="font-mono text-body-sm text-text-tertiary">{i.loc}</span> },
   { key: "status", label: "状态", filter: "select", defaultHidden: true, render: (i) => <span className={statusTag(i.status)}>{i.status}</span> },
