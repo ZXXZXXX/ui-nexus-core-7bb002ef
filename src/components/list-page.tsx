@@ -118,7 +118,10 @@ export function ListPage<T>({
   getRowKey,
   onRowClick,
   emptyText = "暂无数据",
+  dateRangeMode = false,
+  onDateRangeChange,
   children,
+
 }: ListPageProps<T>) {
   const searchCols = useMemo(
     () =>
