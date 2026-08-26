@@ -242,35 +242,49 @@ export function ListPage<T>({
               {dateRangeMode ? (
                 <div className="group inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-card pl-2.5 pr-2 transition-colors hover:border-primary/40 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
                   <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary transition-colors group-focus-within:text-primary" />
-                  <input
-                    type="date"
-                    value={from}
-                    max={to || undefined}
-                    onChange={(e) => {
-                      setFrom(e.target.value);
-                      onDateRangeChange?.({ from: e.target.value, to });
-                    }}
-                    aria-label="开始日期"
-                    className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
-                  />
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={from}
+                      max={to || undefined}
+                      onChange={(e) => {
+                        setFrom(e.target.value);
+                        onDateRangeChange?.({ from: e.target.value, to });
+                      }}
+                      aria-label="开始日期"
+                      className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
+                    />
+                    {!from && (
+                      <span className="pointer-events-none absolute inset-0 flex items-center rounded bg-card px-1 text-body-sm text-text-tertiary">
+                        不限
+                      </span>
+                    )}
+                  </div>
                   <span className="h-px w-2 shrink-0 bg-border" />
-                  <input
-                    type="date"
-                    value={to}
-                    min={from || undefined}
-                    onChange={(e) => {
-                      setTo(e.target.value);
-                      onDateRangeChange?.({ from, to: e.target.value });
-                    }}
-                    aria-label="结束日期"
-                    className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
-                  />
-                  {(from || to) && (
+                  <div className="relative flex items-center gap-1">
+                    <input
+                      type="date"
+                      value={to}
+                      min={from || undefined}
+                      onChange={(e) => {
+                        setTo(e.target.value);
+                        onDateRangeChange?.({ from, to: e.target.value });
+                      }}
+                      aria-label="结束日期"
+                      className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
+                    />
+                    {to === todayStr && (
+                      <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-caption text-primary">
+                        今日
+                      </span>
+                    )}
+                  </div>
+                  {(from || to !== todayStr) && (
                     <button
                       onClick={() => {
                         setFrom("");
-                        setTo("");
-                        onDateRangeChange?.({ from: "", to: "" });
+                        setTo(todayStr);
+                        onDateRangeChange?.({ from: "", to: todayStr });
                       }}
                       aria-label="重置时间范围"
                       className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-surface-subtle hover:text-foreground"
