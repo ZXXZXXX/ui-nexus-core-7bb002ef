@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const Route = createFileRoute("/warehouse/dispense")({
   head: () => ({
@@ -124,13 +124,13 @@ function DispensePage() {
         </Button>
       )}
     />
-    <Dialog open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="text-section">取药记录详情</DialogTitle>
-        </DialogHeader>
+    <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+      <SheetContent side="right" className="w-[460px] sm:max-w-[460px] overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle className="text-section">取药记录详情</SheetTitle>
+        </SheetHeader>
         {detail ? (
-          <div className="space-y-4">
+          <div className="mt-4 space-y-5">
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <Field label="商品编码" value={detail.code} mono />
               <Field label="药品展示名称" value={detail.name} />
@@ -161,8 +161,8 @@ function DispensePage() {
             ) : null}
           </div>
         ) : null}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
     </>
   );
 }
