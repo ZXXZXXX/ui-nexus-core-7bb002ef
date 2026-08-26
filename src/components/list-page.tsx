@@ -19,8 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Plus, X, Download, CalendarDays } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, X, CalendarDays } from "lucide-react";
 import { exportCsv } from "@/lib/export-csv";
+import { ExportConfirmButton } from "@/components/export-confirm";
 
 /* ---------------------------------- types --------------------------------- */
 
@@ -328,16 +329,7 @@ export function ListPage<T>({
           {renderExport ? (
             renderExport(exportCurrent)
           ) : (
-            <Button
-              variant="outline"
-              size="icon"
-              title="导出当前筛选结果"
-              aria-label="导出当前筛选结果"
-              className="h-9 w-9 shrink-0"
-              onClick={exportCurrent}
-            >
-              <Download className="h-4 w-4" />
-            </Button>
+            <ExportConfirmButton onConfirm={exportCurrent} count={data.length} />
           )}
 
           <Button
