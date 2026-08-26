@@ -92,7 +92,7 @@ function tabHandledByRole(role: Role, tab: StatusTab): boolean {
 // 免疫员：疫苗免疫；修蹄工：修蹄
 const EXEC_TYPES_VET = ["疾病治疗", "产后护理"];
 const EXTRA_TASKS = homeTasks.filter(
-  (t) => t.kind === "基础检查" || t.kind === "异常排查",
+  (t) => t.kind === "基础事件" || t.kind === "异常排查",
 );
 
 function getRoleAllTasks(role: Role): HomeTask[] {
@@ -125,7 +125,7 @@ function getRoleAllTasks(role: Role): HomeTask[] {
 }
 
 function statusOf(t: HomeTask): StatusTab {
-  if (t.kind === "基础检查" || t.kind === "异常排查") return "待执行";
+  if (t.kind === "基础事件" || t.kind === "异常排查") return "待执行";
   if (t.type === "疾病治疗") {
 
     const meta = diseaseTaskMeta[t.id]?.task;
@@ -136,8 +136,8 @@ function statusOf(t: HomeTask): StatusTab {
   return "待执行";
 }
 
-type TaskKind = "工单任务" | "基础检查" | "异常排查";
-const ALL_KINDS: TaskKind[] = ["工单任务", "基础检查", "异常排查"];
+type TaskKind = "工单任务" | "基础事件" | "异常排查";
+const ALL_KINDS: TaskKind[] = ["工单任务", "基础事件", "异常排查"];
 
 function AssigneeBadge({ name }: { name: string }) {
   const initial = name.slice(0, 1);
@@ -215,7 +215,7 @@ function TodayTasksPage() {
   }, [capture, navigate]);
 
   const kindOf = (t: HomeTask): TaskKind =>
-    t.kind === "基础检查" || t.kind === "异常排查" ? t.kind : "工单任务";
+    t.kind === "基础事件" || t.kind === "异常排查" ? t.kind : "工单任务";
 
   // 顶层：三大类别
   const kindOptions = useMemo(
@@ -710,7 +710,7 @@ function TodayTasksPage() {
           </div>
         ) : (
           tasks.map((t) => {
-            const isExam = t.kind === "基础检查";
+            const isExam = t.kind === "基础事件";
             const isAlert = t.kind === "异常排查";
             const meta = typeMeta[t.type] ?? typeMeta["疾病治疗"];
             const Icon = meta.icon;
