@@ -1860,14 +1860,15 @@ function StatsPage() {
             <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
-                  <TableHead className="sticky left-0 z-30 min-w-[220px]">模板名称</TableHead>
+                  <TableHead className="sticky left-0 z-30 min-w-[220px] bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">模板名称</TableHead>
                   <TableHead className="min-w-[280px]">计算方式</TableHead>
                   <TableHead>维度</TableHead>
                   <TableHead className="text-right">条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
                   <TableHead>创建人</TableHead>
                   <TableHead>创建时间</TableHead>
-                  <TableHead className="text-right sticky right-0 z-30">操作</TableHead>
+                  <TableHead className="text-right sticky right-0 z-30 bg-[var(--surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">操作</TableHead>
+
                 </TableRow>
               </TableHeader>
               <TableBody>
