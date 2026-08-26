@@ -297,7 +297,32 @@ function DrugArchivePage() {
             <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
               <Filter className="h-3.5 w-3.5" /> 分类
             </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              title="导出当前筛选结果"
+              aria-label="导出当前筛选结果"
+              className="h-9 w-9 shrink-0"
+              onClick={() =>
+                exportCsv(
+                  "药品档案",
+                  ["商品编码", "药品展示名称", "规格型号", "类型", "默认用药方式", "休药期", "启用状态"],
+                  filtered.map((d) => [
+                    d.code,
+                    d.name,
+                    d.spec,
+                    d.drugType,
+                    (d.routes ?? []).join("、"),
+                    d.withdraw,
+                    d.status,
+                  ]),
+                )
+              }
+            >
+              <Download className="h-4 w-4" />
+            </Button>
           </div>
+
           <Button
             size="sm"
             className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
