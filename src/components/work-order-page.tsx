@@ -805,6 +805,23 @@ export function WorkOrderPage({
                     {r.label}
                   </button>
                 ))}
+                {range === "custom" && (
+                  <div className="flex items-center gap-1 pl-1 pr-1">
+                    <Input
+                      type="date"
+                      value={customStart}
+                      onChange={(e) => setCustomStart(e.target.value)}
+                      className="h-7 w-[136px] px-2 text-caption bg-card border-0 shadow-none focus-visible:ring-1 focus-visible:ring-primary"
+                    />
+                    <span className="text-caption text-text-tertiary">至</span>
+                    <Input
+                      type="date"
+                      value={customEnd}
+                      onChange={(e) => setCustomEnd(e.target.value)}
+                      className="h-7 w-[136px] px-2 text-caption bg-card border-0 shadow-none focus-visible:ring-1 focus-visible:ring-primary"
+                    />
+                  </div>
+                )}
               </div>
 
               <WorkOrderExportButton
