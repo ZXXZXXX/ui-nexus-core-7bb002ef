@@ -849,16 +849,22 @@ function HomePage() {
           );
 
           if (!execFrame) {
+            const showAlert = topicOrder.includes("alert");
             return (
-              <>
-                <div>
-                  <h3 className="text-section-title text-foreground">数据看板</h3>
-                </div>
-                {cardsGrid}
-                {topicGrid}
-              </>
+              <div className="space-y-6">
+                <Frame title="数据概览">{cardsGrid}</Frame>
+                <Frame title="数据看板">{topicGrid}</Frame>
+                {showAlert && (
+                  <div id="topic-alert" className="scroll-mt-24">
+                    <Frame title="预警告警">
+                      <AlertSection bare />
+                    </Frame>
+                  </div>
+                )}
+              </div>
             );
           }
+
 
           const region = scope === "region" ? CURRENT_REGION : null;
           const farmScope = scope === "farm-out" ? CURRENT_FARM : null;
