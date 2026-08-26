@@ -35,17 +35,12 @@ const groups: { key: string; icon: typeof AlertTriangle; items: Item[] }[] = [
 
 export const alertCounts = groups.map((g) => ({ key: g.key, count: g.items.length }));
 
-export function AlertSection() {
+export function AlertSection({ bare = false }: { bare?: boolean }) {
   const total = groups.reduce((s, g) => s + g.items.length, 0);
 
-  return (
-    <SectionCard
-      id="topic-alert"
-      title="预警告警专题"
-      desc={`${total} 条待关注`}
-      icon={<AlertTriangle className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+  const grid = (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
         {groups.map((g) => (
           <div key={g.key} className="rounded-xl border border-border overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 bg-surface-subtle">
@@ -72,6 +67,19 @@ export function AlertSection() {
           </div>
         ))}
       </div>
+  );
+
+  if (bare) return grid;
+
+  return (
+    <SectionCard
+      id="topic-alert"
+      title="预警告警专题"
+      desc={`${total} 条待关注`}
+      icon={<AlertTriangle className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+    >
+      {grid}
     </SectionCard>
   );
 }
+

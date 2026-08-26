@@ -730,8 +730,21 @@ function HomePage() {
         {(() => {
           const execFrame = isExec;
 
+          const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
+            <section>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-1 rounded-full bg-primary" />
+                  <h3 className="text-section-title text-foreground">{title}</h3>
+                </div>
+                {extra}
+              </div>
+              {children}
+            </section>
+          );
           const cardsGrid = (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+
               {visibleCards.map((k) => {
                 const Icon = k.icon;
                 return (
@@ -783,9 +796,12 @@ function HomePage() {
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
               {topicOrder.map((key) => {
                 if (key === "ops" && scope !== "region" && scope !== "group" && scope !== "farm-out") return null;
+                // 预警告警已提升为独立板块
+                if (key === "alert") return null;
                 // 集团 / 区域高管视角：不展示牛群 / 产犊 / 死淘 / 疾病 / 药品 / 疫苗 / 工单 / 预警专题
                 if (isExec && ["herd", "calving", "culling", "disease", "drug", "vaccine", "workorder", "alert"].includes(key)) return null;
-                const full = key === "drug" || key === "alert" || key === "ops";
+                const full = key === "drug" || key === "ops";
+
                 const node =
                   key === "herd" ? (
                     <HerdSection />
@@ -809,9 +825,8 @@ function HomePage() {
                     <div className="min-w-0 h-full [&>*]:h-full">
                       <WorkOrderSection />
                     </div>
-                  ) : key === "alert" ? (
-                    <AlertSection />
                   ) : isExec ? (
+
                     <GroupExecSection
                       scopeRegion={scope === "group" ? null : scope === "region" ? CURRENT_REGION : null}
                       scopeFarm={scope === "farm-out" ? CURRENT_FARM : null}
@@ -836,31 +851,27 @@ function HomePage() {
           );
 
           if (!execFrame) {
+            const showAlert = topicOrder.includes("alert");
             return (
-              <>
-                <div>
-                  <h3 className="text-section-title text-foreground">数据看板</h3>
-                </div>
-                {cardsGrid}
-                {topicGrid}
-              </>
+              <div className="space-y-6">
+                <Frame title="数据概览">{cardsGrid}</Frame>
+                <Frame title="数据看板">{topicGrid}</Frame>
+                {showAlert && (
+                  <div id="topic-alert" className="scroll-mt-24">
+                    <Frame title="预警告警">
+                      <AlertSection bare />
+                    </Frame>
+                  </div>
+                )}
+              </div>
             );
           }
 
+
           const region = scope === "region" ? CURRENT_REGION : null;
           const farmScope = scope === "farm-out" ? CURRENT_FARM : null;
-          const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
-            <section>
-              <div className="flex items-center justify-between gap-2 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-4 w-1 rounded-full bg-primary" />
-                  <h3 className="text-section-title text-foreground">{title}</h3>
-                </div>
-                {extra}
-              </div>
-              {children}
-            </section>
-          );
+
+
 
           const timeSelector = (
             <Select
