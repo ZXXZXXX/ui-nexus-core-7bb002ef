@@ -889,49 +889,9 @@ function HomePage() {
 
 
 
-          const timeSelector = (
-            <Select
-              value={timeScope}
-              onValueChange={(v) => setTimeScope(v as typeof timeScope)}
-            >
-              <SelectTrigger className="h-8 w-[120px] border-border bg-card text-body-sm text-text-primary">
-                <SelectValue placeholder="选择时间" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="today">今日</SelectItem>
-                <SelectItem value="month">本月</SelectItem>
-                <SelectItem value="quarter">本季度</SelectItem>
-                <SelectItem value="year">本年</SelectItem>
-              </SelectContent>
-            </Select>
-          );
-
           return (
             <div className="space-y-6">
-              <Frame
-                title="数据概览"
-                extra={
-                  <div className="flex items-center gap-3">
-                    <span className="text-caption text-text-tertiary">统计至昨日</span>
-                    <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
-                      {([["month", "本月"], ["year", "本年"]] as const).map(([v, l]) => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => setTimeScope(v)}
-                          className={`rounded-md px-3 py-1 text-caption transition-colors ${
-                            timeScope === v
-                              ? "bg-[var(--brand-subtle)] text-[var(--brand)] font-medium"
-                              : "text-text-tertiary hover:text-text-primary"
-                          }`}
-                        >
-                          {l}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                }
-              >
+              <Frame title="数据概览" extra={timeTabs}>
                 {cardsGrid}
               </Frame>
               <Frame title="数据看板">
