@@ -421,12 +421,10 @@ function HomePage() {
   const { factor, level, levels } = useDataLevel();
 
   /** 根据时间维度调整绝对数量指标的数值；存量/比率指标保持不变 */
-  const timeFactor =
-    timeScope === "today" ? 1 / 30 : timeScope === "quarter" ? 3 : timeScope === "year" ? 12 : 1;
+  const timeFactor = timeScope === "yesterday" ? 1 / 30 : timeScope === "year" ? 12 : 1;
   const timePrefix: Record<typeof timeScope, string> = {
-    today: "（今日）",
+    yesterday: "（至昨日）",
     month: "（本月）",
-    quarter: "（本季度）",
     year: "（本年）",
   };
 
