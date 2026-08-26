@@ -421,9 +421,8 @@ function PrescriptionPage() {
                     <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
                     <span className="truncate">{r.name}</span>
                   </div>
-                  <div className="truncate flex items-center gap-1.5">
+                  <div className="truncate flex items-center">
                     <span className="tag tag-brand shrink-0">{RX_KIND_LABEL[r.kind]}</span>
-                    <span className="text-body-sm text-text-secondary truncate">{r.subType || r.category || "—"}</span>
                   </div>
                   <div className="text-body-sm text-text-secondary truncate">{drugText}</div>
                   <div className="text-body-sm text-text-secondary truncate">{r.duration} 天</div>
