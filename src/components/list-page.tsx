@@ -122,6 +122,7 @@ export function ListPage<T>({
   emptyText = "暂无数据",
   dateRangeMode = false,
   onDateRangeChange,
+  renderExport,
   children,
 
 }: ListPageProps<T>) {
