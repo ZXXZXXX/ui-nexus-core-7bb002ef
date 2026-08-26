@@ -136,8 +136,13 @@ export function ListPage<T>({
   const [q, setQ] = useState("");
   const [dateKey, setDateKey] = useState(dateCols[0]?.key ?? "");
   const [range, setRange] = useState<QuickRange>("all");
+  const todayStr = useMemo(() => {
+    const d = new Date();
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }, []);
   const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [to, setTo] = useState(dateRangeMode ? todayStr : "");
 
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState<Record<string, string>>({});
