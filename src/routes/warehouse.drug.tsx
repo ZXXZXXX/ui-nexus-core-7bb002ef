@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Pill, Plus, Search, Filter, Lock, Trash2, Download } from "lucide-react";
+import { Pill, Search, Filter, Lock, Trash2, Download } from "lucide-react";
 import { exportCsv } from "@/lib/export-csv";
 
 export const Route = createFileRoute("/warehouse/drug")({
@@ -235,40 +235,6 @@ function DrugArchivePage() {
         d.id.toLowerCase().includes(k),
     );
   }, [list, kw]);
-
-  const openCreate = () => {
-    setDetail({
-      id: "",
-      code: "",
-      name: "",
-      generic: "",
-      brand: "",
-      ingredient: "",
-      spec: "",
-      scanUnit: "瓶",
-      supplier: "",
-      maker: "",
-      reg: "",
-      shelfLife: "",
-      status: "启用",
-      drugType: "处方药",
-      routes: [],
-      withdraw: "0天",
-      doseUnit: "ml",
-      freqRule: "",
-      daysRange: "",
-      variableDose: false,
-      variable: "",
-      defaultDose: "",
-      pcDoseMax: "",
-      remark: "",
-      reportOut: true,
-      reportCode: "",
-      reportRule: "按实际用量回传",
-      reportDose: "",
-    });
-    setMode("create");
-  };
 
   const save = (d: Drug) => {
     if (mode === "create") {
