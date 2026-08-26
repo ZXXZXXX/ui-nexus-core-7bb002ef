@@ -570,6 +570,48 @@ export function WorkOrderPage({
     );
   };
 
+  const textCell = (o: WorkOrder, key: ColKey): string => {
+    switch (key) {
+      case "id":
+        return o.id;
+      case "category":
+        return /复诊|复查/.test(`${o.desc ?? ""}${o.event ?? ""}`) ? "复诊" : "初诊";
+      case "status":
+        return effectiveStatus(o);
+      case "objType":
+        return "牛只";
+      case "target":
+        return o.target
+          .split(/[,，、;；\n]+/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .join("、");
+      case "diagnosis":
+        return o.event ? o.event.split(" · ")[0] : "";
+      case "desc":
+        return o.desc ?? "";
+      case "timeInfo":
+        return `提出 ${o.createdAt ?? ""}${o.reviewedAt ? ` · 诊断 ${o.reviewedAt}` : ""}${o.executedAt ? ` · 执行 ${o.executedAt}` : ""}`;
+      case "staff": {
+        const list = effectiveExecutors(o);
+        return `${o.proposer ?? ""} → ${list.length ? list.join("、") : "未指派"}`;
+      }
+      case "pickup":
+        return title === "疾病治疗" || title === "产后护理" ? "需要领物" : "无需领物";
+      default:
+        return "";
+    }
+  };
+
+  const exportCols = ALL_COLS.filter((c) => c.key !== "action" && visible[c.key]);
+
+  const handleExport = () =>
+    exportCsv(
+      title,
+      exportCols.map((c) => c.label),
+      filtered.map((o) => exportCols.map((c) => textCell(o, c.key))),
+    );
+
   const renderCell = (o: WorkOrder, key: ColKey) => {
     switch (key) {
       case "id":
