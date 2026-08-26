@@ -800,7 +800,7 @@ function HomePage() {
                 if (key === "alert") return null;
                 // 集团 / 区域高管视角：不展示牛群 / 产犊 / 死淘 / 疾病 / 药品 / 疫苗 / 工单 / 预警专题
                 if (isExec && ["herd", "calving", "culling", "disease", "drug", "vaccine", "workorder", "alert"].includes(key)) return null;
-                const full = key === "drug" || key === "ops";
+                const full = key === "drug" || key === "ops" || key === "workorder";
 
                 const node =
                   key === "herd" ? (
