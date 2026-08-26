@@ -3,7 +3,7 @@ import { usePcRole, canExamine } from "@/lib/pc-role";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { exportCsv } from "@/lib/export-csv";
-import { ExportConfirmButton } from "@/components/export-confirm";
+import { WorkOrderExportButton, type ExportOptions } from "@/components/work-order-export-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -605,14 +605,25 @@ export function WorkOrderPage({
     }
   };
 
-  const exportCols = ALL_COLS.filter((c) => c.key !== "action" && visible[c.key]);
+  const exportCols = ALL_COLS.filter((c) => c.key !== "action");
 
-  const handleExport = () =>
+  const handleExport = ({ dateField: df, from, to, keys }: ExportOptions) => {
+    const cols = exportCols.filter((c) => keys.includes(c.key));
+    const start = from ? parseTime(from) : 0;
+    const end = to ? parseTime(to) + 86400000 - 1 : Number.MAX_SAFE_INTEGER;
+    const rows = filtered.filter((o) => {
+      const v = df === "createdAt" ? o.createdAt : df === "reviewedAt" ? o.reviewedAt : o.executedAt;
+      const t = parseTime(v);
+      if (!t) return !from && !to;
+      return t >= start && t <= end;
+    });
     exportCsv(
       title,
-      exportCols.map((c) => c.label),
-      filtered.map((o) => exportCols.map((c) => textCell(o, c.key))),
+      cols.map((c) => c.label),
+      rows.map((o) => cols.map((c) => textCell(o, c.key))),
     );
+    return rows.length;
+  };
 
   const renderCell = (o: WorkOrder, key: ColKey) => {
     switch (key) {
@@ -783,7 +794,12 @@ export function WorkOrderPage({
                 ))}
               </div>
 
-              <ExportConfirmButton onConfirm={handleExport} count={filtered.length} />
+              <WorkOrderExportButton
+                columns={exportCols.map((c) => ({ key: c.key, label: c.label }))}
+                defaultKeys={exportCols.filter((c) => visible[c.key]).map((c) => c.key)}
+                defaultDateField={dateField}
+                onExport={handleExport}
+              />
 
               <Button
                 variant="outline"
