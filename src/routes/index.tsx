@@ -862,18 +862,8 @@ function HomePage() {
 
           const region = scope === "region" ? CURRENT_REGION : null;
           const farmScope = scope === "farm-out" ? CURRENT_FARM : null;
-          const Frame = ({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) => (
-            <section>
-              <div className="flex items-center justify-between gap-2 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="h-4 w-1 rounded-full bg-primary" />
-                  <h3 className="text-section-title text-foreground">{title}</h3>
-                </div>
-                {extra}
-              </div>
-              {children}
-            </section>
-          );
+
+
 
           const timeSelector = (
             <Select
