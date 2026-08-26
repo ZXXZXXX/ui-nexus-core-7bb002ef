@@ -3,6 +3,7 @@ import { usePcRole, canExamine } from "@/lib/pc-role";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { exportCsv } from "@/lib/export-csv";
+import { ExportConfirmButton } from "@/components/export-confirm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -783,16 +784,7 @@ export function WorkOrderPage({
                 ))}
               </div>
 
-              <Button
-                variant="outline"
-                size="icon"
-                title="导出当前筛选结果"
-                aria-label="导出当前筛选结果"
-                className="h-9 w-9 shrink-0"
-                onClick={handleExport}
-              >
-                <Download className="h-4 w-4" />
-              </Button>
+              <ExportConfirmButton onConfirm={handleExport} count={filtered.length} />
 
               <Button
                 variant="outline"
