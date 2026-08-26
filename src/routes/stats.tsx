@@ -1857,24 +1857,24 @@ function StatsPage() {
           </div>
 
           <Card className="border-border bg-white overflow-hidden">
-            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
+            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--bg-surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
-                  <TableHead className="sticky left-0 z-30 min-w-[220px] bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">模板名称</TableHead>
+                  <TableHead className="sticky left-0 z-30 min-w-[220px] bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">模板名称</TableHead>
                   <TableHead className="min-w-[280px]">计算方式</TableHead>
                   <TableHead>维度</TableHead>
                   <TableHead className="text-right">条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
                   <TableHead>创建人</TableHead>
                   <TableHead>创建时间</TableHead>
-                  <TableHead className="text-right sticky right-0 z-30 bg-[var(--surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">操作</TableHead>
+                  <TableHead className="text-right sticky right-0 z-30 bg-[var(--bg-surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">操作</TableHead>
 
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {visibleTemplates.map((t) => (
                   <TableRow key={t.id} className="group">
-                    <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">
+                    <TableCell className="sticky left-0 z-10 bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">
                       <div className="flex items-center gap-2 min-w-0">
                         <button
                           type="button"
@@ -1920,7 +1920,7 @@ function StatsPage() {
                     <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.createdAt}</TableCell>
-                    <TableCell className="text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">
+                    <TableCell className="text-right whitespace-nowrap sticky right-0 z-10 bg-[var(--bg-surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">
                       <Button
                         size="sm"
                         variant="ghost"
@@ -2029,18 +2029,18 @@ function StatsPage() {
           </div>
 
           <Card className="border-border bg-white overflow-hidden">
-            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
+            <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--bg-surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
                   {resultMetric ? (
                     <>
-                      <TableHead className="sticky left-0 z-30 bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">牧场</TableHead>
+                      <TableHead className="sticky left-0 z-30 bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">牧场</TableHead>
                       <TableHead className="min-w-[240px]">分子</TableHead>
                       <TableHead className="min-w-[240px]">分母</TableHead>
                       <TableHead className="text-right">{resultMetric.name}</TableHead>
                     </>
                   ) : resultCols.map((c, i) => (
-                    <TableHead key={c.key} className={`${c.num ? "text-right" : ""} ${i === 0 ? "sticky left-0 z-30 bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]" : ""}`}>
+                    <TableHead key={c.key} className={`${c.num ? "text-right" : ""} ${i === 0 ? "sticky left-0 z-30 bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]" : ""}`}>
                       {c.label}
                     </TableHead>
                   ))}
@@ -2049,7 +2049,7 @@ function StatsPage() {
               <TableBody>
                 {resultMetric ? aggregatedMetricRows.map((r) => (
                   <TableRow key={r.id} className="group">
-                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">{r.farm}</TableCell>
+                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">{r.farm}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary">
                       <span className="tabular-nums text-foreground">{r.numerator.toLocaleString()}</span>
                       <span className="ml-2 text-caption text-text-tertiary">{r.numeratorLabel}</span>
@@ -2067,7 +2067,7 @@ function StatsPage() {
                           key={c.key}
                           className={`text-body-sm whitespace-nowrap ${
                             c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
-                          } ${i === 0 ? "sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]" : ""}`}
+                          } ${i === 0 ? "sticky left-0 z-10 bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]" : ""}`}
                         >
                           {c.value(r)}
                         </TableCell>
