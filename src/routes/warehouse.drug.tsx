@@ -236,40 +236,6 @@ function DrugArchivePage() {
     );
   }, [list, kw]);
 
-  const openCreate = () => {
-    setDetail({
-      id: "",
-      code: "",
-      name: "",
-      generic: "",
-      brand: "",
-      ingredient: "",
-      spec: "",
-      scanUnit: "瓶",
-      supplier: "",
-      maker: "",
-      reg: "",
-      shelfLife: "",
-      status: "启用",
-      drugType: "处方药",
-      routes: [],
-      withdraw: "0天",
-      doseUnit: "ml",
-      freqRule: "",
-      daysRange: "",
-      variableDose: false,
-      variable: "",
-      defaultDose: "",
-      pcDoseMax: "",
-      remark: "",
-      reportOut: true,
-      reportCode: "",
-      reportRule: "按实际用量回传",
-      reportDose: "",
-    });
-    setMode("create");
-  };
-
   const save = (d: Drug) => {
     if (mode === "create") {
       setList((prev) => [{ ...d, id: d.id || `DR-${Date.now().toString().slice(-4)}` }, ...prev]);
@@ -323,13 +289,6 @@ function DrugArchivePage() {
             </Button>
           </div>
 
-          <Button
-            size="sm"
-            className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-            onClick={openCreate}
-          >
-            <Plus className="h-3.5 w-3.5" /> 新建药品
-          </Button>
         </div>
 
         <Card className="border-border bg-card overflow-hidden">
