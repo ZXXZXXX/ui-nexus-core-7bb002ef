@@ -95,10 +95,7 @@ const columns: ListColumn<Row>[] = [
   {
     key: "stock", label: "当前库存量", filter: "number", value: (i) => i.stock,
     render: (item) => (
-      <div className="flex items-baseline gap-1">
-        <span className={`text-body font-medium tabular-nums ${item.stock < item.min ? "text-[var(--state-danger)]" : "text-foreground"}`}>{item.stock}</span>
-        <span className="text-caption text-text-tertiary truncate">{item.unit}</span>
-      </div>
+      <span className="text-body font-medium tabular-nums text-foreground">{item.stock}</span>
     ),
   },
   { key: "unit", label: "计量单位", filter: "select", render: (i) => <span className="text-body-sm text-text-secondary">{i.unit}</span> },
