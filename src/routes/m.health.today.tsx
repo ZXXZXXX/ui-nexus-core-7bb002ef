@@ -257,6 +257,12 @@ function TodayTasksPage() {
     return Array.from(s);
   }, [tabTasks]);
 
+  // 基础事件：枚举牛只档案中的基础检查项目 + 转群/转栏
+  const filterTypes = useMemo(
+    () => (kindFilter === "基础事件" ? BASIC_EVENT_TYPES : allTypes),
+    [kindFilter, allTypes],
+  );
+
 
 
   const me = currentUserName(role);
@@ -487,10 +493,12 @@ function TodayTasksPage() {
           </SheetHeader>
 
           <div className="flex-1 overflow-y-auto px-5 pb-4 space-y-6">
-            {/* 工单类型 */}
-            {showStatusTabs && (
+            {/* 工单类型 / 事件类型 */}
+            {(showStatusTabs || kindFilter === "基础事件") && (
               <section>
-                <h4 className="text-body font-medium text-foreground mb-3">工单类型</h4>
+                <h4 className="text-body font-medium text-foreground mb-3">
+                  {kindFilter === "基础事件" ? "事件类型" : "工单类型"}
+                </h4>
                 <div className="space-y-2">
                   <button
                     type="button"
@@ -519,7 +527,7 @@ function TodayTasksPage() {
                       )}
                     </span>
                   </button>
-                  {allTypes.map((type) => {
+                  {filterTypes.map((type) => {
                     const meta = typeMeta[type] ?? typeMeta["疾病治疗"];
                     const Icon = meta.icon;
                     const sel = selectedTypes.has(type);
