@@ -25,6 +25,7 @@ import {
   ClipboardList,
   FileText,
   Beef,
+  ChevronLeft,
 } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
