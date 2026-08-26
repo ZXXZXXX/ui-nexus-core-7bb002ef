@@ -446,15 +446,6 @@ const SECTION_CATEGORY: Record<string, TplCategory> = {
   immune: "cattle",
 };
 
-const SECTION_DIMENSIONS: Record<string, DimensionKey[]> = {
-  culling: ["farm", "cattle"],
-  calving: ["farm", "calving", "cattle"],
-  udder: ["farm", "disease", "cattle"],
-  disease: ["farm", "disease", "cattle"],
-  postpartum: ["farm", "disease", "calving", "cattle"],
-  immune: ["farm", "order", "cattle"],
-};
-
 const SECTION_FILTER_PRESET: Record<string, Partial<Filters>> = {
   culling: { cowStatuses: ["死淘"] },
   calving: {},
@@ -2420,6 +2411,30 @@ function downloadCsv(rows: Row[], cols: ResultCol[], filename: string) {
   const body = rows.map((r) => cols.map((c) => c.value(r).replace(/"/g, '""')));
   const csv = [header, ...body]
     .map((row) => row.map((c) => `"${c}"`).join(","))
+    .join("\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadMetricCsv(rows: MetricResultRow[], filename: string) {
+  const csvRows = [
+    ["牧场", "分子名称", "分子", "分母名称", "分母", "指标值"],
+    ...rows.map((row) => [
+      row.farm,
+      row.numeratorLabel,
+      String(row.numerator),
+      row.denominatorLabel,
+      String(row.denominator),
+      row.value,
+    ]),
+  ];
+  const csv = csvRows
+    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(","))
     .join("\n");
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
