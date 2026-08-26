@@ -25,6 +25,7 @@ import {
   ClipboardList,
   FileText,
   Beef,
+  ChevronLeft,
 } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
@@ -1819,6 +1820,15 @@ function StatsPage() {
         <main className="flex-1 px-6 py-6 space-y-5 bg-white">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 min-w-0">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 shrink-0"
+                onClick={() => setView("sections")}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                返回
+              </Button>
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground">{sectionTitle}</div>
                 <div className="text-caption text-text-tertiary mt-0.5">
@@ -1826,6 +1836,7 @@ function StatsPage() {
                 </div>
               </div>
             </div>
+
             <div className="flex items-center gap-2">
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
@@ -1849,20 +1860,21 @@ function StatsPage() {
             <Table className="[&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-20 [&_thead_th]:bg-[var(--surface-subtle)]" containerClassName="max-h-[calc(100dvh-280px)]">
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
-                  <TableHead className="sticky left-0 z-30 min-w-[220px]">模板名称</TableHead>
+                  <TableHead className="sticky left-0 z-30 min-w-[220px] bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">模板名称</TableHead>
                   <TableHead className="min-w-[280px]">计算方式</TableHead>
                   <TableHead>维度</TableHead>
                   <TableHead className="text-right">条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
                   <TableHead>创建人</TableHead>
                   <TableHead>创建时间</TableHead>
-                  <TableHead className="text-right sticky right-0 z-30">操作</TableHead>
+                  <TableHead className="text-right sticky right-0 z-30 bg-[var(--surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">操作</TableHead>
+
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {visibleTemplates.map((t) => (
                   <TableRow key={t.id} className="group">
-                    <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]">
+                    <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">
                       <div className="flex items-center gap-2 min-w-0">
                         <button
                           type="button"
@@ -1908,7 +1920,7 @@ function StatsPage() {
                     <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.createdAt}</TableCell>
-                    <TableCell className="text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]">
+                    <TableCell className="text-right whitespace-nowrap sticky right-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[-1px_0_0_0_var(--border)]">
                       <Button
                         size="sm"
                         variant="ghost"
@@ -2022,13 +2034,13 @@ function StatsPage() {
                 <TableRow className="bg-surface-subtle/60">
                   {resultMetric ? (
                     <>
-                      <TableHead className="sticky left-0 z-30">牧场</TableHead>
+                      <TableHead className="sticky left-0 z-30 bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">牧场</TableHead>
                       <TableHead className="min-w-[240px]">分子</TableHead>
                       <TableHead className="min-w-[240px]">分母</TableHead>
                       <TableHead className="text-right">{resultMetric.name}</TableHead>
                     </>
                   ) : resultCols.map((c, i) => (
-                    <TableHead key={c.key} className={`${c.num ? "text-right" : ""} ${i === 0 ? "sticky left-0 z-30" : ""}`}>
+                    <TableHead key={c.key} className={`${c.num ? "text-right" : ""} ${i === 0 ? "sticky left-0 z-30 bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]" : ""}`}>
                       {c.label}
                     </TableHead>
                   ))}
@@ -2037,7 +2049,7 @@ function StatsPage() {
               <TableBody>
                 {resultMetric ? aggregatedMetricRows.map((r) => (
                   <TableRow key={r.id} className="group">
-                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]">{r.farm}</TableCell>
+                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]">{r.farm}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary">
                       <span className="tabular-nums text-foreground">{r.numerator.toLocaleString()}</span>
                       <span className="ml-2 text-caption text-text-tertiary">{r.numeratorLabel}</span>
@@ -2055,7 +2067,7 @@ function StatsPage() {
                           key={c.key}
                           className={`text-body-sm whitespace-nowrap ${
                             c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
-                          } ${i === 0 ? "sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)]" : ""}`}
+                          } ${i === 0 ? "sticky left-0 z-10 bg-white group-hover:bg-[var(--surface-subtle)] shadow-[1px_0_0_0_var(--border)]" : ""}`}
                         >
                           {c.value(r)}
                         </TableCell>
