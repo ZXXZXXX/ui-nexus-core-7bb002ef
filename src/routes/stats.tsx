@@ -1836,10 +1836,12 @@ function StatsPage() {
                   className="h-9 w-[260px] pl-8 bg-white"
                 />
               </div>
-              <Button className="h-9 bg-primary hover:bg-[var(--brand-hover)]" onClick={() => openBuilder()}>
-                <Plus className="h-4 w-4 mr-1" />
-                新建筛选
-              </Button>
+              {activeSection === "custom" && (
+                <Button className="h-9 bg-primary hover:bg-[var(--brand-hover)]" onClick={() => openBuilder()}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  新建筛选
+                </Button>
+              )}
             </div>
           </div>
 
