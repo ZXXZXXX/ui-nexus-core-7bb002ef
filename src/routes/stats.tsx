@@ -639,7 +639,7 @@ const METRIC_TEMPLATES: Template[] = METRIC_SECTIONS.flatMap((sec) =>
     formula: m.formula,
     metricNo: m.no,
     section: sec.key,
-    dimensions: SECTION_DIMENSIONS[sec.key] ?? CATEGORY_DIMENSIONS[SECTION_CATEGORY[sec.key] ?? "cattle"],
+    dimensions: ["farm"],
     icon: BarChart3,
     tone: sec.tone,
     filters: { ...DEFAULT_FILTERS, dateRange: "30d", ...(SECTION_FILTER_PRESET[sec.key] ?? {}) },
@@ -669,6 +669,16 @@ type Row = {
   calfOutcome: string;
   createdAt: string;
   detail: string;
+};
+
+type MetricResultRow = {
+  id: string;
+  farm: string;
+  numeratorLabel: string;
+  numerator: number;
+  denominatorLabel: string;
+  denominator: number;
+  value: string;
 };
 
 const DISEASE_CAT_OF: Record<string, string> = {
@@ -732,6 +742,77 @@ function seedNum(seed: string, min: number, max: number) {
   return min + (h % (max - min + 1));
 }
 const pickOf = <T,>(seed: string, list: T[]): T => list[seedNum(seed, 0, list.length - 1)];
+
+function metricRateRange(name: string): [number, number] {
+  if (name.includes("抗体阳性率") || name.includes("完工率")) return [88, 98];
+  if (name.includes("成活率") || name.includes("治愈率")) return [78, 96];
+  if (name.includes("母犊率") || name.includes("留养率")) return [42, 58];
+  if (name.includes("死亡率")) return [0.3, 1.5];
+  if (name.includes("淘汰率")) return [1.2, 3.8];
+  if (name.includes("发病率")) return [2.5, 10.5];
+  if (name.includes("早产率") || name.includes("双胎率")) return [2, 7];
+  if (name.includes("占比")) return [8, 36];
+  return [3, 18];
+}
+
+function metricOperandLabels(formula: string): [string, string] {
+  if (formula === "源表未提供") return ["统计值", "统计基数"];
+  const normalized = formula.replace(/\*100%/g, "").replace(/\*100/g, "");
+  const [left, ...rightParts] = normalized.split("/");
+  return [left?.trim() || "统计值", rightParts.join("/").trim() || "统计基数"];
+}
+
+function metricRows(template: Template, filters: Filters): MetricResultRow[] {
+  const farms = filters.farms.length ? filters.farms : FARM_NAMES;
+  const [numeratorLabel, denominatorLabel] = metricOperandLabels(template.formula ?? template.desc);
+  const name = template.name;
+  const isAverage = name.includes("平均") && !name.includes("率");
+  const isCount = name.includes("头数") && !name.includes("率") && !name.includes("占比");
+  const isRate = !isAverage && !isCount;
+
+  return farms.map((farm) => {
+    const seed = `${template.id}-${farm}`;
+    if (isAverage) {
+      const numerator = seedNum(seed + "sum", 8200, 12800);
+      const denominator = seedNum(seed + "count", 30, 46);
+      return {
+        id: `${template.id}-${farm}`,
+        farm,
+        numeratorLabel,
+        numerator,
+        denominatorLabel,
+        denominator,
+        value: `${(numerator / denominator).toFixed(1)} 天`,
+      };
+    }
+    if (isCount) {
+      const numerator = seedNum(seed + "count", 12, 68);
+      return {
+        id: `${template.id}-${farm}`,
+        farm,
+        numeratorLabel,
+        numerator,
+        denominatorLabel: "统计周期",
+        denominator: 1,
+        value: `${numerator} 头`,
+      };
+    }
+
+    const [minRate, maxRate] = metricRateRange(name);
+    const denominator = seedNum(seed + "base", 1250, 2380);
+    const rateTenths = seedNum(seed + "rate", Math.round(minRate * 10), Math.round(maxRate * 10));
+    const numerator = Math.max(1, Math.round((denominator * rateTenths) / 1000));
+    return {
+      id: `${template.id}-${farm}`,
+      farm,
+      numeratorLabel,
+      numerator,
+      denominatorLabel,
+      denominator,
+      value: isRate ? `${((numerator / denominator) * 100).toFixed(2)}%` : String(numerator),
+    };
+  });
+}
 
 function resultColumns(cat: TplCategory, f: Filters): ResultCol[] {
   const cols: ResultCol[] = [];
@@ -821,6 +902,7 @@ function StatsPage() {
   const [resultFilters, setResultFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [resultTitle, setResultTitle] = useState("筛选结果");
   const [resultCat, setResultCat] = useState<TplCategory>("cattle");
+  const [resultMetric, setResultMetric] = useState<Template | null>(null);
   const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -844,10 +926,11 @@ function StatsPage() {
       };
     });
 
-  const runFilter = (f: Filters, title = "筛选结果", cat?: TplCategory) => {
+  const runFilter = (f: Filters, title = "筛选结果", cat?: TplCategory, metric?: Template) => {
     setResultFilters(f);
     setResultCat(cat ?? inferCategory(f));
     setResultTitle(title);
+    setResultMetric(metric?.metricNo ? metric : null);
     setView("result");
   };
 
@@ -933,6 +1016,10 @@ function StatsPage() {
 
   const filteredRows = useMemo(() => filterRows(ROWS, resultFilters), [resultFilters]);
   const resultCols = useMemo(() => resultColumns(resultCat, resultFilters), [resultCat, resultFilters]);
+  const aggregatedMetricRows = useMemo(
+    () => (resultMetric ? metricRows(resultMetric, resultFilters) : []),
+    [resultMetric, resultFilters],
+  );
   const activeCount = countActive(filters);
   const visibleTemplates = useMemo(() => {
     const k = query.trim().toLowerCase();
@@ -1863,7 +1950,7 @@ function StatsPage() {
                         size="sm"
                         variant="ghost"
                         className="h-8 px-2 text-primary hover:bg-transparent hover:font-semibold"
-                        onClick={() => runFilter(t.filters, t.name, t.category)}
+                        onClick={() => runFilter(t.filters, t.name, t.category, t)}
                       >
                         查看结果
                       </Button>
@@ -1924,7 +2011,7 @@ function StatsPage() {
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground truncate">{resultTitle}</div>
                 <div className="text-caption text-text-tertiary mt-0.5">
-                  共 <span className="tabular-nums text-foreground font-medium">{filteredRows.length}</span> 条 · {describeFilters(resultFilters)}
+                  共 <span className="tabular-nums text-foreground font-medium">{resultMetric ? aggregatedMetricRows.length : filteredRows.length}</span> 条 · {describeFilters(resultFilters)}
                 </div>
               </div>
             </div>
@@ -1951,7 +2038,11 @@ function StatsPage() {
                 size="sm"
                 className="h-9 bg-primary hover:bg-[var(--brand-hover)]"
                 onClick={() => {
-                  downloadCsv(filteredRows, resultCols, `${resultTitle}.csv`);
+                  if (resultMetric) {
+                    downloadMetricCsv(aggregatedMetricRows, `${resultTitle}.csv`);
+                  } else {
+                    downloadCsv(filteredRows, resultCols, `${resultTitle}.csv`);
+                  }
                   toast.success("已开始下载 CSV");
                 }}
               >
@@ -1966,7 +2057,14 @@ function StatsPage() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-surface-subtle/60">
-                  {resultCols.map((c) => (
+                  {resultMetric ? (
+                    <>
+                      <TableHead>牧场</TableHead>
+                      <TableHead className="min-w-[240px]">分子</TableHead>
+                      <TableHead className="min-w-[240px]">分母</TableHead>
+                      <TableHead className="text-right">{resultMetric.name}</TableHead>
+                    </>
+                  ) : resultCols.map((c) => (
                     <TableHead key={c.key} className={c.num ? "text-right" : undefined}>
                       {c.label}
                     </TableHead>
@@ -1974,23 +2072,36 @@ function StatsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredRows.map((r) => (
+                {resultMetric ? aggregatedMetricRows.map((r) => (
                   <TableRow key={r.id}>
-                    {resultCols.map((c) => (
-                      <TableCell
-                        key={c.key}
-                        className={`text-body-sm whitespace-nowrap ${
-                          c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
-                        }`}
-                      >
-                        {c.value(r)}
-                      </TableCell>
-                    ))}
+                    <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap">{r.farm}</TableCell>
+                    <TableCell className="text-body-sm text-text-secondary">
+                      <span className="tabular-nums text-foreground">{r.numerator.toLocaleString()}</span>
+                      <span className="ml-2 text-caption text-text-tertiary">{r.numeratorLabel}</span>
+                    </TableCell>
+                    <TableCell className="text-body-sm text-text-secondary">
+                      <span className="tabular-nums text-foreground">{r.denominator.toLocaleString()}</span>
+                      <span className="ml-2 text-caption text-text-tertiary">{r.denominatorLabel}</span>
+                    </TableCell>
+                    <TableCell className="text-right text-body-sm font-medium tabular-nums text-foreground">{r.value}</TableCell>
                   </TableRow>
-                ))}
-                {filteredRows.length === 0 && (
+                )) : filteredRows.map((r) => (
+                    <TableRow key={r.id}>
+                      {resultCols.map((c) => (
+                        <TableCell
+                          key={c.key}
+                          className={`text-body-sm whitespace-nowrap ${
+                            c.num ? "text-right tabular-nums text-foreground" : "text-text-secondary"
+                          }`}
+                        >
+                          {c.value(r)}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                {(resultMetric ? aggregatedMetricRows.length === 0 : filteredRows.length === 0) && (
                   <TableRow>
-                    <TableCell colSpan={resultCols.length} className="text-center py-10 text-text-tertiary">
+                    <TableCell colSpan={resultMetric ? 4 : resultCols.length} className="text-center py-10 text-text-tertiary">
                       当前筛选条件下暂无数据
                     </TableCell>
                   </TableRow>
