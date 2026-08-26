@@ -1821,13 +1821,13 @@ function StatsPage() {
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 min-w-0">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="h-9 shrink-0"
+                className="h-9 w-9 p-0 shrink-0"
                 onClick={() => setView("sections")}
+                aria-label="返回"
               >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                返回
+                <ChevronLeft className="h-4 w-4" />
               </Button>
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground">{sectionTitle}</div>
@@ -1979,9 +1979,8 @@ function StatsPage() {
         <main className="flex-1 px-6 py-6 space-y-4 bg-white">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3 min-w-0">
-              <Button variant="outline" size="sm" onClick={() => setView(resultBack)} className="h-9 shrink-0">
-                <ArrowLeft className="h-3.5 w-3.5 mr-1" />
-                {resultBack === "templates" ? "返回模板" : "返回筛选"}
+              <Button variant="ghost" size="sm" onClick={() => setView(resultBack)} className="h-9 w-9 p-0 shrink-0" aria-label="返回">
+                <ArrowLeft className="h-3.5 w-3.5" />
               </Button>
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground truncate">{resultTitle}</div>
