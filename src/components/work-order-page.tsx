@@ -518,7 +518,7 @@ export function WorkOrderPage({
       .filter((o) => {
         const v = dateField === "createdAt" ? o.createdAt : dateField === "reviewedAt" ? o.reviewedAt : o.executedAt;
         if (range !== "all" && !v) return false;
-        return inRange(v ?? "", range);
+        return inRange(v ?? "", range, customStart, customEnd);
       })
       .filter((o) =>
         kw
