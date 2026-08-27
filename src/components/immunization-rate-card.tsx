@@ -77,7 +77,6 @@ export function ImmunizationRateCard() {
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <span className="tag tag-muted">{period === "全部" ? "历史全部" : period}</span>
           <TimeTabs value={period} onChange={setPeriod} options={["近3个月", "近半年", "全部"]} />
         </div>
       </div>
