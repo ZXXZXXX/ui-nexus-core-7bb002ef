@@ -152,7 +152,16 @@ export function WorkOrderSection({ farms }: { farms?: string[] } = {}) {
     <SectionCard
       id="topic-workorder"
       title="兽医工单专题"
-      desc={<TimeTabs value={range} onChange={(v) => { setRange(v); setActive(null); }} options={[WO_ALL, WO_MONTH, WO_YEAR]} />}
+      desc={
+        <PeriodTabs
+          value={tab}
+          onChange={(v) => {
+            setTab(v);
+            setActive(null);
+          }}
+          options={[TAB_ALL, TAB_UD]}
+        />
+      }
       icon={<ClipboardList className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-2">
@@ -177,14 +186,11 @@ export function WorkOrderSection({ farms }: { farms?: string[] } = {}) {
               </SelectContent>
             </Select>
           ) : null}
-          <PeriodTabs
-          value={tab}
-          onChange={(v) => {
-            setTab(v);
-            setActive(null);
-          }}
-          options={[TAB_ALL, TAB_UD]}
-        />
+          <TimeTabs
+            value={range}
+            onChange={(v) => { setRange(v); setActive(null); }}
+            options={[WO_ALL, WO_MONTH, WO_YEAR]}
+          />
         </div>
       }
     >

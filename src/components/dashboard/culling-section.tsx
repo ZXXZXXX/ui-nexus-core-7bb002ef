@@ -36,9 +36,9 @@ export function CullingSection() {
     <SectionCard
       id="topic-culling"
       title="死淘专题"
-      desc={"\n"}
+      desc={<PeriodTabs value={view} onChange={setView} options={["死亡原因", "淘汰原因"]} />}
       icon={<Activity className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<PeriodTabs value={view} onChange={setView} options={["死亡原因", "淘汰原因"]} />}
+      extra={<span className="tag tag-muted">本月</span>}
     >
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div>

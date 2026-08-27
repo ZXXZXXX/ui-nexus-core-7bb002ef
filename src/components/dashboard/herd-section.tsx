@@ -33,9 +33,9 @@ export function HerdSection() {
     <SectionCard
       id="topic-herd"
       title="牛群专题"
-      desc="至昨日"
+      desc={<PeriodTabs value={tab} onChange={setTab} options={[TAB_TYPE, TAB_HEALTH]} />}
       icon={<Beef className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<PeriodTabs value={tab} onChange={setTab} options={[TAB_TYPE, TAB_HEALTH]} />}
+      extra={<span className="tag tag-muted">至昨日</span>}
     >
       <div className="flex h-full flex-col">
         <div className="mb-3 flex items-baseline justify-between gap-3">

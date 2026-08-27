@@ -1029,7 +1029,10 @@ function HomePage() {
                           g.items.map((s) => (
                             <span
                               key={s.id}
-                              className="text-body-sm px-2 py-0.5 rounded-md bg-muted text-text-primary"
+                              className={cn(
+                                "text-body-sm px-2 py-0.5 rounded-md",
+                                g.key === "已签到" ? "tag-brand" : "bg-muted text-text-primary"
+                              )}
                             >
                               {s.name}
                             </span>

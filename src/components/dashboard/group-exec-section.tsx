@@ -497,14 +497,17 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
     <SectionCard
       id="topic-drug-trend"
       title="药费支出趋势"
-      desc={`${scopeRegion ?? "全部牧场"} · ${period}`}
+      desc={<span className="tag tag-muted">{scopeRegion ?? "全部牧场"}</span>}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <TimeTabs
-          value={period}
-          onChange={setPeriod}
-          options={["近 6 个月", "近 1 年"]}
-        />
+        <div className="flex items-center gap-2">
+          <span className="tag tag-muted">{period}</span>
+          <TimeTabs
+            value={period}
+            onChange={setPeriod}
+            options={["近 6 个月", "近 1 年"]}
+          />
+        </div>
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
@@ -933,39 +936,41 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       id="topic-panorama"
       title={scopeFarm ? "关键指标统计" : "关键指标排行"}
       desc={
-        scopeFarm
-          ? `${scopeFarm.farm} · 近 12 个月`
-          : scopeRegion
-            ? `${scopeRegion} · 牧场排名`
-            : viewMode === "farm"
-              ? "全部牧场排名"
-              : "区域排名"
+        !scopeRegion && !scopeFarm ? (
+          <div className="inline-flex items-center rounded-full border border-border bg-surface-subtle p-0.5">
+            <button
+              type="button"
+              onClick={() => setViewMode("region")}
+              className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                viewMode === "region" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+              }`}
+            >
+              按区域排行
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("farm")}
+              className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                viewMode === "farm" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+              }`}
+            >
+              按牧场排行
+            </button>
+          </div>
+        ) : undefined
       }
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          {!scopeRegion && !scopeFarm && (
-            <div className="inline-flex items-center rounded-full border border-border bg-surface-subtle p-0.5">
-              <button
-                type="button"
-                onClick={() => setViewMode("region")}
-                className={`h-6 px-3 rounded-full text-caption transition-colors ${
-                  viewMode === "region" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
-                }`}
-              >
-                按区域排行
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("farm")}
-                className={`h-6 px-3 rounded-full text-caption transition-colors ${
-                  viewMode === "farm" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
-                }`}
-              >
-                按牧场排行
-              </button>
-            </div>
-          )}
+          <span className="tag tag-muted">
+            {scopeFarm
+              ? `${scopeFarm.farm} · 近 12 个月`
+              : scopeRegion
+                ? `${scopeRegion} · 牧场排名`
+                : viewMode === "farm"
+                  ? "全部牧场排名"
+                  : "区域排名"}
+          </span>
           <button
             type="button"
             onClick={exportCsv}
