@@ -189,9 +189,8 @@ const DIS_RANGE_FACTOR: Record<string, number> = { [DIS_ALL]: 30, [DIS_MONTH]: 1
 function rootForLevel(level: DataLevel): Org {
   if (level === "group") return ORG;
   if (level === "region") return ORG.children![0]; // 东北大区
-  // 牧场级：隐藏具体牧场名，用中性根节点包裹当前牧场
   const farm = ORG.children![0].children![0]; // 1 号牧场
-  return { id: "farm-scope", name: "当前牧场", herd: 0, cases: 0, children: [farm] };
+  return { id: "farm-scope", name: farm.name, herd: 0, cases: 0, children: [farm] };
 }
 
 export function DiseaseStatsSection() {
@@ -259,29 +258,27 @@ export function DiseaseStatsSection() {
           <h3 className="text-card-title text-foreground">疾病统计</h3>
           <TimeTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
         </div>
-        {level !== "farm" && (
-          <div className="flex items-center gap-1 text-body-sm flex-wrap">
-            {path.map((n, i) => {
-              const last = i === path.length - 1;
-              return (
-                <span key={n.id} className="inline-flex items-center gap-1">
-                  {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
-                  {last ? (
-                    <span className="text-foreground font-medium inline-flex items-center gap-1">
-                      {i === 0 && <Home className="h-3.5 w-3.5" />}
-                      {n.name}
-                    </span>
-                  ) : (
-                    <button type="button" onClick={() => goto(i)} className="text-text-tertiary hover:text-primary inline-flex items-center gap-1">
-                      {i === 0 && <Home className="h-3.5 w-3.5" />}
-                      {n.name}
-                    </button>
-                  )}
-                </span>
-              );
-            })}
-          </div>
-        )}
+        <div className="flex items-center gap-1 text-body-sm flex-wrap">
+          {path.map((n, i) => {
+            const last = i === path.length - 1;
+            return (
+              <span key={n.id} className="inline-flex items-center gap-1">
+                {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
+                {last ? (
+                  <span className="text-foreground font-medium inline-flex items-center gap-1">
+                    {i === 0 && <Home className="h-3.5 w-3.5" />}
+                    {n.name}
+                  </span>
+                ) : (
+                  <button type="button" onClick={() => goto(i)} className="text-text-tertiary hover:text-primary inline-flex items-center gap-1">
+                    {i === 0 && <Home className="h-3.5 w-3.5" />}
+                    {n.name}
+                  </button>
+                )}
+              </span>
+            );
+          })}
+        </div>
       </div>
 
       <div className="mt-5 @container grid grid-cols-1 @2xl:grid-cols-2 gap-6">
@@ -348,7 +345,7 @@ export function DiseaseStatsSection() {
             <div className="flex items-center gap-2 min-w-0">
               <PieChart className="h-4 w-4 text-text-tertiary shrink-0" strokeWidth={1.75} />
               <p className="text-body-sm text-text-secondary truncate">
-                {level !== "farm" && `${focus.name} · `}{activeCat ? `${activeCat.name}明细` : "疾病类别分布"}
+                {focus.name} · {activeCat ? `${activeCat.name}明细` : "疾病类别分布"}
               </p>
             </div>
             {activeCat && (
@@ -362,7 +359,7 @@ export function DiseaseStatsSection() {
             {activeCat ? <CategoryBars cat={activeCat} /> : <DonutChart data={focusCats} onPick={(c) => setCat(c.name)} />}
           </div>
           <p className="mt-4 text-caption text-text-tertiary">
-            {selected ? "当前展示所选范围疾病构成" : level === "farm" ? "当前展示疾病类别构成" : "当前展示该范围整体疾病构成"}
+            {selected ? "当前展示所选牧场的疾病构成" : "当前展示该范围整体疾病构成"}
           </p>
         </div>
       </div>
