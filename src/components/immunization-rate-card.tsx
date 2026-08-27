@@ -14,7 +14,7 @@ type VaccinePlan = {
 };
 
 const PLANS: Record<string, VaccinePlan[]> = {
-  "近1年": [
+  "全部": [
     { id: "fmd", name: "口蹄疫疫苗", planned: 6154, done: 6042, days: 26, start: "03-05" },
     { id: "brd", name: "牛呼吸道多联疫苗", planned: 4820, done: 4531, days: 21, start: "04-12" },
     { id: "ibr", name: "传染性鼻气管炎疫苗", planned: 3980, done: 3612, days: 18, start: "05-08" },
@@ -22,7 +22,7 @@ const PLANS: Record<string, VaccinePlan[]> = {
     { id: "cd", name: "梭菌病多联疫苗", planned: 2540, done: 2489, days: 12, start: "07-15" },
     { id: "mast", name: "乳房炎疫苗", planned: 2180, done: 1742, days: 15, start: "08-02" },
   ],
-  "近6个月": [
+  "近半年": [
     { id: "fmd", name: "口蹄疫疫苗", planned: 3120, done: 3044, days: 14, start: "09-06" },
     { id: "brd", name: "牛呼吸道多联疫苗", planned: 2410, done: 2263, days: 11, start: "09-24" },
     { id: "ibr", name: "传染性鼻气管炎疫苗", planned: 1985, done: 1786, days: 9, start: "10-11" },
@@ -47,7 +47,7 @@ function toneOf(pct: number) {
 }
 
 export function ImmunizationRateCard() {
-  const [period, setPeriod] = useState("近1年");
+  const [period, setPeriod] = useState("近3个月");
   const { factor } = useDataLevel();
   const plans = (PLANS[period] ?? []).map((p) => ({
     ...p,
@@ -68,14 +68,14 @@ export function ImmunizationRateCard() {
           </div>
           <div>
             <h3 className="text-card-title text-foreground">疫苗免疫专题</h3>
-            <p className="text-caption text-text-tertiary mt-0.5">{period}各项疫苗计划完成情况</p>
+            <p className="text-caption text-text-tertiary mt-0.5">{period === "全部" ? "历史全部" : period}各项疫苗计划完成情况</p>
           </div>
         </div>
-        <PeriodTabs value={period} onChange={setPeriod} options={["近1年", "近6个月", "近3个月"]} />
+        <PeriodTabs value={period} onChange={setPeriod} options={["近3个月", "近半年", "全部"]} />
       </div>
 
       {/* 各项疫苗计划 · 横向柱状图 */}
-      <div className="mt-4 flex-1 min-h-0 overflow-y-auto pr-1">
+      <div className="mt-4 flex-1 min-h-0 max-h-[360px] overflow-y-auto pr-1">
         <div className="flex flex-col gap-5 min-h-full justify-center">
         {plans.map((p) => {
           const r = p.planned === 0 ? 0 : (p.done / p.planned) * 100;
