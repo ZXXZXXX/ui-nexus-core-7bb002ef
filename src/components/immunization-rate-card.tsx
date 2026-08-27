@@ -73,10 +73,13 @@ export function ImmunizationRateCard() {
           </div>
           <div>
             <h3 className="text-card-title text-foreground">疫苗免疫专题</h3>
-            <p className="text-caption text-text-tertiary mt-0.5">{period === "全部" ? "历史全部" : period}各项疫苗计划完成情况</p>
+            <p className="text-caption text-text-tertiary mt-0.5">各项疫苗计划完成情况</p>
           </div>
         </div>
-        <TimeTabs value={period} onChange={setPeriod} options={["近3个月", "近半年", "全部"]} />
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="tag tag-muted">{period === "全部" ? "历史全部" : period}</span>
+          <TimeTabs value={period} onChange={setPeriod} options={["近3个月", "近半年", "全部"]} />
+        </div>
       </div>
 
       {/* 各项疫苗计划 · 横向柱状图 */}
