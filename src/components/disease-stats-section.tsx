@@ -189,8 +189,9 @@ const DIS_RANGE_FACTOR: Record<string, number> = { [DIS_ALL]: 30, [DIS_MONTH]: 1
 function rootForLevel(level: DataLevel): Org {
   if (level === "group") return ORG;
   if (level === "region") return ORG.children![0]; // 东北大区
+  // 牧场级：隐藏具体牧场名，用中性根节点包裹当前牧场
   const farm = ORG.children![0].children![0]; // 1 号牧场
-  return { id: "farm-scope", name: farm.name, herd: 0, cases: 0, children: [farm] };
+  return { id: "farm-scope", name: "当前牧场", herd: 0, cases: 0, children: [farm] };
 }
 
 export function DiseaseStatsSection() {
