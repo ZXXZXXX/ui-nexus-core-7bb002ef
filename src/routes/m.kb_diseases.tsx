@@ -5,7 +5,7 @@ import { MobileShell } from "@/components/mobile-shell";
 import { useFarm } from "@/lib/farm-store";
 import { PRESCRIPTION_SEED } from "@/lib/prescription-kb";
 import { KB_DISEASES, symptomName, severityOf, recent7d } from "@/lib/disease-kb";
-import { StatScopeCard, diseaseStats } from "@/components/stat-scope-card";
+
 
 export const Route = createFileRoute("/m/kb_diseases")({
   head: () => ({ meta: [{ title: "疾病库 · 奇点智牧" }] }),
