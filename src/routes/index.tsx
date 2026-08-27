@@ -223,8 +223,8 @@ function CattleTypeDonut() {
   return <SemiArcStat title="牛只类型分布" data={CATTLE_TYPE_DIST} centerLabel="存栏总数" />;
 }
 
-/** 健康占比：与类型分布仪表盘区分，使用堆叠条形图 + 图例 */
-function HealthRatioBar({
+/** 健康占比：与类型分布半圆仪表盘区分，使用完整环形图 */
+function HealthRatioDonut({
   title,
   data,
   centerLabel,
@@ -233,48 +233,66 @@ function HealthRatioBar({
   data: { key: string; value: number; color: string }[];
   centerLabel: string;
 }) {
+  const [hover, setHover] = useState<number | null>(null);
   const total = data.reduce((s, d) => s + d.value, 0);
+  const cx = 62;
+  const cy = 62;
+  const R = 46;
+  const r = 30;
+  const active = hover === null ? null : data[hover];
+  let acc = 0;
+  const segments = data.map((d) => {
+    const start = (acc / total) * 360;
+    acc += d.value;
+    const end = (acc / total) * 360;
+    const pt = (deg: number, radius: number) => {
+      const rad = ((deg - 90) * Math.PI) / 180;
+      return [cx + radius * Math.cos(rad), cy + radius * Math.sin(rad)] as const;
+    };
+    const [x1, y1] = pt(start, R);
+    const [x2, y2] = pt(end, R);
+    const [x3, y3] = pt(end, r);
+    const [x4, y4] = pt(start, r);
+    const largeArc = end - start > 180 ? 1 : 0;
+    return {
+      d,
+      path: `M ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${r} ${r} 0 ${largeArc} 0 ${x4} ${y4} Z`,
+    };
+  });
   return (
     <div className="flex flex-col justify-between px-5 py-4">
-      <div className="flex items-center justify-between">
-        <span className="text-caption text-text-tertiary">{title}</span>
-        <span className="text-caption font-medium tabular-nums text-text-primary">
-          {total.toLocaleString()}
-          <span className="ml-1 font-normal text-text-tertiary">{centerLabel}</span>
-        </span>
-      </div>
-      <div className="mt-3">
-        <div className="flex h-4 w-full overflow-hidden rounded-full bg-bg-surface">
-          {data.map((d, i) => (
-            <div
-              key={d.key}
-              style={{ width: `${(d.value / total) * 100}%`, backgroundColor: d.color }}
-              className={cn(
-                "h-full transition-all hover:opacity-90",
-                i === 0 && "rounded-l-full",
-                i === data.length - 1 && "rounded-r-full"
-              )}
-            />
-          ))}
-        </div>
-        <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
-          {data.map((d) => (
-            <div key={d.key} className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />
-              <span className="truncate text-caption text-text-tertiary">{d.key}</span>
-              <span className="ml-auto text-caption font-medium tabular-nums text-text-primary">
-                {d.value.toLocaleString()}
-              </span>
-              <span className="text-caption text-text-tertiary">
-                {((d.value / total) * 100).toFixed(1)}%
-              </span>
-            </div>
-          ))}
+      <span className="text-caption text-text-tertiary">{title}</span>
+      <div className="mt-1 flex items-center justify-center">
+        <div className="relative h-[120px] w-[120px] shrink-0">
+          <svg viewBox="0 0 124 124" className="h-full w-full">
+            {segments.map((s, i) => (
+              <path
+                key={s.d.key}
+                d={s.path}
+                fill={s.d.color}
+                className="cursor-pointer transition-all"
+                style={{ opacity: hover === null || hover === i ? 1 : 0.4 }}
+                onMouseEnter={() => setHover(i)}
+                onMouseLeave={() => setHover(null)}
+              />
+            ))}
+          </svg>
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[18px] font-semibold leading-none tabular-nums text-text-primary">
+              {(active ? active.value : total).toLocaleString()}
+            </span>
+            <span className="mt-1 text-caption text-text-tertiary">
+              {active
+                ? `${active.key} · ${((active.value / total) * 100).toFixed(1)}%`
+                : centerLabel}
+            </span>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 
 
@@ -630,7 +648,7 @@ function HomePage() {
 
             {/* 2 · 预警 / 集团视角牧场统计 / 牧场外部健康占比 */}
             {scope === "farm-out" ? (
-              <HealthRatioBar title="牛只健康占比" data={FARM_HEALTH_DIST} centerLabel="存栏总数" />
+              <HealthRatioDonut title="牛只健康占比" data={FARM_HEALTH_DIST} centerLabel="存栏总数" />
             ) : (
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
