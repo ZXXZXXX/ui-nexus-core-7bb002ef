@@ -3,20 +3,18 @@ import { Pill } from "lucide-react";
 import { SectionCard, BarList, LineTrend, MiniStat, PeriodTabs } from "./charts";
 import { useDataLevel } from "@/lib/dashboard-view";
 
-const PERIODS = ["近 1 年", "近 6 个月", "近 3 个月"];
+const BY_MONTH = "按月统计";
+const BY_YEAR = "按年统计";
+const PERIODS = [BY_MONTH, BY_YEAR];
 
 const trendData: Record<string, { labels: string[]; points: number[] }> = {
-  "近 1 年": {
+  [BY_YEAR]: {
+    labels: ["2021年", "2022年", "2023年", "2024年", "2025年", "2026年"],
+    points: [178.4, 186.2, 194.7, 203.1, 208.6, 214.3],
+  },
+  [BY_MONTH]: {
     labels: ["6月", "7月", "8月", "9月", "10月", "11月", "12月", "1月", "2月", "3月", "4月", "5月"],
     points: [16.2, 17.4, 18.1, 15.8, 14.9, 16.6, 19.2, 20.4, 17.3, 16.1, 17.4, 18.6],
-  },
-  "近 6 个月": {
-    labels: ["12月", "1月", "2月", "3月", "4月", "5月"],
-    points: [19.2, 20.4, 17.3, 16.1, 17.4, 18.6],
-  },
-  "近 3 个月": {
-    labels: ["3月", "4月", "5月"],
-    points: [16.1, 17.4, 18.6],
   },
 };
 
@@ -56,22 +54,22 @@ function compositionFor(label: string, total: number) {
 }
 
 export function DrugSection() {
-  const [period, setPeriod] = useState(PERIODS[2]);
-  const [active, setActive] = useState(trendData[PERIODS[2]].labels.length - 1);
+  const [period, setPeriod] = useState(BY_MONTH);
+  const [active, setActive] = useState(trendData[BY_MONTH]!.labels.length - 1);
   const { factor } = useDataLevel();
   const raw = trendData[period];
   const t = { labels: raw.labels, points: raw.points.map((p) => Number((p * factor).toFixed(1))) };
   const idx = Math.min(active, t.labels.length - 1);
   const label = t.labels[idx];
   const total = t.points[idx];
-  const herd = Math.round((herdByMonth[label] ?? 4300) * factor);
+  const herd = Math.round((herdByMonth[label] ?? (period === BY_YEAR ? 51600 : 4300)) * factor);
   const perHead = (total * 10000) / herd;
   const comp = compositionFor(label, total);
 
   return (
     <SectionCard
       id="topic-drug"
-      title="药品专题"
+      title="药品费用专题"
       desc={"\n"}
       icon={<Pill className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
@@ -88,8 +86,8 @@ export function DrugSection() {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
         <div className="flex flex-col">
           <p className="text-body text-text-secondary mb-3">
-            {period}用药总费用趋势
-            <span className="text-text-tertiary text-body-sm">（点击月份查看明细）</span>
+            {period === BY_YEAR ? "各年度" : "各月份"}用药总费用趋势
+            <span className="text-text-tertiary text-body-sm">{period === BY_YEAR ? "（点击年份查看明细）" : "（点击月份查看明细）"}</span>
           </p>
           <div className="flex-1 flex flex-col justify-center">
             <LineTrend
@@ -109,8 +107,8 @@ export function DrugSection() {
             <p className="text-section-title text-foreground">{label}用药明细</p>
           </div>
           <div className="grid grid-cols-2 gap-3 mb-5">
-            <MiniStat label="当月用药总费用" value={total.toFixed(1)} unit="万元" tone="var(--brand)" />
-            <MiniStat label="当月头均用药费用" value={perHead.toFixed(1)} unit="元/头" />
+            <MiniStat label={period === BY_YEAR ? "当年用药总费用" : "当月用药总费用"} value={total.toFixed(1)} unit="万元" tone="var(--brand)" />
+            <MiniStat label={period === BY_YEAR ? "当年头均用药费用" : "当月头均用药费用"} value={perHead.toFixed(1)} unit="元/头" />
           </div>
           <p className="text-body text-text-secondary mb-3">各类药品费用占比</p>
           <BarList data={comp} unit=" 万元" />

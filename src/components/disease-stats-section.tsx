@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { PeriodTabs } from "@/components/dashboard/charts";
 import { ChevronRight, ChevronLeft, Home, BarChart3, PieChart } from "lucide-react";
 import { useDataLevel, type DataLevel } from "@/lib/dashboard-view";
 
@@ -180,6 +181,11 @@ function CategoryBars({ cat }: { cat: DiseaseCat }) {
   );
 }
 
+const DIS_ALL = "全部";
+const DIS_MONTH = "本月";
+const DIS_YEAR = "本年";
+const DIS_RANGE_FACTOR: Record<string, number> = { [DIS_ALL]: 30, [DIS_MONTH]: 1, [DIS_YEAR]: 11.4 };
+
 function rootForLevel(level: DataLevel): Org {
   if (level === "group") return ORG;
   if (level === "region") return ORG.children![0]; // 东北大区
@@ -193,6 +199,8 @@ export function DiseaseStatsSection() {
   const [path, setPath] = useState<Org[]>([root]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cat, setCat] = useState<string | null>(null);
+  const [range, setRange] = useState(DIS_MONTH);
+  const rangeF = DIS_RANGE_FACTOR[range] ?? 1;
 
   useEffect(() => {
     setPath([root]);
@@ -208,9 +216,16 @@ export function DiseaseStatsSection() {
   );
   const selected = ranked.find((o) => o.id === selectedId) ?? null;
   const focus = selected ?? scope;
-  const focusCats = useMemo(() => rollupCats(focus), [focus]);
+  const focusCats = useMemo(
+    () =>
+      rollupCats(focus).map((c) => ({
+        ...c,
+        diseases: c.diseases.map((d) => ({ ...d, count: Math.round(d.count * rangeF) })),
+      })),
+    [focus, rangeF],
+  );
   const activeCat = focusCats.find((c) => c.name === cat) ?? null;
-  const maxRate = Math.max(...ranked.map((o) => incidence(o)), 0.01);
+  const maxRate = Math.max(...ranked.map((o) => incidence(o) * rangeF), 0.01);
   const childrenAreRegions = children.some((c) => c.children?.length);
 
 
@@ -241,6 +256,7 @@ export function DiseaseStatsSection() {
             <BarChart3 className="h-4 w-4" strokeWidth={2} />
           </div>
           <h3 className="text-card-title text-foreground">疾病统计</h3>
+          <PeriodTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
         </div>
         <div className="flex items-center gap-1 text-body-sm flex-wrap">
           {path.map((n, i) => {
@@ -277,8 +293,9 @@ export function DiseaseStatsSection() {
             </div>
             <div className="mt-4 space-y-3">
               {ranked.map((o, i) => {
-                const rate = incidence(o);
-                const sums = rollupOrg(o);
+                const rate = incidence(o) * rangeF;
+                const raw_ = rollupOrg(o);
+                const sums = { ...raw_, cases: Math.round(raw_.cases * rangeF) };
                 const isSel = selectedId === o.id;
                 const drillable = !!o.children?.length;
                 const color = i === 0 ? "var(--state-danger)" : i === 1 ? "var(--state-warning)" : "var(--brand)";

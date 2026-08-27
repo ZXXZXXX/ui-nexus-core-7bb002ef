@@ -115,13 +115,20 @@ const scopes: Record<string, ScopeData> = {
 
 const ORDER: StatusKey[] = ["done", "doing", "overdue"];
 
+const WO_ALL = "全部";
+const WO_MONTH = "本月";
+const WO_YEAR = "本年";
+const WO_RANGE_FACTOR: Record<string, number> = { [WO_ALL]: 32, [WO_MONTH]: 1, [WO_YEAR]: 10.8 };
+
 export function WorkOrderSection({ farms }: { farms?: string[] } = {}) {
   const [tab, setTab] = useState(TAB_ALL);
   const [active, setActive] = useState<StatusKey | null>(null);
   const [farm, setFarm] = useState(ALL_FARMS);
+  const [range, setRange] = useState(WO_MONTH);
   const { factor: levelFactor } = useDataLevel();
   const farms_ = farms ?? [];
-  const factor = levelFactor * (farm === ALL_FARMS ? 1 : farmFactor(farm, farms_));
+  const factor =
+    levelFactor * (farm === ALL_FARMS ? 1 : farmFactor(farm, farms_)) * (WO_RANGE_FACTOR[range] ?? 1);
   const base = scopes[tab]!;
   const s = {
     ...base,
@@ -145,7 +152,7 @@ export function WorkOrderSection({ farms }: { farms?: string[] } = {}) {
     <SectionCard
       id="topic-workorder"
       title="兽医工单专题"
-      desc="本月统计"
+      desc={<PeriodTabs value={range} onChange={(v) => { setRange(v); setActive(null); }} options={[WO_ALL, WO_MONTH, WO_YEAR]} />}
       icon={<ClipboardList className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-2">
