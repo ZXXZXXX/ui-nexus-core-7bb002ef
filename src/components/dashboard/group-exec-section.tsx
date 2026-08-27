@@ -69,7 +69,7 @@ export function farmMonthlyRows(farmName: string, region: string): Row[] {
     const r = (v: number, d = 1) => Number((v * k).toFixed(d));
     return {
       key: m,
-      sub: `${f.region} · ${f.farm}`,
+      sub: "", // 牧场级外部视角：卡片内不展示具体牧场名称
       herd: Math.round(f.herd * (0.98 + i * 0.002)),
       death: Math.round(f.death * k),
       cull: Math.round(f.cull * k),
