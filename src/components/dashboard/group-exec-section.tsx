@@ -936,28 +936,35 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       id="topic-panorama"
       title={scopeFarm ? "关键指标统计" : "关键指标排行"}
       desc={
-        !scopeRegion && !scopeFarm ? (
-          <div className="inline-flex items-center rounded-full border border-border bg-surface-subtle p-0.5">
-            <button
-              type="button"
-              onClick={() => setViewMode("region")}
-              className={`h-6 px-3 rounded-full text-caption transition-colors ${
-                viewMode === "region" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
-              }`}
-            >
-              按区域排行
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode("farm")}
-              className={`h-6 px-3 rounded-full text-caption transition-colors ${
-                viewMode === "farm" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
-              }`}
-            >
-              按牧场排行
-            </button>
-          </div>
-        ) : undefined
+        <div className="flex items-center gap-2">
+          {scopeFarm ? (
+            <span className="tag tag-muted">近 12 个月</span>
+          ) : scopeRegion ? (
+            <span className="tag tag-muted">{scopeRegion} · 牧场排名</span>
+          ) : null}
+          {!scopeRegion && !scopeFarm ? (
+            <div className="inline-flex items-center rounded-full border border-border bg-surface-subtle p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode("region")}
+                className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                  viewMode === "region" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+                }`}
+              >
+                按区域排行
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("farm")}
+                className={`h-6 px-3 rounded-full text-caption transition-colors ${
+                  viewMode === "farm" ? "bg-card text-foreground shadow-sm" : "text-text-tertiary hover:text-foreground"
+                }`}
+              >
+                按牧场排行
+              </button>
+            </div>
+          ) : null}
+        </div>
       }
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
