@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Syringe } from "lucide-react";
+import { Syringe, Clock, CalendarDays } from "lucide-react";
 import { TimeTabs } from "@/components/dashboard/charts";
 import { scaleValue, useDataLevel } from "@/lib/dashboard-view";
 

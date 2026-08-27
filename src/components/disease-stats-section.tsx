@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { PeriodTabs } from "@/components/dashboard/charts";
+import { TimeTabs } from "@/components/dashboard/charts";
 import { ChevronRight, ChevronLeft, Home, BarChart3, PieChart } from "lucide-react";
 import { useDataLevel, type DataLevel } from "@/lib/dashboard-view";
 
