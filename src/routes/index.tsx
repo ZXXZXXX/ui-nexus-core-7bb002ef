@@ -223,6 +223,60 @@ function CattleTypeDonut() {
   return <SemiArcStat title="牛只类型分布" data={CATTLE_TYPE_DIST} centerLabel="存栏总数" />;
 }
 
+/** 健康占比：与类型分布仪表盘区分，使用堆叠条形图 + 图例 */
+function HealthRatioBar({
+  title,
+  data,
+  centerLabel,
+}: {
+  title: string;
+  data: { key: string; value: number; color: string }[];
+  centerLabel: string;
+}) {
+  const total = data.reduce((s, d) => s + d.value, 0);
+  return (
+    <div className="flex flex-col justify-between px-5 py-4">
+      <div className="flex items-center justify-between">
+        <span className="text-caption text-text-tertiary">{title}</span>
+        <span className="text-caption font-medium tabular-nums text-text-primary">
+          {total.toLocaleString()}
+          <span className="ml-1 font-normal text-text-tertiary">{centerLabel}</span>
+        </span>
+      </div>
+      <div className="mt-3">
+        <div className="flex h-4 w-full overflow-hidden rounded-full bg-bg-surface">
+          {data.map((d, i) => (
+            <div
+              key={d.key}
+              style={{ width: `${(d.value / total) * 100}%`, backgroundColor: d.color }}
+              className={cn(
+                "h-full transition-all hover:opacity-90",
+                i === 0 && "rounded-l-full",
+                i === data.length - 1 && "rounded-r-full"
+              )}
+            />
+          ))}
+        </div>
+        <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2">
+          {data.map((d) => (
+            <div key={d.key} className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />
+              <span className="truncate text-caption text-text-tertiary">{d.key}</span>
+              <span className="ml-auto text-caption font-medium tabular-nums text-text-primary">
+                {d.value.toLocaleString()}
+              </span>
+              <span className="text-caption text-text-tertiary">
+                {((d.value / total) * 100).toFixed(1)}%
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 
 
 /** 集团高管视角：数据概览指标卡（本月 / 本年） */
