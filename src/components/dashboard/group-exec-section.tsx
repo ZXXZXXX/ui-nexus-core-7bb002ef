@@ -934,7 +934,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       title={scopeFarm ? "关键指标统计" : "关键指标排行"}
       desc={
         scopeFarm
-          ? `${scopeFarm.farm} · 近 12 个月`
+          ? "近 12 个月"
           : scopeRegion
             ? `${scopeRegion} · 牧场排名`
             : viewMode === "farm"
