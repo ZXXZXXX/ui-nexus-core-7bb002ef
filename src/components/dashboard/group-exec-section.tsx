@@ -962,15 +962,6 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
       icon={<Layers className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3">
-          <span className="tag tag-muted">
-            {scopeFarm
-              ? "近 12 个月"
-              : scopeRegion
-                ? `${scopeRegion} · 牧场排名`
-                : viewMode === "farm"
-                  ? "全部牧场排名"
-                  : "区域排名"}
-          </span>
           <button
             type="button"
             onClick={exportCsv}
