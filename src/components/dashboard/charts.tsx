@@ -198,7 +198,7 @@ export function StackedBar({
           </Tooltip>
         )}
       </div>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
+      <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5">
         {data.map((d, i) => (
           <span key={d.name} className="inline-flex items-center gap-1.5">
             <span
@@ -441,7 +441,7 @@ export function LineTrend({
           </div>
         </div>
       )}
-      <div className="mt-2 flex flex-wrap items-center gap-4">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-4">
         {series.map((s) => (
           <span key={s.name} className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
             <span
@@ -745,7 +745,7 @@ export function SmoothAreaTrend({
           </div>
         </div>
       )}
-      <div className="mt-2 flex flex-wrap items-center gap-4">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-4">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-1.5 w-4 rounded-full" style={{ background: color }} />
           {name}{unit && <span className="text-text-tertiary">（{unit}）</span>}
