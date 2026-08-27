@@ -312,6 +312,8 @@ export function CattleProfileDrawer({
                 <EventHistory />
               ) : tab === "orders" ? (
                 <OrderHistory />
+              ) : tab === "screenings" ? (
+                <ScreeningHistory />
               ) : (
                 <MoveHistory />
               )}
