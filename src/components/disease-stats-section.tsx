@@ -248,8 +248,8 @@ export function DiseaseStatsSection() {
 
   return (
     <Card className="border-border bg-card rounded-2xl shadow-card p-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-2">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
           <div
             className="h-9 w-9 rounded-xl flex items-center justify-center shrink-0"
             style={{ background: "color-mix(in oklab, var(--state-danger) 14%, transparent)", color: "var(--state-danger)" }}
@@ -257,29 +257,31 @@ export function DiseaseStatsSection() {
             <BarChart3 className="h-4 w-4" strokeWidth={2} />
           </div>
           <h3 className="text-card-title text-foreground">疾病统计</h3>
-          <TimeTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
-        </div>
-        <div className="flex items-center gap-1 text-body-sm flex-wrap">
-          {!isFarm && path.map((n, i) => {
-            const last = i === path.length - 1;
-            return (
-              <span key={n.id} className="inline-flex items-center gap-1">
-                {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
-                {last ? (
-                  <span className="text-foreground font-medium inline-flex items-center gap-1">
-                    {i === 0 && <Home className="h-3.5 w-3.5" />}
-                    {n.name}
+          {!isFarm && (
+            <div className="flex items-center gap-1 text-body-sm flex-wrap">
+              {path.map((n, i) => {
+                const last = i === path.length - 1;
+                return (
+                  <span key={n.id} className="inline-flex items-center gap-1">
+                    {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
+                    {last ? (
+                      <span className="text-foreground font-medium inline-flex items-center gap-1">
+                        {i === 0 && <Home className="h-3.5 w-3.5" />}
+                        {n.name}
+                      </span>
+                    ) : (
+                      <button type="button" onClick={() => goto(i)} className="text-text-tertiary hover:text-primary inline-flex items-center gap-1">
+                        {i === 0 && <Home className="h-3.5 w-3.5" />}
+                        {n.name}
+                      </button>
+                    )}
                   </span>
-                ) : (
-                  <button type="button" onClick={() => goto(i)} className="text-text-tertiary hover:text-primary inline-flex items-center gap-1">
-                    {i === 0 && <Home className="h-3.5 w-3.5" />}
-                    {n.name}
-                  </button>
-                )}
-              </span>
-            );
-          })}
+                );
+              })}
+            </div>
+          )}
         </div>
+        <TimeTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
       </div>
 
       <div className="mt-5 @container grid grid-cols-1 @2xl:grid-cols-2 gap-6">
