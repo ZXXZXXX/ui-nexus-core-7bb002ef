@@ -259,27 +259,29 @@ export function DiseaseStatsSection() {
           <h3 className="text-card-title text-foreground">疾病统计</h3>
           <TimeTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
         </div>
-        <div className="flex items-center gap-1 text-body-sm flex-wrap">
-          {path.map((n, i) => {
-            const last = i === path.length - 1;
-            return (
-              <span key={n.id} className="inline-flex items-center gap-1">
-                {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
-                {last ? (
-                  <span className="text-foreground font-medium inline-flex items-center gap-1">
-                    {i === 0 && <Home className="h-3.5 w-3.5" />}
-                    {n.name}
-                  </span>
-                ) : (
-                  <button type="button" onClick={() => goto(i)} className="text-text-tertiary hover:text-primary inline-flex items-center gap-1">
-                    {i === 0 && <Home className="h-3.5 w-3.5" />}
-                    {n.name}
-                  </button>
-                )}
-              </span>
-            );
-          })}
-        </div>
+        {level !== "farm" && (
+          <div className="flex items-center gap-1 text-body-sm flex-wrap">
+            {path.map((n, i) => {
+              const last = i === path.length - 1;
+              return (
+                <span key={n.id} className="inline-flex items-center gap-1">
+                  {i > 0 && <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />}
+                  {last ? (
+                    <span className="text-foreground font-medium inline-flex items-center gap-1">
+                      {i === 0 && <Home className="h-3.5 w-3.5" />}
+                      {n.name}
+                    </span>
+                  ) : (
+                    <button type="button" onClick={() => goto(i)} className="text-text-tertiary hover:text-primary inline-flex items-center gap-1">
+                      {i === 0 && <Home className="h-3.5 w-3.5" />}
+                      {n.name}
+                    </button>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="mt-5 @container grid grid-cols-1 @2xl:grid-cols-2 gap-6">
