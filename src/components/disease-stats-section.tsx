@@ -220,7 +220,6 @@ export function DiseaseStatsSection() {
     () =>
       rollupCats(focus).map((c) => ({
         ...c,
-        count: Math.round(c.count * rangeF),
         diseases: c.diseases.map((d) => ({ ...d, count: Math.round(d.count * rangeF) })),
       })),
     [focus, rangeF],
