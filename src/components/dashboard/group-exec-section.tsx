@@ -1060,10 +1060,10 @@ export function GroupExecSection({
     <div className="space-y-6">
       {showCharts && (scopeFarm ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-          <DeathCullTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
-          <PostpartumTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
-          <TreatmentDaysTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
-          <PrematureRateTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
+          <DeathCullTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm ? null : scopeFarm?.farm} />
+          <PostpartumTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm ? null : scopeFarm?.farm} />
+          <TreatmentDaysTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm ? null : scopeFarm?.farm} />
+          <PrematureRateTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm ? null : scopeFarm?.farm} />
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
