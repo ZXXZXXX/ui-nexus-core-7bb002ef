@@ -143,9 +143,8 @@ export function ExecFocusSection({ level }: { level: "farm" | "region" | "group"
       <SectionCard
         id="topic-exec"
         title={isGroup ? "集团关键指标" : "区域关键指标"}
-        desc={dim}
+        desc={dims.length > 1 ? <PeriodTabs value={dim} onChange={setDim} options={dims} /> : undefined}
         icon={<Crosshair className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-        extra={dims.length > 1 ? <PeriodTabs value={dim} onChange={setDim} options={dims} /> : undefined}
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <MiniStat label="（本月）死亡数" value={String(total.death)} unit="头" tone="var(--state-danger)" />
