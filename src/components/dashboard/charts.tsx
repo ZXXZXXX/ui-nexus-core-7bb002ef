@@ -511,6 +511,36 @@ export function PeriodTabs({
   );
 }
 
+/** 时间维度切换：文字 | 文字 | 文字 */
+export function TimeTabs({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+}) {
+  return (
+    <div className="inline-flex items-center gap-1 text-caption shrink-0">
+      {options.map((o, i) => (
+        <span key={o} className="inline-flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onChange(o)}
+            className={`transition-colors ${
+              value === o ? "text-primary font-medium" : "text-text-tertiary hover:text-foreground"
+            }`}
+          >
+            {o}
+          </button>
+          {i < options.length - 1 && <span className="text-text-tertiary">|</span>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function ColumnChart({
   data,
   unit = "",
