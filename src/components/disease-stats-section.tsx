@@ -190,11 +190,12 @@ function rootForLevel(level: DataLevel): Org {
   if (level === "group") return ORG;
   if (level === "region") return ORG.children![0]; // 东北大区
   const farm = ORG.children![0].children![0]; // 1 号牧场
-  return { id: "farm-scope", name: farm.name, herd: 0, cases: 0, children: [farm] };
+  return { id: "farm-scope", name: "当前牧场", herd: 0, cases: 0, children: [farm] };
 }
 
 export function DiseaseStatsSection() {
   const { level } = useDataLevel();
+  const isFarm = level === "farm";
   const root = useMemo(() => rootForLevel(level), [level]);
   const [path, setPath] = useState<Org[]>([root]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -259,7 +260,7 @@ export function DiseaseStatsSection() {
           <TimeTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
         </div>
         <div className="flex items-center gap-1 text-body-sm flex-wrap">
-          {path.map((n, i) => {
+          {!isFarm && path.map((n, i) => {
             const last = i === path.length - 1;
             return (
               <span key={n.id} className="inline-flex items-center gap-1">
@@ -345,7 +346,7 @@ export function DiseaseStatsSection() {
             <div className="flex items-center gap-2 min-w-0">
               <PieChart className="h-4 w-4 text-text-tertiary shrink-0" strokeWidth={1.75} />
               <p className="text-body-sm text-text-secondary truncate">
-                {focus.name} · {activeCat ? `${activeCat.name}明细` : "疾病类别分布"}
+                {!isFarm && `${focus.name} · `}{activeCat ? `${activeCat.name}明细` : "疾病类别分布"}
               </p>
             </div>
             {activeCat && (
