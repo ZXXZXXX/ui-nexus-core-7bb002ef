@@ -763,6 +763,22 @@ export function WorkOrderPage({
     }
   };
 
+  if (disabled) {
+    return (
+      <TooltipProvider delayDuration={200}>
+        <AppHeader title={title} breadcrumb={["工单管理", title]} />
+        <main className="flex-1 px-6 py-6">
+          <Card className="border-border bg-card">
+            <div className="flex flex-col items-center justify-center gap-2 py-24 text-text-tertiary select-none">
+              <ClipboardList className="h-10 w-10 opacity-40" />
+              <p className="text-body">暂无数据</p>
+            </div>
+          </Card>
+        </main>
+      </TooltipProvider>
+    );
+  }
+
   return (
     <TooltipProvider delayDuration={200}>
       <AppHeader title={title} breadcrumb={["工单管理", title]} />
