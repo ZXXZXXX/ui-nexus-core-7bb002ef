@@ -362,7 +362,7 @@ export function DiseaseStatsSection() {
             {activeCat ? <CategoryBars cat={activeCat} /> : <DonutChart data={focusCats} onPick={(c) => setCat(c.name)} />}
           </div>
           <p className="mt-4 text-caption text-text-tertiary">
-            {selected ? "当前展示所选牧场的疾病构成" : "当前展示该范围整体疾病构成"}
+            {selected ? "当前展示所选范围疾病构成" : level === "farm" ? "当前展示疾病类别构成" : "当前展示该范围整体疾病构成"}
           </p>
         </div>
       </div>
