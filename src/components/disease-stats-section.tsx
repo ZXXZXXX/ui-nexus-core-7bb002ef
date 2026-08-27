@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { PeriodTabs } from "@/components/dashboard/charts";
+import { TimeTabs } from "@/components/dashboard/charts";
 import { ChevronRight, ChevronLeft, Home, BarChart3, PieChart } from "lucide-react";
 import { useDataLevel, type DataLevel } from "@/lib/dashboard-view";
 
@@ -256,7 +256,7 @@ export function DiseaseStatsSection() {
             <BarChart3 className="h-4 w-4" strokeWidth={2} />
           </div>
           <h3 className="text-card-title text-foreground">疾病统计</h3>
-          <PeriodTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
+          <TimeTabs value={range} onChange={setRange} options={[DIS_ALL, DIS_MONTH, DIS_YEAR]} />
         </div>
         <div className="flex items-center gap-1 text-body-sm flex-wrap">
           {path.map((n, i) => {

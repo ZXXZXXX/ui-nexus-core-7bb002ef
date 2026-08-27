@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ClipboardList, ChevronLeft } from "lucide-react";
-import { SectionCard, BarList, Donut, Legend, PeriodTabs } from "./charts";
+import { SectionCard, BarList, Donut, Legend, PeriodTabs, TimeTabs } from "./charts";
 import { scaleValue, useDataLevel } from "@/lib/dashboard-view";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -152,7 +152,7 @@ export function WorkOrderSection({ farms }: { farms?: string[] } = {}) {
     <SectionCard
       id="topic-workorder"
       title="兽医工单专题"
-      desc={<PeriodTabs value={range} onChange={(v) => { setRange(v); setActive(null); }} options={[WO_ALL, WO_MONTH, WO_YEAR]} />}
+      desc={<TimeTabs value={range} onChange={(v) => { setRange(v); setActive(null); }} options={[WO_ALL, WO_MONTH, WO_YEAR]} />}
       icon={<ClipboardList className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-2">

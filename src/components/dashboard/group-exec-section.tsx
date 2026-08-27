@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { BarChart3, Layers, Download, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
-import { SectionCard, PeriodTabs, LineTrend, SmoothAreaTrend } from "./charts";
+import { SectionCard, PeriodTabs, TimeTabs, LineTrend, SmoothAreaTrend } from "./charts";
 import { WorkOrderSection } from "./workorder-section";
 
 /* ---------------- 数据：牧场为最小口径 ---------------- */
@@ -500,7 +500,7 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
       desc={`${scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <PeriodTabs
+        <TimeTabs
           value={period}
           onChange={setPeriod}
           options={["近 6 个月", "近 1 年"]}
@@ -682,7 +682,7 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: str
       title="产后淘汰率趋势"
       desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <StackedColumns
         labels={labels}
@@ -718,7 +718,7 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: stri
       title="牛只死淘变化趋势"
       desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <LineTrend
         labels={labels}
@@ -749,7 +749,7 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: 
       title="早产率变化趋势"
       desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <SmoothAreaTrend
         labels={labels}
@@ -780,7 +780,7 @@ function TreatmentDaysTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: 
       title="发病治愈趋势"
       desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<PeriodTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
+      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <DrugComboChart
         months={labels}

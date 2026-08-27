@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Syringe, Clock, CalendarDays } from "lucide-react";
-import { PeriodTabs } from "@/components/dashboard/charts";
+import { TimeTabs } from "@/components/dashboard/charts";
 import { scaleValue, useDataLevel } from "@/lib/dashboard-view";
 
 type VaccinePlan = {
@@ -76,7 +76,7 @@ export function ImmunizationRateCard() {
             <p className="text-caption text-text-tertiary mt-0.5">{period === "全部" ? "历史全部" : period}各项疫苗计划完成情况</p>
           </div>
         </div>
-        <PeriodTabs value={period} onChange={setPeriod} options={["近3个月", "近半年", "全部"]} />
+        <TimeTabs value={period} onChange={setPeriod} options={["近3个月", "近半年", "全部"]} />
       </div>
 
       {/* 各项疫苗计划 · 横向柱状图 */}
