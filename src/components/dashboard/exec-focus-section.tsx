@@ -84,7 +84,7 @@ export function ExecFocusSection({ level }: { level: "farm" | "region" | "group"
       <SectionCard
         id="topic-exec"
         title="牧场关键指标"
-        desc="外部视角 · 1 号牧场"
+        desc="外部视角"
         icon={<Crosshair className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       >
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -112,7 +112,7 @@ export function ExecFocusSection({ level }: { level: "farm" | "region" | "group"
               </thead>
               <tbody>
                 <tr className="border-t border-border">
-                  <td className="py-2.5 text-foreground">{singleFarm.farm}</td>
+                  <td className="py-2.5 text-foreground">当前牧场</td>
                   <td className="py-2.5 text-right tabular-nums text-text-secondary">{singleFarm.pp30} %</td>
                   <td className="py-2.5 text-right tabular-nums text-text-secondary">{singleFarm.pp60} %</td>
                   <td className="py-2.5 text-right tabular-nums text-foreground">{singleFarm.pp90} %</td>
