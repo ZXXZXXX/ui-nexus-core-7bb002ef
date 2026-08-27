@@ -964,7 +964,7 @@ function PanoramaSection({ scopeRegion, scopeFarm }: { scopeRegion?: string | nu
         <div className="flex items-center gap-3">
           <span className="tag tag-muted">
             {scopeFarm
-              ? `${scopeFarm.farm} · 近 12 个月`
+              ? "近 12 个月"
               : scopeRegion
                 ? `${scopeRegion} · 牧场排名`
                 : viewMode === "farm"
