@@ -304,12 +304,15 @@ export function WorkOrderPage({
   orders: baseOrders,
   createKind,
   createPrefix,
+  disabled = false,
 }: {
   title: string;
   orders: WorkOrder[];
   /** 支持新建工单时传入对应处方类型 */
   createKind?: CreateRxKind;
   createPrefix?: string;
+  /** 禁用态：不展示任何数据，页面不可交互 */
+  disabled?: boolean;
 }) {
   const role = usePcRole();
   const [createOpen, setCreateOpen] = useState(false);
