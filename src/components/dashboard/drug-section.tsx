@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pill } from "lucide-react";
-import { SectionCard, BarList, LineTrend, MiniStat, PeriodTabs } from "./charts";
+import { SectionCard, BarList, LineTrend, MiniStat, TimeTabs } from "./charts";
 import { useDataLevel } from "@/lib/dashboard-view";
 
 const BY_MONTH = "按月统计";
@@ -73,7 +73,7 @@ export function DrugSection() {
       desc={"\n"}
       icon={<Pill className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <PeriodTabs
+        <TimeTabs
           value={period}
           onChange={(v) => {
             setPeriod(v);

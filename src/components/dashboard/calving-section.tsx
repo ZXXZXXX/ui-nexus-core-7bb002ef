@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Baby, ChevronLeft } from "lucide-react";
-import { SectionCard, ColumnChart, GaugeArc, BarList, PeriodTabs } from "./charts";
+import { SectionCard, ColumnChart, GaugeArc, BarList, PeriodTabs, TimeTabs } from "./charts";
 import { scaleList, scaleValue, useDataLevel } from "@/lib/dashboard-view";
 
 const aliveTotal = 170;
@@ -66,7 +66,7 @@ export function CalvingSection() {
     <SectionCard
       id="topic-calving"
       title="产犊专题"
-      desc={<PeriodTabs value={range} onChange={setRange} options={[RANGE_ALL, RANGE_MONTH, RANGE_YEAR]} />}
+      desc={<TimeTabs value={range} onChange={setRange} options={[RANGE_ALL, RANGE_MONTH, RANGE_YEAR]} />}
       icon={<Baby className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3 flex-wrap">
