@@ -79,7 +79,7 @@ export function CattleProfileDrawer({
   onOpenChange: (v: boolean) => void;
   cow: CattleProfile | null;
 }) {
-  const [tab, setTab] = useState<"diagnoses" | "meds" | "tests" | "moves" | "events" | "orders">("diagnoses");
+  const [tab, setTab] = useState<"diagnoses" | "meds" | "tests" | "moves" | "events" | "orders" | "screenings">("diagnoses");
   const historyRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
