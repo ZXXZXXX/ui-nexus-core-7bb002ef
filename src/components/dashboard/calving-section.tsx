@@ -114,22 +114,30 @@ export function CalvingSection() {
                   头
                 </p>
               </div>
-              <div className="flex flex-wrap items-center gap-8">
+              <div className="flex flex-wrap items-center gap-6">
                 <GaugeArc
                   value={(alive / Math.max(total, 1)) * 100}
                   label="犊牛成活率"
                 />
-                <div className="flex-1 min-w-[180px] space-y-3">
-                  {survivalData.map((d) => (
-                    <div key={d.name} className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-sm" style={{ background: d.color }} />
-                      <span className="text-body text-text-secondary">{d.name}</span>
-                      <span className="ml-auto text-section-title tabular-nums text-foreground">
-                        {d.value.toLocaleString()}
-                      </span>
-                      <span className="text-caption text-text-tertiary">头</span>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-8">
+                  <div className="space-y-3">
+                    {survivalData.map((d) => (
+                      <div key={d.name} className="flex items-center gap-2">
+                        <span className="h-2.5 w-2.5 rounded-sm" style={{ background: d.color }} />
+                        <span className="text-body text-text-secondary">{d.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-3 text-right">
+                    {survivalData.map((d) => (
+                      <div key={`${d.name}-val`}>
+                        <span className="text-section-title tabular-nums text-foreground">
+                          {d.value.toLocaleString()}
+                        </span>
+                        <span className="text-caption text-text-tertiary"> 头</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
               <button
