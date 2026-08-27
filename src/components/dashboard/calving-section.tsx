@@ -43,12 +43,19 @@ const TAB_WEIGHT = "体重分布";
 const VIEW_CALF = "犊牛情况";
 const VIEW_COW = "母牛情况";
 
+const RANGE_ALL = "全部";
+const RANGE_MONTH = "本月";
+const RANGE_YEAR = "本年";
+const RANGE_FACTOR: Record<string, number> = { [RANGE_ALL]: 34, [RANGE_MONTH]: 1, [RANGE_YEAR]: 11.6 };
+
 
 export function CalvingSection() {
   const [view, setView] = useState(VIEW_CALF);
   const [drill, setDrill] = useState(false);
   const [tab, setTab] = useState(TAB_PARITY);
-  const { factor } = useDataLevel();
+  const [range, setRange] = useState(RANGE_MONTH);
+  const { factor: levelFactor } = useDataLevel();
+  const factor = levelFactor * RANGE_FACTOR[range]!;
   const alive = scaleValue(aliveTotal, factor);
   const survivalData = scaleList(survival, factor);
   const difficultyData = scaleList(difficulty, factor);
@@ -59,7 +66,7 @@ export function CalvingSection() {
     <SectionCard
       id="topic-calving"
       title="产犊专题"
-      desc={"\n"}
+      desc={<PeriodTabs value={range} onChange={setRange} options={[RANGE_ALL, RANGE_MONTH, RANGE_YEAR]} />}
       icon={<Baby className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <div className="flex items-center gap-3 flex-wrap">
@@ -105,7 +112,7 @@ export function CalvingSection() {
           ) : (
             <>
               <div className="mb-3 flex items-baseline justify-between gap-3">
-                <p className="text-body-sm text-text-secondary">（本月）产犊成活与死亡分布</p>
+                <p className="text-body-sm text-text-secondary">{`（${range}）产犊成活与死亡分布`}</p>
                 <p className="text-caption text-text-tertiary">
                   产犊总数{" "}
                   <span className="text-section-title tabular-nums text-foreground">
@@ -153,7 +160,7 @@ export function CalvingSection() {
       ) : (
         <div>
           <div className="mb-3 flex items-baseline justify-between gap-3">
-            <p className="text-body-sm text-text-secondary">（本月）产犊难易度分布</p>
+            <p className="text-body-sm text-text-secondary">{`（${range}）产犊难易度分布`}</p>
             <p className="text-caption text-text-tertiary">
               顺产率 <span className="text-section-title tabular-nums text-foreground">74.6%</span>
             </p>

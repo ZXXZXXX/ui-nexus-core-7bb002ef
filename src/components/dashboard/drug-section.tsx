@@ -71,7 +71,7 @@ export function DrugSection() {
   return (
     <SectionCard
       id="topic-drug"
-      title="药品专题"
+      title="药品费用专题"
       desc={"\n"}
       icon={<Pill className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
