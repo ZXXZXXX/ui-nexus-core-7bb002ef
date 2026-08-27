@@ -313,7 +313,7 @@ function PostpartumRankSection({ scopeRegion, scopeFarm }: { scopeRegion?: strin
       ) : (
         <StackedBars rows={rows} onPick={region ? undefined : (r) => setRegion(r.key)} />
       )}
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
         {BUCKETS.map((b) => (
           <span key={b.key} className="inline-flex items-center gap-1.5 text-caption text-text-secondary">
             <span className="h-2.5 w-2.5 rounded-sm" style={{ background: b.color }} />
@@ -511,7 +511,7 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
           总药费支出
@@ -638,7 +638,7 @@ function StackedColumns({
 
 function ChartLegend({ items }: { items: { name: string; color: string; line?: boolean }[] }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
       {items.map((it) => (
         <span key={it.name} className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span
@@ -798,7 +798,7 @@ function TreatmentDaysTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: 
         lineColor="var(--brand)"
         extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
       />
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2">
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--state-warning)" }} />
           发病数（头次）
