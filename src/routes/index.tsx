@@ -223,78 +223,6 @@ function CattleTypeDonut() {
   return <SemiArcStat title="牛只类型分布" data={CATTLE_TYPE_DIST} centerLabel="存栏总数" />;
 }
 
-/** 健康占比：与类型分布半圆仪表盘区分，使用完整环形图 */
-function HealthRatioDonut({
-  title,
-  data,
-  centerLabel,
-}: {
-  title: string;
-  data: { key: string; value: number; color: string }[];
-  centerLabel: string;
-}) {
-  const [hover, setHover] = useState<number | null>(null);
-  const total = data.reduce((s, d) => s + d.value, 0);
-  const cx = 62;
-  const cy = 62;
-  const R = 46;
-  const r = 30;
-  const active = hover === null ? null : data[hover];
-  let acc = 0;
-  const segments = data.map((d) => {
-    const start = (acc / total) * 360;
-    acc += d.value;
-    const end = (acc / total) * 360;
-    const pt = (deg: number, radius: number) => {
-      const rad = ((deg - 90) * Math.PI) / 180;
-      return [cx + radius * Math.cos(rad), cy + radius * Math.sin(rad)] as const;
-    };
-    const [x1, y1] = pt(start, R);
-    const [x2, y2] = pt(end, R);
-    const [x3, y3] = pt(end, r);
-    const [x4, y4] = pt(start, r);
-    const largeArc = end - start > 180 ? 1 : 0;
-    return {
-      d,
-      path: `M ${x1} ${y1} A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2} L ${x3} ${y3} A ${r} ${r} 0 ${largeArc} 0 ${x4} ${y4} Z`,
-    };
-  });
-  return (
-    <div className="flex flex-col justify-between px-5 py-4">
-      <span className="text-caption text-text-tertiary">{title}</span>
-      <div className="mt-1 flex items-center justify-center">
-        <div className="relative h-[120px] w-[120px] shrink-0">
-          <svg viewBox="0 0 124 124" className="h-full w-full">
-            {segments.map((s, i) => (
-              <path
-                key={s.d.key}
-                d={s.path}
-                fill={s.d.color}
-                className="cursor-pointer transition-all"
-                style={{ opacity: hover === null || hover === i ? 1 : 0.4 }}
-                onMouseEnter={() => setHover(i)}
-                onMouseLeave={() => setHover(null)}
-              />
-            ))}
-          </svg>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-[18px] font-semibold leading-none tabular-nums text-text-primary">
-              {(active ? active.value : total).toLocaleString()}
-            </span>
-            <span className="mt-1 text-caption text-text-tertiary">
-              {active
-                ? `${active.key} · ${((active.value / total) * 100).toFixed(1)}%`
-                : centerLabel}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-
 
 
 /** 集团高管视角：数据概览指标卡（本月 / 本年） */
@@ -648,7 +576,7 @@ function HomePage() {
 
             {/* 2 · 预警 / 集团视角牧场统计 / 牧场外部健康占比 */}
             {scope === "farm-out" ? (
-              <HealthRatioDonut title="牛只健康占比" data={FARM_HEALTH_DIST} centerLabel="存栏总数" />
+              <SemiArcStat title="牛只健康占比" data={FARM_HEALTH_DIST} centerLabel="存栏总数" />
             ) : (
             <div className="flex flex-col justify-between px-5 py-4">
               <div className="flex items-center justify-between">
