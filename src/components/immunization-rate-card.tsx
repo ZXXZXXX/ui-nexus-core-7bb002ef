@@ -21,6 +21,11 @@ const PLANS: Record<string, VaccinePlan[]> = {
     { id: "bvd", name: "牛病毒性腹泻疫苗", planned: 3760, done: 3208, days: 24, start: "06-20" },
     { id: "cd", name: "梭菌病多联疫苗", planned: 2540, done: 2489, days: 12, start: "07-15" },
     { id: "mast", name: "乳房炎疫苗", planned: 2180, done: 1742, days: 15, start: "08-02" },
+    { id: "anth", name: "炭疽芽孢疫苗", planned: 5860, done: 5721, days: 19, start: "09-10" },
+    { id: "lep", name: "钩端螺旋体疫苗", planned: 3420, done: 2986, days: 16, start: "10-06" },
+    { id: "rota", name: "轮状病毒疫苗", planned: 2960, done: 2703, days: 14, start: "11-02" },
+    { id: "past", name: "巴氏杆菌疫苗", planned: 4130, done: 3742, days: 20, start: "12-08" },
+    { id: "bruc", name: "布鲁氏菌疫苗", planned: 5240, done: 5108, days: 22, start: "01-16" },
   ],
   "近半年": [
     { id: "fmd", name: "口蹄疫疫苗", planned: 3120, done: 3044, days: 14, start: "09-06" },
