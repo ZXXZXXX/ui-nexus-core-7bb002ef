@@ -96,9 +96,9 @@ function SymptomKBMobile() {
                   {i + 1}
                 </span>
                 <span className="flex-1 text-body text-foreground truncate">{s.name}</span>
-                <span className="text-caption text-text-tertiary tabular-nums">{s.recent7d} 头次</span>
                 <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />
               </button>
+
             ))}
           </div>
         </section>
@@ -159,12 +159,8 @@ function SymptomDetailSheet({ item, onClose }: { item: Symptom; onClose: () => v
           </button>
         </div>
 
-        <div className="mb-3 space-y-2">
-          <div className="text-caption text-text-tertiary">近 7 天 {item.recent7d} 头次</div>
-          <StatScopeCard metrics={symptomStats(item.id)} />
-        </div>
-
         <Section label="具体描述">
+
           <p className="text-body-sm text-text-secondary leading-relaxed">{item.desc}</p>
         </Section>
 
