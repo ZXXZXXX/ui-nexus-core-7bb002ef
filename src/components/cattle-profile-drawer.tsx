@@ -12,6 +12,7 @@ import {
   FilePlus2,
   MessageSquareWarning,
   ListChecks,
+  Image as ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -79,7 +80,7 @@ export function CattleProfileDrawer({
   onOpenChange: (v: boolean) => void;
   cow: CattleProfile | null;
 }) {
-  const [tab, setTab] = useState<"diagnoses" | "meds" | "tests" | "moves" | "events" | "orders">("diagnoses");
+  const [tab, setTab] = useState<"diagnoses" | "meds" | "tests" | "moves" | "events" | "orders" | "screenings">("diagnoses");
   const historyRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -275,6 +276,7 @@ export function CattleProfileDrawer({
                 { key: "tests" as const, label: "检测记录" },
                 { key: "moves" as const, label: "转栏记录" },
                 { key: "events" as const, label: "产犊记录" },
+                { key: "screenings" as const, label: "排查记录" },
               ].map((t) => {
                 const active = tab === t.key;
                 return (
@@ -311,6 +313,8 @@ export function CattleProfileDrawer({
                 <EventHistory />
               ) : tab === "orders" ? (
                 <OrderHistory />
+              ) : tab === "screenings" ? (
+                <ScreeningHistory />
               ) : (
                 <MoveHistory />
               )}
@@ -851,6 +855,117 @@ function OrderHistory() {
           <div className="text-caption text-text-tertiary mt-1">执行人 {o.executor}</div>
         </div>
       ))}
+    </div>
+  );
+}
+
+/** 排查记录：移动端异常排查反馈结论 + 现场照片，或由排查发起的健康上报工单 */
+type ScreeningRecord = {
+  id: string;
+  date: string;
+  source: string;
+  result: "无需治疗" | "疾病上报";
+  reason?: string;
+  note?: string;
+  order?: { no: string; type: string; status: string };
+  photos: number;
+  operator: string;
+};
+
+const ALL_SCREENINGS: ScreeningRecord[] = [
+  {
+    id: "S-004",
+    date: "2026-05-18",
+    source: "预警排查 · 反刍异常",
+    result: "疾病上报",
+    order: { no: "WO-20260518-014", type: "疾病诊疗", status: "已完成" },
+    note: "左后乳区红肿，已现场上报",
+    photos: 3,
+    operator: "李雨晴",
+  },
+  {
+    id: "S-003",
+    date: "2026-04-22",
+    source: "预警排查 · 活动量下降",
+    result: "无需治疗",
+    reason: "设备误报",
+    note: "牛只采食正常，颈环松动导致数据异常",
+    photos: 2,
+    operator: "周凯",
+  },
+  {
+    id: "S-002",
+    date: "2026-03-12",
+    source: "预警排查 · 采食量下降",
+    result: "疾病上报",
+    order: { no: "WO-20260312-006", type: "疾病诊疗", status: "已完成" },
+    photos: 2,
+    operator: "李雨晴",
+  },
+  {
+    id: "S-001",
+    date: "2026-02-08",
+    source: "日常巡栏排查",
+    result: "无需治疗",
+    reason: "观察后恢复正常",
+    photos: 1,
+    operator: "王场长",
+  },
+];
+
+function ScreeningHistory() {
+  return (
+    <div>
+      <div className="text-caption text-text-tertiary mb-1">共 {ALL_SCREENINGS.length} 条</div>
+      <div className="rounded-xl border border-border bg-card divide-y divide-border">
+        {ALL_SCREENINGS.map((s) => (
+          <div key={s.id} className="px-3 py-2.5">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex min-w-0 flex-1 items-center gap-3">
+                <span className="shrink-0 font-mono text-caption text-text-secondary">{s.date}</span>
+                <span className="truncate text-body-sm text-foreground">{s.source}</span>
+              </div>
+              <span
+                className={`shrink-0 rounded-md px-1.5 py-0.5 text-caption ${
+                  s.result === "疾病上报" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-600"
+                }`}
+              >
+                {s.result}
+              </span>
+            </div>
+
+            {s.result === "无需治疗" && s.reason ? (
+              <div className="mt-1 text-caption text-text-secondary">原因：{s.reason}</div>
+            ) : null}
+            {s.note ? <div className="mt-1 text-caption text-text-secondary">说明：{s.note}</div> : null}
+
+            {s.order ? (
+              <div className="mt-2 flex items-center gap-2 rounded-lg bg-muted/50 px-2.5 py-1.5">
+                <FilePlus2 className="h-3.5 w-3.5 shrink-0 text-primary" />
+                <span className="font-mono text-caption text-text-secondary">{s.order.no}</span>
+                <span className="text-caption text-text-secondary">{s.order.type}</span>
+                <span className="ml-auto text-caption text-text-tertiary">{s.order.status}</span>
+              </div>
+            ) : null}
+
+            {s.photos > 0 ? (
+              <div className="mt-2 flex items-center gap-1.5">
+                {Array.from({ length: s.photos }).map((_, i) => (
+                  <span
+                    key={i}
+                    className="h-10 w-10 rounded-md bg-muted inline-flex items-center justify-center text-text-tertiary"
+                  >
+                    <ImageIcon className="h-4 w-4" />
+                  </span>
+                ))}
+                <span className="ml-1 text-caption text-text-tertiary">现场照片 {s.photos} 张</span>
+              </div>
+            ) : null}
+
+            <div className="mt-1 text-caption text-text-tertiary">排查人 {s.operator}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
