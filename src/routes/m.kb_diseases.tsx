@@ -128,8 +128,10 @@ function DiseaseKBMobile() {
                   {i + 1}
                 </span>
                 <span className="flex-1 text-body text-foreground truncate">{d.name}</span>
+                <span className="text-caption text-text-tertiary tabular-nums">{d.recent7d} 头</span>
                 <ChevronRight className="h-3.5 w-3.5 text-text-tertiary" />
               </button>
+
 
             ))}
           </div>
@@ -192,7 +194,10 @@ function DiseaseDetailSheet({ item, onClose }: { item: Disease; onClose: () => v
           </button>
         </div>
 
+        <div className="mb-3 text-caption text-text-tertiary">近 7 天 {item.recent7d} 头</div>
+
         <Section label="易感牛群">
+
 
           <div className="flex flex-wrap gap-1.5">
             {(item.groups.length ? item.groups : ["未标注"]).map((g) => (
