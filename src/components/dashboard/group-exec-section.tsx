@@ -750,7 +750,7 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: 
     <SectionCard
       id="topic-premature-trend"
       title="早产率变化趋势"
-      desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
+      desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
