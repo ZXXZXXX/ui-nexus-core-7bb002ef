@@ -680,7 +680,7 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: str
     <SectionCard
       id="topic-pp-rank"
       title="产后淘汰率趋势"
-      desc={`${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
+      desc={scopeLabel === null ? period : `${scopeLabel ?? scopeRegion ?? "全部牧场"} · ${period}`}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
