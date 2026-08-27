@@ -348,7 +348,7 @@ export function DiseaseStatsSection() {
             <div className="flex items-center gap-2 min-w-0">
               <PieChart className="h-4 w-4 text-text-tertiary shrink-0" strokeWidth={1.75} />
               <p className="text-body-sm text-text-secondary truncate">
-                {!isFarm && `${focus.name} · `}{activeCat ? `${activeCat.name}明细` : "疾病类别分布"}
+                {activeCat ? `${activeCat.name}明细` : "疾病类别分布"}
               </p>
             </div>
             {activeCat && (
