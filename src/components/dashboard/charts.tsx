@@ -574,7 +574,7 @@ export function GaugeArc({
     `M ${p(a)} A ${r} ${r} 0 ${b - a > Math.PI ? 1 : 0} 1 ${p(b)}`;
   return (
     <div className="relative shrink-0" style={{ width: size, height: size * 0.78 }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="absolute inset-0">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="absolute inset-0 pointer-events-none">
         <path d={arc(start, end)} fill="none" stroke="var(--bg-surface-subtle)" strokeWidth="14" strokeLinecap="round" />
         <path d={arc(start, at)} fill="none" stroke={color} strokeWidth="14" strokeLinecap="round" />
       </svg>
