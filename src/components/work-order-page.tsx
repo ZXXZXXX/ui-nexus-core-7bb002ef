@@ -304,12 +304,15 @@ export function WorkOrderPage({
   orders: baseOrders,
   createKind,
   createPrefix,
+  disabled = false,
 }: {
   title: string;
   orders: WorkOrder[];
   /** 支持新建工单时传入对应处方类型 */
   createKind?: CreateRxKind;
   createPrefix?: string;
+  /** 禁用态：不展示任何数据，页面不可交互 */
+  disabled?: boolean;
 }) {
   const role = usePcRole();
   const [createOpen, setCreateOpen] = useState(false);
@@ -759,6 +762,22 @@ export function WorkOrderPage({
 
     }
   };
+
+  if (disabled) {
+    return (
+      <TooltipProvider delayDuration={200}>
+        <AppHeader title={title} breadcrumb={["工单管理", title]} />
+        <main className="flex-1 px-6 py-6">
+          <Card className="border-border bg-card">
+            <div className="flex flex-col items-center justify-center gap-2 py-24 text-text-tertiary select-none">
+              <ClipboardList className="h-10 w-10 opacity-40" />
+              <p className="text-body">暂无数据</p>
+            </div>
+          </Card>
+        </main>
+      </TooltipProvider>
+    );
+  }
 
   return (
     <TooltipProvider delayDuration={200}>
