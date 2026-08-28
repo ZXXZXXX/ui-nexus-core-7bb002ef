@@ -365,8 +365,7 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
     if (difficulty == null) return toast.error("请选择产犊难易度评分");
     if (injury == null) return toast.error("请选择产道损伤等级");
     if (!colUse) return toast.error("请选择初乳用途");
-    if (!colQuality) return toast.error("请选择初乳质量");
-    if (!colBag) return toast.error("请选择袋号");
+    if (!colBag) return toast.error("请填写袋号");
     if (!colAmount) return toast.error("请填写初乳量");
     if (!colBrix) return toast.error("请填写白利度");
 
