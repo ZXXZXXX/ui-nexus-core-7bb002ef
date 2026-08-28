@@ -184,8 +184,8 @@ function TodayTasksPage() {
     (typeof SHIFT_STAFF)[number] | null
   >(null);
   const assignees = useAssignees();
-  // 兽医/场长可指定责任人
-  const canAssign = role === "vet" || role === "manager";
+  // 批量选择时所有角色均可指定责任人
+  const canAssign = true;
 
   const commitAssign = (s: (typeof SHIFT_STAFF)[number]) => {
     const ids = Array.from(selected);
