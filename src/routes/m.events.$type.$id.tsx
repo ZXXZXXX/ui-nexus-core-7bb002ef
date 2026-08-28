@@ -342,6 +342,17 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
   const [colUse, setColUse] = useState("");
   const [colQuality, setColQuality] = useState("");
   const [colBag, setColBag] = useState("");
+  // 白利度自动判定初乳质量
+  useEffect(() => {
+    const n = parseFloat(colBrix);
+    if (Number.isNaN(n)) {
+      setColQuality("");
+      return;
+    }
+    if (n >= 22 && n <= 28) setColQuality("好");
+    else if (n >= 19 && n < 22) setColQuality("一般");
+    else setColQuality("坏");
+  }, [colBrix]);
   // 初乳编码：大牛耳号 + 年份后两位和月份
   const colCode = `${id}-${String(new Date().getFullYear()).slice(2)}${String(new Date().getMonth() + 1).padStart(2, "0")}`;
 
