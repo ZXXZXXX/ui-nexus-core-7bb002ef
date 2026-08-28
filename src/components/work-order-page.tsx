@@ -320,7 +320,8 @@ export function WorkOrderPage({
   const orders = useMemo(() => [...createdOrders, ...baseOrders], [createdOrders, baseOrders]);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const [active, setActive] = useState<StatusKey>("待诊断");
+  const [filterStatus, setFilterStatus] = useState<StatusKey | "all">("all");
+  const [filterCategory, setFilterCategory] = useState<"all" | "初诊" | "复诊">("all");
   const [detail, setDetail] = useState<WorkOrder | null>(null);
   const [mode, setMode] = useState<"view" | "process">("view");
   const [confirm, setConfirm] = useState<"approve" | "reject" | null>(null);
@@ -494,9 +495,6 @@ export function WorkOrderPage({
     setConfirm("approve");
   };
 
-  const counts = Object.fromEntries(
-    statusList.map((s) => [s.key, orders.filter((o) => effectiveStatus(o) === s.key).length]),
-  ) as Record<StatusKey, number>;
 
   const proposers = useMemo(
     () => Array.from(new Set(orders.map((o) => o.proposer).filter(Boolean))),
@@ -533,7 +531,13 @@ export function WorkOrderPage({
       .filter((o) => (advProposer === "all" ? true : o.proposer === advProposer))
       .filter((o) =>
         advExecutor === "all" ? true : effectiveExecutors(o).includes(advExecutor),
-      );
+      )
+      .filter((o) => (filterStatus === "all" ? true : effectiveStatus(o) === filterStatus))
+      .filter((o) => {
+        if (filterCategory === "all") return true;
+        const isReview = /复诊|复查/.test(`${o.desc ?? ""}${o.event ?? ""}`);
+        return filterCategory === "复诊" ? isReview : !isReview;
+      });
 
     const key = sortKey;
     return [...list].sort((a, b) => {
@@ -549,9 +553,9 @@ export function WorkOrderPage({
           : key === "reviewedAt"
             ? parseTime(b.reviewedAt)
             : parseTime(b.executedAt);
-    return sortDir === "asc" ? va - vb : vb - va;
+      return sortDir === "asc" ? va - vb : vb - va;
     });
-  }, [orders, active, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
+  }, [orders, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, filterStatus, filterCategory, sortKey, sortDir, deletedIds]);
 
   const leftFrozenKeys: ColKey[] = ["id"];
   const rightFrozenKeys: ColKey[] = ["action"];
@@ -906,6 +910,29 @@ export function WorkOrderPage({
 
                 <div className="space-y-3 border-t border-border pt-4">
                   <div>
+                    <div className="text-caption text-text-tertiary mb-1.5">工单状态</div>
+                    <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as StatusKey | "all")}>
+                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部</SelectItem>
+                        {statusList.map((s) => (
+                          <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <div className="text-caption text-text-tertiary mb-1.5">诊疗属性</div>
+                    <Select value={filterCategory} onValueChange={(v) => setFilterCategory(v as "all" | "初诊" | "复诊")}>
+                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部</SelectItem>
+                        <SelectItem value="初诊">初诊</SelectItem>
+                        <SelectItem value="复诊">复诊</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <div className="text-caption text-text-tertiary mb-1.5">提出人</div>
                     <Select value={advProposer} onValueChange={setAdvProposer}>
                       <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
@@ -929,27 +956,6 @@ export function WorkOrderPage({
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <div className="text-caption text-text-tertiary mb-1.5">排序字段</div>
-                    <Select value={sortKey} onValueChange={(v) => setSortKey(v as typeof sortKey)}>
-                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="proposedAt">提出时间</SelectItem>
-                        <SelectItem value="reviewedAt">诊断时间</SelectItem>
-                        <SelectItem value="executedAt">执行时间</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <div className="text-caption text-text-tertiary mb-1.5">排序方向</div>
-                    <Select value={sortDir} onValueChange={(v) => setSortDir(v as "asc" | "desc")}>
-                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="desc">倒序（新 → 旧）</SelectItem>
-                        <SelectItem value="asc">正序（旧 → 新）</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
               </div>
               <SheetFooter className="px-5 py-4 border-t border-border flex-row gap-2">
@@ -957,6 +963,8 @@ export function WorkOrderPage({
                   variant="outline"
                   className="flex-1"
                   onClick={() => {
+                    setFilterStatus("all");
+                    setFilterCategory("all");
                     setAdvProposer("all");
                     setAdvExecutor("all");
                   }}
@@ -1826,7 +1834,7 @@ export function WorkOrderPage({
               createdAt: stamp,
             };
             setCreatedOrders((prev) => [order, ...prev]);
-            setActive("待诊断");
+            setFilterStatus("待诊断");
           }}
         />
       )}
