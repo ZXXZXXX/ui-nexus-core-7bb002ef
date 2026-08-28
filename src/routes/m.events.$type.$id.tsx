@@ -489,11 +489,11 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
               />
             </Field>
             <Field label="初乳质量" required>
-              <input
-                value={colQuality || "输入白利度后自动判断"}
-                readOnly
-                className={`${inputCls} ${colQuality ? "text-foreground" : "text-text-tertiary"} bg-muted/40`}
-              />
+              <div className="grid grid-cols-3 gap-2">
+                {(["好", "一般", "坏"] as const).map((q) => (
+                  <ChoiceBtn key={q} label={q} active={colQuality === q} onClick={() => {}} disabled />
+                ))}
+              </div>
             </Field>
           </div>
         </section>
@@ -857,13 +857,26 @@ function AutoField({ label, value, mono }: { label: string; value: string; mono?
   );
 }
 
-function ChoiceBtn({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function ChoiceBtn({
+  label,
+  active,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={`h-10 rounded-lg text-body-sm ${
-        active ? "bg-primary text-primary-foreground" : "bg-card border border-border text-text-secondary"
+        active
+          ? "bg-primary text-primary-foreground"
+          : "bg-card border border-border text-text-secondary disabled:opacity-60 disabled:cursor-not-allowed"
       }`}
     >
       {label}
