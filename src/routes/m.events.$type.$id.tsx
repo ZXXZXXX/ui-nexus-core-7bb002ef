@@ -857,13 +857,26 @@ function AutoField({ label, value, mono }: { label: string; value: string; mono?
   );
 }
 
-function ChoiceBtn({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+function ChoiceBtn({
+  label,
+  active,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={`h-10 rounded-lg text-body-sm ${
-        active ? "bg-primary text-primary-foreground" : "bg-card border border-border text-text-secondary"
+        active
+          ? "bg-primary text-primary-foreground"
+          : "bg-card border border-border text-text-secondary disabled:opacity-60 disabled:cursor-not-allowed"
       }`}
     >
       {label}
