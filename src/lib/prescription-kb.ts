@@ -7647,7 +7647,7 @@ export const PRESCRIPTION_SEED: RxSeed[] = [
     "duration": 1,
     "summaryAuto": false,
     "summary": "乙酰氨基阿维菌素注射液（科星），一次量，连续1天。",
-    "extra": "200kg-300kg体重",
+    "extra": "",
     "drugs": [
       {
         "id": "RX-000071-M01",
@@ -7672,8 +7672,26 @@ export const PRESCRIPTION_SEED: RxSeed[] = [
           "noon": 0,
           "evening": 0
         },
-        "variable": false,
-        "fixedDose": "6ml",
+        "variable": true,
+        "variableKind": "weight",
+        "varDose": [
+          {
+            "option": "200-300kg",
+            "dose": "6ml/次"
+          },
+          {
+            "option": "300-400kg",
+            "dose": "7ml/次"
+          },
+          {
+            "option": "400-500kg",
+            "dose": "8ml/次"
+          },
+          {
+            "option": "500kg及以上",
+            "dose": "10ml/次"
+          }
+        ],
         "doseNote": "一次量"
       }
     ],
