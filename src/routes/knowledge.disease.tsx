@@ -856,7 +856,7 @@ function DetailView({ value }: { value: Disease }) {
             {value.prescriptions.map((p) => {
               const seed = PRESCRIPTION_SEED.find((r) => r.code === p.code);
               return (
-                <div key={p.code} className="rounded-md bg-surface-subtle px-3 py-2.5 space-y-1.5">
+                <div key={p.code} className="rounded-md bg-white border border-border px-3 py-2.5 space-y-1.5">
                   <div className="flex items-center gap-2 text-body">
                     <span className="text-foreground">{p.name}</span>
                     <span className="font-mono text-body-sm text-text-tertiary">{p.code}</span>
