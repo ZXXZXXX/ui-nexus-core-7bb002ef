@@ -456,7 +456,10 @@ function DiseaseKBPage() {
       <Sheet open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
           <SheetHeader className="px-6 pt-6 pb-2">
-            <SheetTitle className="text-section-title">疾病详情</SheetTitle>
+            <SheetTitle className="text-section-title flex items-baseline gap-2">
+              <span>{viewing?.name ?? "疾病详情"}</span>
+              {viewing?.code && <span className="text-body-sm font-normal text-text-tertiary font-mono">{viewing.code}</span>}
+            </SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-2 space-y-4">
             {viewing && <DetailView value={viewing} />}
