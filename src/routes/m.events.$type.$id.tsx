@@ -340,19 +340,16 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
   const [colAmount, setColAmount] = useState("");
   const [colBrix, setColBrix] = useState(""); // 白利度
   const [colUse, setColUse] = useState("");
-  const [colQuality, setColQuality] = useState("");
   const [colBag, setColBag] = useState("");
-  // 白利度自动判定初乳质量
-  useEffect(() => {
-    const n = parseFloat(colBrix);
-    if (Number.isNaN(n)) {
-      setColQuality("");
-      return;
-    }
-    if (n >= 22 && n <= 28) setColQuality("好");
-    else if (n >= 19 && n < 22) setColQuality("一般");
-    else setColQuality("坏");
-  }, [colBrix]);
+  // 白利度自动判定初乳质量（直接派生，随输入即时更新）
+  const brixNum = parseFloat(colBrix);
+  const colQuality = Number.isNaN(brixNum)
+    ? ""
+    : brixNum >= 22 && brixNum <= 28
+      ? "好"
+      : brixNum >= 19 && brixNum < 22
+        ? "一般"
+        : "坏";
   // 初乳编码：大牛耳号 + 年份后两位和月份
   const colCode = `${id}-${String(new Date().getFullYear()).slice(2)}${String(new Date().getMonth() + 1).padStart(2, "0")}`;
 
