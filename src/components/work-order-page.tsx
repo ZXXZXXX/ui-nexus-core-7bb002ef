@@ -624,6 +624,8 @@ export function WorkOrderPage({
         return `提出 ${o.createdAt ?? ""}${o.reviewedAt ? ` · 诊断 ${o.reviewedAt}` : ""}${o.executedAt ? ` · 执行 ${o.executedAt}` : ""}`;
       case "staff": {
         const list = effectiveExecutors(o);
+        // 疫苗免疫 / 驱虫工单：由平台发起，仅一名执行人
+        if (platformOrder) return `平台 → ${list[0] ?? "未指派"}`;
         return `${o.proposer ?? ""} → ${list.length ? list.join("、") : "未指派"}`;
       }
       case "pickup":
@@ -700,9 +702,11 @@ export function WorkOrderPage({
         );
       case "staff": {
         const list = effectiveExecutors(o);
-        const text = list.length
-          ? `${o.proposer} → ${list.join("、")}`
-          : `${o.proposer} → 未指派`;
+        const text = platformOrder
+          ? `平台 → ${list[0] ?? "未指派"}`
+          : list.length
+            ? `${o.proposer} → ${list.join("、")}`
+            : `${o.proposer} → 未指派`;
         return (
           <span className="text-body-sm text-text-secondary truncate" title={text}>
             {text}
