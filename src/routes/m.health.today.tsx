@@ -311,8 +311,7 @@ function TodayTasksPage() {
 
   // 基础事件下仅「孕检」「转群/转栏」可批量选择，且两类互斥
   const isBasicEvent = kindFilter === "基础事件";
-  const selectableTask = (t: HomeTask) =>
-    !isBasicEvent || BATCH_EVENT_TYPES.includes(t.type);
+  const selectableTask = (_t: HomeTask) => true;
   const selectedEventType = useMemo(() => {
     if (!isBasicEvent) return null;
     const first = tabTasks.find((t) => selected.has(t.id));
@@ -973,18 +972,33 @@ function TodayTasksPage() {
       {/* 底部操作栏(多选态):按流程单一 CTA — 先取药,再拍照记录 */}
       {selectMode && tasks.length > 0 && (() => {
         const selectedTasks = tasks.filter((t) => selected.has(t.id));
-        const subText =
-          isBasicEvent
-            ? count === 0
-              ? "仅「孕检」「转群/转栏」可批量处理"
-              : `批量${selectedEventType ?? ""}`
-            : count === 0
-            ? "勾选要一次处理的任务"
-            : canAssign
-              ? "可指定责任人或直接执行"
-              : "下一步：批量执行";
         const allIds = selectedTasks.map((t) => t.id).join(",");
         const canExecuteBatch = role !== "manager";
+        // 批量执行条件：同类免疫/驱虫工单且具体内容一致，或同一基础事件
+        const first = selectedTasks[0];
+        const batchExecOk = (() => {
+          if (!first) return false;
+          if (isBasicEvent)
+            return selectedTasks.every((t) => t.type === first.type);
+          if (first.type !== "疫苗免疫" && first.type !== "驱虫") return false;
+          if (!selectedTasks.every((t) => t.type === first.type)) return false;
+          const txt = taskCardContent(first, "待执行");
+          return selectedTasks.every(
+            (t) => taskCardContent(t, "待执行") === txt,
+          );
+        })();
+        const subText =
+          count === 0
+            ? isBasicEvent
+              ? "勾选同一类基础事件任务"
+              : "勾选要一次处理的任务"
+            : batchExecOk
+              ? isBasicEvent
+                ? `批量${first?.type ?? ""}`
+                : `批量${first?.type ?? ""} · 内容一致`
+              : isBasicEvent
+                ? "需为同一基础事件任务"
+                : "需为同类免疫/驱虫工单且内容一致";
         return (
           <div className="fixed bottom-0 inset-x-0 z-30 bg-card/95 backdrop-blur border-t border-border px-4 py-3 pb-[calc(env(safe-area-inset-bottom)+12px)] max-w-[440px] mx-auto">
             <div className="flex items-center justify-between mb-2">
@@ -1019,11 +1033,19 @@ function TodayTasksPage() {
               {canExecuteBatch && (
                 <button
                   type="button"
-                  disabled={count === 0}
+                  disabled={count === 0 || !batchExecOk}
                   onClick={() => {
+                    if (isBasicEvent) {
+                      navigate({
+                        to: "/m/health/today/batch",
+                        search: { ids: allIds },
+                      });
+                      return;
+                    }
                     navigate({
-                      to: "/m/health/today/batch",
-                      search: { ids: allIds },
+                      to: "/m/health/$id/execute",
+                      params: { id: first!.id },
+                      search: { merge: allIds },
                     });
                   }}
                   className="flex-1 h-11 rounded-full bg-primary text-primary-foreground text-body-sm font-medium inline-flex items-center justify-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none active:scale-[.97] transition-transform"
