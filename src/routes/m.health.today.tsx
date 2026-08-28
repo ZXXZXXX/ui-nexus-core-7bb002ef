@@ -152,9 +152,6 @@ function AssigneeBadge({ name }: { name: string }) {
   );
 }
 
-/** 基础事件中支持批量执行的类型（互斥，一次只能批量处理一类） */
-const BATCH_EVENT_TYPES = ["孕检", "转群/转栏"];
-
 function TodayTasksPage() {
   const role = useRole();
   const navigate = useNavigate();
