@@ -534,7 +534,13 @@ export function WorkOrderPage({
       .filter((o) => (advProposer === "all" ? true : o.proposer === advProposer))
       .filter((o) =>
         advExecutor === "all" ? true : effectiveExecutors(o).includes(advExecutor),
-      );
+      )
+      .filter((o) => (filterStatus === "all" ? true : effectiveStatus(o) === filterStatus))
+      .filter((o) => {
+        if (filterCategory === "all") return true;
+        const isReview = /复诊|复查/.test(`${o.desc ?? ""}${o.event ?? ""}`);
+        return filterCategory === "复诊" ? isReview : !isReview;
+      });
 
     const key = sortKey;
     return [...list].sort((a, b) => {
@@ -550,9 +556,9 @@ export function WorkOrderPage({
           : key === "reviewedAt"
             ? parseTime(b.reviewedAt)
             : parseTime(b.executedAt);
-    return sortDir === "asc" ? va - vb : vb - va;
+      return sortDir === "asc" ? va - vb : vb - va;
     });
-  }, [orders, active, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, sortKey, sortDir, deletedIds]);
+  }, [orders, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, filterStatus, filterCategory, sortKey, sortDir, deletedIds]);
 
   const leftFrozenKeys: ColKey[] = ["id"];
   const rightFrozenKeys: ColKey[] = ["action"];
