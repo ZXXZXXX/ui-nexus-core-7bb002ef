@@ -649,6 +649,16 @@ export function actualDoseText(dose: string, weightKg: number): string {
   return dose;
 }
 
+/** 批量执行：把单只剂量文本按头数汇总，如 "22mL / 次" × 12 → "264mL" */
+export function totalDoseText(doseText: string, count: number): string | null {
+  if (count <= 1) return null;
+  const m = doseText.match(/^([\d.]+)\s*(万\s*IU|mL|ml|g|mg|支|瓶|袋|片)/i);
+  if (!m) return null;
+  const v = Math.round(parseFloat(m[1]) * count * 10) / 10;
+  const unit = m[2].replace(/\s+/g, " ");
+  return `${v}${unit.startsWith("万") ? " " + unit : unit}`;
+}
+
 export function getWoPlan(id: string, workType?: string, disease?: string): WoPlan {
   const mapped = WO_MAP[id];
   if (mapped) {
