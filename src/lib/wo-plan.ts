@@ -677,6 +677,7 @@ export function getWoPlan(id: string, workType?: string, disease?: string): WoPl
       : "zigongyan_p2");
   const p = PLANS[key];
   return {
+    weightKg: 500,
     disease: disease ?? p.disease,
     prescription: p.prescription,
     drugs: p.drugs.slice(),
