@@ -1833,7 +1833,7 @@ export function WorkOrderPage({
               createdAt: stamp,
             };
             setCreatedOrders((prev) => [order, ...prev]);
-            setActive("待诊断");
+            setFilterStatus("待诊断");
           }}
         />
       )}
