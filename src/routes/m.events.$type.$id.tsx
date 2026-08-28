@@ -456,6 +456,15 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
           </Field>
 
           <div className="grid grid-cols-2 gap-3">
+            <Field label="初乳量 (L)" required>
+              <input
+                type="number"
+                inputMode="decimal"
+                value={colAmount}
+                onChange={(e) => setColAmount(e.target.value)}
+                className={inputCls}
+              />
+            </Field>
             <Field label="袋号" required>
               <input
                 type="number"
@@ -464,15 +473,6 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
                 onChange={(e) => setColBag(e.target.value)}
                 className={inputCls}
                 placeholder="采集袋数"
-              />
-            </Field>
-            <Field label="初乳量 (L)" required>
-              <input
-                type="number"
-                inputMode="decimal"
-                value={colAmount}
-                onChange={(e) => setColAmount(e.target.value)}
-                className={inputCls}
               />
             </Field>
           </div>
