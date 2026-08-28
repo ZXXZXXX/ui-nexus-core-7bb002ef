@@ -450,24 +450,22 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
             </div>
           </Field>
 
-          <Field label="初乳质量" required>
-            <div className="grid grid-cols-4 gap-2">
-              {(["好", "一般", "坏", "未知"] as const).map((k) => (
-                <ChoiceBtn key={k} label={k} active={colQuality === k} onClick={() => setColQuality(k)} />
-              ))}
-            </div>
-          </Field>
-
           <Field label="初乳编码">
             <input value={colCode} readOnly className={`${inputCls} bg-muted/40 text-text-secondary`} />
             <div className="text-caption text-text-tertiary mt-1">系统自动生成</div>
           </Field>
 
-          <Field label="袋号" required>
-            <ScoreRow min={1} max={5} value={colBag ? Number(colBag) : null} onChange={(n) => setColBag(String(n))} />
-          </Field>
-
           <div className="grid grid-cols-2 gap-3">
+            <Field label="袋号" required>
+              <input
+                type="number"
+                inputMode="numeric"
+                value={colBag}
+                onChange={(e) => setColBag(e.target.value)}
+                className={inputCls}
+                placeholder="采集袋数"
+              />
+            </Field>
             <Field label="初乳量 (L)" required>
               <input
                 type="number"
@@ -477,6 +475,9 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
                 className={inputCls}
               />
             </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <Field label="白利度 (%)" required>
               <input
                 type="number"
@@ -484,6 +485,14 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
                 value={colBrix}
                 onChange={(e) => setColBrix(e.target.value)}
                 className={inputCls}
+                placeholder="输入白利度"
+              />
+            </Field>
+            <Field label="初乳质量" required>
+              <input
+                value={colQuality || "输入白利度后自动判断"}
+                readOnly
+                className={`${inputCls} ${colQuality ? "text-foreground" : "text-text-tertiary"} bg-muted/40`}
               />
             </Field>
           </div>
