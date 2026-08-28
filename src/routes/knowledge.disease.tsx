@@ -812,7 +812,7 @@ function DetailView({ value }: { value: Disease }) {
         />
         {value.groups.length > 0 && (
           <KV
-            label="适用牛群"
+           label="易感牛群"
             valueNode={
               <div className="flex flex-wrap gap-1">
                 {value.groups.map((g) => <span key={g} className="tag tag-muted">{g}</span>)}
