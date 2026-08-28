@@ -649,20 +649,9 @@ export function WorkOrderPage({
     switch (key) {
       case "id":
         return <span className="font-mono text-body text-foreground">{o.id}</span>;
-      case "target": {
-        const parts = o.target.split(/[,，、;；\n]+/).map((s) => s.trim()).filter(Boolean);
-        const first = parts[0] ?? "";
-        const truncated = first.length > 16 ? first.slice(0, 16) + "…" : first;
-        const extra = parts.length - 1;
-        return (
-          <span className="inline-flex items-center gap-1 max-w-full">
-            <span className="text-body text-foreground truncate" title={parts.join("、")}>{truncated}</span>
-            {extra > 0 && (
-              <span className="tag tag-muted shrink-0" title={parts.slice(1).join("、")}>+{extra}</span>
-            )}
-          </span>
-        );
-      }
+      case "target":
+        // 对象信息固定为单头牛只耳号
+        return <span className="text-body text-foreground whitespace-nowrap">{o.target}</span>;
       case "status": {
         const st = effectiveStatus(o);
         if (st === "已终止") {
