@@ -129,7 +129,13 @@ export function CreateWorkOrderDialog({
   }, [mode, pickedBarns, pickedCows, parsedInput]);
 
   const rx = rxList.find((r) => r.id === rxId) ?? PRESCRIPTION_SEED.find((r) => r.id === rxId);
-  const canSubmit = selection.count > 0 && !!rx;
+
+  const varDrugs = useMemo(
+    () => (rx?.drugs ?? []).filter((d) => d.variable && (d.varDose?.length ?? 0) > 0),
+    [rx],
+  );
+  const varDone = varDrugs.every((d) => !!varPick[d.id]);
+  const canSubmit = selection.count > 0 && !!rx && varDone;
 
   const reset = () => {
     setMode("cow");
@@ -140,11 +146,17 @@ export function CreateWorkOrderDialog({
     setRawInput("");
     setRxQuery("");
     setRxId("");
+    setVarPick({});
   };
 
   const submit = () => {
     if (!canSubmit || !rx) return;
-    onCreate({ targets: selection.targets, targetLabel: selection.label, rx });
+    const varSelections = varDrugs.map((d) => ({
+      drug: d.drugs.map((x) => x.name).join("+"),
+      option: varPick[d.id],
+      dose: d.varDose?.find((v) => v.option === varPick[d.id])?.dose ?? "",
+    }));
+    onCreate({ targets: selection.targets, targetLabel: selection.label, rx, varSelections });
     toast.success(`已创建${title}，执行对象 ${selection.count} 头`);
     reset();
     onOpenChange(false);
