@@ -2342,12 +2342,15 @@ export function makeOrders(
   return items.map(({ i, proposedAt }) => {
     const ev = pick(events, i);
     const status = statuses[i % statuses.length];
-    const reviewedAt = new Date(proposedAt.getTime() + 60 * 60 * 1000);
-    const executedAt = new Date(proposedAt.getTime() + 8 * 60 * 60 * 1000);
     // 疫苗免疫（YM）/ 驱虫工单（QC）为平台发起，固定"平台"且仅一名执行人
     const isPlatform = prefix === "YM" || prefix === "QC";
+    // 平台工单下发后自动通过诊断：诊断时间与提出时间一致，诊断人为"平台"
+    const reviewedAt = isPlatform
+      ? new Date(proposedAt.getTime())
+      : new Date(proposedAt.getTime() + 60 * 60 * 1000);
+    const executedAt = new Date(proposedAt.getTime() + 8 * 60 * 60 * 1000);
     const proposer = isPlatform ? "平台" : pick(proposersPool, i);
-    const reviewer = pick(reviewersPool, i);
+    const reviewer = isPlatform ? "平台" : pick(reviewersPool, i);
     // 执行人可能多人（1~7 人）；平台工单固定 1 人
     const execCount = isPlatform ? 1 : [1, 1, 2, 3, 5, 7, 4][i % 7];
     const execList = Array.from({ length: execCount }, (_, k) => pick(executorsPool, i + k));
