@@ -426,7 +426,7 @@ function PrescriptionPage() {
             </div>
             <div className="w-[160px] text-right shrink-0">功能</div>
           </div>
-          {list.map((r) => {
+          {shown.map((r) => {
             const checked = selected.has(r.id);
             const drugText =
               r.drugs.map((d) => d.drugs[0]?.name).filter(Boolean).join("、") || "—";
