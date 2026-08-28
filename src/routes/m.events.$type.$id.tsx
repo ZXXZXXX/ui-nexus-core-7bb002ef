@@ -489,11 +489,11 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
               />
             </Field>
             <Field label="初乳质量" required>
-              <input
-                value={colQuality || "输入白利度后自动判断"}
-                readOnly
-                className={`${inputCls} ${colQuality ? "text-foreground" : "text-text-tertiary"} bg-muted/40`}
-              />
+              <div className="grid grid-cols-3 gap-2">
+                {(["好", "一般", "坏"] as const).map((q) => (
+                  <ChoiceBtn key={q} label={q} active={colQuality === q} onClick={() => {}} disabled />
+                ))}
+              </div>
             </Field>
           </div>
         </section>
