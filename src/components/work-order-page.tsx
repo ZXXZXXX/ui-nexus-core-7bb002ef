@@ -556,7 +556,7 @@ export function WorkOrderPage({
       })
       .filter((o) =>
         kw
-          ? [o.id, o.target, o.event, o.proposer]
+          ? [o.id, o.target, o.event ? o.event.split(" · ")[0] : ""]
               .filter(Boolean)
               .some((v) => String(v).toLowerCase().includes(kw))
           : true,
