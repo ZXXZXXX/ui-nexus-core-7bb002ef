@@ -172,7 +172,6 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
     treatable: rxCodes.length > 0,
     groups: (d.groups.length ? d.groups : ["泌乳牛"]) as CattleGroup[],
     status: d.status === "启用" ? "启用" : "停用",
-    order: i + 1,
     symptoms: d.symptoms.map((code, idx) => ({ code, name: symptomName(code), core: idx < 3 })),
     prescriptions: rxCodes.map((code, idx) => ({
       code,
