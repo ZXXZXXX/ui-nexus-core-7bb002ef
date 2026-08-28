@@ -514,7 +514,10 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
             </div>
 
             <div className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-xl bg-muted/40 p-3">
-              <Field label="牛只耳号" required>
+              <div>
+                <div className="text-caption text-text-tertiary mb-1.5">
+                  牛只耳号<span className="text-[var(--state-danger)] ml-0.5">*</span>
+                </div>
                 <input
                   value={c.earTag}
                   onChange={(e) => updateCalf(idx, { earTag: e.target.value })}
@@ -522,8 +525,11 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
                   placeholder="请输入耳号"
                 />
                 <div className="text-caption text-text-tertiary mt-1">系统自动生成，耳标丢失/损坏可手动修改</div>
-              </Field>
-              <AutoField label="出生日期" value={c.birthDate} />
+              </div>
+              <div>
+                <div className="text-caption text-text-tertiary mb-1.5">出生日期</div>
+                <div className="h-11 flex items-center text-body-sm text-foreground font-mono">{c.birthDate}</div>
+              </div>
             </div>
 
 
