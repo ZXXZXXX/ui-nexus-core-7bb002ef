@@ -62,6 +62,17 @@ const D = {
     isPrescription: true,
     isSpecial: true,
   } satisfies PlanDrug,
+  fmdVaccine: {
+    name: "口蹄疫 O 型/A 型二价灭活疫苗",
+    spec: "100ml / 瓶",
+    manufacturer: "中牧实业",
+    use: "颈部肌内注射",
+    dose: "2mL / 次",
+    method: "单次免疫，共 1 次",
+    qty: "1 瓶",
+    isPrescription: false,
+    isSpecial: false,
+  } satisfies PlanDrug,
   rifaximin: {
     name: "利福昔明子宫注入剂（澳利舒）",
     spec: "100ml / 瓶",
@@ -424,6 +435,16 @@ const PLANS = {
       note: "干奶当日一次量乳注，默认 4 支 / 头。",
     },
     drugs: [D.drying_saifukui],
+    days: 1,
+  },
+
+  fmd_vaccine: {
+    disease: "口蹄疫加强免疫",
+    prescription: {
+      name: "口蹄疫疫苗免疫方案",
+      note: "全群加强免疫；颈部肌内注射 2mL/头，单次完成。",
+    },
+    drugs: [D.fmdVaccine],
     days: 1,
   },
 
