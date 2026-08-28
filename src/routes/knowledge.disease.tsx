@@ -439,7 +439,7 @@ function DiseaseKBPage() {
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
           <SheetHeader className="px-6 pt-6 pb-2">
             <SheetTitle className="text-section-title">
-              {editing?.code?.startsWith("DZ-—") ? "新建疾病" : "编辑疾病"}
+              {editing?.code?.startsWith("DZ-—") ? "新建疾病" : editing?.name ?? "编辑疾病"}
             </SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-2 space-y-4">
