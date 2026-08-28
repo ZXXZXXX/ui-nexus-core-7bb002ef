@@ -709,12 +709,14 @@ export function WorkOrderPage({
           </span>
         );
       case "staff": {
-        const list = effectiveExecutors(o);
         const text = platformOrder
-          ? `平台 → ${list[0] ?? "未指派"}`
-          : list.length
-            ? `${o.proposer} → ${list.join("、")}`
-            : `${o.proposer} → 未指派`;
+          ? platformStaffText(o)
+          : (() => {
+              const list = effectiveExecutors(o);
+              return list.length
+                ? `${o.proposer} → ${list.join("、")}`
+                : `${o.proposer} → 未指派`;
+            })();
         return (
           <span className="text-body-sm text-text-secondary truncate" title={text}>
             {text}
