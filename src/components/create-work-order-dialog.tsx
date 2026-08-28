@@ -346,6 +346,43 @@ export function CreateWorkOrderDialog({
                 <div className="py-8 text-center text-caption text-text-tertiary">无可用处方</div>
               )}
             </div>
+
+            {varDrugs.length > 0 && (
+              <div className="space-y-2 pt-1">
+                <div className="text-body-sm font-medium">
+                  3. 选择变量范围
+                  <span className="ml-2 text-caption text-text-tertiary">（该处方含变量给药，需选择后方可提交）</span>
+                </div>
+                {varDrugs.map((d) => (
+                  <div key={d.id} className="border border-border rounded-md p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-body-sm">{d.drugs.map((x) => x.name).join(" + ")}</span>
+                      <span className="ml-auto text-caption text-text-tertiary">
+                        {d.variableKind === "weight" ? "按体重" : d.variableKind === "quarter" ? "按乳区" : "按变量"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(d.varDose ?? []).map((v) => (
+                        <button
+                          key={v.option}
+                          onClick={() => setVarPick((p) => ({ ...p, [d.id]: v.option }))}
+                          className={`h-9 px-2 rounded-md border text-caption transition-colors ${
+                            varPick[d.id] === v.option
+                              ? "border-primary text-primary bg-[rgba(0,161,79,0.05)]"
+                              : "border-border text-text-secondary hover:border-primary/50"
+                          }`}
+                        >
+                          {v.option} · {v.dose}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {!varDone && (
+                  <div className="text-caption text-[var(--state-danger)]">请为每个变量药品选择对应范围</div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
