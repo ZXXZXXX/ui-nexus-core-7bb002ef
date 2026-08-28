@@ -39,7 +39,7 @@ import { MediaGrid } from "@/components/m/media-grid";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
 import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
-import { getWoPlan, buildActionText, computeSessions, type WoPlan, type PlanTask } from "@/lib/wo-plan";
+import { getWoPlan, buildActionText, computeSessions, actualDoseText, type WoPlan, type PlanTask } from "@/lib/wo-plan";
 
 
 import { useRole, canExecute, canDiagnose } from "@/lib/mobile-role";
@@ -1109,11 +1109,13 @@ function buildDayItems(day: number, _tags: string[], _withTemp = false, plan?: W
     });
   });
   const drugs = allDrugs.filter((d) => d.kind !== "therapy");
+  const weightKg = plan?.weightKg ?? 500;
   drugs.forEach((d, idx) => {
+    const actualDose = actualDoseText(d.dose, weightKg);
     items.push({
       id: `d${day}-t${idx + 1}`,
       title: d.name,
-      desc: `${d.dose}（${d.use}）`,
+      desc: `${actualDose}（${d.use}）`,
       status: "pending",
       needMed: true,
       manufacturer: d.manufacturer,
@@ -1121,7 +1123,7 @@ function buildDayItems(day: number, _tags: string[], _withTemp = false, plan?: W
       spec: d.spec,
       useWay: d.use,
       freq: d.method.split(/[，,]/)[0],
-      doseText: d.dose,
+      doseText: actualDose,
 
     });
   });
