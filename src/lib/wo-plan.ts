@@ -634,11 +634,27 @@ const DEFAULT_BY_DISEASE: Record<string, PlanKey> = {
   "白线病": "baixian_p1",
 };
 
+// 将体重相关剂量（如 4.4mL / 100kg、2.2 万 IU / kg）按牛只体重换算为实际单次剂量
+export function actualDoseText(dose: string, weightKg: number): string {
+  const per100 = dose.match(/^([\d.]+)\s*(mL|ml|g|mg)\s*\/\s*100\s*kg/i);
+  if (per100) {
+    const v = Math.round(parseFloat(per100[1]) * (weightKg / 100) * 10) / 10;
+    return `${v}${per100[2]} / 次`;
+  }
+  const perKgIU = dose.match(/^([\d.]+)\s*万\s*IU\s*\/\s*kg/i);
+  if (perKgIU) {
+    const v = Math.round(parseFloat(perKgIU[1]) * weightKg);
+    return `${v} 万 IU / 次`;
+  }
+  return dose;
+}
+
 export function getWoPlan(id: string, workType?: string, disease?: string): WoPlan {
   const mapped = WO_MAP[id];
   if (mapped) {
     const p = PLANS[mapped.key];
     return {
+      weightKg: 500,
       disease: p.disease,
       subType: mapped.subType,
       prescription: p.prescription,
