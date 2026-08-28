@@ -467,7 +467,7 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
                 className={inputCls}
               />
             </Field>
-            <Field label="白利度" required>
+            <Field label="白利度 (%)" required>
               <input
                 type="number"
                 inputMode="decimal"
