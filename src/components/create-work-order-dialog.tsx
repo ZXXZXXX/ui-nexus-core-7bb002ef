@@ -324,7 +324,10 @@ export function CreateWorkOrderDialog({
               {rxList.map((r) => (
                 <button
                   key={r.id}
-                  onClick={() => setRxId(r.id)}
+                  onClick={() => {
+                    setRxId(r.id);
+                    setVarPick({});
+                  }}
                   className={`w-full text-left border rounded-md p-3 transition-colors ${
                     rxId === r.id ? "border-primary bg-[rgba(0,161,79,0.05)]" : "border-border hover:border-primary/50"
                   }`}
