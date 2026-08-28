@@ -1408,8 +1408,8 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
 
 // === 执行页：仅显示当前进行中的当天 checklist ===
 export function ActiveDayExecute({ pickupCode, tags, day = 2, date = "05/13", workOrderId, onReadyChange, batchCount = 1 }: { pickupCode: string | null; tags: string[]; day?: number; date?: string; workOrderId: string; onReadyChange?: (ready: boolean) => void; batchCount?: number }) {
-  // 疾病治疗（WO）/ 产后护理（PP）默认每日测温；修蹄（HF）/ 干奶（GN）/ 损耗（LS）无需测温
-  const noTempPrefix = ["HF", "GN", "LS"].some((p) => workOrderId?.startsWith(p));
+  // 疾病治疗（WO）/ 产后护理（PP）默认每日测温；修蹄（HF）/ 干奶（GN）/ 损耗（LS）/ 疫苗免疫（YM）/ 驱虫（QC）无需测温
+  const noTempPrefix = ["HF", "GN", "LS", "YM", "QC"].some((p) => workOrderId?.startsWith(p));
   let withTemp = !workOrderId || !noTempPrefix;
   if (typeof window !== "undefined") {
     const flag = window.localStorage.getItem(`health:dailyTemp:${workOrderId}`);
