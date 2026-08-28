@@ -132,7 +132,6 @@ type Disease = {
   treatable: boolean;        // 是否治疗
   groups: CattleGroup[];     // 适用牛群
   status: "启用" | "停用";
-  order?: number;
   remark?: string;
   symptoms: SymptomRef[];
   prescriptions: PrescriptionRef[];
@@ -154,7 +153,7 @@ const TYPES: DiseaseType[] = (() => {
 
 const GROUP_OPTIONS: CattleGroup[] = ["泌乳牛", "青年牛", "干奶牛", "围产牛", "犊牛", "育成牛"];
 
-const seed: Disease[] = KB_DISEASES.map((d, i) => {
+const seed: Disease[] = KB_DISEASES.map((d) => {
   const type = TYPES.find((t) => t.name === d.type && t.categoryCode === d.cat);
   const rxCodes = [
     ...(d.rx ?? []),
@@ -210,7 +209,7 @@ function DiseaseKBPage() {
   const [pendingDelete, setPendingDelete] = useState<string[] | null>(null);
 
   const filtered = useMemo(() => {
-    return list.filter((d) => {
+    return [...list].sort((a, b) => a.code.localeCompare(b.code)).filter((d) => {
       const t = typeById(d.typeId);
       if (filterCat !== "all" && t?.categoryCode !== filterCat) return false;
       if (!keyword.trim()) return true;
@@ -590,14 +589,6 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
                 <SelectItem value="停用">停用</SelectItem>
               </SelectContent>
             </Select>
-          </Field>
-          <Field label="排序值">
-            <Input
-              type="number"
-              value={value.order ?? ""}
-              onChange={(e) => onChange({ ...value, order: e.target.value ? Number(e.target.value) : undefined })}
-              placeholder="同类型内排序"
-            />
           </Field>
           <Field label="是否治疗" required hint="选择否将走放弃治疗兜底">
             <Select value={value.treatable ? "yes" : "no"} onValueChange={(v) => onChange({ ...value, treatable: v === "yes" })}>
