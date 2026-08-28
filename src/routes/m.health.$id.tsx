@@ -1109,11 +1109,13 @@ function buildDayItems(day: number, _tags: string[], _withTemp = false, plan?: W
     });
   });
   const drugs = allDrugs.filter((d) => d.kind !== "therapy");
+  const weightKg = plan?.weightKg ?? 500;
   drugs.forEach((d, idx) => {
+    const actualDose = actualDoseText(d.dose, weightKg);
     items.push({
       id: `d${day}-t${idx + 1}`,
       title: d.name,
-      desc: `${d.dose}（${d.use}）`,
+      desc: `${actualDose}（${d.use}）`,
       status: "pending",
       needMed: true,
       manufacturer: d.manufacturer,
@@ -1121,7 +1123,7 @@ function buildDayItems(day: number, _tags: string[], _withTemp = false, plan?: W
       spec: d.spec,
       useWay: d.use,
       freq: d.method.split(/[，,]/)[0],
-      doseText: d.dose,
+      doseText: actualDose,
 
     });
   });
