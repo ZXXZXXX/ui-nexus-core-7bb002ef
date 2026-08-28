@@ -72,6 +72,7 @@ export function CreateWorkOrderDialog({
   const [rawInput, setRawInput] = useState("");
   const [rxQuery, setRxQuery] = useState("");
   const [rxId, setRxId] = useState("");
+  const [varPick, setVarPick] = useState<Record<string, string>>({});
 
   const rxList = useMemo(() => {
     const kw = rxQuery.trim();
