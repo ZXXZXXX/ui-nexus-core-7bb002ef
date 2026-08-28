@@ -259,8 +259,14 @@ function PrescriptionPage() {
   const [editing, setEditing] = useState<Rx | null>(null);
   const [viewing, setViewing] = useState<Rx | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string[] | null>(null);
+  const [kindFilter, setKindFilter] = useState<RxKind | "all">("all");
 
-  const allChecked = list.length > 0 && selected.size === list.length;
+  const shown = useMemo(
+    () => (kindFilter === "all" ? list : list.filter((r) => r.kind === kindFilter)),
+    [list, kindFilter],
+  );
+
+  const allChecked = shown.length > 0 && selected.size === shown.length;
   const someChecked = selected.size > 0 && !allChecked;
 
   const toggleOne = (id: string) =>
