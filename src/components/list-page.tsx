@@ -236,125 +236,122 @@ export function ListPage<T>({
             </div>
           )}
 
-          {dateCols.length > 0 && (
-            <div className="flex items-center gap-1.5">
-              <Select value={dateKey} onValueChange={setDateKey}>
-                <SelectTrigger className="h-9 w-[116px] shrink-0 text-body-sm bg-card border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {dateCols.map((c) => (
-                    <SelectItem key={c.key} value={c.key} className="text-body-sm">
-                      {c.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {dateRangeMode ? (
-                <div className="group inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-card pl-2.5 pr-2 transition-colors hover:border-primary/40 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
-                  <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary transition-colors group-focus-within:text-primary" />
-                  <div className="relative">
-                    <input
-                      type="date"
-                      value={from}
-                      max={to || undefined}
-                      onChange={(e) => {
-                        setFrom(e.target.value);
-                        onDateRangeChange?.({ from: e.target.value, to });
-                      }}
-                      aria-label="开始日期"
-                      className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
-                    />
-                    {!from && (
-                      <span className="pointer-events-none absolute inset-0 flex items-center rounded bg-card px-1 text-body-sm text-text-tertiary">
-                        不限
-                      </span>
+          <div className="ml-auto flex items-center gap-2 shrink-0 flex-wrap xl:flex-nowrap">
+            {dateCols.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <Select value={dateKey} onValueChange={setDateKey}>
+                  <SelectTrigger className="h-9 w-[116px] shrink-0 text-body-sm bg-card border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {dateCols.map((c) => (
+                      <SelectItem key={c.key} value={c.key} className="text-body-sm">
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {dateRangeMode ? (
+                  <div className="group inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-card pl-2.5 pr-2 transition-colors hover:border-primary/40 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+                    <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary transition-colors group-focus-within:text-primary" />
+                    <div className="relative">
+                      <input
+                        type="date"
+                        value={from}
+                        max={to || undefined}
+                        onChange={(e) => {
+                          setFrom(e.target.value);
+                          onDateRangeChange?.({ from: e.target.value, to });
+                        }}
+                        aria-label="开始日期"
+                        className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
+                      />
+                      {!from && (
+                        <span className="pointer-events-none absolute inset-0 flex items-center rounded bg-card px-1 text-body-sm text-text-tertiary">
+                          不限
+                        </span>
+                      )}
+                    </div>
+                    <span className="h-px w-2 shrink-0 bg-border" />
+                    <div className="relative flex items-center gap-1">
+                      <input
+                        type="date"
+                        value={to}
+                        min={from || undefined}
+                        onChange={(e) => {
+                          setTo(e.target.value);
+                          onDateRangeChange?.({ from, to: e.target.value });
+                        }}
+                        aria-label="结束日期"
+                        className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
+                      />
+                      {to === todayStr && (
+                        <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-caption text-primary">
+                          今日
+                        </span>
+                      )}
+                    </div>
+                    {(from || to !== todayStr) && (
+                      <button
+                        onClick={() => {
+                          setFrom("");
+                          setTo(todayStr);
+                          onDateRangeChange?.({ from: "", to: todayStr });
+                        }}
+                        aria-label="重置时间范围"
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-surface-subtle hover:text-foreground"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
                     )}
                   </div>
-                  <span className="h-px w-2 shrink-0 bg-border" />
-                  <div className="relative flex items-center gap-1">
-                    <input
-                      type="date"
-                      value={to}
-                      min={from || undefined}
-                      onChange={(e) => {
-                        setTo(e.target.value);
-                        onDateRangeChange?.({ from, to: e.target.value });
-                      }}
-                      aria-label="结束日期"
-                      className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
-                    />
-                    {to === todayStr && (
-                      <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-caption text-primary">
-                        今日
-                      </span>
-                    )}
+
+                ) : (
+                  <div className="inline-flex h-9 items-center rounded-md border border-border bg-card p-0.5">
+                    {RANGES.map((r) => (
+                      <button
+                        key={r.key}
+                        onClick={() => setRange(r.key)}
+                        className={`h-8 px-2 rounded text-body-sm transition-colors ${
+                          range === r.key
+                            ? "bg-brand-subtle text-primary font-medium"
+                            : "text-text-secondary hover:text-foreground"
+                        }`}
+                      >
+                        {r.label}
+                      </button>
+                    ))}
                   </div>
-                  {(from || to !== todayStr) && (
-                    <button
-                      onClick={() => {
-                        setFrom("");
-                        setTo(todayStr);
-                        onDateRangeChange?.({ from: "", to: todayStr });
-                      }}
-                      aria-label="重置时间范围"
-                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-surface-subtle hover:text-foreground"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  )}
-                </div>
-
-              ) : (
-                <div className="inline-flex h-9 items-center rounded-md border border-border bg-card p-0.5">
-                  {RANGES.map((r) => (
-                    <button
-                      key={r.key}
-                      onClick={() => setRange(r.key)}
-                      className={`h-8 px-2 rounded text-body-sm transition-colors ${
-                        range === r.key
-                          ? "bg-brand-subtle text-primary font-medium"
-                          : "text-text-secondary hover:text-foreground"
-                      }`}
-                    >
-                      {r.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-            </div>
-          )}
-
-          {renderExport ? (
-            renderExport(exportCurrent)
-          ) : (
-            <ExportConfirmButton onConfirm={exportCurrent} count={data.length} />
-          )}
-
-          <Button
-            variant="outline"
-            size="icon"
-            title="筛选与列设置"
-            aria-label="筛选与列设置"
-            className="relative h-9 w-9 shrink-0"
-            onClick={() => {
-              setDraft(filters);
-              setDraftVisible(visible);
-              setFilterOpen(true);
-            }}
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            {activeFilterCount > 0 && (
-              <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-4 text-center tabular-nums">
-                {activeFilterCount}
-              </span>
+                )}
+              </div>
             )}
-          </Button>
 
+            {renderExport ? (
+              renderExport(exportCurrent)
+            ) : (
+              <ExportConfirmButton onConfirm={exportCurrent} count={data.length} />
+            )}
 
+            <Button
+              variant="outline"
+              size="icon"
+              title="筛选与列设置"
+              aria-label="筛选与列设置"
+              className="relative h-9 w-9 shrink-0"
+              onClick={() => {
+                setDraft(filters);
+                setDraftVisible(visible);
+                setFilterOpen(true);
+              }}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-4 text-center tabular-nums">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
 
-          <div className="ml-auto flex items-center gap-2 shrink-0">
             {secondaryActions}
             {primaryAction && (
               <Button
