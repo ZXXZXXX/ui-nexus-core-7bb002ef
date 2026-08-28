@@ -631,9 +631,9 @@ export function WorkOrderPage({
       case "timeInfo":
         return `提出 ${o.createdAt ?? ""}${o.reviewedAt ? ` · 诊断 ${o.reviewedAt}` : ""}${o.executedAt ? ` · 执行 ${o.executedAt}` : ""}`;
       case "staff": {
+        // 疫苗免疫 / 驱虫工单：由平台发起，仅一名执行人；未执行前显示"平台 → -"
+        if (platformOrder) return platformStaffText(o);
         const list = effectiveExecutors(o);
-        // 疫苗免疫 / 驱虫工单：由平台发起，仅一名执行人
-        if (platformOrder) return `平台 → ${list[0] ?? "未指派"}`;
         return `${o.proposer ?? ""} → ${list.length ? list.join("、") : "未指派"}`;
       }
       case "pickup":
