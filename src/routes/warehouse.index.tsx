@@ -205,7 +205,7 @@ function ExportDialog({
           const first = days[0];
           const last = days[days.length - 1];
           return [
-            rangeText, rangeText, r.sku, r.name, r.unit,
+            rangeText, "汇总", r.sku, r.name, r.unit,
             first ? first.open : 0,
             days.reduce((s, d) => s + d.inQty, 0),
             days.reduce((s, d) => s + d.outQty, 0),
@@ -240,7 +240,7 @@ function ExportDialog({
         <DialogHeader className="px-5 py-4 border-b border-border">
           <DialogTitle className="text-section">导出数据</DialogTitle>
           <DialogDescription className="text-caption text-text-tertiary">
-            选择导出内容类型，台账按所选药品逐个生成工作表，含每日出入库结存
+            选择导出内容类型，含「汇总」表（各药品期间合计）与每个药品的逐日出入库结存表
           </DialogDescription>
         </DialogHeader>
 
