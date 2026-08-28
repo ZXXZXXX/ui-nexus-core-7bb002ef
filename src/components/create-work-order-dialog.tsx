@@ -57,7 +57,12 @@ export function CreateWorkOrderDialog({
   onOpenChange: (v: boolean) => void;
   title: string;
   kind: CreateRxKind;
-  onCreate: (payload: { targets: string[]; targetLabel: string; rx: RxSeed }) => void;
+  onCreate: (payload: {
+    targets: string[];
+    targetLabel: string;
+    rx: RxSeed;
+    varSelections?: { drug: string; option: string; dose: string }[];
+  }) => void;
 }) {
   const [mode, setMode] = useState<Mode>("cow");
   const [cowQuery, setCowQuery] = useState("");
