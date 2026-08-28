@@ -210,18 +210,20 @@ function DiseaseKBPage() {
   const [pendingDelete, setPendingDelete] = useState<string[] | null>(null);
 
   const filtered = useMemo(() => {
-    return list.filter((d) => {
-      const t = typeById(d.typeId);
-      if (filterCat !== "all" && t?.categoryCode !== filterCat) return false;
-      if (!keyword.trim()) return true;
-      const k = keyword.trim().toLowerCase();
-      return (
-        d.name.toLowerCase().includes(k) ||
-        d.code.toLowerCase().includes(k) ||
-        (t?.name.toLowerCase().includes(k) ?? false) ||
-        d.symptoms.some((s) => s.name.toLowerCase().includes(k))
-      );
-    });
+    return list
+      .filter((d) => {
+        const t = typeById(d.typeId);
+        if (filterCat !== "all" && t?.categoryCode !== filterCat) return false;
+        if (!keyword.trim()) return true;
+        const k = keyword.trim().toLowerCase();
+        return (
+          d.name.toLowerCase().includes(k) ||
+          d.code.toLowerCase().includes(k) ||
+          (t?.name.toLowerCase().includes(k) ?? false) ||
+          d.symptoms.some((s) => s.name.toLowerCase().includes(k))
+        );
+      })
+      .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity));
   }, [list, keyword, filterCat]);
 
   const allChecked = filtered.length > 0 && filtered.every((d) => selected.has(d.id));
