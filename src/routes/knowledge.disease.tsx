@@ -244,7 +244,7 @@ function DiseaseKBPage() {
       pendingDelete.forEach((id) => next.delete(id));
       return next;
     });
-    toast.success(`已删除 ${pendingDelete.length} 条疾病子类型`);
+    toast.success(`已删除 ${pendingDelete.length} 条疾病`);
     setPendingDelete(null);
   };
 
@@ -344,7 +344,7 @@ function DiseaseKBPage() {
             <Checkbox ref={headerCheckRef} checked={allChecked} onCheckedChange={toggleAll} aria-label="全选" />
             <div className="grid grid-cols-[140px_minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)_80px_80px_minmax(0,1.6fr)] gap-4 flex-1 min-w-0">
               <div>疾病编码</div>
-              <div>疾病子类型</div>
+              <div>疾病名称</div>
               <div>所属疾病类型</div>
               <div>疾病分类</div>
               <div>是否治疗</div>
@@ -429,7 +429,7 @@ function DiseaseKBPage() {
             );
           })}
           {filtered.length === 0 && (
-            <div className="px-6 py-12 text-center text-body-sm text-text-tertiary">暂无匹配的疾病子类型</div>
+            <div className="px-6 py-12 text-center text-body-sm text-text-tertiary">暂无匹配的疾病</div>
           )}
         </Card>
       </main>
@@ -439,7 +439,7 @@ function DiseaseKBPage() {
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
           <SheetHeader className="px-6 pt-6 pb-2">
             <SheetTitle className="text-section-title">
-              {editing?.code?.startsWith("DZ-—") ? "新建疾病" : "编辑疾病子类型"}
+              {editing?.code?.startsWith("DZ-—") ? "新建疾病" : "编辑疾病"}
             </SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-2 space-y-4">
@@ -483,7 +483,7 @@ function DiseaseKBPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
-              将删除 {pendingDelete?.length ?? 0} 条疾病子类型,删除后不可恢复。历史诊断记录仍会保留当时的编码快照。
+              将删除 {pendingDelete?.length ?? 0} 条疾病,删除后不可恢复。历史诊断记录仍会保留当时的编码快照。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -563,7 +563,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="疾病子类型名称" required>
+          <Field label="疾病名称" required>
             <Input value={value.name} onChange={(e) => onChange({ ...value, name: e.target.value })} placeholder="如:乳房炎一级" />
           </Field>
           <Field label="疾病分类" hint="由所属疾病类型带出">
@@ -762,7 +762,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
       ) : (
         <SectionCard title="适用处方" icon={<Pill className="h-4 w-4 text-primary" />}>
           <div className="rounded-md bg-surface-subtle px-3 py-3 text-body-sm text-text-secondary">
-            该疾病子类型「是否治疗」= 否,mobile 端诊断时将展示:放弃治疗,请登记"死亡/淘汰"。
+            该疾病「是否治疗」= 否,mobile 端诊断时将展示:放弃治疗,请登记"死亡/淘汰"。
           </div>
         </SectionCard>
       )}
