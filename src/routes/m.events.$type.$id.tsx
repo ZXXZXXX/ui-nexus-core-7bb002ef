@@ -338,7 +338,7 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
   const [barnPickerIdx, setBarnPickerIdx] = useState<number | null>(null);
   const [techPickerIdx, setTechPickerIdx] = useState<number | null>(null);
   const [colAmount, setColAmount] = useState("");
-  const [colBrix, setColBrix] = useState(""); // 白力度
+  const [colBrix, setColBrix] = useState(""); // 白利度
   const [colUse, setColUse] = useState("");
   const [colQuality, setColQuality] = useState("");
   const [colBag, setColBag] = useState("");
@@ -357,7 +357,7 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
     if (!colQuality) return toast.error("请选择初乳质量");
     if (!colBag) return toast.error("请选择袋号");
     if (!colAmount) return toast.error("请填写初乳量");
-    if (!colBrix) return toast.error("请填写白力度");
+    if (!colBrix) return toast.error("请填写白利度");
 
 
     for (let i = 0; i < calves.length; i++) {
@@ -467,7 +467,7 @@ function CalvingForm({ id, onDone }: { id: string; onDone: () => void }) {
                 className={inputCls}
               />
             </Field>
-            <Field label="白力度" required>
+            <Field label="白利度" required>
               <input
                 type="number"
                 inputMode="decimal"
