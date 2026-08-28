@@ -913,6 +913,29 @@ export function WorkOrderPage({
 
                 <div className="space-y-3 border-t border-border pt-4">
                   <div>
+                    <div className="text-caption text-text-tertiary mb-1.5">工单状态</div>
+                    <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as StatusKey | "all")}>
+                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部</SelectItem>
+                        {statusList.map((s) => (
+                          <SelectItem key={s.key} value={s.key}>{s.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <div className="text-caption text-text-tertiary mb-1.5">诊疗属性</div>
+                    <Select value={filterCategory} onValueChange={(v) => setFilterCategory(v as "all" | "初诊" | "复诊")}>
+                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部</SelectItem>
+                        <SelectItem value="初诊">初诊</SelectItem>
+                        <SelectItem value="复诊">复诊</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <div className="text-caption text-text-tertiary mb-1.5">提出人</div>
                     <Select value={advProposer} onValueChange={setAdvProposer}>
                       <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
@@ -933,27 +956,6 @@ export function WorkOrderPage({
                         {executors.map((p) => (
                           <SelectItem key={p} value={p}>{p}</SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <div className="text-caption text-text-tertiary mb-1.5">排序字段</div>
-                    <Select value={sortKey} onValueChange={(v) => setSortKey(v as typeof sortKey)}>
-                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="proposedAt">提出时间</SelectItem>
-                        <SelectItem value="reviewedAt">诊断时间</SelectItem>
-                        <SelectItem value="executedAt">执行时间</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <div className="text-caption text-text-tertiary mb-1.5">排序方向</div>
-                    <Select value={sortDir} onValueChange={(v) => setSortDir(v as "asc" | "desc")}>
-                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="desc">倒序（新 → 旧）</SelectItem>
-                        <SelectItem value="asc">正序（旧 → 新）</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
