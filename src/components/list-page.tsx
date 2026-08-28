@@ -457,22 +457,20 @@ export function ListPage<T>({
         <SheetContent side="right" className="w-[380px] sm:max-w-[380px] flex flex-col p-0">
           <SheetHeader className="px-5 py-4 border-b border-border">
             <SheetTitle className="text-section">筛选与列设置</SheetTitle>
-            <p className="text-caption text-text-tertiary">
-              勾选需要展示的列，并对展示中的列设置筛选条件
-            </p>
           </SheetHeader>
-          <div className="flex-1 overflow-auto px-5 py-4 space-y-3">
-            {columns.map((c) => {
-              const type = c.filter ?? "text";
-              const on = draftVisible.includes(c.key);
-              return (
-                <div
-                  key={c.key}
-                  className={`rounded-md border border-border p-3 space-y-2 ${on ? "" : "bg-surface-subtle"}`}
-                >
-                  <label className="flex items-center gap-2 cursor-pointer">
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+            <div>
+              <div className="text-caption text-text-tertiary mb-2">显示列（筛选仅作用于展示中的列）</div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                {columns.map((c) => (
+                  <label
+                    key={c.key}
+                    className={`flex items-center gap-2 text-body-sm ${
+                      c.required ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                    }`}
+                  >
                     <Checkbox
-                      checked={on}
+                      checked={draftVisible.includes(c.key)}
                       disabled={c.required}
                       onCheckedChange={(v) =>
                         setDraftVisible((prev) =>
@@ -484,40 +482,53 @@ export function ListPage<T>({
                         )
                       }
                     />
-                    <span className="text-body-sm text-foreground">{c.label}</span>
+                    <span>{c.label}</span>
                   </label>
-                  {on && type !== "none" && (
-                    type === "select" ? (
-                      <Select
-                        value={draft[c.key] || "__all"}
-                        onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}
-                      >
-                        <SelectTrigger className="h-9 text-body-sm">
-                          <SelectValue placeholder="全部" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="__all" className="text-body-sm">
-                            全部
-                          </SelectItem>
-                          {optionsFor(c).map((o) => (
-                            <SelectItem key={o} value={o} className="text-body-sm">
-                              {o}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    ) : (
-                      <Input
-                        value={draft[c.key] ?? ""}
-                        onChange={(e) => setDraft((p) => ({ ...p, [c.key]: e.target.value }))}
-                        placeholder={type === "date" ? "如 2026-05" : `包含…`}
-                        className="h-9 text-body-sm"
-                      />
-                    )
-                  )}
-                </div>
-              );
-            })}
+                ))}
+              </div>
+            </div>
+
+            {columns.some((c) => (c.filter ?? "text") !== "none" && draftVisible.includes(c.key)) && (
+              <div className="space-y-3 border-t border-border pt-4">
+                {columns
+                  .filter((c) => (c.filter ?? "text") !== "none" && draftVisible.includes(c.key))
+                  .map((c) => {
+                    const type = c.filter ?? "text";
+                    return (
+                      <div key={c.key}>
+                        <div className="text-caption text-text-tertiary mb-1.5">{c.label}</div>
+                        {type === "select" ? (
+                          <Select
+                            value={draft[c.key] || "__all"}
+                            onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}
+                          >
+                            <SelectTrigger className="h-9 text-body-sm">
+                              <SelectValue placeholder="全部" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__all" className="text-body-sm">
+                                全部
+                              </SelectItem>
+                              {optionsFor(c).map((o) => (
+                                <SelectItem key={o} value={o} className="text-body-sm">
+                                  {o}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Input
+                            value={draft[c.key] ?? ""}
+                            onChange={(e) => setDraft((p) => ({ ...p, [c.key]: e.target.value }))}
+                            placeholder={type === "date" ? "如 2026-05" : `包含…`}
+                            className="h-9 text-body-sm"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
           <SheetFooter className="px-5 py-4 border-t border-border flex-row gap-2">
             <Button
