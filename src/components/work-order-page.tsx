@@ -1808,21 +1808,21 @@ export function WorkOrderPage({
           onOpenChange={setCreateOpen}
           title={title}
           kind={createKind}
-          onCreate={({ targets, targetLabel, rx }) => {
+            onCreate={({ targets, rx }) => {
             const now = new Date();
             const p2 = (n: number) => (n < 10 ? `0${n}` : `${n}`);
             const stamp = `${now.getFullYear()}-${p2(now.getMonth() + 1)}-${p2(now.getDate())} ${p2(now.getHours())}:${p2(now.getMinutes())}`;
-            const seq = createdOrders.length + 1;
-            const order: WorkOrder = {
-              id: `${createPrefix ?? "WO"}${p2(now.getMonth() + 1)}${p2(now.getDate())}${p2(90 + seq)}`,
-              target: targets.length > 3 ? `${targets.slice(0, 3).join("、")} 等 ${targets.length} 项` : targetLabel,
+            // 一头牛只对应一张工单，对象信息仅展示单头牛耳号
+            const newOrders: WorkOrder[] = targets.map((t, i) => ({
+              id: `${createPrefix ?? "WO"}${p2(now.getMonth() + 1)}${p2(now.getDate())}${p2(90 + createdOrders.length + i + 1)}`,
+              target: t,
               event: rx.name,
               desc: rx.summary || rx.desc || `${rx.name}（${rx.code}），疗程 ${rx.duration} 天。`,
               proposer: "当前用户",
               status: "待诊断",
               createdAt: stamp,
-            };
-            setCreatedOrders((prev) => [order, ...prev]);
+            }));
+            setCreatedOrders((prev) => [...newOrders, ...prev]);
             setFilterStatus("待诊断");
           }}
         />
