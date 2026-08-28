@@ -714,7 +714,7 @@ export function WorkOrderPage({
         const diseaseName = o.event ? o.event.split(" · ")[0] : "";
         return (
           <span className="text-body-sm text-text-secondary truncate" title={diseaseName}>
-            {diseaseName || "—"}
+            {diseaseName ? highlightText(diseaseName, keyword) : "—"}
           </span>
         );
       }
