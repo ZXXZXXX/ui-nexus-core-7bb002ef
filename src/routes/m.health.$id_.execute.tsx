@@ -8,8 +8,9 @@ import { ActiveDayExecute } from "./m.health.$id";
 
 export const Route = createFileRoute("/m/health/$id_/execute")({
   head: () => ({ meta: [{ title: "执行记录 · 奇点智牧" }] }),
-  validateSearch: (s: Record<string, unknown>): { return?: string; batchIds?: string; batchDone?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { return?: string; batchIds?: string; batchDone?: string; merge?: string } => ({
     return: typeof s.return === "string" ? s.return : undefined,
+    merge: typeof s.merge === "string" ? s.merge : "",
     batchIds: typeof s.batchIds === "string" ? s.batchIds : "",
     batchDone: typeof s.batchDone === "string" ? s.batchDone : "",
   }),
@@ -35,6 +36,10 @@ function ExecuteRecordPage() {
   const earTag = singleEar ?? (isHoof ? "#01-24-2150" : "#01-24-2381");
   const execTags: string[] = [earTag];
 
+  // 合并批量执行：merge = 任务 id 列表
+  const mergeIds = (search.merge ?? "").split(",").filter(Boolean);
+  const isMerge = mergeIds.length > 1;
+
   const pickupCode = isLoss ? null : `PK-${id.replace(/^WO-?/i, "")}`;
 
   const [ready, setReady] = useState(false);
@@ -42,7 +47,12 @@ function ExecuteRecordPage() {
 
   const handleSubmit = () => {
     if (!ready) return;
-    toast.success("提交成功");
+    toast.success(isMerge ? `已提交 ${mergeIds.length} 项执行记录` : "提交成功");
+
+    if (isMerge) {
+      navigate({ to: "/m/health/today", search: {} });
+      return;
+    }
 
     if (search.return === "batch") {
       const doneList = (search.batchDone ?? "").split(",").filter(Boolean);
@@ -69,15 +79,28 @@ function ExecuteRecordPage() {
     <MobileShell title="执行记录" back={backConfig} hideTabBar>
       <div className="pb-28">
         <div className="px-4 pt-3 pb-2">
-          <div className="text-caption text-text-tertiary inline-flex items-center gap-1.5">
-            <span>工单</span>
-            <span className="font-mono text-text-secondary">{id}</span>
-            <span className="text-text-tertiary">·</span>
-            <span className="font-mono text-text-secondary">{earTag}</span>
-          </div>
+          {isMerge ? (
+            <div className="text-caption text-text-tertiary inline-flex items-center gap-1.5">
+              <span>批量执行</span>
+              <span className="text-text-secondary">
+                共计 <span className="text-primary tabular-nums font-medium">{mergeIds.length}</span> 个任务
+              </span>
+              <span className="text-text-tertiary">·</span>
+              <span className="text-text-secondary">
+                <span className="text-primary tabular-nums font-medium">{mergeIds.length}</span> 头牛只
+              </span>
+            </div>
+          ) : (
+            <div className="text-caption text-text-tertiary inline-flex items-center gap-1.5">
+              <span>工单</span>
+              <span className="font-mono text-text-secondary">{id}</span>
+              <span className="text-text-tertiary">·</span>
+              <span className="font-mono text-text-secondary">{earTag}</span>
+            </div>
+          )}
         </div>
         <div className="px-4 space-y-3">
-          <ActiveDayExecute pickupCode={pickupCode} tags={execTags} workOrderId={id} onReadyChange={handleReady} />
+          <ActiveDayExecute pickupCode={pickupCode} tags={execTags} workOrderId={id} onReadyChange={handleReady} batchCount={isMerge ? mergeIds.length : 1} />
         </div>
       </div>
 

@@ -39,7 +39,7 @@ import { MediaGrid } from "@/components/m/media-grid";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
 import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
-import { getWoPlan, buildActionText, computeSessions, actualDoseText, type WoPlan, type PlanTask } from "@/lib/wo-plan";
+import { getWoPlan, buildActionText, computeSessions, actualDoseText, totalDoseText, type WoPlan, type PlanTask } from "@/lib/wo-plan";
 
 
 import { useRole, canExecute, canDiagnose } from "@/lib/mobile-role";
@@ -1085,6 +1085,8 @@ type ExecItem = {
   freq?: string;
   /** 单次剂量，如 33ml / 次 */
   doseText?: string;
+  /** 批量执行时的总需求量 */
+  totalText?: string;
 };
 
 
@@ -1095,7 +1097,7 @@ const DRUG_ASSOCIATIONS: Record<string, string[]> = {
 };
 
 // 根据处方拆解每日任务：每种药品 = 一次任务，加上不需用药的常规任务（如测温）
-function buildDayItems(day: number, _tags: string[], _withTemp = false, plan?: WoPlan): ExecItem[] {
+function buildDayItems(day: number, _tags: string[], _withTemp = false, plan?: WoPlan, batchCount = 1): ExecItem[] {
   const items: ExecItem[] = [];
   const allDrugs = plan?.drugs ?? [];
   const therapies = allDrugs.filter((d) => d.kind === "therapy");
@@ -1124,6 +1126,7 @@ function buildDayItems(day: number, _tags: string[], _withTemp = false, plan?: W
       useWay: d.use,
       freq: d.method.split(/[，,]/)[0],
       doseText: actualDose,
+      totalText: totalDoseText(actualDose, batchCount) ?? undefined,
 
     });
   });
@@ -1404,7 +1407,7 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
 }
 
 // === 执行页：仅显示当前进行中的当天 checklist ===
-export function ActiveDayExecute({ pickupCode, tags, day = 2, date = "05/13", workOrderId, onReadyChange }: { pickupCode: string | null; tags: string[]; day?: number; date?: string; workOrderId: string; onReadyChange?: (ready: boolean) => void }) {
+export function ActiveDayExecute({ pickupCode, tags, day = 2, date = "05/13", workOrderId, onReadyChange, batchCount = 1 }: { pickupCode: string | null; tags: string[]; day?: number; date?: string; workOrderId: string; onReadyChange?: (ready: boolean) => void; batchCount?: number }) {
   // 疾病治疗（WO）/ 产后护理（PP）默认每日测温；修蹄（HF）/ 干奶（GN）/ 损耗（LS）无需测温
   const noTempPrefix = ["HF", "GN", "LS"].some((p) => workOrderId?.startsWith(p));
   let withTemp = !workOrderId || !noTempPrefix;
@@ -1415,7 +1418,7 @@ export function ActiveDayExecute({ pickupCode, tags, day = 2, date = "05/13", wo
   }
   return (
     <div>
-      <ChecklistDay day={day} date={date} pickupCode={pickupCode} tags={tags} dayState="active" initialNote="" workOrderId={workOrderId} withTemp={withTemp} onReadyChange={onReadyChange} />
+      <ChecklistDay day={day} date={date} pickupCode={pickupCode} tags={tags} dayState="active" initialNote="" workOrderId={workOrderId} withTemp={withTemp} onReadyChange={onReadyChange} batchCount={batchCount} />
     </div>
   );
 }
@@ -1435,6 +1438,7 @@ function ChecklistDay({
   workOrderId,
   withTemp = false,
   onReadyChange,
+  batchCount = 1,
 }: {
   day: number;
   date: string;
@@ -1446,6 +1450,7 @@ function ChecklistDay({
   workOrderId?: string;
   withTemp?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  batchCount?: number;
 }) {
 
   const isActive = dayState === "active";
@@ -1458,7 +1463,7 @@ function ChecklistDay({
 
   const activePlan = workOrderId ? getWoPlan(workOrderId) : undefined;
   const [items, setItems] = useState<ExecItem[]>(() => {
-    const base = buildDayItems(day, tags, withTemp, activePlan);
+    const base = buildDayItems(day, tags, withTemp, activePlan, batchCount);
     if (isDone) return base.map((it) => ({ ...it, status: "done" as ItemStatus }));
     return base;
   });
@@ -1747,7 +1752,14 @@ function ChecklistDay({
                           {metaLine || it.desc}
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-3 text-caption">
-                          <span className="text-text-tertiary">剂量 {it.doseText ?? "-"}</span>
+                          <span className="text-text-tertiary">
+                            剂量 {it.doseText ?? "-"}
+                            {it.totalText && (
+                              <span className="ml-2 text-primary">
+                                总需求 {it.totalText}
+                              </span>
+                            )}
+                          </span>
                           {scanned && (
                             <span className="shrink-0 inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5">
                               <span className="text-text-tertiary">批次号</span>

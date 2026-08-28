@@ -55,6 +55,15 @@ const SIMPLE_CONCLUSIONS: Record<string, string[]> = {
   "转群/转栏": ["已完成转群", "未转群"],
 };
 
+/** 其余基础事件（体温检查、酮病检查等）统一用通用结论 */
+const DEFAULT_CONCLUSIONS = ["正常", "异常"];
+
+function conclusionsOf(t: HomeTask): string[] | null {
+  if (SIMPLE_CONCLUSIONS[t.type]) return SIMPLE_CONCLUSIONS[t.type];
+  if (t.kind === "基础事件") return DEFAULT_CONCLUSIONS;
+  return null;
+}
+
 function SimpleForm({
   options,
   value,
@@ -158,7 +167,7 @@ function BatchExecutePage() {
     );
   }, [tasks, q]);
 
-  const isSimple = (t: HomeTask) => !!SIMPLE_CONCLUSIONS[t.type];
+  const isSimple = (t: HomeTask) => !!conclusionsOf(t);
   const taskDone = (t: HomeTask) =>
     isSimple(t) ? simpleDone(t) : doneSet.has(t.id);
   const doneCount = tasks.filter(taskDone).length;
@@ -277,7 +286,7 @@ function BatchExecutePage() {
                 </button>
                 {simpleMode && (
                   <SimpleForm
-                    options={SIMPLE_CONCLUSIONS[t.type]!}
+                    options={conclusionsOf(t)!}
                     value={simple[t.id]?.conclusion ?? null}
                     onChange={(v) =>
                       setSimple((prev) => ({
