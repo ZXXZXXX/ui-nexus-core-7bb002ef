@@ -683,10 +683,10 @@ export function WorkOrderPage({
   const renderCell = (o: WorkOrder, key: ColKey) => {
     switch (key) {
       case "id":
-        return <span className="font-mono text-body text-foreground">{o.id}</span>;
+        return <span className="font-mono text-body text-foreground">{highlightText(o.id, keyword)}</span>;
       case "target":
         // 对象信息固定为单头牛只耳号
-        return <span className="text-body text-foreground whitespace-nowrap">{o.target}</span>;
+        return <span className="text-body text-foreground whitespace-nowrap">{highlightText(o.target, keyword)}</span>;
       case "status": {
         const st = effectiveStatus(o);
         if (st === "已终止") {
