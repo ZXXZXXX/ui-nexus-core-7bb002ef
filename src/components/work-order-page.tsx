@@ -2311,10 +2311,12 @@ export function makeOrders(
     const status = statuses[i % statuses.length];
     const reviewedAt = new Date(proposedAt.getTime() + 60 * 60 * 1000);
     const executedAt = new Date(proposedAt.getTime() + 8 * 60 * 60 * 1000);
-    const proposer = pick(proposersPool, i);
+    // 疫苗免疫（YM）/ 驱虫工单（QC）为平台发起，固定"平台"且仅一名执行人
+    const isPlatform = prefix === "YM" || prefix === "QC";
+    const proposer = isPlatform ? "平台" : pick(proposersPool, i);
     const reviewer = pick(reviewersPool, i);
-    // 执行人可能多人（1~7 人）
-    const execCount = [1, 1, 2, 3, 5, 7, 4][i % 7];
+    // 执行人可能多人（1~7 人）；平台工单固定 1 人
+    const execCount = isPlatform ? 1 : [1, 1, 2, 3, 5, 7, 4][i % 7];
     const execList = Array.from({ length: execCount }, (_, k) => pick(executorsPool, i + k));
     const executors = Array.from(new Set(execList));
     // 媒体附件：每条工单按索引轮换三种媒体组合，保证演示多样性
