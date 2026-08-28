@@ -320,7 +320,8 @@ export function WorkOrderPage({
   const orders = useMemo(() => [...createdOrders, ...baseOrders], [createdOrders, baseOrders]);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const [active, setActive] = useState<StatusKey>("待诊断");
+  const [filterStatus, setFilterStatus] = useState<StatusKey | "all">("all");
+  const [filterCategory, setFilterCategory] = useState<"all" | "初诊" | "复诊">("all");
   const [detail, setDetail] = useState<WorkOrder | null>(null);
   const [mode, setMode] = useState<"view" | "process">("view");
   const [confirm, setConfirm] = useState<"approve" | "reject" | null>(null);
