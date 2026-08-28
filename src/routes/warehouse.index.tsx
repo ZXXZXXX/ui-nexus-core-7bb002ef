@@ -196,9 +196,27 @@ function ExportDialog({
         "期初库存", "期间存入", "期间发出", "期末结存",
         ...extras.map((f) => f.label),
       ];
-      const sheets: SheetData[] = buildRows(from, to)
-        .filter((r) => skus.includes(r.sku))
-        .map((r) => ({
+      const rows = buildRows(from, to).filter((r) => skus.includes(r.sku));
+      const summary: SheetData = {
+        name: "汇总",
+        heads,
+        body: rows.map((r) => {
+          const days = buildDaily(r, from, to);
+          const first = days[0];
+          const last = days[days.length - 1];
+          return [
+            rangeText, "汇总", r.sku, r.name, r.unit,
+            first ? first.open : 0,
+            days.reduce((s, d) => s + d.inQty, 0),
+            days.reduce((s, d) => s + d.outQty, 0),
+            last ? last.close : 0,
+            ...extras.map((f) => String(r[f.key])),
+          ];
+        }),
+      };
+      const sheets: SheetData[] = [
+        summary,
+        ...rows.map((r) => ({
           name: r.name,
           heads,
           body: buildDaily(r, from, to).map((d) => [
@@ -206,8 +224,10 @@ function ExportDialog({
             d.open, d.inQty, d.outQty, d.close,
             ...extras.map((f) => String(r[f.key])),
           ]),
-        }));
+        })),
+      ];
       exportXlsx("库存台账", sheets);
+
     }
     onOpenChange(false);
   };
@@ -220,7 +240,7 @@ function ExportDialog({
         <DialogHeader className="px-5 py-4 border-b border-border">
           <DialogTitle className="text-section">导出数据</DialogTitle>
           <DialogDescription className="text-caption text-text-tertiary">
-            选择导出内容类型，台账按所选药品逐个生成工作表，含每日出入库结存
+            选择导出内容类型，含「汇总」表（各药品期间合计）与每个药品的逐日出入库结存表
           </DialogDescription>
         </DialogHeader>
 
