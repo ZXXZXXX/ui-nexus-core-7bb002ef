@@ -223,6 +223,7 @@ export type PlanTask = {
 };
 
 export type WoPlan = {
+  weightKg?: number;                 // 诊断时确认的牛只体重（用于换算实际剂量）
   disease: string;
   subType?: string;                  // 子类型，如 "阴道黏膜层撕裂"
   symptoms: string[];
