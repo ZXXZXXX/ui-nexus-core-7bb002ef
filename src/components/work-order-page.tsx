@@ -299,6 +299,31 @@ function inRange(s: string, range: DateRange, customStart?: string, customEnd?: 
   return true;
 }
 
+function highlightText(text: string, keyword: string): React.ReactNode {
+  if (!keyword) return text;
+  const kw = keyword.trim().toLowerCase();
+  if (!kw) return text;
+  const lower = text.toLowerCase();
+  const parts: React.ReactNode[] = [];
+  let i = 0;
+  let keyIdx = 0;
+  while (i < text.length) {
+    const idx = lower.indexOf(kw, i);
+    if (idx === -1) {
+      parts.push(text.slice(i));
+      break;
+    }
+    if (idx > i) parts.push(text.slice(i, idx));
+    parts.push(
+      <span key={`h-${keyIdx++}`} className="text-[var(--brand)] font-medium">
+        {text.slice(idx, idx + kw.length)}
+      </span>,
+    );
+    i = idx + kw.length;
+  }
+  return <>{parts}</>;
+}
+
 export function WorkOrderPage({
   title,
   orders: baseOrders,
@@ -531,7 +556,7 @@ export function WorkOrderPage({
       })
       .filter((o) =>
         kw
-          ? [o.id, o.target, o.event, o.proposer]
+          ? [o.id, o.target, o.event ? o.event.split(" · ")[0] : ""]
               .filter(Boolean)
               .some((v) => String(v).toLowerCase().includes(kw))
           : true,
@@ -658,10 +683,10 @@ export function WorkOrderPage({
   const renderCell = (o: WorkOrder, key: ColKey) => {
     switch (key) {
       case "id":
-        return <span className="font-mono text-body text-foreground">{o.id}</span>;
+        return <span className="font-mono text-body text-foreground">{highlightText(o.id, keyword)}</span>;
       case "target":
         // 对象信息固定为单头牛只耳号
-        return <span className="text-body text-foreground whitespace-nowrap">{o.target}</span>;
+        return <span className="text-body text-foreground whitespace-nowrap">{highlightText(o.target, keyword)}</span>;
       case "status": {
         const st = effectiveStatus(o);
         if (st === "已终止") {
@@ -689,7 +714,7 @@ export function WorkOrderPage({
         const diseaseName = o.event ? o.event.split(" · ")[0] : "";
         return (
           <span className="text-body-sm text-text-secondary truncate" title={diseaseName}>
-            {diseaseName || "—"}
+            {diseaseName ? highlightText(diseaseName, keyword) : "—"}
           </span>
         );
       }
@@ -801,7 +826,7 @@ export function WorkOrderPage({
               <Input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder="按工单号 / 耳号 / 描述搜索"
+                placeholder="按工单号 / 牛耳号 / 疾病结论搜索"
                 className="h-9 w-64 pl-9 text-body-sm bg-card border-border"
               />
             </div>
