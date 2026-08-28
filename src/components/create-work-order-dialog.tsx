@@ -57,7 +57,12 @@ export function CreateWorkOrderDialog({
   onOpenChange: (v: boolean) => void;
   title: string;
   kind: CreateRxKind;
-  onCreate: (payload: { targets: string[]; targetLabel: string; rx: RxSeed }) => void;
+  onCreate: (payload: {
+    targets: string[];
+    targetLabel: string;
+    rx: RxSeed;
+    varSelections?: { drug: string; option: string; dose: string }[];
+  }) => void;
 }) {
   const [mode, setMode] = useState<Mode>("cow");
   const [cowQuery, setCowQuery] = useState("");
@@ -67,6 +72,7 @@ export function CreateWorkOrderDialog({
   const [rawInput, setRawInput] = useState("");
   const [rxQuery, setRxQuery] = useState("");
   const [rxId, setRxId] = useState("");
+  const [varPick, setVarPick] = useState<Record<string, string>>({});
 
   const rxList = useMemo(() => {
     const kw = rxQuery.trim();
@@ -123,7 +129,13 @@ export function CreateWorkOrderDialog({
   }, [mode, pickedBarns, pickedCows, parsedInput]);
 
   const rx = rxList.find((r) => r.id === rxId) ?? PRESCRIPTION_SEED.find((r) => r.id === rxId);
-  const canSubmit = selection.count > 0 && !!rx;
+
+  const varDrugs = useMemo(
+    () => (rx?.drugs ?? []).filter((d) => d.variable && (d.varDose?.length ?? 0) > 0),
+    [rx],
+  );
+  const varDone = varDrugs.every((d) => !!varPick[d.id]);
+  const canSubmit = selection.count > 0 && !!rx && varDone;
 
   const reset = () => {
     setMode("cow");
@@ -134,11 +146,17 @@ export function CreateWorkOrderDialog({
     setRawInput("");
     setRxQuery("");
     setRxId("");
+    setVarPick({});
   };
 
   const submit = () => {
     if (!canSubmit || !rx) return;
-    onCreate({ targets: selection.targets, targetLabel: selection.label, rx });
+    const varSelections = varDrugs.map((d) => ({
+      drug: d.drugs.map((x) => x.name).join("+"),
+      option: varPick[d.id],
+      dose: d.varDose?.find((v) => v.option === varPick[d.id])?.dose ?? "",
+    }));
+    onCreate({ targets: selection.targets, targetLabel: selection.label, rx, varSelections });
     toast.success(`已创建${title}，执行对象 ${selection.count} 头`);
     reset();
     onOpenChange(false);
@@ -306,7 +324,10 @@ export function CreateWorkOrderDialog({
               {rxList.map((r) => (
                 <button
                   key={r.id}
-                  onClick={() => setRxId(r.id)}
+                  onClick={() => {
+                    setRxId(r.id);
+                    setVarPick({});
+                  }}
                   className={`w-full text-left border rounded-md p-3 transition-colors ${
                     rxId === r.id ? "border-primary bg-[rgba(0,161,79,0.05)]" : "border-border hover:border-primary/50"
                   }`}
@@ -325,6 +346,43 @@ export function CreateWorkOrderDialog({
                 <div className="py-8 text-center text-caption text-text-tertiary">无可用处方</div>
               )}
             </div>
+
+            {varDrugs.length > 0 && (
+              <div className="space-y-2 pt-1">
+                <div className="text-body-sm font-medium">
+                  3. 选择变量范围
+                  <span className="ml-2 text-caption text-text-tertiary">（该处方含变量给药，需选择后方可提交）</span>
+                </div>
+                {varDrugs.map((d) => (
+                  <div key={d.id} className="border border-border rounded-md p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-body-sm">{d.drugs.map((x) => x.name).join(" + ")}</span>
+                      <span className="ml-auto text-caption text-text-tertiary">
+                        {d.variableKind === "weight" ? "按体重" : d.variableKind === "quarter" ? "按乳区" : "按变量"}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(d.varDose ?? []).map((v) => (
+                        <button
+                          key={v.option}
+                          onClick={() => setVarPick((p) => ({ ...p, [d.id]: v.option }))}
+                          className={`h-9 px-2 rounded-md border text-caption transition-colors ${
+                            varPick[d.id] === v.option
+                              ? "border-primary text-primary bg-[rgba(0,161,79,0.05)]"
+                              : "border-border text-text-secondary hover:border-primary/50"
+                          }`}
+                        >
+                          {v.option} · {v.dose}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {!varDone && (
+                  <div className="text-caption text-[var(--state-danger)]">请为每个变量药品选择对应范围</div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
