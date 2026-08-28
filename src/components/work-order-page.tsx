@@ -381,6 +381,8 @@ export function WorkOrderPage({
     if (ov && "executor" in ov) return ov.executor ?? undefined;
     return o.executor ?? o.who;
   };
+  /** 疫苗免疫 / 驱虫工单：平台发起的计划性任务，人员信息固定为"平台 → 单执行人" */
+  const platformOrder = title === "疫苗免疫" || title === "驱虫工单";
   /** 执行人列表（可多人） */
   const effectiveExecutors = (o: WorkOrder): string[] => {
     const ov = overrides[o.id];
