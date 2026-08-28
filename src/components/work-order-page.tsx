@@ -299,6 +299,31 @@ function inRange(s: string, range: DateRange, customStart?: string, customEnd?: 
   return true;
 }
 
+function highlightText(text: string, keyword: string): React.ReactNode {
+  if (!keyword) return text;
+  const kw = keyword.trim().toLowerCase();
+  if (!kw) return text;
+  const lower = text.toLowerCase();
+  const parts: React.ReactNode[] = [];
+  let i = 0;
+  let keyIdx = 0;
+  while (i < text.length) {
+    const idx = lower.indexOf(kw, i);
+    if (idx === -1) {
+      parts.push(text.slice(i));
+      break;
+    }
+    if (idx > i) parts.push(text.slice(i, idx));
+    parts.push(
+      <span key={`h-${keyIdx++}`} className="text-[var(--brand)] font-medium">
+        {text.slice(idx, idx + kw.length)}
+      </span>,
+    );
+    i = idx + kw.length;
+  }
+  return <>{parts}</>;
+}
+
 export function WorkOrderPage({
   title,
   orders: baseOrders,
