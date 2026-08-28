@@ -383,7 +383,7 @@ export function WorkOrderPage({
   };
   /** 疫苗免疫 / 驱虫工单：平台发起的计划性任务，人员信息固定为"平台 → 单执行人" */
   const platformOrder = title === "疫苗免疫" || title === "驱虫工单";
-  /** 执行人列表（可多人） */
+  /** 执行人列表（可多人）。疫苗/驱虫工单仅读取实际执行人，不读取被指派人 */
   const effectiveExecutors = (o: WorkOrder): string[] => {
     const ov = overrides[o.id];
     if (ov && "executor" in ov) return ov.executor ? [ov.executor] : [];
@@ -391,6 +391,12 @@ export function WorkOrderPage({
     const single = o.executor ?? o.who;
     return single ? [single] : [];
   };
+  /** 疫苗/驱虫工单人员信息展示：仅基于执行人，未执行时显示"平台 → -" */
+  const platformStaffText = (o: WorkOrder): string => {
+    const executor = o.executor ?? o.executors?.[0];
+    return `平台 → ${executor ?? "-"}`;
+  };
+
   const openMoreAction = (type: MoreActionType, o: WorkOrder) => {
     setActionReason("");
     setNewExecutor("");
