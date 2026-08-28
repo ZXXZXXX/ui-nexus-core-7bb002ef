@@ -793,8 +793,6 @@ function DetailView({ value }: { value: Disease }) {
 
       <SectionCard title="基础信息" icon={<FileText className="h-4 w-4 text-primary" />}>
         <KV label="疾病类型" value={t?.name ?? "—"} />
-        <KV label="疾病名称" value={value.name} />
-        <KV label="疾病编码" value={value.code} mono />
         <KV label="疾病分类" value={cat?.name ?? "—"} />
         {value.alias && <KV label="英文/缩写" value={value.alias} />}
         {value.aliases.length > 0 && (
