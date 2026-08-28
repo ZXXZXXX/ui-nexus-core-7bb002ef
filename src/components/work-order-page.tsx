@@ -966,6 +966,8 @@ export function WorkOrderPage({
                   variant="outline"
                   className="flex-1"
                   onClick={() => {
+                    setFilterStatus("all");
+                    setFilterCategory("all");
                     setAdvProposer("all");
                     setAdvExecutor("all");
                   }}
