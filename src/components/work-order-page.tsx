@@ -826,7 +826,7 @@ export function WorkOrderPage({
               <Input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder="按工单号 / 耳号 / 描述搜索"
+                placeholder="按工单号 / 牛耳号 / 疾病结论搜索"
                 className="h-9 w-64 pl-9 text-body-sm bg-card border-border"
               />
             </div>
