@@ -259,8 +259,14 @@ function PrescriptionPage() {
   const [editing, setEditing] = useState<Rx | null>(null);
   const [viewing, setViewing] = useState<Rx | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string[] | null>(null);
+  const [kindFilter, setKindFilter] = useState<RxKind | "all">("all");
 
-  const allChecked = list.length > 0 && selected.size === list.length;
+  const shown = useMemo(
+    () => (kindFilter === "all" ? list : list.filter((r) => r.kind === kindFilter)),
+    [list, kindFilter],
+  );
+
+  const allChecked = shown.length > 0 && selected.size === shown.length;
   const someChecked = selected.size > 0 && !allChecked;
 
   const toggleOne = (id: string) =>
@@ -269,7 +275,7 @@ function PrescriptionPage() {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
-  const toggleAll = () => setSelected(allChecked ? new Set() : new Set(list.map((r) => r.id)));
+  const toggleAll = () => setSelected(allChecked ? new Set() : new Set(shown.map((r) => r.id)));
 
   const confirmDelete = () => {
     if (!pendingDelete) return;
@@ -351,9 +357,26 @@ function PrescriptionPage() {
               <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
               <Input placeholder="搜索处方 / 编码 / 疾病" className="h-9 w-72 pl-9 text-body-sm" />
             </div>
-            <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
-              <Filter className="h-3.5 w-3.5" /> 处方类型
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
+                  <Filter className="h-3.5 w-3.5" />
+                  {kindFilter === "all" ? "处方类型" : RX_KIND_LABEL[kindFilter]}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-36">
+                <DropdownMenuItem onClick={() => setKindFilter("all")} className="justify-between">
+                  全部类型
+                  {kindFilter === "all" && <Check className="h-3.5 w-3.5 text-primary" />}
+                </DropdownMenuItem>
+                {(Object.keys(RX_KIND_LABEL) as RxKind[]).map((k) => (
+                  <DropdownMenuItem key={k} onClick={() => setKindFilter(k)} className="justify-between">
+                    {RX_KIND_LABEL[k]}
+                    {kindFilter === k && <Check className="h-3.5 w-3.5 text-primary" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <Button
             size="sm"
@@ -403,7 +426,7 @@ function PrescriptionPage() {
             </div>
             <div className="w-[160px] text-right shrink-0">功能</div>
           </div>
-          {list.map((r) => {
+          {shown.map((r) => {
             const checked = selected.has(r.id);
             const drugText =
               r.drugs.map((d) => d.drugs[0]?.name).filter(Boolean).join("、") || "—";
