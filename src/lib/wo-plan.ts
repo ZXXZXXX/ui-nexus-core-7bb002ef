@@ -62,6 +62,17 @@ const D = {
     isPrescription: true,
     isSpecial: true,
   } satisfies PlanDrug,
+  fmdVaccine: {
+    name: "口蹄疫 O 型/A 型二价灭活疫苗",
+    spec: "100ml / 瓶",
+    manufacturer: "中牧实业",
+    use: "颈部肌内注射",
+    dose: "2mL / 次",
+    method: "单次免疫，共 1 次",
+    qty: "1 瓶",
+    isPrescription: false,
+    isSpecial: false,
+  } satisfies PlanDrug,
   rifaximin: {
     name: "利福昔明子宫注入剂（澳利舒）",
     spec: "100ml / 瓶",
@@ -427,6 +438,16 @@ const PLANS = {
     days: 1,
   },
 
+  fmd_vaccine: {
+    disease: "口蹄疫加强免疫",
+    prescription: {
+      name: "口蹄疫疫苗免疫方案",
+      note: "全群加强免疫；颈部肌内注射 2mL/头，单次完成。",
+    },
+    drugs: [D.fmdVaccine],
+    days: 1,
+  },
+
   postpartum: {
     disease: "产后保健",
     prescription: {
@@ -529,6 +550,62 @@ const WO_MAP: Record<string, {
     symptoms: ["产后 2 天"],
     description: "产后例检 · 常规护理。",
     reviewAction: "产后 7 天例检。",
+  },
+
+  // 疫苗免疫 · 口蹄疫加强免疫（批量演示，内容一致）
+  "YM-1041": {
+    key: "fmd_vaccine",
+    subType: "口蹄疫加强免疫",
+    symptoms: ["平台统一下发"],
+    description: "口蹄疫加强免疫，颈部肌内注射 2mL/头。",
+    reviewAction: "免疫后观察 30 分钟有无过敏反应。",
+    diagnoser: "平台",
+    diagnoseTime: "2026-05-24 08:00",
+  },
+  "YM-1051": {
+    key: "fmd_vaccine",
+    subType: "口蹄疫加强免疫",
+    symptoms: ["平台统一下发"],
+    description: "口蹄疫加强免疫，颈部肌内注射 2mL/头。",
+    reviewAction: "免疫后观察 30 分钟有无过敏反应。",
+    diagnoser: "平台",
+    diagnoseTime: "2026-05-24 08:00",
+  },
+  "YM-1052": {
+    key: "fmd_vaccine",
+    subType: "口蹄疫加强免疫",
+    symptoms: ["平台统一下发"],
+    description: "口蹄疫加强免疫，颈部肌内注射 2mL/头。",
+    reviewAction: "免疫后观察 30 分钟有无过敏反应。",
+    diagnoser: "平台",
+    diagnoseTime: "2026-05-24 08:00",
+  },
+  "YM-1053": {
+    key: "fmd_vaccine",
+    subType: "口蹄疫加强免疫",
+    symptoms: ["平台统一下发"],
+    description: "口蹄疫加强免疫，颈部肌内注射 2mL/头。",
+    reviewAction: "免疫后观察 30 分钟有无过敏反应。",
+    diagnoser: "平台",
+    diagnoseTime: "2026-05-24 08:00",
+  },
+  "YM-1054": {
+    key: "fmd_vaccine",
+    subType: "口蹄疫加强免疫",
+    symptoms: ["平台统一下发"],
+    description: "口蹄疫加强免疫，颈部肌内注射 2mL/头。",
+    reviewAction: "免疫后观察 30 分钟有无过敏反应。",
+    diagnoser: "平台",
+    diagnoseTime: "2026-05-24 08:00",
+  },
+  "YM-1055": {
+    key: "fmd_vaccine",
+    subType: "口蹄疫加强免疫",
+    symptoms: ["平台统一下发"],
+    description: "口蹄疫加强免疫，颈部肌内注射 2mL/头。",
+    reviewAction: "免疫后观察 30 分钟有无过敏反应。",
+    diagnoser: "平台",
+    diagnoseTime: "2026-05-24 08:00",
   },
 
   // 修蹄

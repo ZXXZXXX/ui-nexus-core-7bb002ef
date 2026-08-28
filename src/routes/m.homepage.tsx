@@ -297,6 +297,12 @@ export const homeTasks: HomeTask[] = [
   { id: "YM-1045", target: "#01-24-2045", conclusion: "副伤寒免疫", type: "疫苗免疫", status: "进行中", minutesAgo: 62 },
   { id: "YM-1046", target: "#01-24-2120", conclusion: "漏针补免", type: "疫苗免疫", status: "进行中", minutesAgo: 78 },
   { id: "YM-1047", target: "#01-24-2047", conclusion: "结核检疫排查", type: "疫苗免疫", status: "进行中", minutesAgo: 95 },
+  // 疫苗免疫 · 同内容批量演示（口蹄疫疫苗、颈部肌注）
+  { id: "YM-1051", target: "#01-24-2051", conclusion: "口蹄疫加强免疫", type: "疫苗免疫", status: "进行中", minutesAgo: 101 },
+  { id: "YM-1052", target: "#01-24-2052", conclusion: "口蹄疫加强免疫", type: "疫苗免疫", status: "进行中", minutesAgo: 104 },
+  { id: "YM-1053", target: "#01-24-2053", conclusion: "口蹄疫加强免疫", type: "疫苗免疫", status: "进行中", minutesAgo: 108 },
+  { id: "YM-1054", target: "#01-24-2054", conclusion: "口蹄疫加强免疫", type: "疫苗免疫", status: "进行中", minutesAgo: 113 },
+  { id: "YM-1055", target: "#01-24-2055", conclusion: "口蹄疫加强免疫", type: "疫苗免疫", status: "进行中", minutesAgo: 118 },
   // 修蹄 · 进行中（来源：晟安标准处方 · 肢蹄病类）
   { id: "HF-0702", target: "#01-24-2150", conclusion: "腐蹄病处方 1 · 头孢噻呋+氟尼辛", type: "修蹄", status: "进行中", minutesAgo: 7 },
   { id: "HF-0703", target: "#01-24-2151", conclusion: "腐蹄病处方 2 · 青霉素+生理盐水", type: "修蹄", status: "进行中", minutesAgo: 22 },
@@ -459,6 +465,11 @@ export const EXEC_BRIEF: Record<string, string> = {
   "YM-1045": "副伤寒疫苗、颈部肌注",
   "YM-1046": "漏针补免、颈部肌注",
   "YM-1047": "结核菌素、皮内注射",
+  "YM-1051": "口蹄疫疫苗、颈部肌注",
+  "YM-1052": "口蹄疫疫苗、颈部肌注",
+  "YM-1053": "口蹄疫疫苗、颈部肌注",
+  "YM-1054": "口蹄疫疫苗、颈部肌注",
+  "YM-1055": "口蹄疫疫苗、颈部肌注",
 };
 // 待复查:复查任务描述
 export const REVIEW_BRIEF: Record<string, string> = {
