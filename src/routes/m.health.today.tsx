@@ -767,6 +767,8 @@ function TodayTasksPage() {
             const isAlert = t.kind === "异常排查";
             const meta = typeMeta[t.type] ?? typeMeta["疾病治疗"];
             const Icon = meta.icon;
+            const urg = isAlert ? t.urgency ?? "低" : null;
+            const uMeta = urg ? urgencyMeta[urg] : null;
             const checked = selected.has(t.id);
             const chip: TaskChip | null = isAlert
               ? t.cattleId && handledAlerts.has(t.cattleId)
