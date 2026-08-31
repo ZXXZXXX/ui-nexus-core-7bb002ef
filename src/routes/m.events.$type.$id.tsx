@@ -1059,10 +1059,12 @@ function ExamForm({
   id,
   item,
   onDone,
+  batchCount = 0,
 }: {
   id: string;
   item?: string;
   onDone: () => void;
+  batchCount?: number;
 }) {
   const preset = EXAM_ITEMS.find(
     (it) => item && (it.label === item || item.includes(it.label.slice(0, 2))),
