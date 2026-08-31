@@ -803,17 +803,29 @@ function TodayTasksPage() {
             const tabChip: TaskChip =
               activeTab === "待诊断" ? "待诊断" : activeTab === "待复查" ? "待复查" : "待执行";
             const actionLine = taskCardContent(t, tabChip);
-            const timeAgo = `${((tasks.indexOf(t) + 1) * 2) % 59 || 2}分钟前`;
+            const timeAgo = isAlert
+              ? formatTimeAgo(t.minutesAgo)
+              : `${((tasks.indexOf(t) + 1) * 2) % 59 || 2}分钟前`;
 
             const inner = (
               <div className="px-3.5 py-3">
                 {/* 顶部:类型 + 编号 + 状态 + 时间 */}
                 <div className="flex items-center gap-1.5">
-                  <span
-                    className={`h-5 w-5 rounded-full ${meta.bg} ${meta.text} inline-flex items-center justify-center shrink-0`}
-                  >
-                    <Icon className="h-3 w-3" strokeWidth={2} />
-                  </span>
+                  {uMeta ? (
+                    <span
+                      className={`h-5 min-w-5 px-1 rounded-full ${uMeta.bg} ${uMeta.text} inline-flex items-center justify-center shrink-0 text-caption font-medium leading-none`}
+                      title={`紧急等级：${uMeta.label}`}
+                      aria-label={`紧急等级 ${uMeta.label}`}
+                    >
+                      {uMeta.label}
+                    </span>
+                  ) : (
+                    <span
+                      className={`h-5 w-5 rounded-full ${meta.bg} ${meta.text} inline-flex items-center justify-center shrink-0`}
+                    >
+                      <Icon className="h-3 w-3" strokeWidth={2} />
+                    </span>
+                  )}
                   <span className="text-body-sm text-text-secondary">{t.type}</span>
                   {!isExam && !isAlert && (
                     <span className="text-caption text-text-tertiary font-mono">{t.id}</span>
