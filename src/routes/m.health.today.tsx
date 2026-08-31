@@ -284,8 +284,16 @@ function TodayTasksPage() {
     if (mineOnly) list = list.filter((t) => assignees[t.id] === me);
     if (selectedTypes.size > 0)
       list = list.filter((t) => selectedTypes.has(t.type));
+    // 异常排查：先按紧急等级（高 > 中 > 低），同级按出现时间由早到晚
+    if (kindFilter === "异常排查") {
+      list = [...list].sort(
+        (a, b) =>
+          URGENCY_RANK[a.urgency ?? "低"] - URGENCY_RANK[b.urgency ?? "低"] ||
+          b.minutesAgo - a.minutesAgo,
+      );
+    }
     return list;
-  }, [tabTasks, selectedBarns, mineOnly, assignees, me, selectedTypes]);
+  }, [tabTasks, selectedBarns, mineOnly, assignees, me, selectedTypes, kindFilter]);
 
 
 
