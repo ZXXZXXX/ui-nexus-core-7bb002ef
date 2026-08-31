@@ -1034,8 +1034,12 @@ function TodayTasksPage() {
                   onClick={() => {
                     if (isBasicEvent) {
                       navigate({
-                        to: "/m/health/today/batch",
-                        search: { ids: allIds },
+                        to: "/m/events/$type/$id",
+                        params: {
+                          type: first!.type === "转群/转栏" ? "transfer" : "exam",
+                          id: first!.target.replace("#", ""),
+                        },
+                        search: { item: first!.type, batch: allIds },
                       });
                       return;
                     }

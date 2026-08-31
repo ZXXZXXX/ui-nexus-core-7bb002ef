@@ -11,8 +11,9 @@ import { Check } from "lucide-react";
 
 
 export const Route = createFileRoute("/m/events/$type/$id")({
-  validateSearch: (s: Record<string, unknown>): { item?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { item?: string; batch?: string } => ({
     item: typeof s.item === "string" ? s.item : undefined,
+    batch: typeof s.batch === "string" ? s.batch : undefined,
   }),
   head: () => ({ meta: [{ title: "事件记录 · 奇点智牧" }] }),
   component: EventPage,
@@ -20,14 +21,38 @@ export const Route = createFileRoute("/m/events/$type/$id")({
 
 function EventPage() {
   const { type, id } = useParams({ from: "/m/events/$type/$id" });
-  const { item } = Route.useSearch();
+  const { item, batch } = Route.useSearch();
   const navigate = useNavigate();
-  const done = () => navigate({ to: "/m/animals-{$id}", params: { id } });
+  const batchIds = (batch ?? "").split(",").filter(Boolean);
+  const batchCount = batchIds.length > 1 ? batchIds.length : 0;
+  const done = () =>
+    batchCount
+      ? navigate({ to: "/m/health/today" })
+      : navigate({ to: "/m/animals-{$id}", params: { id } });
   if (type === "calving") return <CalvingForm id={id} onDone={done} />;
-  if (type === "exam") return <ExamForm id={id} item={item} onDone={done} />;
-  if (type === "transfer") return <TransferForm id={id} onDone={done} />;
+  if (type === "exam") return <ExamForm id={id} item={item} onDone={done} batchCount={batchCount} />;
+  if (type === "transfer") return <TransferForm id={id} onDone={done} batchCount={batchCount} />;
   return <LeaveForm id={id} onDone={done} />;
 }
+
+/** 批量执行时的顶部提示：共计 N 个任务 · N 头牛只 */
+function BatchBanner({ count }: { count: number }) {
+  return (
+    <div className="px-4 pt-3">
+      <div className="text-caption text-text-tertiary inline-flex items-center gap-1.5">
+        <span>批量执行</span>
+        <span className="text-text-secondary">
+          共计 <span className="text-primary tabular-nums font-medium">{count}</span> 个任务
+        </span>
+        <span className="text-text-tertiary">·</span>
+        <span className="text-text-secondary">
+          <span className="text-primary tabular-nums font-medium">{count}</span> 头牛只
+        </span>
+      </div>
+    </div>
+  );
+}
+
 
 
 const TRANSFER_REASONS = [
@@ -108,7 +133,7 @@ function ReasonPicker({
   );
 }
 
-function TransferForm({ id, onDone }: { id: string; onDone: () => void }) {
+function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () => void; batchCount?: number }) {
   const currentBarn = "3 号牛舍";
   const [to, setTo] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -124,13 +149,14 @@ function TransferForm({ id, onDone }: { id: string; onDone: () => void }) {
   };
   const confirm = () => {
     setConfirmOpen(false);
-    toast.success(`已转至 ${to}`);
+    toast.success(batchCount ? `已提交 ${batchCount} 项转栏记录` : `已转至 ${to}`);
     onDone();
   };
 
   return (
-    <MobileShell title={`#${id} · 转栏/转群`} back hideTabBar>
+    <MobileShell title={batchCount ? "批量转栏/转群" : `#${id} · 转栏/转群`} back hideTabBar>
       <div className="pb-24">
+        {batchCount > 0 && <BatchBanner count={batchCount} />}
         <div className="px-4 pt-4">
           <div className="rounded-2xl bg-gradient-to-br from-primary to-[#00823F] p-4 text-primary-foreground flex items-center gap-3">
             <span className="h-11 w-11 rounded-xl bg-white/20 inline-flex items-center justify-center">
@@ -138,7 +164,9 @@ function TransferForm({ id, onDone }: { id: string; onDone: () => void }) {
             </span>
             <div>
               <div className="text-card-title">转栏 / 转群</div>
-              <div className="text-caption opacity-85">牛只 #{id}</div>
+              <div className="text-caption opacity-85">
+                {batchCount ? `${batchCount} 头牛只` : `牛只 #${id}`}
+              </div>
             </div>
           </div>
         </div>
@@ -149,8 +177,11 @@ function TransferForm({ id, onDone }: { id: string; onDone: () => void }) {
                 <MapPin className="h-3 w-3" />
                 当前位置
               </div>
-              <div className="text-body-sm text-foreground font-medium truncate">{currentBarn}</div>
+              <div className="text-body-sm text-foreground font-medium truncate">
+                {batchCount ? `${batchCount} 头牛只` : currentBarn}
+              </div>
             </div>
+
             <div className={`shrink-0 flex items-center justify-center w-7 ${to ? "text-primary" : "text-text-tertiary"}`}>
               <ArrowRight className="h-4 w-4" />
             </div>
@@ -221,7 +252,7 @@ function TransferForm({ id, onDone }: { id: string; onDone: () => void }) {
       </div>
       <ConfirmTransferDialog
         open={confirmOpen}
-        earTag={`#${id}`}
+        earTag={batchCount ? `${batchCount} 头牛只` : `#${id}`}
         barn={to}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={confirm}
@@ -1034,10 +1065,12 @@ function ExamForm({
   id,
   item,
   onDone,
+  batchCount = 0,
 }: {
   id: string;
   item?: string;
   onDone: () => void;
+  batchCount?: number;
 }) {
   const preset = EXAM_ITEMS.find(
     (it) => item && (it.label === item || item.includes(it.label.slice(0, 2))),
@@ -1073,14 +1106,16 @@ function ExamForm({
     if (active.ketosis && !ketosis) return toast.error("请输入酮病检查数值");
     if (active.urineph && !urineph) return toast.error("请输入尿液 PH 值");
     if (active.pregnancy && !pregnancy) return toast.error("请选择孕检结果");
-    toast.success("基础检查已保存");
+    toast.success(batchCount ? `已提交 ${batchCount} 项检查记录` : "基础检查已保存");
     onDone();
   };
 
   return (
-    <MobileShell title={`#${id} · 基础检查`} back hideTabBar>
+    <MobileShell title={batchCount ? "批量基础检查" : `#${id} · 基础检查`} back hideTabBar>
       <div className="pb-24">
+        {batchCount > 0 && <BatchBanner count={batchCount} />}
         <div className="px-4 mt-4 space-y-4">
+
           <Field label="检查日期" required>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
           </Field>
