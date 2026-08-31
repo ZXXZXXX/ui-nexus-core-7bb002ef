@@ -11,8 +11,9 @@ import { Check } from "lucide-react";
 
 
 export const Route = createFileRoute("/m/events/$type/$id")({
-  validateSearch: (s: Record<string, unknown>): { item?: string } => ({
+  validateSearch: (s: Record<string, unknown>): { item?: string; batch?: string } => ({
     item: typeof s.item === "string" ? s.item : undefined,
+    batch: typeof s.batch === "string" ? s.batch : undefined,
   }),
   head: () => ({ meta: [{ title: "事件记录 · 奇点智牧" }] }),
   component: EventPage,
@@ -20,14 +21,38 @@ export const Route = createFileRoute("/m/events/$type/$id")({
 
 function EventPage() {
   const { type, id } = useParams({ from: "/m/events/$type/$id" });
-  const { item } = Route.useSearch();
+  const { item, batch } = Route.useSearch();
   const navigate = useNavigate();
-  const done = () => navigate({ to: "/m/animals-{$id}", params: { id } });
+  const batchIds = (batch ?? "").split(",").filter(Boolean);
+  const batchCount = batchIds.length > 1 ? batchIds.length : 0;
+  const done = () =>
+    batchCount
+      ? navigate({ to: "/m/health/today" })
+      : navigate({ to: "/m/animals-{$id}", params: { id } });
   if (type === "calving") return <CalvingForm id={id} onDone={done} />;
-  if (type === "exam") return <ExamForm id={id} item={item} onDone={done} />;
-  if (type === "transfer") return <TransferForm id={id} onDone={done} />;
+  if (type === "exam") return <ExamForm id={id} item={item} onDone={done} batchCount={batchCount} />;
+  if (type === "transfer") return <TransferForm id={id} onDone={done} batchCount={batchCount} />;
   return <LeaveForm id={id} onDone={done} />;
 }
+
+/** 批量执行时的顶部提示：共计 N 个任务 · N 头牛只 */
+function BatchBanner({ count }: { count: number }) {
+  return (
+    <div className="px-4 pt-3">
+      <div className="text-caption text-text-tertiary inline-flex items-center gap-1.5">
+        <span>批量执行</span>
+        <span className="text-text-secondary">
+          共计 <span className="text-primary tabular-nums font-medium">{count}</span> 个任务
+        </span>
+        <span className="text-text-tertiary">·</span>
+        <span className="text-text-secondary">
+          <span className="text-primary tabular-nums font-medium">{count}</span> 头牛只
+        </span>
+      </div>
+    </div>
+  );
+}
+
 
 
 const TRANSFER_REASONS = [
