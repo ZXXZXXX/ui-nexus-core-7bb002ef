@@ -1114,6 +1114,8 @@ function ExamForm({
     if (active.ketosis && !ketosis) return toast.error("请输入酮病检查数值");
     if (active.urineph && !urineph) return toast.error("请输入尿液 PH 值");
     if (active.pregnancy && !pregnancy) return toast.error("请选择孕检结果");
+    if (active.brucella && !brucella) return toast.error("请选择布病 A19 抗体检测结果");
+    if (active.ibrbvdv && !ibrbvdv) return toast.error("请选择 IBR/BVDV 抗体检测结果");
     toast.success(batchCount ? `已提交 ${batchCount} 项检查记录` : "基础检查已保存");
     onDone();
   };
