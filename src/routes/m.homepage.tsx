@@ -257,6 +257,14 @@ function MHomePage() {
 
 // ---------------- 数据 ----------------
 export type TaskKind = "工单" | "基础事件" | "异常排查";
+/** 异常排查任务的紧急等级（高 > 中 > 低） */
+export type AlertUrgency = "高" | "中" | "低";
+export const URGENCY_RANK: Record<AlertUrgency, number> = { 高: 0, 中: 1, 低: 2 };
+export const urgencyMeta: Record<AlertUrgency, { label: string; bg: string; text: string }> = {
+  高: { label: "高", bg: "bg-[#FEE2E2]", text: "text-[#DC2626]" },
+  中: { label: "中", bg: "bg-[#FFF3E0]", text: "text-[#EA8C00]" },
+  低: { label: "低", bg: "bg-[#FEF9C3]", text: "text-[#B08900]" },
+};
 export type HomeTask = {
   id: string;
   target: string;
