@@ -1032,13 +1032,6 @@ function TodayTasksPage() {
                   type="button"
                   disabled={count === 0 || !batchExecOk}
                   onClick={() => {
-                    if (isBasicEvent) {
-                      navigate({
-                        to: "/m/health/today/batch",
-                        search: { ids: allIds },
-                      });
-                      return;
-                    }
                     navigate({
                       to: "/m/health/$id/execute",
                       params: { id: first!.id },
