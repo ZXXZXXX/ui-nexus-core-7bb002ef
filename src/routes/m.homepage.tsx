@@ -257,6 +257,14 @@ function MHomePage() {
 
 // ---------------- 数据 ----------------
 export type TaskKind = "工单" | "基础事件" | "异常排查";
+/** 异常排查任务的紧急等级（高 > 中 > 低） */
+export type AlertUrgency = "高" | "中" | "低";
+export const URGENCY_RANK: Record<AlertUrgency, number> = { 高: 0, 中: 1, 低: 2 };
+export const urgencyMeta: Record<AlertUrgency, { label: string; bg: string; text: string }> = {
+  高: { label: "高", bg: "bg-[#FEE2E2]", text: "text-[#DC2626]" },
+  中: { label: "中", bg: "bg-[#FFF3E0]", text: "text-[#EA8C00]" },
+  低: { label: "低", bg: "bg-[#FEF9C3]", text: "text-[#B08900]" },
+};
 export type HomeTask = {
   id: string;
   target: string;
@@ -267,6 +275,7 @@ export type HomeTask = {
   kind?: TaskKind; // 缺省为「工单」
   dueDate?: string; // 基础事件：平台给出的完成期限
   cattleId?: string; // 异常排查：跳转牛只档案
+  urgency?: AlertUrgency; // 异常排查：紧急等级
 };
 
 
@@ -358,10 +367,13 @@ export const homeTasks: HomeTask[] = [
   { id: "TR-0332", target: "#01-24-2502", conclusion: "围产转群 · 转入 围产群（产房 1 号）", type: "转群/转栏", status: "进行中", minutesAgo: 26, kind: "基础事件", dueDate: "2026-08-10" },
   { id: "TR-0333", target: "#01-24-2503", conclusion: "围产转群 · 转入 围产群（产房 1 号）", type: "转群/转栏", status: "进行中", minutesAgo: 47, kind: "基础事件", dueDate: "2026-08-10" },
 
-  // 异常排查类（设备预警）
-  { id: "AL-0101", target: "#01-24-2405", conclusion: "耳温异常", type: "耳温数据", status: "进行中", minutesAgo: 6, kind: "异常排查", cattleId: "01-24-2405" },
-  { id: "AL-0102", target: "#01-24-2418", conclusion: "颈环异常", type: "颈环数据", status: "进行中", minutesAgo: 19, kind: "异常排查", cattleId: "01-24-2418" },
-  { id: "AL-0103", target: "#01-24-2432", conclusion: "奶量异常", type: "奶量数据", status: "进行中", minutesAgo: 35, kind: "异常排查", cattleId: "01-24-2432" },
+  // 异常排查类（设备预警）· urgency 为异常紧急等级
+  { id: "AL-0101", target: "#01-24-2405", conclusion: "耳温异常", type: "耳温数据", status: "进行中", minutesAgo: 6, kind: "异常排查", cattleId: "01-24-2405", urgency: "高" },
+  { id: "AL-0102", target: "#01-24-2418", conclusion: "颈环异常", type: "颈环数据", status: "进行中", minutesAgo: 19, kind: "异常排查", cattleId: "01-24-2418", urgency: "中" },
+  { id: "AL-0103", target: "#01-24-2432", conclusion: "奶量异常", type: "奶量数据", status: "进行中", minutesAgo: 35, kind: "异常排查", cattleId: "01-24-2432", urgency: "低" },
+  { id: "AL-0104", target: "#01-24-2447", conclusion: "耳温持续偏高", type: "耳温数据", status: "进行中", minutesAgo: 128, kind: "异常排查", cattleId: "01-24-2447", urgency: "高" },
+  { id: "AL-0105", target: "#01-24-2455", conclusion: "反刍时长骤降", type: "颈环数据", status: "进行中", minutesAgo: 76, kind: "异常排查", cattleId: "01-24-2455", urgency: "中" },
+  { id: "AL-0106", target: "#01-24-2461", conclusion: "奶量连续下滑", type: "奶量数据", status: "进行中", minutesAgo: 210, kind: "异常排查", cattleId: "01-24-2461", urgency: "低" },
 ];
 
 

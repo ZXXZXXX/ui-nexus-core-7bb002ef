@@ -44,6 +44,9 @@ import {
   typeMeta,
   taskCardContent,
   BASIC_EVENT_TYPES,
+  URGENCY_RANK,
+  urgencyMeta,
+  formatTimeAgo,
   type HomeTask,
   type TaskChip,
 } from "@/routes/m.homepage";
@@ -281,8 +284,16 @@ function TodayTasksPage() {
     if (mineOnly) list = list.filter((t) => assignees[t.id] === me);
     if (selectedTypes.size > 0)
       list = list.filter((t) => selectedTypes.has(t.type));
+    // 异常排查：先按紧急等级（高 > 中 > 低），同级按出现时间由早到晚
+    if (kindFilter === "异常排查") {
+      list = [...list].sort(
+        (a, b) =>
+          URGENCY_RANK[a.urgency ?? "低"] - URGENCY_RANK[b.urgency ?? "低"] ||
+          b.minutesAgo - a.minutesAgo,
+      );
+    }
     return list;
-  }, [tabTasks, selectedBarns, mineOnly, assignees, me, selectedTypes]);
+  }, [tabTasks, selectedBarns, mineOnly, assignees, me, selectedTypes, kindFilter]);
 
 
 
@@ -756,6 +767,8 @@ function TodayTasksPage() {
             const isAlert = t.kind === "异常排查";
             const meta = typeMeta[t.type] ?? typeMeta["疾病治疗"];
             const Icon = meta.icon;
+            const urg = isAlert ? t.urgency ?? "低" : null;
+            const uMeta = urg ? urgencyMeta[urg] : null;
             const checked = selected.has(t.id);
             const chip: TaskChip | null = isAlert
               ? t.cattleId && handledAlerts.has(t.cattleId)
@@ -790,17 +803,29 @@ function TodayTasksPage() {
             const tabChip: TaskChip =
               activeTab === "待诊断" ? "待诊断" : activeTab === "待复查" ? "待复查" : "待执行";
             const actionLine = taskCardContent(t, tabChip);
-            const timeAgo = `${((tasks.indexOf(t) + 1) * 2) % 59 || 2}分钟前`;
+            const timeAgo = isAlert
+              ? formatTimeAgo(t.minutesAgo)
+              : `${((tasks.indexOf(t) + 1) * 2) % 59 || 2}分钟前`;
 
             const inner = (
               <div className="px-3.5 py-3">
                 {/* 顶部:类型 + 编号 + 状态 + 时间 */}
                 <div className="flex items-center gap-1.5">
-                  <span
-                    className={`h-5 w-5 rounded-full ${meta.bg} ${meta.text} inline-flex items-center justify-center shrink-0`}
-                  >
-                    <Icon className="h-3 w-3" strokeWidth={2} />
-                  </span>
+                  {uMeta ? (
+                    <span
+                      className={`h-5 min-w-5 px-1 rounded-full ${uMeta.bg} ${uMeta.text} inline-flex items-center justify-center shrink-0 text-caption font-medium leading-none`}
+                      title={`紧急等级：${uMeta.label}`}
+                      aria-label={`紧急等级 ${uMeta.label}`}
+                    >
+                      {uMeta.label}
+                    </span>
+                  ) : (
+                    <span
+                      className={`h-5 w-5 rounded-full ${meta.bg} ${meta.text} inline-flex items-center justify-center shrink-0`}
+                    >
+                      <Icon className="h-3 w-3" strokeWidth={2} />
+                    </span>
+                  )}
                   <span className="text-body-sm text-text-secondary">{t.type}</span>
                   {!isExam && !isAlert && (
                     <span className="text-caption text-text-tertiary font-mono">{t.id}</span>
