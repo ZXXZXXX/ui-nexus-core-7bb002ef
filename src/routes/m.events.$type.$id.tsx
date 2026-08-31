@@ -1208,6 +1208,47 @@ function ExamForm({
               </div>
             </Field>
           )}
+          {active.brucella && (
+            <Field label="布病 A19 免疫抗体检测结果" required>
+              <div className="grid grid-cols-2 gap-2">
+                {(["合格", "不合格"] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setBrucella(k)}
+                    className={`h-11 rounded-lg text-body-sm ${
+                      brucella === k
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card border border-border text-text-secondary"
+                    }`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+              <div className="text-caption text-text-tertiary mt-1">阻断率 ≥ 40% 判定为合格</div>
+            </Field>
+          )}
+          {active.ibrbvdv && (
+            <Field label="IBR/BVDV 免疫抗体检测结果" required>
+              <div className="grid grid-cols-2 gap-2">
+                {(["合格", "不合格"] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setIbrbvdv(k)}
+                    className={`h-11 rounded-lg text-body-sm ${
+                      ibrbvdv === k
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card border border-border text-text-secondary"
+                    }`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            </Field>
+          )}
 
 
           <Field label="现场影像">
