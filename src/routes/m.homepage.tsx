@@ -421,6 +421,8 @@ export const typeMeta: Record<string, { icon: typeof Pill; bg: string; text: str
   "子宫分泌物检查": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "酮病检查":       { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "尿液 PH 值检查": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "布病 A19 免疫抗体检测": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "IBR/BVDV 免疫抗体检测": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "孕检":           { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "转群/转栏":      { icon: ArrowRightLeft, bg: "bg-[#EEF2FF]", text: "text-[#6366F1]" },
   // 异常排查类（警示色）
