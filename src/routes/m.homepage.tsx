@@ -267,6 +267,7 @@ export type HomeTask = {
   kind?: TaskKind; // 缺省为「工单」
   dueDate?: string; // 基础事件：平台给出的完成期限
   cattleId?: string; // 异常排查：跳转牛只档案
+  urgency?: AlertUrgency; // 异常排查：紧急等级
 };
 
 
