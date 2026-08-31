@@ -1106,14 +1106,16 @@ function ExamForm({
     if (active.ketosis && !ketosis) return toast.error("请输入酮病检查数值");
     if (active.urineph && !urineph) return toast.error("请输入尿液 PH 值");
     if (active.pregnancy && !pregnancy) return toast.error("请选择孕检结果");
-    toast.success("基础检查已保存");
+    toast.success(batchCount ? `已提交 ${batchCount} 项检查记录` : "基础检查已保存");
     onDone();
   };
 
   return (
-    <MobileShell title={`#${id} · 基础检查`} back hideTabBar>
+    <MobileShell title={batchCount ? "批量基础检查" : `#${id} · 基础检查`} back hideTabBar>
       <div className="pb-24">
+        {batchCount > 0 && <BatchBanner count={batchCount} />}
         <div className="px-4 mt-4 space-y-4">
+
           <Field label="检查日期" required>
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
           </Field>
