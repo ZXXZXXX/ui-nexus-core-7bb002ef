@@ -318,8 +318,46 @@ export const homeTasks: HomeTask[] = [
   { id: "EX-0903", target: "#01-24-2313", conclusion: "孕检", type: "孕检", status: "进行中", minutesAgo: 44, kind: "基础事件", dueDate: "2026-08-08" },
   { id: "EX-0904", target: "#01-24-2325", conclusion: "子宫分泌物检查", type: "子宫分泌物检查", status: "进行中", minutesAgo: 52, kind: "基础事件", dueDate: "2026-08-11" },
   { id: "EX-0905", target: "#01-24-2338", conclusion: "尿液 PH 值检查", type: "尿液 PH 值检查", status: "进行中", minutesAgo: 61, kind: "基础事件", dueDate: "2026-08-13" },
+  // 孕检 · 批量演示
+  { id: "EX-0911", target: "#01-24-2401", conclusion: "孕检", type: "孕检", status: "进行中", minutesAgo: 12, kind: "基础事件", dueDate: "2026-08-08" },
+  { id: "EX-0912", target: "#01-24-2402", conclusion: "孕检", type: "孕检", status: "进行中", minutesAgo: 18, kind: "基础事件", dueDate: "2026-08-08" },
+  { id: "EX-0913", target: "#01-24-2403", conclusion: "孕检", type: "孕检", status: "进行中", minutesAgo: 24, kind: "基础事件", dueDate: "2026-08-08" },
+  { id: "EX-0914", target: "#01-24-2404", conclusion: "孕检", type: "孕检", status: "进行中", minutesAgo: 30, kind: "基础事件", dueDate: "2026-08-09" },
+  // 酮病检查 · 批量演示
+  { id: "EX-0921", target: "#01-24-2411", conclusion: "酮病检查", type: "酮病检查", status: "进行中", minutesAgo: 14, kind: "基础事件", dueDate: "2026-08-12" },
+  { id: "EX-0922", target: "#01-24-2412", conclusion: "酮病检查", type: "酮病检查", status: "进行中", minutesAgo: 21, kind: "基础事件", dueDate: "2026-08-12" },
+  { id: "EX-0923", target: "#01-24-2413", conclusion: "酮病检查", type: "酮病检查", status: "进行中", minutesAgo: 29, kind: "基础事件", dueDate: "2026-08-12" },
+  { id: "EX-0924", target: "#01-24-2414", conclusion: "酮病检查", type: "酮病检查", status: "进行中", minutesAgo: 40, kind: "基础事件", dueDate: "2026-08-13" },
+  // 尿液 PH 值检测 · 批量演示
+  { id: "EX-0931", target: "#01-24-2421", conclusion: "尿液 PH 值检查", type: "尿液 PH 值检查", status: "进行中", minutesAgo: 16, kind: "基础事件", dueDate: "2026-08-13" },
+  { id: "EX-0932", target: "#01-24-2422", conclusion: "尿液 PH 值检查", type: "尿液 PH 值检查", status: "进行中", minutesAgo: 23, kind: "基础事件", dueDate: "2026-08-13" },
+  { id: "EX-0933", target: "#01-24-2423", conclusion: "尿液 PH 值检查", type: "尿液 PH 值检查", status: "进行中", minutesAgo: 34, kind: "基础事件", dueDate: "2026-08-13" },
+  { id: "EX-0934", target: "#01-24-2424", conclusion: "尿液 PH 值检查", type: "尿液 PH 值检查", status: "进行中", minutesAgo: 45, kind: "基础事件", dueDate: "2026-08-14" },
+  // 布病 A19 疫苗免疫抗体检测 · 批量演示
+  { id: "EX-0941", target: "#01-24-2431", conclusion: "布病 A19 疫苗免疫抗体检测", type: "布病 A19 免疫抗体检测", status: "进行中", minutesAgo: 11, kind: "基础事件", dueDate: "2026-08-15" },
+  { id: "EX-0942", target: "#01-24-2432", conclusion: "布病 A19 疫苗免疫抗体检测", type: "布病 A19 免疫抗体检测", status: "进行中", minutesAgo: 19, kind: "基础事件", dueDate: "2026-08-15" },
+  { id: "EX-0943", target: "#01-24-2433", conclusion: "布病 A19 疫苗免疫抗体检测", type: "布病 A19 免疫抗体检测", status: "进行中", minutesAgo: 27, kind: "基础事件", dueDate: "2026-08-15" },
+  { id: "EX-0944", target: "#01-24-2434", conclusion: "布病 A19 疫苗免疫抗体检测", type: "布病 A19 免疫抗体检测", status: "进行中", minutesAgo: 38, kind: "基础事件", dueDate: "2026-08-16" },
+  // 后备牛 IBR/BVDV 免疫抗体检测 · 批量演示
+  { id: "EX-0951", target: "#01-24-2441", conclusion: "后备牛 IBR/BVDV 免疫抗体检测", type: "IBR/BVDV 免疫抗体检测", status: "进行中", minutesAgo: 13, kind: "基础事件", dueDate: "2026-08-16" },
+  { id: "EX-0952", target: "#01-24-2442", conclusion: "后备牛 IBR/BVDV 免疫抗体检测", type: "IBR/BVDV 免疫抗体检测", status: "进行中", minutesAgo: 22, kind: "基础事件", dueDate: "2026-08-16" },
+  { id: "EX-0953", target: "#01-24-2443", conclusion: "后备牛 IBR/BVDV 免疫抗体检测", type: "IBR/BVDV 免疫抗体检测", status: "进行中", minutesAgo: 31, kind: "基础事件", dueDate: "2026-08-16" },
+  { id: "EX-0954", target: "#01-24-2444", conclusion: "后备牛 IBR/BVDV 免疫抗体检测", type: "IBR/BVDV 免疫抗体检测", status: "进行中", minutesAgo: 43, kind: "基础事件", dueDate: "2026-08-17" },
   { id: "TR-0201", target: "#01-24-2352", conclusion: "由 3 号牛舍转入 泌乳一群（1 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 15, kind: "基础事件", dueDate: "2026-08-09" },
   { id: "TR-0202", target: "#01-24-2364", conclusion: "由 病牛舍 转回 泌乳二群（2 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 33, kind: "基础事件", dueDate: "2026-08-10" },
+  // 6 月龄牛只转群 · 批量演示
+  { id: "TR-0311", target: "#01-25-1101", conclusion: "6 月龄转群 · 转入 育成一群（5 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 17, kind: "基础事件", dueDate: "2026-08-11" },
+  { id: "TR-0312", target: "#01-25-1102", conclusion: "6 月龄转群 · 转入 育成一群（5 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 24, kind: "基础事件", dueDate: "2026-08-11" },
+  { id: "TR-0313", target: "#01-25-1103", conclusion: "6 月龄转群 · 转入 育成一群（5 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 36, kind: "基础事件", dueDate: "2026-08-11" },
+  // 犊牛转育成交接转群 · 批量演示
+  { id: "TR-0321", target: "#01-26-0201", conclusion: "犊牛转育成交接 · 转入 育成二群（6 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 20, kind: "基础事件", dueDate: "2026-08-12" },
+  { id: "TR-0322", target: "#01-26-0202", conclusion: "犊牛转育成交接 · 转入 育成二群（6 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 28, kind: "基础事件", dueDate: "2026-08-12" },
+  { id: "TR-0323", target: "#01-26-0203", conclusion: "犊牛转育成交接 · 转入 育成二群（6 号牛舍）", type: "转群/转栏", status: "进行中", minutesAgo: 41, kind: "基础事件", dueDate: "2026-08-12" },
+  // 围产转群 · 批量演示
+  { id: "TR-0331", target: "#01-24-2501", conclusion: "围产转群 · 转入 围产群（产房 1 号）", type: "转群/转栏", status: "进行中", minutesAgo: 9, kind: "基础事件", dueDate: "2026-08-10" },
+  { id: "TR-0332", target: "#01-24-2502", conclusion: "围产转群 · 转入 围产群（产房 1 号）", type: "转群/转栏", status: "进行中", minutesAgo: 26, kind: "基础事件", dueDate: "2026-08-10" },
+  { id: "TR-0333", target: "#01-24-2503", conclusion: "围产转群 · 转入 围产群（产房 1 号）", type: "转群/转栏", status: "进行中", minutesAgo: 47, kind: "基础事件", dueDate: "2026-08-10" },
+
   // 异常排查类（设备预警）
   { id: "AL-0101", target: "#01-24-2405", conclusion: "耳温异常", type: "耳温数据", status: "进行中", minutesAgo: 6, kind: "异常排查", cattleId: "01-24-2405" },
   { id: "AL-0102", target: "#01-24-2418", conclusion: "颈环异常", type: "颈环数据", status: "进行中", minutesAgo: 19, kind: "异常排查", cattleId: "01-24-2418" },
@@ -383,6 +421,8 @@ export const typeMeta: Record<string, { icon: typeof Pill; bg: string; text: str
   "子宫分泌物检查": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "酮病检查":       { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "尿液 PH 值检查": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "布病 A19 免疫抗体检测": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
+  "IBR/BVDV 免疫抗体检测": { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "孕检":           { icon: ClipboardCheck, bg: "bg-[#E6F7FE]", text: "text-[#0EA5E9]" },
   "转群/转栏":      { icon: ArrowRightLeft, bg: "bg-[#EEF2FF]", text: "text-[#6366F1]" },
   // 异常排查类（警示色）
@@ -398,6 +438,8 @@ export const BASIC_EVENT_TYPES = [
   "子宫分泌物检查",
   "酮病检查",
   "尿液 PH 值检查",
+  "布病 A19 免疫抗体检测",
+  "IBR/BVDV 免疫抗体检测",
   "孕检",
   "转群/转栏",
 ];

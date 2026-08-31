@@ -1052,14 +1052,17 @@ function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
   );
 }
 
-type ExamKey = "temp" | "discharge" | "ketosis" | "urineph" | "pregnancy";
+type ExamKey = "temp" | "discharge" | "ketosis" | "urineph" | "pregnancy" | "brucella" | "ibrbvdv";
 const EXAM_ITEMS: { key: ExamKey; label: string; unit?: string; hint?: string }[] = [
   { key: "temp", label: "体温检查", unit: "℃", hint: "正常 38.0 ~ 39.3" },
   { key: "discharge", label: "子宫分泌物检查", hint: "1 分（清亮）~ 5 分（脓性恶臭）" },
   { key: "ketosis", label: "酮病检查", unit: "mmol/L", hint: "血酮 ≥ 1.2 提示亚临床酮病" },
   { key: "urineph", label: "尿液 PH 值检查", hint: "正常 7.8 ~ 8.4" },
   { key: "pregnancy", label: "孕检" },
+  { key: "brucella", label: "布病 A19 免疫抗体检测", hint: "阻断率 ≥ 40% 判定为合格" },
+  { key: "ibrbvdv", label: "IBR/BVDV 免疫抗体检测", hint: "后备牛免疫抗体水平监测" },
 ];
+
 
 function ExamForm({
   id,
@@ -1082,6 +1085,8 @@ function ExamForm({
     ketosis: preset === "ketosis",
     urineph: preset === "urineph",
     pregnancy: preset === "pregnancy",
+    brucella: preset === "brucella",
+    ibrbvdv: preset === "ibrbvdv",
   });
 
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -1090,6 +1095,9 @@ function ExamForm({
   const [ketosis, setKetosis] = useState("");
   const [urineph, setUrineph] = useState("");
   const [pregnancy, setPregnancy] = useState<"有" | "无" | null>(null);
+  const [brucella, setBrucella] = useState<"合格" | "不合格" | null>(null);
+  const [ibrbvdv, setIbrbvdv] = useState<"合格" | "不合格" | null>(null);
+
   const [note, setNote] = useState("");
   const [media, setMedia] = useState<number[]>([]);
 
@@ -1106,6 +1114,8 @@ function ExamForm({
     if (active.ketosis && !ketosis) return toast.error("请输入酮病检查数值");
     if (active.urineph && !urineph) return toast.error("请输入尿液 PH 值");
     if (active.pregnancy && !pregnancy) return toast.error("请选择孕检结果");
+    if (active.brucella && !brucella) return toast.error("请选择布病 A19 抗体检测结果");
+    if (active.ibrbvdv && !ibrbvdv) return toast.error("请选择 IBR/BVDV 抗体检测结果");
     toast.success(batchCount ? `已提交 ${batchCount} 项检查记录` : "基础检查已保存");
     onDone();
   };
@@ -1188,6 +1198,47 @@ function ExamForm({
                     onClick={() => setPregnancy(k)}
                     className={`h-11 rounded-lg text-body-sm ${
                       pregnancy === k
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card border border-border text-text-secondary"
+                    }`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            </Field>
+          )}
+          {active.brucella && (
+            <Field label="布病 A19 免疫抗体检测结果" required>
+              <div className="grid grid-cols-2 gap-2">
+                {(["合格", "不合格"] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setBrucella(k)}
+                    className={`h-11 rounded-lg text-body-sm ${
+                      brucella === k
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-card border border-border text-text-secondary"
+                    }`}
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+              <div className="text-caption text-text-tertiary mt-1">阻断率 ≥ 40% 判定为合格</div>
+            </Field>
+          )}
+          {active.ibrbvdv && (
+            <Field label="IBR/BVDV 免疫抗体检测结果" required>
+              <div className="grid grid-cols-2 gap-2">
+                {(["合格", "不合格"] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => setIbrbvdv(k)}
+                    className={`h-11 rounded-lg text-body-sm ${
+                      ibrbvdv === k
                         ? "bg-primary text-primary-foreground"
                         : "bg-card border border-border text-text-secondary"
                     }`}
