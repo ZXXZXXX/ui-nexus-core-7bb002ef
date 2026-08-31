@@ -252,7 +252,7 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
       </div>
       <ConfirmTransferDialog
         open={confirmOpen}
-        earTag={`#${id}`}
+        earTag={batchCount ? `${batchCount} 头牛只` : `#${id}`}
         barn={to}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={confirm}
