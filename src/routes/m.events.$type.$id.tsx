@@ -149,13 +149,14 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
   };
   const confirm = () => {
     setConfirmOpen(false);
-    toast.success(`已转至 ${to}`);
+    toast.success(batchCount ? `已提交 ${batchCount} 项转栏记录` : `已转至 ${to}`);
     onDone();
   };
 
   return (
-    <MobileShell title={`#${id} · 转栏/转群`} back hideTabBar>
+    <MobileShell title={batchCount ? "批量转栏/转群" : `#${id} · 转栏/转群`} back hideTabBar>
       <div className="pb-24">
+        {batchCount > 0 && <BatchBanner count={batchCount} />}
         <div className="px-4 pt-4">
           <div className="rounded-2xl bg-gradient-to-br from-primary to-[#00823F] p-4 text-primary-foreground flex items-center gap-3">
             <span className="h-11 w-11 rounded-xl bg-white/20 inline-flex items-center justify-center">
@@ -163,7 +164,9 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
             </span>
             <div>
               <div className="text-card-title">转栏 / 转群</div>
-              <div className="text-caption opacity-85">牛只 #{id}</div>
+              <div className="text-caption opacity-85">
+                {batchCount ? `${batchCount} 头牛只` : `牛只 #${id}`}
+              </div>
             </div>
           </div>
         </div>
@@ -174,8 +177,11 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
                 <MapPin className="h-3 w-3" />
                 当前位置
               </div>
-              <div className="text-body-sm text-foreground font-medium truncate">{currentBarn}</div>
+              <div className="text-body-sm text-foreground font-medium truncate">
+                {batchCount ? `${batchCount} 头牛只` : currentBarn}
+              </div>
             </div>
+
             <div className={`shrink-0 flex items-center justify-center w-7 ${to ? "text-primary" : "text-text-tertiary"}`}>
               <ArrowRight className="h-4 w-4" />
             </div>
