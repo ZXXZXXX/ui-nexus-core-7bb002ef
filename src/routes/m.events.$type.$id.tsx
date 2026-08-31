@@ -1052,14 +1052,17 @@ function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
   );
 }
 
-type ExamKey = "temp" | "discharge" | "ketosis" | "urineph" | "pregnancy";
+type ExamKey = "temp" | "discharge" | "ketosis" | "urineph" | "pregnancy" | "brucella" | "ibrbvdv";
 const EXAM_ITEMS: { key: ExamKey; label: string; unit?: string; hint?: string }[] = [
   { key: "temp", label: "体温检查", unit: "℃", hint: "正常 38.0 ~ 39.3" },
   { key: "discharge", label: "子宫分泌物检查", hint: "1 分（清亮）~ 5 分（脓性恶臭）" },
   { key: "ketosis", label: "酮病检查", unit: "mmol/L", hint: "血酮 ≥ 1.2 提示亚临床酮病" },
   { key: "urineph", label: "尿液 PH 值检查", hint: "正常 7.8 ~ 8.4" },
   { key: "pregnancy", label: "孕检" },
+  { key: "brucella", label: "布病 A19 免疫抗体检测", hint: "阻断率 ≥ 40% 判定为合格" },
+  { key: "ibrbvdv", label: "IBR/BVDV 免疫抗体检测", hint: "后备牛免疫抗体水平监测" },
 ];
+
 
 function ExamForm({
   id,
