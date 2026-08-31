@@ -1085,6 +1085,8 @@ function ExamForm({
     ketosis: preset === "ketosis",
     urineph: preset === "urineph",
     pregnancy: preset === "pregnancy",
+    brucella: preset === "brucella",
+    ibrbvdv: preset === "ibrbvdv",
   });
 
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -1093,6 +1095,9 @@ function ExamForm({
   const [ketosis, setKetosis] = useState("");
   const [urineph, setUrineph] = useState("");
   const [pregnancy, setPregnancy] = useState<"有" | "无" | null>(null);
+  const [brucella, setBrucella] = useState<"合格" | "不合格" | null>(null);
+  const [ibrbvdv, setIbrbvdv] = useState<"合格" | "不合格" | null>(null);
+
   const [note, setNote] = useState("");
   const [media, setMedia] = useState<number[]>([]);
 
