@@ -133,7 +133,7 @@ function ReasonPicker({
   );
 }
 
-function TransferForm({ id, onDone }: { id: string; onDone: () => void }) {
+function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () => void; batchCount?: number }) {
   const currentBarn = "3 号牛舍";
   const [to, setTo] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
