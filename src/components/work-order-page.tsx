@@ -202,8 +202,9 @@ type ColKey =
   | "diagnosis"
   | "desc"
   | "timeInfo"
+  | "proposer"
   | "reviewer"
-  | "staff"
+  | "executor"
   | "pickup"
   | "action";
 
@@ -223,8 +224,9 @@ const ALL_COLS: ColDef[] = [
   { key: "diagnosis", label: "疾病结论", width: 140 },
   { key: "desc", label: "具体描述", width: 240 },
   { key: "timeInfo", label: "时间信息", width: 180 },
+  { key: "proposer", label: "提出人", width: 100 },
   { key: "reviewer", label: "诊断人", width: 100 },
-  { key: "staff", label: "人员信息", width: 180 },
+  { key: "executor", label: "执行人", width: 160 },
   { key: "pickup", label: "领物信息", width: 110 },
   { key: "action", label: "操作名称", width: 120, locked: true },
 ];
@@ -422,11 +424,6 @@ export function WorkOrderPage({
     if (o.executors?.length) return o.executors;
     const single = o.executor ?? o.who;
     return single ? [single] : [];
-  };
-  /** 疫苗/驱虫工单人员信息展示：仅基于执行人，未执行时显示"平台 → -" */
-  const platformStaffText = (o: WorkOrder): string => {
-    const executor = o.executor ?? o.executors?.[0];
-    return `平台 → ${executor ?? "-"}`;
   };
 
   const openMoreAction = (type: MoreActionType, o: WorkOrder) => {
@@ -664,16 +661,17 @@ export function WorkOrderPage({
         return o.event ? o.event.split(" · ")[0] : "";
       case "desc":
         return o.desc ?? "";
+      case "proposer":
+        return isPlatformOrder(o) ? "平台" : (o.proposer || "—");
       case "reviewer":
         return reviewerOf(o) || "—";
+      case "executor": {
+        if (isPlatformOrder(o)) return o.executor ?? o.executors?.[0] ?? "—";
+        const list = effectiveExecutors(o);
+        return list.length ? list.join("、") : "未指派";
+      }
       case "timeInfo":
         return `提出 ${o.createdAt ?? ""}${o.reviewedAt ? ` · 诊断 ${o.reviewedAt}` : ""}${o.executedAt ? ` · 执行 ${o.executedAt}` : ""}`;
-      case "staff": {
-        // 疫苗免疫 / 驱虫工单：由平台发起，仅一名执行人；未执行前显示"平台 → -"
-        if (isPlatformOrder(o)) return platformStaffText(o);
-        const list = effectiveExecutors(o);
-        return `${o.proposer ?? ""} → ${list.length ? list.join("、") : "未指派"}`;
-      }
       case "pickup":
         return title === "疾病治疗" || title === "产后护理" ? "需要领物" : "无需领物";
       default:
@@ -751,14 +749,18 @@ export function WorkOrderPage({
             {o.executedAt ?? o.reviewedAt ?? o.createdAt}
           </span>
         );
-      case "staff": {
+      case "proposer": {
+        const p = isPlatformOrder(o) ? "平台" : (o.proposer || "");
+        return (
+          <span className="text-body-sm text-text-secondary whitespace-nowrap">{p || "—"}</span>
+        );
+      }
+      case "executor": {
         const text = isPlatformOrder(o)
-          ? platformStaffText(o)
+          ? (o.executor ?? o.executors?.[0] ?? "—")
           : (() => {
               const list = effectiveExecutors(o);
-              return list.length
-                ? `${o.proposer} → ${list.join("、")}`
-                : `${o.proposer} → 未指派`;
+              return list.length ? list.join("、") : "未指派";
             })();
         return (
           <span className="text-body-sm text-text-secondary truncate" title={text}>
