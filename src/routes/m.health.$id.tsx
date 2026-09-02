@@ -1059,7 +1059,6 @@ function ReviewTab({ isLoss, status, plan }: { isLoss: boolean; status: StatusKe
 
           <Section title="执行安排">
             <Field label="指定执行人" value={<PersonChip name="李雨晴" />} />
-            <Field label="复查记录" value={plan.reviewAction} />
           </Section>
         </>
     </>
