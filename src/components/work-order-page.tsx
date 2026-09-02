@@ -1577,16 +1577,110 @@ export function WorkOrderPage({
                 </section>
               )}
 
-              {/* 查看态：诊断记录 */}
+              {/* 查看态：诊断记录（与移动端字段一致） */}
               {detailTab === "diagnose" && (detail.status !== "待诊断" || mode === "view") && (
                 <section className="space-y-3">
                   <SectionHeader icon={<ClipboardCheck className="h-3.5 w-3.5" />} title="诊断记录" />
                   {reviewerOf(detail) || detail.reviewedAt ? (
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
-                      <Field label="诊断人" value={reviewerOf(detail) || "—"} />
-                      <Field label="诊断时间" value={detail.reviewedAt ?? "—"} />
-                      <Field label="诊断结论" value={plan.suspectedDisease || detail.event || "—"} />
-                      <Field label="匹配方案" value={plan.kbSource || "—"} />
+                    <div className="space-y-3">
+                      {/* 基础信息 */}
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
+                        <Field label="诊断人" value={reviewerOf(detail) || woPlan.diagnoser || "—"} />
+                        <Field label="诊断时间" value={detail.reviewedAt ?? woPlan.diagnoseTime ?? "—"} />
+                      </div>
+
+                      {/* 疾病信息 */}
+                      <div className="rounded-md border border-border p-4 space-y-3">
+                        <div>
+                          <div className="text-caption text-text-tertiary mb-1.5">症状标签</div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {diagSymptoms.length > 0
+                              ? diagSymptoms.map((t) => (
+                                  <span key={t} className="tag tag-brand">{t}</span>
+                                ))
+                              : <span className="text-body-sm text-text-tertiary">—</span>}
+                          </div>
+                        </div>
+                        <Field label="诊断结论" value={diagConclusion || "—"} />
+                      </div>
+
+                      {/* 具体描述 */}
+                      <div className="rounded-md border border-border p-4">
+                        <div className="text-caption text-text-tertiary mb-1.5">具体描述</div>
+                        <p className="text-body-sm text-text-secondary leading-relaxed whitespace-pre-line">
+                          {isLoss ? "疫苗冷链异常判定失效，作损耗处理。" : woPlan.description || "—"}
+                        </p>
+                      </div>
+
+                      {/* 证据材料 */}
+                      <div className="rounded-md border border-border p-4 space-y-3">
+                        <div className="text-caption text-text-tertiary">证据材料</div>
+                        <div>
+                          <div className="text-caption text-text-tertiary mb-2 inline-flex items-center gap-1">
+                            <Camera className="h-3 w-3" /> 照片 · 2 张
+                          </div>
+                          <div className="grid grid-cols-6 gap-2">
+                            {[0, 1].map((i) => (
+                              <div key={i} className="aspect-square rounded-md bg-gradient-to-br from-surface-subtle to-border border border-border" />
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-caption text-text-tertiary mb-2 inline-flex items-center gap-1">
+                            <Video className="h-3 w-3" /> 视频 · 1 段
+                          </div>
+                          <div className="grid grid-cols-6 gap-2">
+                            <div className="aspect-square rounded-md bg-gradient-to-br from-surface-subtle to-border border border-border inline-flex items-center justify-center">
+                              <PlayCircle className="h-5 w-5 text-text-tertiary" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 h-9 rounded-md bg-surface-subtle border border-border">
+                          <Mic className="h-4 w-4 text-primary" />
+                          <div className="flex-1 h-1.5 rounded-full bg-border overflow-hidden">
+                            <div className="h-full w-2/3 bg-primary/60" />
+                          </div>
+                          <span className="font-mono text-caption text-text-secondary">00:28</span>
+                        </div>
+                      </div>
+
+                      {/* 治疗方案 / 执行方案 */}
+                      <div className="rounded-md border border-border p-4 space-y-3">
+                        <div className="text-caption text-text-tertiary">治疗方案 / 执行方案</div>
+                        <ul className="space-y-3">
+                          {woPlan.drugs.map((m) => (
+                            <li key={m.name}>
+                              <div className="flex items-start gap-1.5 mb-1">
+                                {m.kind === "therapy" ? (
+                                  <Activity className="h-3.5 w-3.5 text-[#22ACEB] shrink-0 mt-0.5" />
+                                ) : (
+                                  <Pill className="h-3.5 w-3.5 text-primary shrink-0 mt-0.5" />
+                                )}
+                                <span className="text-body-sm font-medium text-foreground min-w-0 flex-1">{m.name}</span>
+                                {m.isSpecial && <span className="tag tag-warning shrink-0">特殊</span>}
+                              </div>
+                              <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-body-sm pl-5">
+                                <div><span className="text-text-tertiary">给药方法</span><span className="text-foreground ml-1">{m.use}</span></div>
+                                <div><span className="text-text-tertiary">单次剂量</span><span className="text-foreground ml-1">{m.dose}</span></div>
+                                <div><span className="text-text-tertiary">用药方法</span><span className="text-foreground ml-1">{m.method}</span></div>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="pt-3 border-t border-border text-body-sm inline-flex items-start gap-1">
+                          <FileText className="h-3.5 w-3.5 text-text-tertiary shrink-0 mt-0.5" />
+                          <span>
+                            <span className="text-text-tertiary">补充说明</span>
+                            <span className="text-foreground ml-1">{woPlan.prescription.note || "-"}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 执行安排 */}
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4">
+                        <Field label="指定执行人" value={effectiveExecutors(detail)[0] ?? "—"} />
+                        <Field label="复查记录" value={woPlan.reviewAction || "—"} />
+                      </div>
                     </div>
                   ) : (
                     <div className="rounded-md border border-border p-8 text-center text-body-sm text-text-tertiary">
@@ -1596,17 +1690,63 @@ export function WorkOrderPage({
                 </section>
               )}
 
-              {/* 查看态：执行记录 */}
+              {/* 查看态：执行记录（与移动端一致，按执行任务逐条展示） */}
               {detailTab === "execute" && (detail.status !== "待诊断" || mode === "view") && (
                 <section className="space-y-3">
                   <SectionHeader icon={<ClipboardList className="h-3.5 w-3.5" />} title="执行记录" />
-                  {effectiveExecutors(detail).length > 0 || detail.executedAt ? (
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
-                      <Field
-                        label={`执行人${effectiveExecutors(detail).length > 1 ? `（${effectiveExecutors(detail).length} 人）` : ""}`}
-                        value={effectiveExecutors(detail).join("、") || "—"}
-                      />
-                      <Field label="最近执行时间" value={detail.executedAt ?? "—"} />
+                  {execDays.length > 0 && (effectiveExecutors(detail).length > 0 || detail.executedAt) ? (
+                    <div className="space-y-3">
+                      {execDays.map((d) => {
+                        const isDone = d.phase === "done";
+                        const isActive = d.phase === "active";
+                        const statusLabel = isDone ? "已完成" : isActive ? "进行中" : "未开始";
+                        const statusClass = isDone ? "tag-success" : isActive ? "tag-info" : "tag-muted";
+                        const executors = effectiveExecutors(detail);
+                        return (
+                          <div
+                            key={d.day}
+                            className={`rounded-md border border-border p-4 ${d.phase === "pending" ? "opacity-60" : ""}`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-body-sm font-medium text-foreground">
+                                  执行任务{String(d.day).padStart(2, "0")}
+                                </span>
+                                <span className="text-caption text-text-tertiary font-mono">
+                                  {isDone ? d.date : d.date.split(" ")[0]}
+                                </span>
+                              </div>
+                              <span className={`tag ${statusClass}`}>{statusLabel}</span>
+                            </div>
+                            <div className="border-l-2 border-primary/40 pl-3 mb-2">
+                              <div className="text-caption text-text-tertiary mb-0.5">具体动作</div>
+                              <div className="text-body-sm leading-relaxed text-foreground">{d.action}</div>
+                            </div>
+                            {isDone && (
+                              <div className="flex items-center gap-1.5 text-caption text-text-tertiary">
+                                <span>执行人</span>
+                                <span className="text-foreground">
+                                  {executors[(d.day - 1) % Math.max(executors.length, 1)] ?? "—"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {woPlan.reviewAction && (
+                        <div className="rounded-md border border-border p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-body-sm font-medium text-foreground">复查</span>
+                            <span className={`tag ${detail.status === "已完成" ? "tag-success" : "tag-muted"}`}>
+                              {detail.status === "已完成" ? "已完成" : "未开始"}
+                            </span>
+                          </div>
+                          <div className="border-l-2 border-primary/40 pl-3">
+                            <div className="text-caption text-text-tertiary mb-0.5">具体动作</div>
+                            <div className="text-body-sm leading-relaxed text-foreground">{woPlan.reviewAction}</div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="rounded-md border border-border p-8 text-center text-body-sm text-text-tertiary">
@@ -1615,6 +1755,7 @@ export function WorkOrderPage({
                   )}
                 </section>
               )}
+
 
 
             </div>
