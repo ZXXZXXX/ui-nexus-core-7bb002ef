@@ -1362,9 +1362,10 @@ export function WorkOrderPage({
                 )}
 
               </section>
+              )}
 
               {/* ============ 二、诊断结论（处理态） ============ */}
-              {!isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
+              {detailTab === "diagnose" && !isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
                 <section className="space-y-3">
                   <SectionHeader icon={<ClipboardCheck className="h-3.5 w-3.5" />} title="诊断结论" hint="以专业视角，根据线索重新确认类型、标签与结论" tone="brand" />
                   <div className="rounded-md border border-primary/30 bg-brand-subtle/30 p-4 space-y-4">
