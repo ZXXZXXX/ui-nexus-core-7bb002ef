@@ -67,6 +67,19 @@ const RX_KIND_LABEL: Record<RxKind, string> = {
   hoof: "修蹄处方",
 };
 
+/** 处方所属类型可维护选项（含“全部”） */
+const RX_OWNER_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "all", label: "全部" },
+  { value: "disease", label: "疾病处方" },
+  { value: "postpartum", label: "产后护理" },
+  { value: "drying", label: "干奶处方" },
+  { value: "immune", label: "免疫处方" },
+  { value: "deworm", label: "驱虫处方" },
+  { value: "hoof", label: "修蹄处方" },
+];
+const ownerTypeLabel = (k: string) =>
+  RX_OWNER_TYPE_OPTIONS.find((o) => o.value === k)?.label ?? "—";
+
 type TimeSlot = { morning: number; noon: number; evening: number };
 const defaultSlot = (freq: number): TimeSlot => {
   if (freq <= 1) return { morning: 1, noon: 0, evening: 0 };
@@ -420,7 +433,7 @@ function PrescriptionPage() {
             <div className="grid grid-cols-[110px_1fr_1fr_2fr_80px] gap-4 flex-1 min-w-0">
               <div>处方编码</div>
               <div>处方名称</div>
-              <div>归属</div>
+              <div>处方所属类型</div>
               <div>用药摘要</div>
               <div>疗程</div>
             </div>
@@ -445,7 +458,7 @@ function PrescriptionPage() {
                     <span className="truncate">{r.name}</span>
                   </div>
                   <div className="truncate flex items-center">
-                    <span className="tag tag-brand shrink-0">{RX_KIND_LABEL[r.kind]}</span>
+                    <span className="tag tag-brand shrink-0">{ownerTypeLabel(r.kind)}</span>
                   </div>
                   <div className="text-body-sm text-text-secondary truncate">{drugText}</div>
                   <div className="text-body-sm text-text-secondary truncate">{r.duration} 天</div>
@@ -697,6 +710,23 @@ function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) =>
               />
             </Field>
           </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="处方所属类型" required>
+              <Select value={value.kind} onValueChange={(v) => patch({ kind: v as RxKind })}>
+                <SelectTrigger className="h-9 text-body-sm">
+                  <SelectValue placeholder="请选择处方所属类型" />
+                </SelectTrigger>
+                <SelectContent>
+                  {RX_OWNER_TYPE_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value} className="text-body-sm">
+                      {o.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+
           <div className="grid grid-cols-2 gap-3">
             <Field label="处方描述">
               <Input
@@ -1705,7 +1735,7 @@ function PrescriptionView({ r }: { r: Rx }) {
     <div className="mt-4 space-y-3 text-body-sm">
       <div className="rounded-lg border border-border p-4 bg-surface-subtle/50">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="tag tag-brand">{RX_KIND_LABEL[r.kind]}</span>
+          <span className="tag tag-brand">{ownerTypeLabel(r.kind)}</span>
           <span className="text-section-title text-foreground">{r.name}</span>
           <span className="text-caption text-text-tertiary">
             应用于 {r.category || "—"} · {r.subType || "—"}（编号{r.code}）
@@ -1719,6 +1749,7 @@ function PrescriptionView({ r }: { r: Rx }) {
 
       <ViewGroup label="处方描述">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5">
+          <ViewRow label="处方所属类型" value={ownerTypeLabel(r.kind)} />
           <ViewRow label="处方疗程" value={`${r.duration} 天`} />
           <ViewRow label="补充说明" value={r.extra || "—"} />
           <div className="md:col-span-2">
