@@ -20,9 +20,9 @@ const ITEMS = [
 
 // 损耗发生环节 → 具体原因
 const LOSS_STAGES = [
-  { key: "storage", label: "储存保管", reasons: ["冷链断电", "过期失效", "包装破损", "其他原因"] },
-  { key: "prepare", label: "取药配药", reasons: ["牛只终止用药", "正常用药损耗", "其他"] },
   { key: "dosing", label: "给药用药", reasons: ["正常疫苗损耗", "牛只终止用药", "其他原因"] },
+  { key: "storage", label: "储存保管", reasons: ["冷链断电", "过期失效", "包装破损", "其他原因"] },
+  { key: "prepare", label: "配药取药", reasons: ["配药溢洒", "误开未用", "操作失误", "其他原因"] },
   { key: "other", label: "其他", reasons: ["运输破损", "盘点误差", "其他原因"] },
 ] as const;
 
