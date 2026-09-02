@@ -79,6 +79,17 @@ const RX_OWNER_TYPE_OPTIONS: { value: string; label: string }[] = [
 ];
 const ownerTypeLabel = (k: string) =>
   RX_OWNER_TYPE_OPTIONS.find((o) => o.value === k)?.label ?? "—";
+/** 处方所属类型标签配色 —— 各类型颜色区分 */
+const RX_KIND_TAG: Record<string, string> = {
+  disease: "tag-danger",
+  postpartum: "tag-pink",
+  drying: "tag-info",
+  immune: "tag-brand",
+  deworm: "tag-warning",
+  hoof: "tag-success",
+  all: "tag-muted",
+};
+const ownerTypeTag = (k: string) => RX_KIND_TAG[k] ?? "tag-muted";
 
 type TimeSlot = { morning: number; noon: number; evening: number };
 const defaultSlot = (freq: number): TimeSlot => {
@@ -458,7 +469,7 @@ function PrescriptionPage() {
                     <span className="truncate">{r.name}</span>
                   </div>
                   <div className="truncate flex items-center">
-                    <span className="tag tag-brand shrink-0">{ownerTypeLabel(r.kind)}</span>
+                    <span className={`tag shrink-0 ${ownerTypeTag(r.kind)}`}>{ownerTypeLabel(r.kind)}</span>
                   </div>
                   <div className="text-body-sm text-text-secondary truncate">{drugText}</div>
                   <div className="text-body-sm text-text-secondary truncate">{r.duration} 天</div>
@@ -1749,7 +1760,7 @@ function PrescriptionView({ r }: { r: Rx }) {
     <div className="mt-4 space-y-3 text-body-sm">
       <div className="rounded-lg border border-border p-4 bg-surface-subtle/50">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="tag tag-brand">{ownerTypeLabel(r.kind)}</span>
+          <span className={`tag ${ownerTypeTag(r.kind)}`}>{ownerTypeLabel(r.kind)}</span>
           <span className="text-section-title text-foreground">{r.name}</span>
           <span className="text-caption text-text-tertiary">
             应用于 {r.category || "—"} · {r.subType || "—"}（编号{r.code}）
