@@ -357,6 +357,7 @@ export function WorkOrderPage({
   const [filterCategory, setFilterCategory] = useState<"all" | "初诊" | "复诊">("all");
   const [detail, setDetail] = useState<WorkOrder | null>(null);
   const [mode, setMode] = useState<"view" | "process">("view");
+  const [detailTab, setDetailTab] = useState<"report" | "diagnose" | "execute">("report");
   const [confirm, setConfirm] = useState<"approve" | "reject" | null>(null);
   // ============ 执行方案（统一通用字段） ============
   const emptyPlan: Plan = {
