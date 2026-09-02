@@ -1679,7 +1679,6 @@ export function WorkOrderPage({
                       {/* 执行安排 */}
                       <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4">
                         <Field label="指定执行人" value={effectiveExecutors(detail)[0] ?? "—"} />
-                        <Field label="复查记录" value={woPlan.reviewAction || "—"} />
                       </div>
                     </div>
                   ) : (
