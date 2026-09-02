@@ -715,7 +715,7 @@ export function WorkOrderPage({
       case "category": {
         const isReview = /复诊|复查/.test(`${o.desc ?? ""}${o.event ?? ""}`);
         return (
-          <span className={isReview ? "tag tag-muted" : "tag tag-brand"}>
+          <span className={isReview ? "tag tag-danger" : "tag tag-brand"}>
             {isReview ? "复诊" : "初诊"}
           </span>
         );
