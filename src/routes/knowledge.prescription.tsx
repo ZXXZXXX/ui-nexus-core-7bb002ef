@@ -67,6 +67,19 @@ const RX_KIND_LABEL: Record<RxKind, string> = {
   hoof: "修蹄处方",
 };
 
+/** 处方所属类型可维护选项（含“全部”） */
+const RX_OWNER_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "all", label: "全部" },
+  { value: "disease", label: "疾病处方" },
+  { value: "postpartum", label: "产后护理" },
+  { value: "drying", label: "干奶处方" },
+  { value: "immune", label: "免疫处方" },
+  { value: "deworm", label: "驱虫处方" },
+  { value: "hoof", label: "修蹄处方" },
+];
+const ownerTypeLabel = (k: string) =>
+  RX_OWNER_TYPE_OPTIONS.find((o) => o.value === k)?.label ?? "—";
+
 type TimeSlot = { morning: number; noon: number; evening: number };
 const defaultSlot = (freq: number): TimeSlot => {
   if (freq <= 1) return { morning: 1, noon: 0, evening: 0 };
@@ -420,7 +433,7 @@ function PrescriptionPage() {
             <div className="grid grid-cols-[110px_1fr_1fr_2fr_80px] gap-4 flex-1 min-w-0">
               <div>处方编码</div>
               <div>处方名称</div>
-              <div>归属</div>
+              <div>处方所属类型</div>
               <div>用药摘要</div>
               <div>疗程</div>
             </div>
