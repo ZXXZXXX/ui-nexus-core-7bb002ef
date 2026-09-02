@@ -1149,7 +1149,7 @@ export function WorkOrderPage({
         </Card>
       </main>
 
-      <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+      <Sheet open={!!detail} onOpenChange={(o) => { if (!o) setDetail(null); else setDetailTab("report"); }}>
         <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col gap-0">
           <SheetHeader className="px-6 py-4 border-b border-border">
             <SheetTitle className="text-section-title text-left">工单详情</SheetTitle>
