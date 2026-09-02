@@ -184,6 +184,8 @@ export type WorkOrder = {
   createdAt: string;
   reviewer?: string;
   reviewedAt?: string;
+  /** 平台下发工单（自动通过诊断，诊断人固定为"平台"） */
+  platform?: boolean;
   executor?: string;
   /** 执行人（可多人） */
   executors?: string[];
@@ -201,6 +203,7 @@ type ColKey =
   | "diagnosis"
   | "desc"
   | "timeInfo"
+  | "reviewer"
   | "staff"
   | "pickup"
   | "action";
@@ -222,6 +225,7 @@ const ALL_COLS: ColDef[] = [
   { key: "diagnosis", label: "疾病结论", width: 140 },
   { key: "desc", label: "具体描述", width: 240 },
   { key: "timeInfo", label: "时间信息", width: 180 },
+  { key: "reviewer", label: "诊断人", width: 100 },
   { key: "staff", label: "人员信息", width: 180 },
   { key: "pickup", label: "领物信息", width: 110 },
   { key: "action", label: "操作名称", width: 120, locked: true },
@@ -384,6 +388,7 @@ export function WorkOrderPage({
   const [advOpen, setAdvOpen] = useState(false);
   const [advProposer, setAdvProposer] = useState<string>("all");
   const [advExecutor, setAdvExecutor] = useState<string>("all");
+  const [advReviewer, setAdvReviewer] = useState<string>("all");
   const [sortKey, setSortKey] = useState<"proposedAt" | "reviewedAt" | "executedAt">("proposedAt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [visible, setVisible] = useState<Record<ColKey, boolean>>(() =>
@@ -408,6 +413,10 @@ export function WorkOrderPage({
   };
   /** 疫苗免疫 / 驱虫工单：平台发起的计划性任务，人员信息固定为"平台 → 单执行人" */
   const platformOrder = title === "疫苗免疫" || title === "驱虫工单";
+  /** 单条工单是否为平台下发（免疫 / 驱虫全量，干奶 / 修蹄部分） */
+  const isPlatformOrder = (o: WorkOrder) => o.platform ?? platformOrder;
+  /** 诊断人：平台下发工单固定"平台" */
+  const reviewerOf = (o: WorkOrder) => (isPlatformOrder(o) ? "平台" : (o.reviewer ?? ""));
   /** 执行人列表（可多人）。疫苗/驱虫工单仅读取实际执行人，不读取被指派人 */
   const effectiveExecutors = (o: WorkOrder): string[] => {
     const ov = overrides[o.id];
@@ -545,6 +554,11 @@ export function WorkOrderPage({
     [orders],
   );
 
+  const reviewersList = useMemo(
+    () => Array.from(new Set(orders.map((o) => (o.platform ?? platformOrder) ? "平台" : o.reviewer).filter(Boolean) as string[])),
+    [orders, platformOrder],
+  );
+
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     const list = orders
@@ -565,6 +579,7 @@ export function WorkOrderPage({
       .filter((o) =>
         advExecutor === "all" ? true : effectiveExecutors(o).includes(advExecutor),
       )
+      .filter((o) => (advReviewer === "all" ? true : reviewerOf(o) === advReviewer))
       .filter((o) => (filterStatus === "all" ? true : effectiveStatus(o) === filterStatus))
       .filter((o) => {
         if (filterCategory === "all") return true;
@@ -588,7 +603,7 @@ export function WorkOrderPage({
             : parseTime(b.executedAt);
       return sortDir === "asc" ? va - vb : vb - va;
     });
-  }, [orders, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, filterStatus, filterCategory, sortKey, sortDir, deletedIds]);
+  }, [orders, range, dateField, customStart, customEnd, keyword, advProposer, advExecutor, advReviewer, filterStatus, filterCategory, sortKey, sortDir, deletedIds]);
 
   const leftFrozenKeys: ColKey[] = ["id"];
   const rightFrozenKeys: ColKey[] = ["action"];
@@ -653,11 +668,13 @@ export function WorkOrderPage({
         return o.event ? o.event.split(" · ")[0] : "";
       case "desc":
         return o.desc ?? "";
+      case "reviewer":
+        return reviewerOf(o) || "—";
       case "timeInfo":
         return `提出 ${o.createdAt ?? ""}${o.reviewedAt ? ` · 诊断 ${o.reviewedAt}` : ""}${o.executedAt ? ` · 执行 ${o.executedAt}` : ""}`;
       case "staff": {
         // 疫苗免疫 / 驱虫工单：由平台发起，仅一名执行人；未执行前显示"平台 → -"
-        if (platformOrder) return platformStaffText(o);
+        if (isPlatformOrder(o)) return platformStaffText(o);
         const list = effectiveExecutors(o);
         return `${o.proposer ?? ""} → ${list.length ? list.join("、") : "未指派"}`;
       }
@@ -718,6 +735,14 @@ export function WorkOrderPage({
           </span>
         );
       }
+      case "reviewer": {
+        const r = reviewerOf(o);
+        return (
+          <span className="text-body-sm text-text-secondary whitespace-nowrap">
+            {r ? highlightText(r, keyword) : "—"}
+          </span>
+        );
+      }
       case "desc":
         return (
           <span className="text-body-sm text-text-secondary truncate" title={o.desc}>
@@ -734,7 +759,7 @@ export function WorkOrderPage({
           </span>
         );
       case "staff": {
-        const text = platformOrder
+        const text = isPlatformOrder(o)
           ? platformStaffText(o)
           : (() => {
               const list = effectiveExecutors(o);
@@ -984,6 +1009,18 @@ export function WorkOrderPage({
                       </SelectContent>
                     </Select>
                   </div>
+                  <div>
+                    <div className="text-caption text-text-tertiary mb-1.5">诊断人</div>
+                    <Select value={advReviewer} onValueChange={setAdvReviewer}>
+                      <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">全部</SelectItem>
+                        {reviewersList.map((p) => (
+                          <SelectItem key={p} value={p}>{p}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
               <SheetFooter className="px-5 py-4 border-t border-border flex-row gap-2">
@@ -995,6 +1032,7 @@ export function WorkOrderPage({
                     setFilterCategory("all");
                     setAdvProposer("all");
                     setAdvExecutor("all");
+                    setAdvReviewer("all");
                   }}
                 >
                   重置
@@ -1497,7 +1535,7 @@ export function WorkOrderPage({
                       label={`执行人${effectiveExecutors(detail).length > 1 ? `（${effectiveExecutors(detail).length} 人）` : ""}`}
                       value={effectiveExecutors(detail).join("、") || "—"}
                     />
-                    <Field label="诊断人" value={detail.reviewer ?? "—"} />
+                    <Field label="诊断人" value={reviewerOf(detail) || "—"} />
                     <Field label="诊断时间" value={detail.reviewedAt ?? "—"} />
                     <Field label="执行时间" value={detail.executedAt ?? "—"} />
                   </div>
@@ -2343,7 +2381,9 @@ export function makeOrders(
     const ev = pick(events, i);
     const status = statuses[i % statuses.length];
     // 疫苗免疫（YM）/ 驱虫工单（QC）为平台发起，固定"平台"且仅一名执行人
-    const isPlatform = prefix === "YM" || prefix === "QC";
+    // 免疫 / 驱虫全量由平台下发；干奶 / 修蹄部分由平台下发
+    const isPlatform =
+      prefix === "YM" || prefix === "QC" || ((prefix === "GN" || prefix === "XT") && i % 2 === 0);
     // 平台工单下发后自动通过诊断：诊断时间与提出时间一致，诊断人为"平台"
     const reviewedAt = isPlatform
       ? new Date(proposedAt.getTime())
@@ -2378,10 +2418,11 @@ export function makeOrders(
       proposer,
       status,
       createdAt: fmt(proposedAt),
+      platform: isPlatform,
       attachments: attachmentSets[i % attachmentSets.length],
     };
 
-    if (status !== "待诊断") {
+    if (status !== "待诊断" || isPlatform) {
       order.reviewer = reviewer;
       order.reviewedAt = fmt(reviewedAt);
     }
