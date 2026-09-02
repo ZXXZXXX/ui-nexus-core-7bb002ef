@@ -555,7 +555,7 @@ export function WorkOrderPage({
   );
 
   const reviewersList = useMemo(
-    () => Array.from(new Set(orders.map((o) => o.platform ?? platformOrder ? "平台" : o.reviewer).filter(Boolean) as string[])),
+    () => Array.from(new Set(orders.map((o) => (o.platform ?? platformOrder) ? "平台" : o.reviewer).filter(Boolean) as string[])),
     [orders, platformOrder],
   );
 
