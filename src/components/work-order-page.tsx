@@ -1189,6 +1189,27 @@ export function WorkOrderPage({
             const videos = isLoss ? 1 : 0;
             const voiceSecs = isLoss ? 42 : 28;
             const proposerPhone = "138 0000 0001";
+            // 与移动端工单详情保持一致的诊断/执行数据
+            const woPlan = getWoPlan(detail.id, title);
+            const execAction = buildActionText(woPlan);
+            const execSessions = computeSessions(woPlan);
+            const execDate = (dayIdx: number, slot: number) => {
+              const base = new Date(2026, 4, 12, slot === 2 ? 19 : 8, 0);
+              const d = new Date(base.getTime() + (dayIdx - 1) * 86400000);
+              const pad = (n: number) => String(n).padStart(2, "0");
+              return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+            };
+            const execDays = execSessions.map((s, i) => {
+              const phase: "done" | "active" | "pending" =
+                detail.status === "已完成" ? "done" : i === 0 ? "done" : i === 1 ? "active" : "pending";
+              return { day: i + 1, date: execDate(s.day, s.slot), action: execAction, phase };
+            });
+            const diagSymptoms = isLoss ? ["冷链异常"] : woPlan.symptoms;
+            const diagConclusion = isLoss
+              ? "疫苗失效，作损耗处理"
+              : woPlan.subType
+                ? `${woPlan.disease}（${woPlan.subType}）`
+                : woPlan.disease;
             return (
             <div className="space-y-5">
               <div className="flex items-center justify-between">
