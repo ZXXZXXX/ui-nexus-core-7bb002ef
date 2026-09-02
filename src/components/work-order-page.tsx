@@ -1504,7 +1504,7 @@ export function WorkOrderPage({
               )}
 
               {/* ============ 三、执行计划（处理态） ============ */}
-              {!isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
+              {detailTab === "execute" && !isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
                 <section className="space-y-3">
                   <SectionHeader
                     icon={<Stethoscope className="h-3.5 w-3.5" />}
@@ -1529,7 +1529,7 @@ export function WorkOrderPage({
               )}
 
               {/* ============ 四、指派执行人（处理态） ============ */}
-              {!isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
+              {detailTab === "execute" && !isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
                 <section className="space-y-3">
                   <SectionHeader icon={<UserPlus className="h-3.5 w-3.5" />} title="指派执行人" hint="选填" />
                   <div className="rounded-md border border-border bg-card p-4">
@@ -1552,24 +1552,45 @@ export function WorkOrderPage({
                 </section>
               )}
 
-
-
-
-              {/* 查看态：仅展示固定的诊断 / 响应人元数据 */}
-              {(detail.status !== "待诊断" || mode === "view") && (
+              {/* 查看态：诊断记录 */}
+              {detailTab === "diagnose" && (detail.status !== "待诊断" || mode === "view") && (
                 <section className="space-y-3">
-                  <SectionHeader icon={<ClipboardList className="h-3.5 w-3.5" />} title="诊断与执行记录" />
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
-                    <Field
-                      label={`执行人${effectiveExecutors(detail).length > 1 ? `（${effectiveExecutors(detail).length} 人）` : ""}`}
-                      value={effectiveExecutors(detail).join("、") || "—"}
-                    />
-                    <Field label="诊断人" value={reviewerOf(detail) || "—"} />
-                    <Field label="诊断时间" value={detail.reviewedAt ?? "—"} />
-                    <Field label="执行时间" value={detail.executedAt ?? "—"} />
-                  </div>
+                  <SectionHeader icon={<ClipboardCheck className="h-3.5 w-3.5" />} title="诊断记录" />
+                  {reviewerOf(detail) || detail.reviewedAt ? (
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
+                      <Field label="诊断人" value={reviewerOf(detail) || "—"} />
+                      <Field label="诊断时间" value={detail.reviewedAt ?? "—"} />
+                      <Field label="诊断结论" value={plan.suspectedDisease || detail.event || "—"} />
+                      <Field label="匹配方案" value={plan.kbSource || "—"} />
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-border p-8 text-center text-body-sm text-text-tertiary">
+                      暂无诊断记录
+                    </div>
+                  )}
                 </section>
               )}
+
+              {/* 查看态：执行记录 */}
+              {detailTab === "execute" && (detail.status !== "待诊断" || mode === "view") && (
+                <section className="space-y-3">
+                  <SectionHeader icon={<ClipboardList className="h-3.5 w-3.5" />} title="执行记录" />
+                  {effectiveExecutors(detail).length > 0 || detail.executedAt ? (
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
+                      <Field
+                        label={`执行人${effectiveExecutors(detail).length > 1 ? `（${effectiveExecutors(detail).length} 人）` : ""}`}
+                        value={effectiveExecutors(detail).join("、") || "—"}
+                      />
+                      <Field label="最近执行时间" value={detail.executedAt ?? "—"} />
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-border p-8 text-center text-body-sm text-text-tertiary">
+                      暂无执行记录
+                    </div>
+                  )}
+                </section>
+              )}
+
 
             </div>
             );
