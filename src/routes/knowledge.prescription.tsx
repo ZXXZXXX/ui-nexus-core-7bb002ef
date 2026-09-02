@@ -69,7 +69,7 @@ const RX_KIND_LABEL: Record<RxKind, string> = {
 
 /** 处方所属类型可维护选项（含“全部”） */
 const RX_OWNER_TYPE_OPTIONS: { value: string; label: string }[] = [
-  { value: "all", label: "全部" },
+  { value: "all", label: "不限" },
   { value: "disease", label: "疾病处方" },
   { value: "postpartum", label: "产后护理" },
   { value: "drying", label: "干奶处方" },
