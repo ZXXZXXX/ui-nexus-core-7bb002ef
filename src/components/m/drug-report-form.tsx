@@ -225,13 +225,45 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
           </div>
         </Section>
 
+        {!isReturn && (
+          <Section title="发生环节" required hint="单选；决定可选的具体原因">
+            <div className="grid grid-cols-2 gap-2">
+              {LOSS_STAGES.map((s) => {
+                const active = stage === s.key;
+                return (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => {
+                      if (stage === s.key) return;
+                      setStage(s.key);
+                      setReasons([]);
+                    }}
+                    className={`h-10 rounded-xl text-body-sm transition-colors border ${
+                      active
+                        ? "bg-brand-subtle text-primary border-transparent font-medium"
+                        : "bg-card text-text-secondary border-border"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </Section>
+        )}
+
         <Section title={`${word}原因`} required hint="单选；输入关键词搜索，未命中可直接新建">
-          <TagPicker
-            selected={reasons}
-            onChange={setReasons}
-            presets={isReturn ? RETURN_REASONS : LOSS_REASONS}
-            singleSelect
-          />
+          {!isReturn && !stage ? (
+            <div className="text-body-sm text-text-tertiary">请先选择发生环节</div>
+          ) : (
+            <TagPicker
+              selected={reasons}
+              onChange={setReasons}
+              presets={isReturn ? RETURN_REASONS : stageReasons}
+              singleSelect
+            />
+          )}
         </Section>
 
         <EvidenceSection
