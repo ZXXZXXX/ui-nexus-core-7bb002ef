@@ -77,7 +77,11 @@ import {
   Repeat2,
   LogOut,
   Ban,
+  Activity,
+  Pill,
+  Mic,
 } from "lucide-react";
+import { getWoPlan, buildActionText, computeSessions } from "@/lib/wo-plan";
 import {
   DropdownMenu,
   DropdownMenuContent,
