@@ -1197,7 +1197,30 @@ export function WorkOrderPage({
                 </span>
               </div>
 
+              {/* Tab 切换 */}
+              <div className="flex items-center gap-1 border-b border-border">
+                {([
+                  { key: "report", label: "上报记录" },
+                  { key: "diagnose", label: "诊断记录" },
+                  { key: "execute", label: "执行记录" },
+                ] as const).map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setDetailTab(t.key)}
+                    className={`px-3 h-9 text-body-sm -mb-px border-b-2 transition-colors ${
+                      detailTab === t.key
+                        ? "border-primary text-primary font-medium"
+                        : "border-transparent text-text-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
               {/* ============ 一、原始上报信息 ============ */}
+              {detailTab === "report" && (
               <section className="space-y-3">
                 <SectionHeader icon={<FileSearch className="h-3.5 w-3.5" />} title="原始上报信息" hint="小程序上报内容，仅供查看" />
 
