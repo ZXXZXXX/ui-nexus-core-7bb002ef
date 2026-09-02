@@ -198,7 +198,6 @@ type ColKey =
   | "id"
   | "category"
   | "status"
-  | "objType"
   | "target"
   | "diagnosis"
   | "desc"
@@ -220,7 +219,6 @@ const ALL_COLS: ColDef[] = [
   { key: "id", label: "工单编号", width: 120, locked: true },
   { key: "category", label: "诊疗属性", width: 110 },
   { key: "status", label: "工单状态", width: 100 },
-  { key: "objType", label: "对象类型", width: 90 },
   { key: "target", label: "对象信息", width: 180 },
   { key: "diagnosis", label: "疾病结论", width: 140 },
   { key: "desc", label: "具体描述", width: 240 },
@@ -656,8 +654,6 @@ export function WorkOrderPage({
         return /复诊|复查/.test(`${o.desc ?? ""}${o.event ?? ""}`) ? "复诊" : "初诊";
       case "status":
         return effectiveStatus(o);
-      case "objType":
-        return "牛只";
       case "target":
         return o.target
           .split(/[,，、;；\n]+/)
@@ -723,9 +719,6 @@ export function WorkOrderPage({
             {isReview ? "复诊" : "初诊"}
           </span>
         );
-      }
-      case "objType": {
-        return <span className="tag tag-muted">牛只</span>;
       }
       case "diagnosis": {
         const diseaseName = o.event ? o.event.split(" · ")[0] : "";
