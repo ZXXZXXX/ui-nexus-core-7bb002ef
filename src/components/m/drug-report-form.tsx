@@ -316,9 +316,13 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
               }, 1200);
             }
           }}
-          descRequired={false}
+          descRequired={descRequired}
           mediaRequired
-          descPlaceholder={`可补充${word}经过、影响范围等说明（选填）`}
+          descPlaceholder={
+            descRequired
+              ? `请说明具体${word}原因（必填）`
+              : `可补充${word}经过、影响范围等说明（选填）`
+          }
         />
       </div>
 
