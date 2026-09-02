@@ -18,15 +18,15 @@ const ITEMS = [
   { id: "DR-0712", name: "碳酸氢钠", unit: "袋", price: 9 },
 ];
 
-const LOSS_REASONS = [
-  "冷链断电",
-  "过期失效",
-  "运输破损",
-  "盘点误差",
-  "误开未用",
-  "操作失误",
-  "包装破损",
-];
+// 损耗发生环节 → 具体原因
+const LOSS_STAGES = [
+  { key: "dosing", label: "给药用药", reasons: ["正常疫苗损耗", "牛只终止用药", "其他原因"] },
+  { key: "storage", label: "储存保管", reasons: ["冷链断电", "过期失效", "包装破损", "其他原因"] },
+  { key: "prepare", label: "配药取药", reasons: ["配药溢洒", "误开未用", "操作失误", "其他原因"] },
+  { key: "other", label: "其他", reasons: ["运输破损", "盘点误差", "其他原因"] },
+] as const;
+
+type LossStage = (typeof LOSS_STAGES)[number]["key"];
 
 const RETURN_REASONS = [
   "工单取消",
@@ -50,6 +50,10 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
   const [lines, setLines] = useState<Line[]>([{ itemId: "", qty: "" }]);
   const [reasons, setReasons] = useState<string[]>([]);
+  const [stage, setStage] = useState<LossStage | null>(null);
+  const stageReasons: string[] = [
+    ...(LOSS_STAGES.find((s) => s.key === stage)?.reasons ?? []),
+  ];
   const [desc, setDesc] = useState("");
   const [photos, setPhotos] = useState<number[]>([]);
   const [videos, setVideos] = useState<number[]>([]);
@@ -74,6 +78,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
   const canSubmit =
     lines.every((l) => l.itemId && l.qty.trim()) &&
+    (isReturn || !!stage) &&
     reasons.length > 0 &&
     photos.length + videos.length > 0;
 
@@ -222,13 +227,45 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
           </div>
         </Section>
 
+        {!isReturn && (
+          <Section title="发生环节" required hint="单选；决定可选的具体原因">
+            <div className="grid grid-cols-2 gap-2">
+              {LOSS_STAGES.map((s) => {
+                const active = stage === s.key;
+                return (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={() => {
+                      if (stage === s.key) return;
+                      setStage(s.key);
+                      setReasons([]);
+                    }}
+                    className={`h-10 rounded-xl text-body-sm transition-colors border ${
+                      active
+                        ? "bg-brand-subtle text-primary border-transparent font-medium"
+                        : "bg-card text-text-secondary border-border"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </Section>
+        )}
+
         <Section title={`${word}原因`} required hint="单选；输入关键词搜索，未命中可直接新建">
-          <TagPicker
-            selected={reasons}
-            onChange={setReasons}
-            presets={isReturn ? RETURN_REASONS : LOSS_REASONS}
-            singleSelect
-          />
+          {!isReturn && !stage ? (
+            <div className="text-body-sm text-text-tertiary">请先选择发生环节</div>
+          ) : (
+            <TagPicker
+              selected={reasons}
+              onChange={setReasons}
+              presets={isReturn ? RETURN_REASONS : stageReasons}
+              singleSelect
+            />
+          )}
         </Section>
 
         <EvidenceSection
