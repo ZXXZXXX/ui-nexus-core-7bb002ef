@@ -201,7 +201,9 @@ type ColKey =
   | "target"
   | "diagnosis"
   | "desc"
-  | "timeInfo"
+  | "createdAt"
+  | "reviewedAt"
+  | "executedAt"
   | "proposer"
   | "reviewer"
   | "executor"
@@ -223,7 +225,9 @@ const ALL_COLS: ColDef[] = [
   { key: "target", label: "对象信息", width: 180 },
   { key: "diagnosis", label: "疾病结论", width: 140 },
   { key: "desc", label: "具体描述", width: 240 },
-  { key: "timeInfo", label: "时间信息", width: 180 },
+  { key: "createdAt", label: "提出时间", width: 150, isTime: true },
+  { key: "reviewedAt", label: "诊断时间", width: 150, isTime: true },
+  { key: "executedAt", label: "最近执行时间", width: 150, isTime: true },
   { key: "proposer", label: "提出人", width: 100 },
   { key: "reviewer", label: "诊断人", width: 100 },
   { key: "executor", label: "执行人", width: 160 },
@@ -670,8 +674,12 @@ export function WorkOrderPage({
         const list = effectiveExecutors(o);
         return list.length ? list.join("、") : "未指派";
       }
-      case "timeInfo":
-        return `提出 ${o.createdAt ?? ""}${o.reviewedAt ? ` · 诊断 ${o.reviewedAt}` : ""}${o.executedAt ? ` · 执行 ${o.executedAt}` : ""}`;
+      case "createdAt":
+        return o.createdAt ?? "—";
+      case "reviewedAt":
+        return o.reviewedAt ?? "—";
+      case "executedAt":
+        return o.executedAt ?? "—";
       case "pickup":
         return title === "疾病治疗" || title === "产后护理" ? "需要领物" : "无需领物";
       default:
@@ -740,15 +748,16 @@ export function WorkOrderPage({
             {o.desc || "—"}
           </span>
         );
-      case "timeInfo":
+      case "createdAt":
+      case "reviewedAt":
+      case "executedAt": {
+        const v = key === "createdAt" ? o.createdAt : key === "reviewedAt" ? o.reviewedAt : o.executedAt;
         return (
-          <span
-            className="text-body-sm text-text-secondary tabular-nums truncate"
-            title={`提出 ${o.createdAt}${o.reviewedAt ? ` · 诊断 ${o.reviewedAt}` : ""}${o.executedAt ? ` · 执行 ${o.executedAt}` : ""}`}
-          >
-            {o.executedAt ?? o.reviewedAt ?? o.createdAt}
+          <span className="text-body-sm text-text-secondary tabular-nums whitespace-nowrap">
+            {v ?? "—"}
           </span>
         );
+      }
       case "proposer": {
         const p = isPlatformOrder(o) ? "平台" : (o.proposer || "");
         return (
