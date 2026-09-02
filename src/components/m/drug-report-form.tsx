@@ -51,8 +51,9 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
   const [lines, setLines] = useState<Line[]>([{ itemId: "", qty: "" }]);
   const [reasons, setReasons] = useState<string[]>([]);
   const [stage, setStage] = useState<LossStage | null>(null);
-  const stageReasons =
-    LOSS_STAGES.find((s) => s.key === stage)?.reasons ?? [];
+  const stageReasons: string[] = [
+    ...(LOSS_STAGES.find((s) => s.key === stage)?.reasons ?? []),
+  ];
   const [desc, setDesc] = useState("");
   const [photos, setPhotos] = useState<number[]>([]);
   const [videos, setVideos] = useState<number[]>([]);
