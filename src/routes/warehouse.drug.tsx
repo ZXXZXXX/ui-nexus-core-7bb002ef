@@ -324,9 +324,7 @@ function DrugArchivePage() {
                 <div className="truncate">
                   <span
                     className={
-                      d.status === "启用"
-                        ? "tag tag-muted text-primary"
-                        : "tag tag-muted text-text-tertiary"
+                      d.status === "启用" ? "tag tag-success" : "tag tag-muted"
                     }
                   >
                     {d.status}
