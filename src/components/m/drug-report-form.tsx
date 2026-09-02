@@ -76,10 +76,13 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
   const removeLine = (idx: number) =>
     setLines((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
 
+  const descRequired = reasons.some((r) => r.includes("其他"));
+
   const canSubmit =
     lines.every((l) => l.itemId && l.qty.trim()) &&
     (isReturn || !!stage) &&
     reasons.length > 0 &&
+    (!descRequired || desc.trim().length > 0) &&
     photos.length + videos.length > 0;
 
   const submit = () => {
@@ -277,7 +280,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
         )}
 
-        <Section title={`${word}原因`} required hint="单选；输入关键词搜索，未命中可直接新建">
+        <Section title={`${word}原因`} required hint="单选；输入关键词搜索">
           {!isReturn && !stage ? (
             <div className="text-body-sm text-text-tertiary">请先选择发生环节</div>
           ) : (
@@ -286,6 +289,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
               onChange={setReasons}
               presets={isReturn ? RETURN_REASONS : stageReasons}
               singleSelect
+              disableCreate
             />
           )}
         </Section>
@@ -312,9 +316,13 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
               }, 1200);
             }
           }}
-          descRequired={false}
+          descRequired={descRequired}
           mediaRequired
-          descPlaceholder={`可补充${word}经过、影响范围等说明（选填）`}
+          descPlaceholder={
+            descRequired
+              ? `请说明具体${word}原因（必填）`
+              : `可补充${word}经过、影响范围等说明（选填）`
+          }
         />
       </div>
 
