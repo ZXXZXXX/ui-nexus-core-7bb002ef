@@ -711,6 +711,23 @@ function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) =>
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
+            <Field label="处方所属类型" required>
+              <Select value={value.kind} onValueChange={(v) => patch({ kind: v as RxKind })}>
+                <SelectTrigger className="h-9 text-body-sm">
+                  <SelectValue placeholder="请选择处方所属类型" />
+                </SelectTrigger>
+                <SelectContent>
+                  {RX_OWNER_TYPE_OPTIONS.map((o) => (
+                    <SelectItem key={o.value} value={o.value} className="text-body-sm">
+                      {o.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
             <Field label="处方描述">
               <Input
                 value={value.desc ?? ""}
