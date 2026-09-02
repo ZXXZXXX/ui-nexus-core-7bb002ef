@@ -357,6 +357,7 @@ export function WorkOrderPage({
   const [filterCategory, setFilterCategory] = useState<"all" | "初诊" | "复诊">("all");
   const [detail, setDetail] = useState<WorkOrder | null>(null);
   const [mode, setMode] = useState<"view" | "process">("view");
+  const [detailTab, setDetailTab] = useState<"report" | "diagnose" | "execute">("report");
   const [confirm, setConfirm] = useState<"approve" | "reject" | null>(null);
   // ============ 执行方案（统一通用字段） ============
   const emptyPlan: Plan = {
@@ -1148,7 +1149,7 @@ export function WorkOrderPage({
         </Card>
       </main>
 
-      <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+      <Sheet open={!!detail} onOpenChange={(o) => { if (!o) setDetail(null); else setDetailTab("report"); }}>
         <SheetContent side="right" className="w-full sm:max-w-2xl p-0 flex flex-col gap-0">
           <SheetHeader className="px-6 py-4 border-b border-border">
             <SheetTitle className="text-section-title text-left">工单详情</SheetTitle>
@@ -1196,7 +1197,30 @@ export function WorkOrderPage({
                 </span>
               </div>
 
+              {/* Tab 切换 */}
+              <div className="flex items-center gap-1 border-b border-border">
+                {([
+                  { key: "report", label: "上报记录" },
+                  { key: "diagnose", label: "诊断记录" },
+                  { key: "execute", label: "执行记录" },
+                ] as const).map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    onClick={() => setDetailTab(t.key)}
+                    className={`px-3 h-9 text-body-sm -mb-px border-b-2 transition-colors ${
+                      detailTab === t.key
+                        ? "border-primary text-primary font-medium"
+                        : "border-transparent text-text-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
               {/* ============ 一、原始上报信息 ============ */}
+              {detailTab === "report" && (
               <section className="space-y-3">
                 <SectionHeader icon={<FileSearch className="h-3.5 w-3.5" />} title="原始上报信息" hint="小程序上报内容，仅供查看" />
 
@@ -1338,9 +1362,10 @@ export function WorkOrderPage({
                 )}
 
               </section>
+              )}
 
               {/* ============ 二、诊断结论（处理态） ============ */}
-              {!isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
+              {detailTab === "diagnose" && !isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
                 <section className="space-y-3">
                   <SectionHeader icon={<ClipboardCheck className="h-3.5 w-3.5" />} title="诊断结论" hint="以专业视角，根据线索重新确认类型、标签与结论" tone="brand" />
                   <div className="rounded-md border border-primary/30 bg-brand-subtle/30 p-4 space-y-4">
@@ -1479,7 +1504,7 @@ export function WorkOrderPage({
               )}
 
               {/* ============ 三、执行计划（处理态） ============ */}
-              {!isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
+              {detailTab === "execute" && !isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
                 <section className="space-y-3">
                   <SectionHeader
                     icon={<Stethoscope className="h-3.5 w-3.5" />}
@@ -1504,7 +1529,7 @@ export function WorkOrderPage({
               )}
 
               {/* ============ 四、指派执行人（处理态） ============ */}
-              {!isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
+              {detailTab === "execute" && !isLoss && canExamine(role) && detail.status === "待诊断" && mode === "process" && (
                 <section className="space-y-3">
                   <SectionHeader icon={<UserPlus className="h-3.5 w-3.5" />} title="指派执行人" hint="选填" />
                   <div className="rounded-md border border-border bg-card p-4">
@@ -1527,24 +1552,45 @@ export function WorkOrderPage({
                 </section>
               )}
 
-
-
-
-              {/* 查看态：仅展示固定的诊断 / 响应人元数据 */}
-              {(detail.status !== "待诊断" || mode === "view") && (
+              {/* 查看态：诊断记录 */}
+              {detailTab === "diagnose" && (detail.status !== "待诊断" || mode === "view") && (
                 <section className="space-y-3">
-                  <SectionHeader icon={<ClipboardList className="h-3.5 w-3.5" />} title="诊断与执行记录" />
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
-                    <Field
-                      label={`执行人${effectiveExecutors(detail).length > 1 ? `（${effectiveExecutors(detail).length} 人）` : ""}`}
-                      value={effectiveExecutors(detail).join("、") || "—"}
-                    />
-                    <Field label="诊断人" value={reviewerOf(detail) || "—"} />
-                    <Field label="诊断时间" value={detail.reviewedAt ?? "—"} />
-                    <Field label="执行时间" value={detail.executedAt ?? "—"} />
-                  </div>
+                  <SectionHeader icon={<ClipboardCheck className="h-3.5 w-3.5" />} title="诊断记录" />
+                  {reviewerOf(detail) || detail.reviewedAt ? (
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
+                      <Field label="诊断人" value={reviewerOf(detail) || "—"} />
+                      <Field label="诊断时间" value={detail.reviewedAt ?? "—"} />
+                      <Field label="诊断结论" value={plan.suspectedDisease || detail.event || "—"} />
+                      <Field label="匹配方案" value={plan.kbSource || "—"} />
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-border p-8 text-center text-body-sm text-text-tertiary">
+                      暂无诊断记录
+                    </div>
+                  )}
                 </section>
               )}
+
+              {/* 查看态：执行记录 */}
+              {detailTab === "execute" && (detail.status !== "待诊断" || mode === "view") && (
+                <section className="space-y-3">
+                  <SectionHeader icon={<ClipboardList className="h-3.5 w-3.5" />} title="执行记录" />
+                  {effectiveExecutors(detail).length > 0 || detail.executedAt ? (
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-md border border-border p-4 bg-surface-subtle">
+                      <Field
+                        label={`执行人${effectiveExecutors(detail).length > 1 ? `（${effectiveExecutors(detail).length} 人）` : ""}`}
+                        value={effectiveExecutors(detail).join("、") || "—"}
+                      />
+                      <Field label="最近执行时间" value={detail.executedAt ?? "—"} />
+                    </div>
+                  ) : (
+                    <div className="rounded-md border border-border p-8 text-center text-body-sm text-text-tertiary">
+                      暂无执行记录
+                    </div>
+                  )}
+                </section>
+              )}
+
 
             </div>
             );
