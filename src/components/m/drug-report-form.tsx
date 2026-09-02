@@ -78,6 +78,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
   const canSubmit =
     lines.every((l) => l.itemId && l.qty.trim()) &&
+    (isReturn || !!stage) &&
     reasons.length > 0 &&
     photos.length + videos.length > 0;
 
