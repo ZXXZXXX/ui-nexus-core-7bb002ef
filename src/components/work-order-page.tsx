@@ -425,11 +425,6 @@ export function WorkOrderPage({
     const single = o.executor ?? o.who;
     return single ? [single] : [];
   };
-  /** 疫苗/驱虫工单人员信息展示：仅基于执行人，未执行时显示"平台 → -" */
-  const platformStaffText = (o: WorkOrder): string => {
-    const executor = o.executor ?? o.executors?.[0];
-    return `平台 → ${executor ?? "-"}`;
-  };
 
   const openMoreAction = (type: MoreActionType, o: WorkOrder) => {
     setActionReason("");
