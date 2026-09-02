@@ -511,8 +511,15 @@ function PrescriptionPage() {
       <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none bg-white flex flex-col gap-0 p-0 overflow-hidden">
           <SheetHeader className="px-6 pt-6 pb-2">
-            <SheetTitle className="text-section-title">
-              {list.some((r) => r.id === editing?.id) ? "编辑处方" : "新建处方"}
+            <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+              <span className="truncate">
+                {editing?.name || (list.some((r) => r.id === editing?.id) ? "编辑处方" : "新建处方")}
+              </span>
+              {editing?.code && (
+                <span className="text-body-sm font-normal font-mono text-text-tertiary shrink-0">
+                  {editing.code}
+                </span>
+              )}
             </SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-6 py-2">
@@ -536,7 +543,14 @@ function PrescriptionPage() {
       <Sheet open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white">
           <SheetHeader>
-            <SheetTitle className="text-section-title">处方详情</SheetTitle>
+            <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+              <span className="truncate">{viewing?.name || "处方详情"}</span>
+              {viewing?.code && (
+                <span className="text-body-sm font-normal font-mono text-text-tertiary shrink-0">
+                  {viewing.code}
+                </span>
+              )}
+            </SheetTitle>
           </SheetHeader>
           {viewing && <PrescriptionView r={viewing} />}
           <SheetFooter className="mt-6 flex-row justify-end gap-2">
