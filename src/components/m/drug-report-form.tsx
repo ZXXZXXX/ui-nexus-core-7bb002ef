@@ -76,10 +76,13 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
   const removeLine = (idx: number) =>
     setLines((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
 
+  const descRequired = reasons.some((r) => r.includes("其他"));
+
   const canSubmit =
     lines.every((l) => l.itemId && l.qty.trim()) &&
     (isReturn || !!stage) &&
     reasons.length > 0 &&
+    (!descRequired || desc.trim().length > 0) &&
     photos.length + videos.length > 0;
 
   const submit = () => {
