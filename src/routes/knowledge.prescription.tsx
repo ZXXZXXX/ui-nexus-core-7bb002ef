@@ -458,7 +458,7 @@ function PrescriptionPage() {
                     <span className="truncate">{r.name}</span>
                   </div>
                   <div className="truncate flex items-center">
-                    <span className="tag tag-brand shrink-0">{RX_KIND_LABEL[r.kind]}</span>
+                    <span className="tag tag-brand shrink-0">{ownerTypeLabel(r.kind)}</span>
                   </div>
                   <div className="text-body-sm text-text-secondary truncate">{drugText}</div>
                   <div className="text-body-sm text-text-secondary truncate">{r.duration} 天</div>
@@ -1718,7 +1718,7 @@ function PrescriptionView({ r }: { r: Rx }) {
     <div className="mt-4 space-y-3 text-body-sm">
       <div className="rounded-lg border border-border p-4 bg-surface-subtle/50">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="tag tag-brand">{RX_KIND_LABEL[r.kind]}</span>
+          <span className="tag tag-brand">{ownerTypeLabel(r.kind)}</span>
           <span className="text-section-title text-foreground">{r.name}</span>
           <span className="text-caption text-text-tertiary">
             应用于 {r.category || "—"} · {r.subType || "—"}（编号{r.code}）
