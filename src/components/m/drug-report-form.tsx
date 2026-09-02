@@ -229,30 +229,52 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
         {!isReturn && (
           <Section title="发生环节" required hint="单选；决定可选的具体原因">
-            <div className="grid grid-cols-2 gap-2">
-              {LOSS_STAGES.map((s) => {
+            <div className="flex items-start pt-1">
+              {LOSS_STAGES.map((s, i) => {
                 const active = stage === s.key;
                 return (
-                  <button
-                    key={s.key}
-                    type="button"
-                    onClick={() => {
-                      if (stage === s.key) return;
-                      setStage(s.key);
-                      setReasons([]);
-                    }}
-                    className={`h-10 rounded-xl text-body-sm transition-colors border ${
-                      active
-                        ? "bg-brand-subtle text-primary border-transparent font-medium"
-                        : "bg-card text-text-secondary border-border"
-                    }`}
-                  >
-                    {s.label}
-                  </button>
+                  <div key={s.key} className="flex-1 flex flex-col items-center min-w-0">
+                    <div className="relative w-full flex items-center justify-center h-6">
+                      {i > 0 && (
+                        <span className="absolute left-0 right-1/2 top-1/2 -translate-y-1/2 mr-3 h-px bg-border" />
+                      )}
+                      {i < LOSS_STAGES.length - 1 && (
+                        <span className="absolute left-1/2 right-0 top-1/2 -translate-y-1/2 ml-3 h-px bg-border" />
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (stage === s.key) return;
+                          setStage(s.key);
+                          setReasons([]);
+                        }}
+                        aria-label={s.label}
+                        className={`relative z-10 h-5 w-5 rounded-full border-2 transition-colors flex items-center justify-center ${
+                          active ? "border-primary bg-primary" : "border-border bg-card"
+                        }`}
+                      >
+                        {active && <span className="h-1.5 w-1.5 rounded-full bg-primary-foreground" />}
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (stage === s.key) return;
+                        setStage(s.key);
+                        setReasons([]);
+                      }}
+                      className={`mt-2 text-body-sm text-center leading-tight px-1 truncate max-w-full ${
+                        active ? "text-primary font-medium" : "text-text-secondary"
+                      }`}
+                    >
+                      {s.label}
+                    </button>
+                  </div>
                 );
               })}
             </div>
           </Section>
+
         )}
 
         <Section title={`${word}原因`} required hint="单选；输入关键词搜索，未命中可直接新建">
