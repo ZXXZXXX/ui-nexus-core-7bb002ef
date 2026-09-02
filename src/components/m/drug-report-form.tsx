@@ -277,7 +277,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
         )}
 
-        <Section title={`${word}原因`} required hint="单选；输入关键词搜索，未命中可直接新建">
+        <Section title={`${word}原因`} required hint="单选；输入关键词搜索">
           {!isReturn && !stage ? (
             <div className="text-body-sm text-text-tertiary">请先选择发生环节</div>
           ) : (
@@ -286,6 +286,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
               onChange={setReasons}
               presets={isReturn ? RETURN_REASONS : stageReasons}
               singleSelect
+              disableCreate
             />
           )}
         </Section>
