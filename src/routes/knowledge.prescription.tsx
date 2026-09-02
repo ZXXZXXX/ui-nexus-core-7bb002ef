@@ -1732,6 +1732,7 @@ function PrescriptionView({ r }: { r: Rx }) {
 
       <ViewGroup label="处方描述">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5">
+          <ViewRow label="处方所属类型" value={ownerTypeLabel(r.kind)} />
           <ViewRow label="处方疗程" value={`${r.duration} 天`} />
           <ViewRow label="补充说明" value={r.extra || "—"} />
           <div className="md:col-span-2">
