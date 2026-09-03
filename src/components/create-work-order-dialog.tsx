@@ -161,6 +161,7 @@ export function CreateWorkOrderDialog({
     setRxQuery("");
     setRxId("");
     setVarPick({});
+    setStartDate(TODAY_STR());
   };
 
   const submit = () => {
