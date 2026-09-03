@@ -137,12 +137,7 @@ const columns: ListColumn<Row>[] = [
       <span className="text-body font-medium tabular-nums text-foreground">{item.stock}</span>
     ),
   },
-  { key: "open", label: "期初库存", filter: "number", defaultHidden: true, value: (i) => i.open, render: (i) => num(i.open) },
-  { key: "inQty", label: "期间存入", filter: "number", defaultHidden: true, value: (i) => i.inQty, render: (i) => num(i.inQty) },
-  { key: "outQty", label: "期间发出", filter: "number", defaultHidden: true, value: (i) => i.outQty, render: (i) => num(i.outQty) },
-  { key: "close", label: "期末结存", filter: "number", defaultHidden: true, value: (i) => i.close, render: (i) => num(i.close) },
   { key: "cat", label: "药品分类", filter: "select", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary">{i.cat}</span> },
-  { key: "loc", label: "库位", defaultHidden: true, render: (i) => <span className="font-mono text-body-sm text-text-tertiary">{i.loc}</span> },
   { key: "status", label: "状态", filter: "select", defaultHidden: true, render: (i) => <span className={statusTag(i.status)}>{i.status}</span> },
   { key: "supplier", label: "供应商", filter: "select", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.supplier}</span> },
   { key: "maker", label: "生产厂家", filter: "select", defaultHidden: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.maker}</span> },
