@@ -189,14 +189,16 @@ function TransferPage() {
                   </button>
                 </div>
               ) : (
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
-                  <Input
-                    value={itemKw}
-                    onChange={(e) => setItemKw(e.target.value)}
-                    placeholder="搜索药品名称 / 商品编码"
-                    className="h-9 pl-9 text-body-sm"
-                  />
+                <div>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
+                    <Input
+                      value={itemKw}
+                      onChange={(e) => setItemKw(e.target.value)}
+                      placeholder="搜索药品名称 / 商品编码"
+                      className="h-9 pl-9 text-body-sm"
+                    />
+                  </div>
                   <div className="mt-1.5 max-h-40 overflow-y-auto rounded-md border border-border bg-card">
                     {itemMatches.length === 0 ? (
                       <div className="px-3 py-2 text-caption text-text-tertiary">无匹配项</div>
