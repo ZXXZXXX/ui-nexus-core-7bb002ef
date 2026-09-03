@@ -46,6 +46,17 @@ const MODES: { key: Mode; label: string; icon: typeof Beef }[] = [
   { key: "farm", label: "全牧场牛只", icon: Check },
 ];
 
+function ymd(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function addDays(base: Date, n: number) {
+  const d = new Date(base);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+const TODAY_STR = () => ymd(new Date());
+const MAX_STR = () => ymd(addDays(new Date(), 7));
+
 export function CreateWorkOrderDialog({
   open,
   onOpenChange,
@@ -62,6 +73,7 @@ export function CreateWorkOrderDialog({
     targetLabel: string;
     rx: RxSeed;
     varSelections?: { drug: string; option: string; dose: string }[];
+    startDate?: string;
   }) => void;
 }) {
   const [mode, setMode] = useState<Mode>("cow");
@@ -73,6 +85,7 @@ export function CreateWorkOrderDialog({
   const [rxQuery, setRxQuery] = useState("");
   const [rxId, setRxId] = useState("");
   const [varPick, setVarPick] = useState<Record<string, string>>({});
+  const [startDate, setStartDate] = useState<string>(TODAY_STR);
 
   const rxList = useMemo(() => {
     const kw = rxQuery.trim();
@@ -135,7 +148,8 @@ export function CreateWorkOrderDialog({
     [rx],
   );
   const varDone = varDrugs.every((d) => !!varPick[d.id]);
-  const canSubmit = selection.count > 0 && !!rx && varDone;
+  const dateValid = !!startDate && startDate >= TODAY_STR() && startDate <= MAX_STR();
+  const canSubmit = selection.count > 0 && !!rx && varDone && dateValid;
 
   const reset = () => {
     setMode("cow");
@@ -147,6 +161,7 @@ export function CreateWorkOrderDialog({
     setRxQuery("");
     setRxId("");
     setVarPick({});
+    setStartDate(TODAY_STR());
   };
 
   const submit = () => {
@@ -156,7 +171,7 @@ export function CreateWorkOrderDialog({
       option: varPick[d.id],
       dose: d.varDose?.find((v) => v.option === varPick[d.id])?.dose ?? "",
     }));
-    onCreate({ targets: selection.targets, targetLabel: selection.label, rx, varSelections });
+    onCreate({ targets: selection.targets, targetLabel: selection.label, rx, varSelections, startDate });
     toast.success(`已创建${title}，执行对象 ${selection.count} 头`);
     reset();
     onOpenChange(false);
@@ -384,6 +399,37 @@ export function CreateWorkOrderDialog({
               </div>
             )}
           </div>
+        </div>
+
+        <div className="px-6 py-3 border-t border-border flex items-center gap-3 flex-wrap">
+          <span className="text-body-sm font-medium">开始执行日期</span>
+          <input
+            type="date"
+            value={startDate}
+            min={TODAY_STR()}
+            max={MAX_STR()}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="h-9 rounded-md border border-border bg-card px-2 text-body-sm"
+          />
+          <div className="flex items-center gap-1.5">
+            {[0, 1, 2, 3, 7].map((n) => {
+              const v = ymd(addDays(new Date(), n));
+              return (
+                <button
+                  key={n}
+                  onClick={() => setStartDate(v)}
+                  className={`h-8 px-2.5 rounded-md border text-caption transition-colors ${
+                    startDate === v
+                      ? "border-primary text-primary bg-[rgba(0,161,79,0.05)]"
+                      : "border-border text-text-secondary hover:border-primary/50"
+                  }`}
+                >
+                  {n === 0 ? "今日" : n === 1 ? "明日" : `${n} 天后`}
+                </button>
+              );
+            })}
+          </div>
+          <span className="text-caption text-text-tertiary">最晚可选 7 天后（{MAX_STR()}）</span>
         </div>
 
         <DialogFooter className="px-6 py-4 border-t border-border">
