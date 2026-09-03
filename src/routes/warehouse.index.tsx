@@ -355,7 +355,6 @@ function InventoryPage() {
         columns={columns}
         searchKeys={["name", "sku"]}
         searchPlaceholder="按 SKU / 药品名称搜索"
-        primaryAction={{ label: "新增类别" }}
         getRowKey={(i) => i.sku}
         renderExport={(exportCurrent) => (
           <>
