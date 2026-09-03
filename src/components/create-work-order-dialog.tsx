@@ -62,6 +62,7 @@ export function CreateWorkOrderDialog({
     targetLabel: string;
     rx: RxSeed;
     varSelections?: { drug: string; option: string; dose: string }[];
+    startDate?: string;
   }) => void;
 }) {
   const [mode, setMode] = useState<Mode>("cow");
