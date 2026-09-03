@@ -171,7 +171,7 @@ export function CreateWorkOrderDialog({
       option: varPick[d.id],
       dose: d.varDose?.find((v) => v.option === varPick[d.id])?.dose ?? "",
     }));
-    onCreate({ targets: selection.targets, targetLabel: selection.label, rx, varSelections });
+    onCreate({ targets: selection.targets, targetLabel: selection.label, rx, varSelections, startDate });
     toast.success(`已创建${title}，执行对象 ${selection.count} 头`);
     reset();
     onOpenChange(false);
