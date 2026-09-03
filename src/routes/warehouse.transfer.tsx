@@ -49,7 +49,7 @@ type TransferRow = {
   remark: string; // 备注信息
   requestedAt: string; // 提出调拨时间
   requester: string; // 提出人
-  actualInboundAt: string; // 实际入库时间
+  inboundBy: string; // 入库登记人
 };
 
 const ITEMS = [
@@ -61,10 +61,10 @@ const ITEMS = [
 ];
 
 const initial: TransferRow[] = [
-  { id: "TR-2026-0142", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20, unit: "支", inboundAt: "2026-05-19 10:24", operator: "王建国", remark: "昨日用量超预期，1 号库紧急补货至 2 号库", requestedAt: "2026-05-19 08:52", requester: "李兽医", actualInboundAt: "2026-05-19 10:31" },
-  { id: "TR-2026-0141", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支", inboundAt: "2026-05-19 09:08", operator: "王建国", remark: "5 月加强免疫备货", requestedAt: "2026-05-18 17:20", requester: "李兽医", actualInboundAt: "2026-05-19 09:15" },
-  { id: "TR-2026-0140", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15, unit: "瓶", inboundAt: "2026-05-18 16:42", operator: "孙库管", remark: "季度体内驱虫批次", requestedAt: "2026-05-18 14:05", requester: "周主管", actualInboundAt: "2026-05-18 16:50" },
-  { id: "TR-2026-0139", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶", inboundAt: "2026-05-18 11:30", operator: "孙库管", remark: "", requestedAt: "2026-05-18 09:40", requester: "周主管", actualInboundAt: "2026-05-18 11:44" },
+  { id: "TR-2026-0142", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20, unit: "支", inboundAt: "2026-05-19 10:24", operator: "王建国", remark: "昨日用量超预期，1 号库紧急补货至 2 号库", requestedAt: "2026-05-19 08:52", requester: "李兽医", inboundBy: "王建国" },
+  { id: "TR-2026-0141", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支", inboundAt: "2026-05-19 09:08", operator: "王建国", remark: "5 月加强免疫备货", requestedAt: "2026-05-18 17:20", requester: "李兽医", inboundBy: "王建国" },
+  { id: "TR-2026-0140", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15, unit: "瓶", inboundAt: "2026-05-18 16:42", operator: "孙库管", remark: "季度体内驱虫批次", requestedAt: "2026-05-18 14:05", requester: "周主管", inboundBy: "孙库管" },
+  { id: "TR-2026-0139", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶", inboundAt: "2026-05-18 11:30", operator: "孙库管", remark: "", requestedAt: "2026-05-18 09:40", requester: "周主管", inboundBy: "孙库管" },
 ];
 
 const columns: ListColumn<TransferRow>[] = [
@@ -145,7 +145,7 @@ function TransferPage() {
       remark: remark || `${from} → ${to}`,
       requestedAt: stamp(),
       requester: "超级管理员",
-      actualInboundAt: inboundAt,
+      inboundBy: "超级管理员",
     }));
     setData((d) => [...rows.reverse(), ...d]);
     toast.success(`已登记 ${rows.length} 条调拨记录`);
@@ -389,7 +389,7 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                   <Field label="提出调拨时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
                   <Field label="提出人" value={row.requester} />
                   <Field label="入库时间" value={<span className="tabular-nums">{row.inboundAt}</span>} />
-                  <Field label="实际入库时间" value={<span className="tabular-nums">{row.actualInboundAt}</span>} />
+                  <Field label="入库登记人" value={row.inboundBy} />
                 </div>
               </section>
 
