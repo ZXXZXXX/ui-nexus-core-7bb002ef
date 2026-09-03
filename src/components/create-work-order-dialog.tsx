@@ -401,6 +401,37 @@ export function CreateWorkOrderDialog({
           </div>
         </div>
 
+        <div className="px-6 py-3 border-t border-border flex items-center gap-3 flex-wrap">
+          <span className="text-body-sm font-medium">开始执行日期</span>
+          <input
+            type="date"
+            value={startDate}
+            min={TODAY_STR()}
+            max={MAX_STR()}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="h-9 rounded-md border border-border bg-card px-2 text-body-sm"
+          />
+          <div className="flex items-center gap-1.5">
+            {[0, 1, 2, 3, 7].map((n) => {
+              const v = ymd(addDays(new Date(), n));
+              return (
+                <button
+                  key={n}
+                  onClick={() => setStartDate(v)}
+                  className={`h-8 px-2.5 rounded-md border text-caption transition-colors ${
+                    startDate === v
+                      ? "border-primary text-primary bg-[rgba(0,161,79,0.05)]"
+                      : "border-border text-text-secondary hover:border-primary/50"
+                  }`}
+                >
+                  {n === 0 ? "今日" : n === 1 ? "明日" : `${n} 天后`}
+                </button>
+              );
+            })}
+          </div>
+          <span className="text-caption text-text-tertiary">最晚可选 7 天后（{MAX_STR()}）</span>
+        </div>
+
         <DialogFooter className="px-6 py-4 border-t border-border">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             取消
