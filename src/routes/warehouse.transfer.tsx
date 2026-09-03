@@ -47,6 +47,9 @@ type TransferRow = {
   inboundAt: string; // 入库时间
   operator: string; // 登记人员
   remark: string; // 备注信息
+  requestedAt: string; // 提出调拨时间
+  requester: string; // 提出人
+  actualInboundAt: string; // 实际入库时间
 };
 
 const ITEMS = [
@@ -58,10 +61,10 @@ const ITEMS = [
 ];
 
 const initial: TransferRow[] = [
-  { id: "TR-2026-0142", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20, unit: "支", inboundAt: "2026-05-19 10:24", operator: "王建国", remark: "昨日用量超预期，1 号库紧急补货至 2 号库" },
-  { id: "TR-2026-0141", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支", inboundAt: "2026-05-19 09:08", operator: "王建国", remark: "5 月加强免疫备货" },
-  { id: "TR-2026-0140", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15, unit: "瓶", inboundAt: "2026-05-18 16:42", operator: "孙库管", remark: "季度体内驱虫批次" },
-  { id: "TR-2026-0139", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶", inboundAt: "2026-05-18 11:30", operator: "孙库管", remark: "" },
+  { id: "TR-2026-0142", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20, unit: "支", inboundAt: "2026-05-19 10:24", operator: "王建国", remark: "昨日用量超预期，1 号库紧急补货至 2 号库", requestedAt: "2026-05-19 08:52", requester: "李兽医", actualInboundAt: "2026-05-19 10:31" },
+  { id: "TR-2026-0141", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支", inboundAt: "2026-05-19 09:08", operator: "王建国", remark: "5 月加强免疫备货", requestedAt: "2026-05-18 17:20", requester: "李兽医", actualInboundAt: "2026-05-19 09:15" },
+  { id: "TR-2026-0140", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15, unit: "瓶", inboundAt: "2026-05-18 16:42", operator: "孙库管", remark: "季度体内驱虫批次", requestedAt: "2026-05-18 14:05", requester: "周主管", actualInboundAt: "2026-05-18 16:50" },
+  { id: "TR-2026-0139", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶", inboundAt: "2026-05-18 11:30", operator: "孙库管", remark: "", requestedAt: "2026-05-18 09:40", requester: "周主管", actualInboundAt: "2026-05-18 11:44" },
 ];
 
 const columns: ListColumn<TransferRow>[] = [
@@ -88,6 +91,7 @@ type DraftLine = { code: string; name: string; spec: string; unit: string; qty: 
 function TransferPage() {
   const [data, setData] = useState<TransferRow[]>(initial);
   const [open, setOpen] = useState(false);
+  const [detail, setDetail] = useState<TransferRow | null>(null);
 
   const [itemId, setItemId] = useState("");
   const [itemKw, setItemKw] = useState("");
@@ -139,6 +143,9 @@ function TransferPage() {
       inboundAt,
       operator: "超级管理员",
       remark: remark || `${from} → ${to}`,
+      requestedAt: stamp(),
+      requester: "超级管理员",
+      actualInboundAt: inboundAt,
     }));
     setData((d) => [...rows.reverse(), ...d]);
     toast.success(`已登记 ${rows.length} 条调拨记录`);
@@ -158,12 +165,19 @@ function TransferPage() {
         searchPlaceholder="按药品名称 / 商品编码搜索"
         primaryAction={{ label: "新建调拨", icon: <Plus className="h-3.5 w-3.5" />, onClick: () => setOpen(true) }}
         getRowKey={(r) => r.id}
-        rowActions={() => (
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">
+        rowActions={(r) => (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground"
+            onClick={() => setDetail(r)}
+          >
             查看
           </Button>
         )}
       />
+
+      <DetailDrawer row={detail} onClose={() => setDetail(null)} />
 
       <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none p-0 flex flex-col gap-0">
@@ -329,4 +343,64 @@ function stamp() {
   const d = new Date();
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function Field({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className="text-body-sm text-foreground">{value || "—"}</div>
+    </div>
+  );
+}
+
+function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () => void }) {
+  return (
+    <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-none overflow-y-auto">
+        {row && (
+          <>
+            <SheetHeader className="text-left px-0">
+              <SheetTitle className="text-section text-foreground">
+                {row.name}
+                <span className="ml-2 text-body-sm font-normal text-text-tertiary">{row.code}</span>
+              </SheetTitle>
+              <SheetDescription className="text-caption text-text-tertiary">
+                调拨单号 {row.id}
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="mt-5 space-y-6">
+              <section className="space-y-3">
+                <div className="text-body-sm font-medium text-foreground">基础信息</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="商品编码" value={<span className="font-mono">{row.code}</span>} />
+                  <Field label="药品展示名称" value={row.name} />
+                  <Field label="规格型号" value={row.spec} />
+                  <Field label="调拨数量" value={<span className="tabular-nums">{row.qty} {row.unit}</span>} />
+                  <Field label="基础单位" value={row.unit} />
+                  <Field label="登记人员" value={row.operator} />
+                </div>
+              </section>
+
+              <section className="space-y-3">
+                <div className="text-body-sm font-medium text-foreground">流转信息</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="提出调拨时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
+                  <Field label="提出人" value={row.requester} />
+                  <Field label="入库时间" value={<span className="tabular-nums">{row.inboundAt}</span>} />
+                  <Field label="实际入库时间" value={<span className="tabular-nums">{row.actualInboundAt}</span>} />
+                </div>
+              </section>
+
+              <section className="space-y-2">
+                <div className="text-body-sm font-medium text-foreground">备注信息</div>
+                <div className="text-body-sm text-text-secondary">{row.remark || "—"}</div>
+              </section>
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
 }
