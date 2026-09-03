@@ -47,6 +47,9 @@ type TransferRow = {
   inboundAt: string; // 入库时间
   operator: string; // 登记人员
   remark: string; // 备注信息
+  requestedAt: string; // 提出调拨时间
+  requester: string; // 提出人
+  actualInboundAt: string; // 实际入库时间
 };
 
 const ITEMS = [
