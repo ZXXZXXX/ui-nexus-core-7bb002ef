@@ -91,6 +91,7 @@ type DraftLine = { code: string; name: string; spec: string; unit: string; qty: 
 function TransferPage() {
   const [data, setData] = useState<TransferRow[]>(initial);
   const [open, setOpen] = useState(false);
+  const [detail, setDetail] = useState<TransferRow | null>(null);
 
   const [itemId, setItemId] = useState("");
   const [itemKw, setItemKw] = useState("");
