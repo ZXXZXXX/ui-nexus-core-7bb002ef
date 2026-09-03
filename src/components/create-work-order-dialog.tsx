@@ -46,6 +46,17 @@ const MODES: { key: Mode; label: string; icon: typeof Beef }[] = [
   { key: "farm", label: "全牧场牛只", icon: Check },
 ];
 
+function ymd(d: Date) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function addDays(base: Date, n: number) {
+  const d = new Date(base);
+  d.setDate(d.getDate() + n);
+  return d;
+}
+const TODAY_STR = () => ymd(new Date());
+const MAX_STR = () => ymd(addDays(new Date(), 7));
+
 export function CreateWorkOrderDialog({
   open,
   onOpenChange,
