@@ -148,7 +148,8 @@ export function CreateWorkOrderDialog({
     [rx],
   );
   const varDone = varDrugs.every((d) => !!varPick[d.id]);
-  const canSubmit = selection.count > 0 && !!rx && varDone;
+  const dateValid = !!startDate && startDate >= TODAY_STR() && startDate <= MAX_STR();
+  const canSubmit = selection.count > 0 && !!rx && varDone && dateValid;
 
   const reset = () => {
     setMode("cow");
