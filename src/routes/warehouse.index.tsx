@@ -476,25 +476,20 @@ function InventoryPage() {
             />
           </>
         )}
-        rowActions={() => (
-          <>
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">查看</Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button type="button" className="inline-flex h-7 w-7 items-center justify-center rounded-md text-text-tertiary hover:text-foreground hover:bg-surface-subtle transition-colors">
-                  <MoreHorizontal className="h-4 w-4" strokeWidth={1.75} />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-36">
-                <DropdownMenuItem><Pencil className="h-3.5 w-3.5 mr-2" /> 编辑信息</DropdownMenuItem>
-                <DropdownMenuItem className="text-[var(--state-danger)] focus:text-[var(--state-danger)]">
-                  <Trash2 className="h-3.5 w-3.5 mr-2" /> 删除
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
+        onRowClick={(row) => setDetail(row)}
+        rowActions={(row) => (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground"
+            onClick={() => setDetail(row)}
+          >
+            查看
+          </Button>
         )}
+        actionsWidth={80}
       />
+      <DetailDrawer row={detail} onClose={() => setDetail(null)} />
     </>
   );
 }
