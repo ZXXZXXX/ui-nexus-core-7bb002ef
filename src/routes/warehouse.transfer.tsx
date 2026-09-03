@@ -142,6 +142,9 @@ function TransferPage() {
       inboundAt,
       operator: "超级管理员",
       remark: remark || `${from} → ${to}`,
+      requestedAt: stamp(),
+      requester: "超级管理员",
+      actualInboundAt: inboundAt,
     }));
     setData((d) => [...rows.reverse(), ...d]);
     toast.success(`已登记 ${rows.length} 条调拨记录`);
