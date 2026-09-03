@@ -376,39 +376,20 @@ const outbound: Record<string, Rec[]> = {
   ],
 };
 
-function RecordList({ list, unit, sign }: { list: Rec[]; unit: string; sign: "+" | "-" }) {
-  if (!list.length) {
-    return <div className="py-8 text-center text-body-sm text-text-tertiary">暂无记录</div>;
-  }
-  return (
-    <div className="divide-y divide-border rounded-md border border-border">
-      {list.map((r, idx) => (
-        <div key={idx} className="flex items-start gap-3 px-3 py-2.5">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="text-body-sm font-medium text-foreground">{r.via}</span>
-              <span className="text-caption text-text-tertiary tabular-nums">{r.date}</span>
-            </div>
-            <div className="mt-0.5 text-caption text-text-tertiary">
-              操作人：{r.operator}
-              {r.note ? ` · ${r.note}` : ""}
-            </div>
-          </div>
-          <span
-            className={`shrink-0 text-body font-medium tabular-nums ${
-              sign === "+" ? "text-primary" : "text-[var(--state-danger)]"
-            }`}
-          >
-            {sign}
-            {r.qty} {unit}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+type Flow = Rec & { dir: "in" | "out" };
+
+function buildFlows(sku: string): Flow[] {
+  return [
+    ...(inbound[sku] ?? []).map((r) => ({ ...r, dir: "in" as const })),
+    ...(outbound[sku] ?? []).map((r) => ({ ...r, dir: "out" as const })),
+  ].sort((a, b) => b.date.localeCompare(a.date));
 }
 
 function DetailDrawer({ row, onClose }: { row: Row | null; onClose: () => void }) {
+  const [tab, setTab] = useState<"all" | "in" | "out">("all");
+  const flows = row ? buildFlows(row.sku) : [];
+  const list = flows.filter((f) => tab === "all" || f.dir === tab);
+
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
       <SheetContent className="w-[520px] sm:max-w-[520px] overflow-auto">
@@ -424,15 +405,65 @@ function DetailDrawer({ row, onClose }: { row: Row | null; onClose: () => void }
               </SheetDescription>
             </SheetHeader>
 
-            <div className="mt-5 space-y-5">
-              <div>
-                <div className="mb-2 text-body-sm font-medium text-foreground">入库记录</div>
-                <RecordList list={inbound[row.sku] ?? []} unit={row.unit} sign="+" />
+            <div className="mt-5">
+              <div className="mb-3 inline-flex rounded-md border border-border p-0.5">
+                {([
+                  { k: "all", t: `全部 ${flows.length}` },
+                  { k: "in", t: `入库 ${flows.filter((f) => f.dir === "in").length}` },
+                  { k: "out", t: `出库 ${flows.filter((f) => f.dir === "out").length}` },
+                ] as const).map((o) => (
+                  <button
+                    key={o.k}
+                    onClick={() => setTab(o.k)}
+                    className={`rounded px-3 py-1 text-body-sm transition-colors ${
+                      tab === o.k
+                        ? "bg-brand-subtle text-primary font-medium"
+                        : "text-text-secondary hover:text-foreground"
+                    }`}
+                  >
+                    {o.t}
+                  </button>
+                ))}
               </div>
-              <div>
-                <div className="mb-2 text-body-sm font-medium text-foreground">出库记录</div>
-                <RecordList list={outbound[row.sku] ?? []} unit={row.unit} sign="-" />
-              </div>
+
+              {list.length === 0 ? (
+                <div className="py-10 text-center text-body-sm text-text-tertiary">暂无记录</div>
+              ) : (
+                <div className="relative pl-4">
+                  <span className="absolute left-[3px] top-1.5 bottom-1.5 w-px bg-border" />
+                  {list.map((r, idx) => (
+                    <div key={idx} className="relative py-2.5">
+                      <span
+                        className={`absolute -left-4 top-4 h-[7px] w-[7px] rounded-full ${
+                          r.dir === "in" ? "bg-primary" : "bg-[var(--state-danger)]"
+                        }`}
+                      />
+                      <div className="flex items-start gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className={r.dir === "in" ? "tag tag-success" : "tag tag-danger"}>
+                              {r.dir === "in" ? "入库" : "出库"}
+                            </span>
+                            <span className="text-body-sm font-medium text-foreground">{r.via}</span>
+                          </div>
+                          <div className="mt-1 text-caption text-text-tertiary tabular-nums">
+                            {r.date} · 操作人：{r.operator}
+                            {r.note ? ` · ${r.note}` : ""}
+                          </div>
+                        </div>
+                        <span
+                          className={`shrink-0 text-body font-medium tabular-nums ${
+                            r.dir === "in" ? "text-primary" : "text-[var(--state-danger)]"
+                          }`}
+                        >
+                          {r.dir === "in" ? "+" : "-"}
+                          {r.qty} {row.unit}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </>
         )}
