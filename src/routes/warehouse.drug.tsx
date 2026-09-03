@@ -21,9 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Pill, Plus, Search, Filter, Lock, Trash2, Download } from "lucide-react";
-import { exportCsv } from "@/lib/export-csv";
-import { ExportConfirmButton } from "@/components/export-confirm";
+import { Pill, Plus, Lock, Trash2 } from "lucide-react";
+import { ListPage, type ListColumn } from "@/components/list-page";
+
 
 export const Route = createFileRoute("/warehouse/drug")({
   head: () => ({ meta: [{ title: "药品档案 — 奇点智牧" }] }),
@@ -246,121 +246,83 @@ function DrugArchivePage() {
     setDetail(null);
   };
 
+  const columns: ListColumn<Drug>[] = [
+    {
+      key: "code", label: "商品编码", required: true,
+      render: (d) => <span className="font-mono text-body text-foreground truncate">{d.code}</span>,
+    },
+    {
+      key: "name", label: "药品展示名称", required: true,
+      render: (d) => (
+        <span className="flex items-center gap-1.5 text-body text-foreground truncate">
+          <Pill className="h-3.5 w-3.5 text-primary shrink-0" />
+          <span className="truncate">{d.name}</span>
+        </span>
+      ),
+    },
+    { key: "spec", label: "规格型号", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.spec}</span> },
+    { key: "drugType", label: "类型", filter: "select", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.drugType}</span> },
+    {
+      key: "routes", label: "默认用药方式", filter: "select",
+      value: (d) => d.routes.join("、"),
+      render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.routes.join("、") || "—"}</span>,
+    },
+    { key: "withdraw", label: "休药期", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.withdraw}</span> },
+    {
+      key: "status", label: "启用状态", filter: "select",
+      render: (d) => <span className={d.status === "启用" ? "tag tag-success" : "tag tag-muted"}>{d.status}</span>,
+    },
+    { key: "generic", label: "通用名称", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.generic || "—"}</span> },
+    { key: "ingredient", label: "主要成分", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.ingredient || "—"}</span> },
+    { key: "scanUnit", label: "扫码单位", filter: "select", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary">{d.scanUnit || "—"}</span> },
+    { key: "supplier", label: "供应商", filter: "select", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.supplier || "—"}</span> },
+    { key: "maker", label: "生产厂家", filter: "select", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.maker || "—"}</span> },
+    { key: "reg", label: "批准文号", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.reg || "—"}</span> },
+    { key: "shelfLife", label: "保质期", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary">{d.shelfLife || "—"}</span> },
+    { key: "defaultDose", label: "默认剂量", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.defaultDose || "—"}</span> },
+    { key: "daysRange", label: "疗程范围", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary">{d.daysRange || "—"}</span> },
+    { key: "remark", label: "备注", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.remark || "—"}</span> },
+  ];
+
   return (
     <>
-      <AppHeader title="药品档案" breadcrumb={["药品管理", "药品档案"]} />
-      <main className="flex-1 px-6 py-6 space-y-4 bg-white">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
-              <Input
-                value={kw}
-                onChange={(e) => setKw(e.target.value)}
-                placeholder="搜索药品名称 / 商品编码 / ID"
-                className="h-9 w-72 pl-9 text-body-sm"
-              />
-            </div>
-            <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
-              <Filter className="h-3.5 w-3.5" /> 分类
-            </Button>
-            <ExportConfirmButton
-              count={filtered.length}
-              title="下载药品档案数据"
-              onConfirm={() =>
-                exportCsv(
-                  "药品档案",
-                  ["商品编码", "药品展示名称", "规格型号", "类型", "默认用药方式", "休药期", "启用状态"],
-                  filtered.map((d) => [
-                    d.code,
-                    d.name,
-                    d.spec,
-                    d.drugType,
-                    (d.routes ?? []).join("、"),
-                    d.withdraw,
-                    d.status,
-                  ]),
-                )
-              }
-            />
-
-          </div>
-
-        </div>
-
-        <Card className="border-border bg-card overflow-hidden">
-          <div className="flex items-center gap-4 px-6 h-12 text-table-header text-text-secondary border-b border-border bg-surface-subtle">
-            <div className="grid grid-cols-[120px_minmax(0,1.6fr)_minmax(0,1fr)_100px_110px_90px_90px] gap-4 flex-1 min-w-0">
-              <div>商品编码</div>
-              <div>药品展示名称</div>
-              <div>规格型号</div>
-              <div>类型</div>
-              <div>默认用药方式</div>
-              <div>休药期</div>
-              <div>启用状态</div>
-            </div>
-            <div className="w-[140px] text-right shrink-0">操作</div>
-          </div>
-          {filtered.map((d) => (
-            <div
-              key={d.id}
-              className="flex items-center gap-4 px-6 h-12 text-table-cell border-b border-border last:border-0 hover:bg-surface-subtle"
+      <ListPage<Drug>
+        title="药品档案"
+        breadcrumb={["药品管理", "药品档案"]}
+        rows={list}
+        columns={columns}
+        searchKeys={["name", "code"]}
+        searchPlaceholder="搜索药品名称 / 商品编码"
+        getRowKey={(d) => d.id}
+        emptyText="未找到匹配的药品"
+        rowActions={(d) => (
+          <>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground"
+              onClick={() => {
+                setMode("view");
+                setDetail(d);
+              }}
             >
-              <div className="grid grid-cols-[120px_minmax(0,1.6fr)_minmax(0,1fr)_100px_110px_90px_90px] gap-4 flex-1 min-w-0">
-                <div className="font-mono text-body text-foreground truncate">{d.code}</div>
-                <div className="flex items-center gap-1.5 text-body text-foreground truncate">
-                  <Pill className="h-3.5 w-3.5 text-primary shrink-0" />
-                  <span className="truncate">{d.name}</span>
-                </div>
-                <div className="text-body-sm text-text-secondary truncate">{d.spec}</div>
-                <div className="text-body-sm text-text-secondary truncate">{d.drugType}</div>
-                <div className="text-body-sm text-text-secondary truncate">
-                  {d.routes.join("、") || "—"}
-                </div>
-                <div className="text-body-sm text-text-secondary truncate">{d.withdraw}</div>
-                <div className="truncate">
-                  <span
-                    className={
-                      d.status === "启用" ? "tag tag-success" : "tag tag-muted"
-                    }
-                  >
-                    {d.status}
-                  </span>
-                </div>
-              </div>
-              <div className="w-[140px] shrink-0 flex justify-end items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground"
-                  onClick={() => {
-                    setMode("view");
-                    setDetail(d);
-                  }}
-                >
-                  查看
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary"
-                  onClick={() => {
-                    setMode("edit");
-                    setDetail(d);
-                  }}
-                >
-                  编辑
-                </Button>
-              </div>
-            </div>
-          ))}
-          {filtered.length === 0 && (
-            <div className="text-center py-16 text-body-sm text-text-tertiary">
-              未找到匹配的药品
-            </div>
-          )}
-        </Card>
-      </main>
+              查看
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary"
+              onClick={() => {
+                setMode("edit");
+                setDetail(d);
+              }}
+            >
+              编辑
+            </Button>
+          </>
+        )}
+      />
+
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white">
