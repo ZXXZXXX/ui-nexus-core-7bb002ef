@@ -21,9 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Pill, Plus, Search, Filter, Lock, Trash2, Download } from "lucide-react";
-import { exportCsv } from "@/lib/export-csv";
-import { ExportConfirmButton } from "@/components/export-confirm";
+import { Pill, Plus, Lock, Trash2 } from "lucide-react";
+import { ListPage, type ListColumn } from "@/components/list-page";
+
 
 export const Route = createFileRoute("/warehouse/drug")({
   head: () => ({ meta: [{ title: "药品档案 — 奇点智牧" }] }),
