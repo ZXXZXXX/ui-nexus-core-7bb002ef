@@ -164,12 +164,19 @@ function TransferPage() {
         searchPlaceholder="按药品名称 / 商品编码搜索"
         primaryAction={{ label: "新建调拨", icon: <Plus className="h-3.5 w-3.5" />, onClick: () => setOpen(true) }}
         getRowKey={(r) => r.id}
-        rowActions={() => (
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">
+        rowActions={(r) => (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground"
+            onClick={() => setDetail(r)}
+          >
             查看
           </Button>
         )}
       />
+
+      <DetailDrawer row={detail} onClose={() => setDetail(null)} />
 
       <Sheet open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none p-0 flex flex-col gap-0">
