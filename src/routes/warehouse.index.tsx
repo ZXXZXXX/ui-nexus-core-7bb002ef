@@ -333,9 +333,119 @@ function ExportDialog({
   );
 }
 
+/* ------------------------------ 出入库记录抽屉 ------------------------------ */
+
+type Rec = { date: string; qty: number; via: string; operator: string; note?: string };
+
+const inbound: Record<string, Rec[]> = {
+  "01-00063": [
+    { date: "2026-08-20 09:12", qty: 20, via: "调拨入库", operator: "王磊", note: "由中心库调拨" },
+    { date: "2026-08-02 14:30", qty: 40, via: "采购入库", operator: "李静" },
+  ],
+  "02-00214": [{ date: "2026-07-28 10:05", qty: 30, via: "采购入库", operator: "李静" }],
+  "03-00306": [
+    { date: "2026-08-14 08:40", qty: 12, via: "退料入库", operator: "赵敏", note: "三级库未用完退回" },
+    { date: "2026-08-05 16:20", qty: 24, via: "调拨入库", operator: "王磊" },
+  ],
+  "04-00412": [{ date: "2026-08-02 11:00", qty: 60, via: "采购入库", operator: "李静" }],
+  "05-00521": [{ date: "2026-07-21 09:30", qty: 10, via: "调拨入库", operator: "王磊" }],
+  "06-00633": [
+    { date: "2026-08-11 15:10", qty: 18, via: "退料入库", operator: "赵敏" },
+    { date: "2026-07-15 09:00", qty: 36, via: "采购入库", operator: "李静" },
+  ],
+};
+
+const outbound: Record<string, Rec[]> = {
+  "01-00063": [
+    { date: "2026-08-20 17:40", qty: 18, via: "用药领取", operator: "陈涛", note: "乳房炎治疗工单" },
+    { date: "2026-08-02 18:05", qty: 12, via: "用药领取", operator: "陈涛" },
+  ],
+  "02-00214": [
+    { date: "2026-08-19 16:22", qty: 14, via: "用药领取", operator: "刘洋" },
+    { date: "2026-07-28 17:50", qty: 26, via: "用药领取", operator: "刘洋" },
+  ],
+  "03-00306": [
+    { date: "2026-08-14 17:15", qty: 15, via: "盘点损耗", operator: "赵敏", note: "储存保管破损" },
+    { date: "2026-08-05 18:00", qty: 9, via: "用药领取", operator: "陈涛" },
+  ],
+  "04-00412": [{ date: "2026-08-02 18:20", qty: 22, via: "用药领取", operator: "陈涛" }],
+  "05-00521": [{ date: "2026-07-21 17:30", qty: 26, via: "盘点损耗", operator: "赵敏", note: "取药配药洒漏" }],
+  "06-00633": [
+    { date: "2026-08-11 17:55", qty: 10, via: "用药领取", operator: "刘洋" },
+    { date: "2026-07-15 18:10", qty: 20, via: "用药领取", operator: "陈涛" },
+  ],
+};
+
+function RecordList({ list, unit, sign }: { list: Rec[]; unit: string; sign: "+" | "-" }) {
+  if (!list.length) {
+    return <div className="py-8 text-center text-body-sm text-text-tertiary">暂无记录</div>;
+  }
+  return (
+    <div className="divide-y divide-border rounded-md border border-border">
+      {list.map((r, idx) => (
+        <div key={idx} className="flex items-start gap-3 px-3 py-2.5">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="text-body-sm font-medium text-foreground">{r.via}</span>
+              <span className="text-caption text-text-tertiary tabular-nums">{r.date}</span>
+            </div>
+            <div className="mt-0.5 text-caption text-text-tertiary">
+              操作人：{r.operator}
+              {r.note ? ` · ${r.note}` : ""}
+            </div>
+          </div>
+          <span
+            className={`shrink-0 text-body font-medium tabular-nums ${
+              sign === "+" ? "text-primary" : "text-[var(--state-danger)]"
+            }`}
+          >
+            {sign}
+            {r.qty} {unit}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DetailDrawer({ row, onClose }: { row: Row | null; onClose: () => void }) {
+  return (
+    <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent className="w-[520px] sm:max-w-[520px] overflow-auto">
+        {row && (
+          <>
+            <SheetHeader className="text-left">
+              <SheetTitle className="text-section">
+                {row.name}
+                <span className="ml-2 font-mono text-caption font-normal text-text-tertiary">{row.sku}</span>
+              </SheetTitle>
+              <SheetDescription className="text-caption text-text-tertiary">
+                {row.spec} · 当前库存 {row.stock} {row.unit} · 效期 {row.expiry}
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="mt-5 space-y-5">
+              <div>
+                <div className="mb-2 text-body-sm font-medium text-foreground">入库记录</div>
+                <RecordList list={inbound[row.sku] ?? []} unit={row.unit} sign="+" />
+              </div>
+              <div>
+                <div className="mb-2 text-body-sm font-medium text-foreground">出库记录</div>
+                <RecordList list={outbound[row.sku] ?? []} unit={row.unit} sign="-" />
+              </div>
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 function InventoryPage() {
   const [exportOpen, setExportOpen] = useState(false);
+  const [detail, setDetail] = useState<Row | null>(null);
   const rows = useMemo(() => buildRows("", ""), []);
+
 
   return (
     <>
