@@ -344,3 +344,63 @@ function stamp() {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
+
+function Field({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className="text-body-sm text-foreground">{value || "—"}</div>
+    </div>
+  );
+}
+
+function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () => void }) {
+  return (
+    <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-none overflow-y-auto">
+        {row && (
+          <>
+            <SheetHeader className="text-left px-0">
+              <SheetTitle className="text-section text-foreground">
+                {row.name}
+                <span className="ml-2 text-body-sm font-normal text-text-tertiary">{row.code}</span>
+              </SheetTitle>
+              <SheetDescription className="text-caption text-text-tertiary">
+                调拨单号 {row.id}
+              </SheetDescription>
+            </SheetHeader>
+
+            <div className="mt-5 space-y-6">
+              <section className="space-y-3">
+                <div className="text-body-sm font-medium text-foreground">基础信息</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="商品编码" value={<span className="font-mono">{row.code}</span>} />
+                  <Field label="药品展示名称" value={row.name} />
+                  <Field label="规格型号" value={row.spec} />
+                  <Field label="调拨数量" value={<span className="tabular-nums">{row.qty} {row.unit}</span>} />
+                  <Field label="基础单位" value={row.unit} />
+                  <Field label="登记人员" value={row.operator} />
+                </div>
+              </section>
+
+              <section className="space-y-3">
+                <div className="text-body-sm font-medium text-foreground">流转信息</div>
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="提出调拨时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
+                  <Field label="提出人" value={row.requester} />
+                  <Field label="入库时间" value={<span className="tabular-nums">{row.inboundAt}</span>} />
+                  <Field label="实际入库时间" value={<span className="tabular-nums">{row.actualInboundAt}</span>} />
+                </div>
+              </section>
+
+              <section className="space-y-2">
+                <div className="text-body-sm font-medium text-foreground">备注信息</div>
+                <div className="text-body-sm text-text-secondary">{row.remark || "—"}</div>
+              </section>
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
