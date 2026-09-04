@@ -347,56 +347,71 @@ function stamp() {
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="space-y-1">
-      <div className="text-caption text-text-tertiary">{label}</div>
-      <div className="text-body-sm text-foreground">{value || "—"}</div>
+    <div className="flex items-start justify-between gap-4 py-2.5">
+      <div className="shrink-0 text-body-sm text-text-tertiary">{label}</div>
+      <div className="min-w-0 text-right text-body-sm text-foreground">{value || "—"}</div>
     </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <div className="mb-2 flex items-center gap-2">
+        <span className="h-3 w-[3px] rounded-full bg-primary" />
+        <span className="text-body-sm font-medium text-foreground">{title}</span>
+      </div>
+      <div className="rounded-lg border border-border bg-card px-4 py-1">{children}</div>
+    </section>
   );
 }
 
 function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () => void }) {
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-none overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-none overflow-y-auto bg-surface-subtle">
         {row && (
           <>
-            <SheetHeader className="text-left px-0">
+            <SheetHeader className="text-left px-0 pb-4 border-b border-border">
               <SheetTitle className="text-section text-foreground">
                 {row.name}
                 <span className="ml-2 text-body-sm font-normal text-text-tertiary">{row.code}</span>
               </SheetTitle>
               <SheetDescription className="text-caption text-text-tertiary">
-                调拨单号 {row.id}
+                调拨单号 {row.id} · 调拨数量 {row.qty} {row.unit}
               </SheetDescription>
             </SheetHeader>
 
-            <div className="mt-5 space-y-6">
-              <section className="space-y-3">
-                <div className="text-body-sm font-medium text-foreground">基础信息</div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="商品编码" value={<span className="font-mono">{row.code}</span>} />
-                  <Field label="药品展示名称" value={row.name} />
-                  <Field label="规格型号" value={row.spec} />
-                  <Field label="调拨数量" value={<span className="tabular-nums">{row.qty} {row.unit}</span>} />
-                  <Field label="基础单位" value={row.unit} />
-                  <Field label="登记人员" value={row.operator} />
-                </div>
-              </section>
+            <div className="mt-5 space-y-5">
+              <Section title="基础信息">
+                <Field label="商品编码" value={<span className="font-mono">{row.code}</span>} />
+                <div className="border-t border-border/60" />
+                <Field label="药品展示名称" value={row.name} />
+                <div className="border-t border-border/60" />
+                <Field label="规格型号" value={row.spec} />
+                <div className="border-t border-border/60" />
+                <Field label="调拨数量" value={<span className="tabular-nums">{row.qty} {row.unit}</span>} />
+                <div className="border-t border-border/60" />
+                <Field label="基础单位" value={row.unit} />
+                <div className="border-t border-border/60" />
+                <Field label="登记人员" value={row.operator} />
+              </Section>
 
-              <section className="space-y-3">
-                <div className="text-body-sm font-medium text-foreground">流转信息</div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="提出调拨时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
-                  <Field label="提出人" value={row.requester} />
-                  <Field label="入库时间" value={<span className="tabular-nums">{row.inboundAt}</span>} />
-                  <Field label="入库登记人" value={row.inboundBy} />
-                </div>
-              </section>
+              <Section title="流转信息">
+                <Field label="提出调拨时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
+                <div className="border-t border-border/60" />
+                <Field label="提出人" value={row.requester} />
+                <div className="border-t border-border/60" />
+                <Field label="入库时间" value={<span className="tabular-nums">{row.inboundAt}</span>} />
+                <div className="border-t border-border/60" />
+                <Field label="入库登记人" value={row.inboundBy} />
+              </Section>
 
-              <section className="space-y-2">
-                <div className="text-body-sm font-medium text-foreground">备注信息</div>
-                <div className="text-body-sm text-text-secondary">{row.remark || "—"}</div>
-              </section>
+              <Section title="备注信息">
+                <div className="py-2.5 text-body-sm leading-relaxed text-text-secondary">
+                  {row.remark || "—"}
+                </div>
+              </Section>
             </div>
           </>
         )}
