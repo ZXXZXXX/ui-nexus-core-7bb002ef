@@ -151,7 +151,7 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                 <div className="border-t border-border/60" />
                 <Field label="调拨类型" value={row.type} />
                 <div className="border-t border-border/60" />
-                <Field label="调拨数量" value={<span className="tabular-nums">{row.qty} {row.unit}</span>} />
+                <Field label="调拨数量" value={<span className="tabular-nums">{row.qty}</span>} />
                 <div className="border-t border-border/60" />
                 <Field label="基础单位" value={row.unit} />
                 <div className="border-t border-border/60" />
