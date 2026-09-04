@@ -125,6 +125,39 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+function FlowNode({
+  stage,
+  store,
+  time,
+  person,
+  highlight,
+}: {
+  stage: string;
+  store: string;
+  time: string;
+  person: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="min-w-0 flex-1">
+      <div className="mb-2 flex items-center gap-2">
+        <span
+          className={`h-2 w-2 rounded-full ${highlight ? "bg-primary" : "bg-border"}`}
+        />
+        <span className="text-caption text-text-tertiary">{stage}</span>
+        {highlight && <span className="text-caption text-primary">本仓库</span>}
+      </div>
+      <div className="rounded-lg border border-border bg-background/40 px-3 py-2.5">
+        <div className={`truncate text-body-sm font-medium ${highlight ? "text-primary" : "text-foreground"}`}>
+          {store}
+        </div>
+        <div className="mt-1 text-caption tabular-nums text-text-secondary">{time || "—"}</div>
+        <div className="mt-0.5 text-caption text-text-tertiary">登记人 {person || "—"}</div>
+      </div>
+    </div>
+  );
+}
+
 function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () => void }) {
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
@@ -159,26 +192,29 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
               </Section>
 
               <Section title="流转信息">
-                <Field
-                  label="调拨流向"
-                  value={
-                    <span>
-                      <span className={row.type === "出库" ? "text-primary font-medium" : ""}>{row.fromStore}</span>
-                      <span className="mx-1 text-text-tertiary">→</span>
-                      <span className={row.type === "入库" ? "text-primary font-medium" : ""}>{row.toStore}</span>
-                    </span>
-                  }
-                />
-
-                <div className="border-t border-border/60" />
-                <Field label="登记出库时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
-                <div className="border-t border-border/60" />
-                <Field label="出库登记人" value={row.requester} />
-                <div className="border-t border-border/60" />
-                <Field label="登记入库时间" value={<span className="tabular-nums">{row.inboundAt}</span>} />
-                <div className="border-t border-border/60" />
-                <Field label="入库登记人" value={row.inboundBy} />
+                <div className="flex items-stretch gap-3 py-4">
+                  <FlowNode
+                    stage="出库"
+                    store={row.fromStore}
+                    time={row.requestedAt}
+                    person={row.requester}
+                    highlight={row.type === "出库"}
+                  />
+                  <div className="flex shrink-0 items-center pt-6">
+                    <span className="h-[1px] w-4 bg-border" />
+                    <span className="text-text-tertiary">→</span>
+                    <span className="h-[1px] w-4 bg-border" />
+                  </div>
+                  <FlowNode
+                    stage="入库"
+                    store={row.toStore}
+                    time={row.inboundAt}
+                    person={row.inboundBy}
+                    highlight={row.type === "入库"}
+                  />
+                </div>
               </Section>
+
 
               <Section title="备注信息">
                 <div className="py-2.5 text-body-sm leading-relaxed text-text-secondary">
