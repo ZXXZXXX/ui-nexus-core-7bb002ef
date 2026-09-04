@@ -149,7 +149,7 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                 <div className="border-t border-border/60" />
                 <Field label="规格型号" value={row.spec} />
                 <div className="border-t border-border/60" />
-                <Field label="调拨类型" value={row.type} />
+                <Field label="调拨类型" value={<span className={`tag ${row.type === "入库" ? "tag-brand" : "tag-warning"}`}>{row.type}</span>} />
                 <div className="border-t border-border/60" />
                 <Field label="调拨数量" value={<span className="tabular-nums">{row.qty}</span>} />
                 <div className="border-t border-border/60" />
