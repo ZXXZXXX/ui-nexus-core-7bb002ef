@@ -30,7 +30,7 @@ type LossStage = (typeof LOSS_STAGES)[number]["key"];
 const RETURN_REASONS = [
   "工单变更 ",
   "用料剩余",
-  
+  "牛只死亡",
   "牛只转出",
   "领取错误",
   "其他 ",
