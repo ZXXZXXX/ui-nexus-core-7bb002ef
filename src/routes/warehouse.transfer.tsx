@@ -149,7 +149,7 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                 <div className="border-t border-border/60" />
                 <Field label="规格型号" value={row.spec} />
                 <div className="border-t border-border/60" />
-                <Field label="调拨类型" value={row.type} />
+                <Field label="调拨类型" value={<span className={`tag ${row.type === "入库" ? "tag-brand" : "tag-warning"}`}>{row.type}</span>} />
                 <div className="border-t border-border/60" />
                 <Field label="调拨数量" value={<span className="tabular-nums">{row.qty}</span>} />
                 <div className="border-t border-border/60" />
@@ -159,7 +159,17 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
               </Section>
 
               <Section title="流转信息">
-                <Field label="调拨流向" value={`${row.fromStore} → ${row.toStore}`} />
+                <Field
+                  label="调拨流向"
+                  value={
+                    <span>
+                      <span className={row.type === "出库" ? "text-primary font-medium" : ""}>{row.fromStore}</span>
+                      <span className="mx-1 text-text-tertiary">→</span>
+                      <span className={row.type === "入库" ? "text-primary font-medium" : ""}>{row.toStore}</span>
+                    </span>
+                  }
+                />
+
                 <div className="border-t border-border/60" />
                 <Field label="登记出库时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
                 <div className="border-t border-border/60" />
