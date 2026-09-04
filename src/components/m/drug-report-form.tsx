@@ -4,7 +4,6 @@ import { ScanLine, X, Plus, PackageX, ChevronRight } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { EvidenceSection } from "@/components/evidence-section";
 import { DrugItemPicker } from "@/components/drug-item-picker";
-import { TagPicker } from "@/components/m/tag-picker";
 import { toast } from "sonner";
 
 // 物品/药品候选（含参考单价，用于自动估算金额）
