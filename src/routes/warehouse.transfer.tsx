@@ -362,6 +362,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
         <span className="text-body-sm font-medium text-foreground">{title}</span>
       </div>
       <div className="rounded-lg border border-border bg-card px-4 py-1">{children}</div>
+
     </section>
   );
 }
@@ -369,7 +370,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () => void }) {
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-none overflow-y-auto bg-surface-subtle">
+      <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-none overflow-y-auto bg-card">
         {row && (
           <>
             <SheetHeader className="text-left px-0 pb-4 border-b border-border">
