@@ -279,7 +279,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
         )}
 
-        <Section title={`${word}原因`} required hint="单选；从固定原因中选择">
+        <Section title={`${word}原因`} required hint="单选">
           {!isReturn && !stage ? (
             <div className="text-body-sm text-text-tertiary">请先选择发生环节</div>
           ) : (
