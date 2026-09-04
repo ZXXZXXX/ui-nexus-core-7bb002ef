@@ -224,7 +224,7 @@ function LossPage() {
               </section>
 
               <section className="rounded-lg border border-border">
-                <div className="px-4 py-2.5 border-b border-border text-body-sm text-text-secondary inline-flex items-center gap-1.5">
+                <div className="px-4 py-2.5 border-b border-border text-body-sm text-text-secondary flex items-center gap-1.5">
                   <Camera className="h-3.5 w-3.5" /> 现场照片 · {current.photos} 张
                 </div>
                 <div className="px-4 py-3">
