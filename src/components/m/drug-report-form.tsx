@@ -280,19 +280,32 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
 
         )}
 
-        <Section title={`${word}原因`} required hint="单选；输入关键词搜索">
+        <Section title={`${word}原因`} required hint="单选；从固定原因中选择">
           {!isReturn && !stage ? (
             <div className="text-body-sm text-text-tertiary">请先选择发生环节</div>
           ) : (
-            <TagPicker
-              selected={reasons}
-              onChange={setReasons}
-              presets={isReturn ? RETURN_REASONS : stageReasons}
-              singleSelect
-              disableCreate
-            />
+            <div className="flex flex-wrap gap-2">
+              {(isReturn ? RETURN_REASONS : stageReasons).map((t) => {
+                const active = reasons[0] === t;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => setReasons(active ? [] : [t])}
+                    className={`inline-flex items-center h-9 px-4 rounded-full text-body-sm border transition-colors ${
+                      active
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-card text-foreground border-border active:border-primary"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
           )}
         </Section>
+
 
         <EvidenceSection
           desc={desc}
