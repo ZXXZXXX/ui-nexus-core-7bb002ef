@@ -125,6 +125,39 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+function FlowNode({
+  stage,
+  store,
+  time,
+  person,
+  highlight,
+}: {
+  stage: string;
+  store: string;
+  time: string;
+  person: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="min-w-0 flex-1">
+      <div className="mb-2 flex items-center gap-2">
+        <span
+          className={`h-2 w-2 rounded-full ${highlight ? "bg-primary" : "bg-border"}`}
+        />
+        <span className="text-caption text-text-tertiary">{stage}</span>
+        {highlight && <span className="text-caption text-primary">本仓库</span>}
+      </div>
+      <div className="rounded-lg border border-border bg-background/40 px-3 py-2.5">
+        <div className={`truncate text-body-sm font-medium ${highlight ? "text-primary" : "text-foreground"}`}>
+          {store}
+        </div>
+        <div className="mt-1 text-caption tabular-nums text-text-secondary">{time || "—"}</div>
+        <div className="mt-0.5 text-caption text-text-tertiary">登记人 {person || "—"}</div>
+      </div>
+    </div>
+  );
+}
+
 function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () => void }) {
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
