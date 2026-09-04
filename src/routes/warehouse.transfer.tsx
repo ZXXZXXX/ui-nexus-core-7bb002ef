@@ -159,7 +159,7 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
               </Section>
 
               <Section title="流转信息">
-                <Field label="调拨流向" value={<span>{row.fromStore} → {row.toStore}</span>} />
+                <Field label="调拨流向" value={`${row.fromStore} → ${row.toStore}`} />
                 <div className="border-t border-border/60" />
                 <Field label="登记出库时间" value={<span className="tabular-nums">{row.requestedAt}</span>} />
                 <div className="border-t border-border/60" />
