@@ -147,7 +147,7 @@ function FlowNode({
         <span className="text-caption text-text-tertiary">{stage}</span>
         {highlight && <span className="text-caption text-primary">本仓库</span>}
       </div>
-      <div className="rounded-lg border border-border bg-background/40 px-3 py-2.5">
+      <div className={`rounded-lg border px-3 py-2.5 ${highlight ? "border-primary bg-primary/5" : "border-border bg-background/40"}`}>
         <div className={`truncate text-body-sm font-medium ${highlight ? "text-primary" : "text-foreground"}`}>
           {store}
         </div>
