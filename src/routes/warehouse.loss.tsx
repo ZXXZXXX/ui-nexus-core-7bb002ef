@@ -174,10 +174,11 @@ function LossPage() {
                 <div className="px-4 py-2.5 border-b border-border text-body-sm text-text-secondary">基础信息</div>
                 <div className="px-4 py-3 divide-y divide-border">
                   {[
-                    ["损耗上报日期", current.reportedAt],
                     ["上报人员", current.reporter],
-                    ["发生环节", current.stage],
+                    ["上报日期", current.reportedAt],
+                    ["损耗环节", current.stage],
                     ["损耗原因", current.reason],
+
                     ["损耗类型", current.type],
                     ["药品数目", `${current.drugCount} 种`],
                     ["损耗总估值", money(current.value)],
