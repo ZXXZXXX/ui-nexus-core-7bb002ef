@@ -117,9 +117,10 @@ function LossPage() {
       key: "drugCount", label: "药品数目", filter: "number", value: (r) => r.drugCount,
       render: (r) => <span className="text-body tabular-nums text-foreground">{r.drugCount}</span>,
     },
-    { key: "reportedAt", label: "损耗上报日期", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.reportedAt}</span> },
+    { key: "stage", label: "损耗环节", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.stage}</span> },
     { key: "reason", label: "损耗原因", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.reason}</span> },
     { key: "reporter", label: "上报人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.reporter}</span> },
+    { key: "reportedAt", label: "上报日期", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.reportedAt}</span> },
     {
       key: "value", label: "损耗总估值", filter: "number", value: (r) => r.value,
       render: (r) => <span className="text-body tabular-nums text-foreground">{money(r.value)}</span>,
@@ -127,9 +128,10 @@ function LossPage() {
     {
       key: "type", label: "损耗类型", filter: "select",
       render: (r) => (
-        <span className={r.type === "牛只均摊" ? "tag tag-muted text-primary" : "tag tag-muted text-text-secondary"}>{r.type}</span>
+        <span className={r.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{r.type}</span>
       ),
     },
+
   ];
 
   return (
