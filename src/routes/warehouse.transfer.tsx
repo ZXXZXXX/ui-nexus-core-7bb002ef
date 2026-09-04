@@ -54,7 +54,7 @@ const columns: ListColumn<TransferRow>[] = [
   {
     key: "type", label: "调拨类型", filter: "select",
     render: (r) => (
-      <span className={`inline-flex items-center rounded px-1.5 py-0.5 text-caption ${r.type === "入库" ? "bg-primary/10 text-primary" : "bg-warning/10 text-warning"}`}>{r.type}</span>
+      <span className={`tag ${r.type === "入库" ? "tag-brand" : "tag-warning"}`}>{r.type}</span>
     ),
   },
   {
