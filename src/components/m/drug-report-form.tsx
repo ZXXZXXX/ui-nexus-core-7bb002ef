@@ -28,13 +28,12 @@ const LOSS_STAGES = [
 type LossStage = (typeof LOSS_STAGES)[number]["key"];
 
 const RETURN_REASONS = [
-  "工单取消",
+  "工单变更 ",
   "用料剩余",
-  "诊断变更",
   "牛只死亡",
   "牛只转出",
   "领取错误",
-  "包装未拆",
+  "其他 ",
 ];
 
 type Line = { itemId: string; qty: string };
