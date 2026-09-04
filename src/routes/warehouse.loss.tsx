@@ -172,25 +172,33 @@ function LossPage() {
             <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
               <section className="rounded-lg border border-border">
                 <div className="px-4 py-2.5 border-b border-border text-body-sm text-text-secondary">基础信息</div>
-                <div className="px-4 py-3 divide-y divide-border">
-                  {[
+                <div className="grid grid-cols-2 gap-x-6 gap-y-3 px-4 py-3.5">
+                  {([
                     ["上报人员", current.reporter],
                     ["上报日期", current.reportedAt],
                     ["损耗环节", current.stage],
                     ["损耗原因", current.reason],
-
-                    ["损耗类型", current.type],
                     ["药品数目", `${current.drugCount} 种`],
                     ["损耗总估值", money(current.value)],
-                    ["备注", current.remark || "—"],
-                  ].map(([k, v]) => (
-                    <div key={k} className="flex items-start justify-between gap-6 py-2">
-                      <span className="text-body-sm text-text-tertiary shrink-0">{k}</span>
-                      <span className="text-body-sm text-foreground text-right">{v}</span>
+                  ] as [string, string][]).map(([k, v]) => (
+                    <div key={k} className="min-w-0">
+                      <div className="text-caption text-text-tertiary">{k}</div>
+                      <div className="text-body-sm text-foreground truncate">{v}</div>
                     </div>
                   ))}
+                  <div className="min-w-0">
+                    <div className="text-caption text-text-tertiary">损耗类型</div>
+                    <div className="mt-0.5">
+                      <span className={current.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{current.type}</span>
+                    </div>
+                  </div>
+                  <div className="col-span-2 min-w-0">
+                    <div className="text-caption text-text-tertiary">备注</div>
+                    <div className="text-body-sm text-foreground">{current.remark || "—"}</div>
+                  </div>
                 </div>
               </section>
+
 
               <section className="rounded-lg border border-border">
                 <div className="px-4 py-2.5 border-b border-border text-body-sm text-text-secondary">
