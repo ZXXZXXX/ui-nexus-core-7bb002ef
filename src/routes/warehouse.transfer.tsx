@@ -202,11 +202,11 @@ function FlowNode({
   tone: "brand" | "warning";
 }) {
   const isWarn = tone === "warning";
-  const dot = highlight ? (isWarn ? "bg-alert" : "bg-primary") : "bg-border";
-  const accentText = isWarn ? "text-alert" : "text-primary";
+  const dot = highlight ? (isWarn ? "bg-[#F9B855]" : "bg-primary") : "bg-border";
+  const accentText = isWarn ? "text-[#F9B855]" : "text-primary";
   const box = highlight
     ? isWarn
-      ? "border-alert bg-alert/10"
+      ? "border-[#F9B855] bg-[#FFF5DF]"
       : "border-primary bg-primary/5"
     : "border-border bg-background/40";
   return (
