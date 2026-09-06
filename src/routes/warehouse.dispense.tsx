@@ -109,9 +109,10 @@ const columns: ListColumn<DispenseRow>[] = [
   { key: "takenAt", label: "领取时间", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.takenAt}</span> },
   { key: "operator", label: "领取人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
   {
-    key: "status", label: "药品状态", filter: "select",
-    render: (r) => <span className={statusTone[r.status]}>{r.status}</span>,
+    key: "status", label: "使用状态", filter: "select",
+    render: (r) => <UsageBar row={r} />,
   },
+
   {
     key: "users", label: "使用人员",
     render: (r) => <ListCell items={r.users} />,
