@@ -92,7 +92,7 @@ const columns: ListColumn<DispenseRow>[] = [
     key: "remark", label: "备注",
     render: (r) => (
       <span className="text-body-sm text-text-secondary truncate">
-        {r.status === "已退回" ? r.remark || "—" : "—"}
+        {r.remark || "—"}
       </span>
     ),
   },
