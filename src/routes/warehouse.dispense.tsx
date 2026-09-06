@@ -62,27 +62,27 @@ function UsageBar({ row }: { row: DispenseRow }) {
   ].filter((s) => s.v > 0);
 
   return (
-    <div className="min-w-[150px]">
-      <div
-        className="flex h-2 w-full overflow-hidden rounded-full bg-surface-subtle"
-        title={seg.map((s) => `${s.k} ${s.v}${row.unit}`).join(" · ")}
-      >
+    <div className="group relative min-w-[150px] py-1.5">
+      <div className="flex h-2 w-full overflow-hidden rounded-full bg-surface-subtle">
         {seg.map((s) => (
           <span key={s.k} style={{ width: `${(s.v / total) * 100}%`, backgroundColor: s.c }} />
         ))}
       </div>
-      <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-caption text-text-secondary">
+      <div className="pointer-events-none absolute left-0 bottom-full z-20 mb-1.5 hidden whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1.5 text-caption text-card shadow-lg group-hover:block">
         {seg.map((s) => (
-          <span key={s.k} className="inline-flex items-center gap-1">
+          <span key={s.k} className="mr-2.5 inline-flex items-center gap-1 last:mr-0">
             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.c }} />
             {s.k}
-            <span className="tabular-nums text-text-tertiary">{s.v}</span>
+            <span className="tabular-nums">
+              {s.v} {row.unit}
+            </span>
           </span>
         ))}
       </div>
     </div>
   );
 }
+
 
 
 function ListCell({ items, mono }: { items: string[]; mono?: boolean }) {
