@@ -157,7 +157,7 @@ function DispensePage() {
                 ))}
               </div>
             </div>
-            {detail.status === "已退回" && detail.remark ? (
+            {detail.remark ? (
               <Field label="备注" value={detail.remark} />
             ) : null}
           </div>
