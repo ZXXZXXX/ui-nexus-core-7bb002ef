@@ -192,22 +192,32 @@ function FlowNode({
   time,
   person,
   highlight,
+  tone,
 }: {
   stage: string;
   store: string;
   time: string;
   person: string;
   highlight?: boolean;
+  tone: "brand" | "warning";
 }) {
+  const isWarn = tone === "warning";
+  const dot = highlight ? (isWarn ? "bg-warning" : "bg-primary") : "bg-border";
+  const accentText = isWarn ? "text-warning" : "text-primary";
+  const box = highlight
+    ? isWarn
+      ? "border-warning bg-warning/5"
+      : "border-primary bg-primary/5"
+    : "border-border bg-background/40";
   return (
     <div className="min-w-0 flex-1">
       <div className="mb-2 flex items-center gap-2">
-        <span className={`h-2 w-2 rounded-full ${highlight ? "bg-primary" : "bg-border"}`} />
+        <span className={`h-2 w-2 rounded-full ${dot}`} />
         <span className="text-caption text-text-tertiary">{stage}</span>
-        {highlight && <span className="text-caption text-primary">本仓库</span>}
+        {highlight && <span className={`text-caption ${accentText}`}>本仓库</span>}
       </div>
-      <div className={`rounded-lg border px-3 py-2.5 ${highlight ? "border-primary bg-primary/5" : "border-border bg-background/40"}`}>
-        <div className={`truncate text-body-sm font-medium ${highlight ? "text-primary" : "text-foreground"}`}>
+      <div className={`rounded-lg border px-3 py-2.5 ${box}`}>
+        <div className={`truncate text-body-sm font-medium ${highlight ? accentText : "text-foreground"}`}>
           {store}
         </div>
         <div className="mt-1 text-caption tabular-nums text-text-secondary">{time || "—"}</div>
@@ -216,6 +226,7 @@ function FlowNode({
     </div>
   );
 }
+
 
 function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () => void }) {
   return (
@@ -238,8 +249,7 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                 <Field label="调拨记录编码" value={<span className="font-mono">{row.id}</span>} />
                 <div className="border-t border-border/60" />
                 <Field label="调拨类型" value={<span className={`tag ${row.type === "入库" ? "tag-brand" : "tag-warning"}`}>{row.type}</span>} />
-                <div className="border-t border-border/60" />
-                <Field label="药品数目" value={<span className="tabular-nums">{row.items.length}</span>} />
+
               </Section>
 
               <Section title="流转信息">
