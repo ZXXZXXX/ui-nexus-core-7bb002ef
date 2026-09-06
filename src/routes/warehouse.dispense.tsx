@@ -69,8 +69,16 @@ const columns: ListColumn<DispenseRow>[] = [
   { key: "takenAt", label: "领取时间", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.takenAt}</span> },
   { key: "operator", label: "领取人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
   {
-    key: "status", label: "药品状态", filter: "select",
-    render: (r) => <span className={statusTone[r.status]}>{r.status}</span>,
+    key: "unusedQty", label: "未使用数量", filter: "number", value: (r) => r.unusedQty,
+    render: (r) => <span className="text-body tabular-nums text-foreground">{r.unusedQty}</span>,
+  },
+  {
+    key: "usedQty", label: "已使用数量", filter: "number", value: (r) => r.usedQty,
+    render: (r) => <span className="text-body tabular-nums text-foreground">{r.usedQty}</span>,
+  },
+  {
+    key: "returnedQty", label: "已退回数量", filter: "number", value: (r) => r.returnedQty,
+    render: (r) => <span className="text-body tabular-nums text-foreground">{r.returnedQty}</span>,
   },
   {
     key: "users", label: "使用人员",
