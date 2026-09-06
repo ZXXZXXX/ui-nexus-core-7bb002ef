@@ -170,7 +170,11 @@ function DispensePage() {
               <Field label="领取数量" value={`${detail.qty} ${detail.unit}`} />
               <Field label="领取时间" value={detail.takenAt} />
               <Field label="领取人员" value={detail.operator} />
-              <Field label="药品状态" value={detail.status} />
+              <div className="col-span-2">
+                <div className="text-caption text-text-tertiary mb-1.5">使用状态</div>
+                <UsageBar row={detail} />
+              </div>
+
             </div>
             <div>
               <div className="text-caption text-text-tertiary mb-1.5">使用人员（{detail.users.length}）</div>
