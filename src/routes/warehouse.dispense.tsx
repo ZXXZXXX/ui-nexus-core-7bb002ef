@@ -18,32 +18,38 @@ export const Route = createFileRoute("/warehouse/dispense")({
   component: DispensePage,
 });
 
+type DrugStatus = "未使用" | "已使用" | "已退回";
+
 type DispenseRow = {
   id: string;
   code: string; // 商品编码
   name: string; // 药品展示名称
   spec: string; // 规格型号
   qty: number; // 领取数量
-  unusedQty: number; // 未使用数量
-  usedQty: number; // 已使用数量
-  returnedQty: number; // 已退回数量
   unit: string;
   takenAt: string; // 领取时间
   operator: string; // 领取人员
+  status: DrugStatus; // 药品状态
   users: string[]; // 使用人员
   cows: string[]; // 用药牛只耳号
-  remark: string; // 备注
+  remark: string; // 备注（仅已退回有值）
 };
 
 const initial: DispenseRow[] = [
-  { id: "DP-3202", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 3, unusedQty: 3, usedQty: 0, returnedQty: 0, unit: "支", takenAt: "2026-05-12 10:36", operator: "李雨晴", users: ["李雨晴"], cows: ["1042"], remark: "" },
-  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unusedQty: 0, usedQty: 2, returnedQty: 0, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], remark: "" },
-  { id: "DP-3200", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 5, unusedQty: 1, usedQty: 4, returnedQty: 0, unit: "支", takenAt: "2026-05-12 08:15", operator: "陈晓东", users: ["陈晓东", "刘敏", "赵强"], cows: ["0431", "0432", "0455", "0478", "0509", "0611"], remark: "" },
-  { id: "DP-3199", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 10, unusedQty: 0, usedQty: 8, returnedQty: 2, unit: "瓶", takenAt: "2026-05-11 16:38", operator: "李雨晴", users: ["李雨晴"], cows: ["1201", "1202", "1233"], remark: "剩余 2 瓶未拆封退回" },
-  { id: "DP-3198", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 2, unusedQty: 0, usedQty: 0, returnedQty: 2, unit: "桶", takenAt: "2026-05-11 14:02", operator: "孙库管", users: ["孙库管"], cows: [], remark: "3 号牛舍消毒改期，整桶未拆封退回一级库" },
-  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unusedQty: 0, usedQty: 1, returnedQty: 0, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", users: ["李雨晴", "周敏"], cows: ["3301", "3315"], remark: "" },
-  { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unusedQty: 0, usedQty: 0, returnedQty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", users: ["王建国"], cows: ["2210"], remark: "工单 WO-2350 已终止，未开封退回" },
+  { id: "DP-3202", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 3, unit: "支", takenAt: "2026-05-12 10:36", operator: "李雨晴", status: "未使用", users: ["李雨晴"], cows: ["1042"], remark: "" },
+  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", status: "已使用", users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], remark: "" },
+  { id: "DP-3200", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 5, unit: "支", takenAt: "2026-05-12 08:15", operator: "陈晓东", status: "已使用", users: ["陈晓东", "刘敏", "赵强"], cows: ["0431", "0432", "0455", "0478", "0509", "0611"], remark: "" },
+  { id: "DP-3199", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 10, unit: "瓶", takenAt: "2026-05-11 16:38", operator: "李雨晴", status: "已使用", users: ["李雨晴"], cows: ["1201", "1202", "1233"], remark: "" },
+  { id: "DP-3198", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 2, unit: "桶", takenAt: "2026-05-11 14:02", operator: "孙库管", status: "已退回", users: ["孙库管"], cows: [], remark: "3 号牛舍消毒改期，整桶未拆封退回一级库" },
+  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", users: ["李雨晴", "周敏"], cows: ["3301", "3315"], remark: "" },
+  { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", users: ["王建国"], cows: ["2210"], remark: "工单 WO-2350 已终止，未开封退回" },
 ];
+
+const statusTone: Record<DrugStatus, string> = {
+  未使用: "tag tag-warning",
+  已使用: "tag tag-success",
+  已退回: "tag tag-muted",
+};
 
 function ListCell({ items, mono }: { items: string[]; mono?: boolean }) {
   if (!items.length) return <span className="text-body-sm text-text-tertiary">—</span>;
@@ -69,16 +75,8 @@ const columns: ListColumn<DispenseRow>[] = [
   { key: "takenAt", label: "领取时间", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.takenAt}</span> },
   { key: "operator", label: "领取人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
   {
-    key: "unusedQty", label: "未使用数量", filter: "number", value: (r) => r.unusedQty,
-    render: (r) => <span className="text-body tabular-nums text-foreground">{r.unusedQty}</span>,
-  },
-  {
-    key: "usedQty", label: "已使用数量", filter: "number", value: (r) => r.usedQty,
-    render: (r) => <span className="text-body tabular-nums text-foreground">{r.usedQty}</span>,
-  },
-  {
-    key: "returnedQty", label: "已退回数量", filter: "number", value: (r) => r.returnedQty,
-    render: (r) => <span className="text-body tabular-nums text-foreground">{r.returnedQty}</span>,
+    key: "status", label: "药品状态", filter: "select",
+    render: (r) => <span className={statusTone[r.status]}>{r.status}</span>,
   },
   {
     key: "users", label: "使用人员",
@@ -92,7 +90,7 @@ const columns: ListColumn<DispenseRow>[] = [
     key: "remark", label: "备注",
     render: (r) => (
       <span className="text-body-sm text-text-secondary truncate">
-        {r.remark || "—"}
+        {r.status === "已退回" ? r.remark || "—" : "—"}
       </span>
     ),
   },
@@ -137,9 +135,7 @@ function DispensePage() {
               <Field label="领取数量" value={`${detail.qty} ${detail.unit}`} />
               <Field label="领取时间" value={detail.takenAt} />
               <Field label="领取人员" value={detail.operator} />
-              <Field label="未使用数量" value={`${detail.unusedQty} ${detail.unit}`} />
-              <Field label="已使用数量" value={`${detail.usedQty} ${detail.unit}`} />
-              <Field label="已退回数量" value={`${detail.returnedQty} ${detail.unit}`} />
+              <Field label="药品状态" value={detail.status} />
             </div>
             <div>
               <div className="text-caption text-text-tertiary mb-1.5">使用人员（{detail.users.length}）</div>
@@ -157,7 +153,7 @@ function DispensePage() {
                 ))}
               </div>
             </div>
-            {detail.remark ? (
+            {detail.status === "已退回" && detail.remark ? (
               <Field label="备注" value={detail.remark} />
             ) : null}
           </div>
