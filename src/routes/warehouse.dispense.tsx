@@ -30,26 +30,60 @@ type DispenseRow = {
   takenAt: string; // 领取时间
   operator: string; // 领取人员
   status: DrugStatus; // 药品状态
+  usedQty: number; // 已使用数量
+  returnedQty: number; // 已退回数量
   users: string[]; // 使用人员
   cows: string[]; // 用药牛只耳号
   remark: string; // 备注（仅已退回有值）
 };
 
 const initial: DispenseRow[] = [
-  { id: "DP-3202", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 3, unit: "支", takenAt: "2026-05-12 10:36", operator: "李雨晴", status: "未使用", users: ["李雨晴"], cows: ["1042"], remark: "" },
-  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", status: "已使用", users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], remark: "" },
-  { id: "DP-3200", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 5, unit: "支", takenAt: "2026-05-12 08:15", operator: "陈晓东", status: "已使用", users: ["陈晓东", "刘敏", "赵强"], cows: ["0431", "0432", "0455", "0478", "0509", "0611"], remark: "" },
-  { id: "DP-3199", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 10, unit: "瓶", takenAt: "2026-05-11 16:38", operator: "李雨晴", status: "已使用", users: ["李雨晴"], cows: ["1201", "1202", "1233"], remark: "" },
-  { id: "DP-3198", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 2, unit: "桶", takenAt: "2026-05-11 14:02", operator: "孙库管", status: "已退回", users: ["孙库管"], cows: [], remark: "3 号牛舍消毒改期，整桶未拆封退回一级库" },
-  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", users: ["李雨晴", "周敏"], cows: ["3301", "3315"], remark: "" },
-  { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", users: ["王建国"], cows: ["2210"], remark: "工单 WO-2350 已终止，未开封退回" },
+  { id: "DP-3202", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 3, unit: "支", takenAt: "2026-05-12 10:36", operator: "李雨晴", status: "未使用", usedQty: 0, returnedQty: 0, users: ["李雨晴"], cows: ["1042"], remark: "" },
+  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", status: "已使用", usedQty: 2, returnedQty: 0, users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], remark: "" },
+  { id: "DP-3200", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 5, unit: "支", takenAt: "2026-05-12 08:15", operator: "陈晓东", status: "已使用", usedQty: 4, returnedQty: 1, users: ["陈晓东", "刘敏", "赵强"], cows: ["0431", "0432", "0455", "0478", "0509", "0611"], remark: "" },
+  { id: "DP-3199", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 10, unit: "瓶", takenAt: "2026-05-11 16:38", operator: "李雨晴", status: "已使用", usedQty: 7, returnedQty: 0, users: ["李雨晴"], cows: ["1201", "1202", "1233"], remark: "" },
+  { id: "DP-3198", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 2, unit: "桶", takenAt: "2026-05-11 14:02", operator: "孙库管", status: "已退回", usedQty: 0, returnedQty: 2, users: ["孙库管"], cows: [], remark: "3 号牛舍消毒改期，整桶未拆封退回一级库" },
+  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", usedQty: 1, returnedQty: 0, users: ["李雨晴", "周敏"], cows: ["3301", "3315"], remark: "" },
+  { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", usedQty: 1, returnedQty: 1, users: ["王建国"], cows: ["2210"], remark: "工单 WO-2350 已终止，未开封退回" },
 ];
 
-const statusTone: Record<DrugStatus, string> = {
-  未使用: "tag tag-warning",
-  已使用: "tag tag-success",
-  已退回: "tag tag-muted",
-};
+const USE_COLORS = { unused: "#D5D9D7", used: "#23A969", returned: "#F09A3E" };
+
+/** 横向堆积条形图：未使用（灰） / 已使用（绿） / 已退回（橙） */
+function UsageBar({ row }: { row: DispenseRow }) {
+  const used = Math.min(row.usedQty, row.qty);
+  const returned = Math.min(row.returnedQty, Math.max(row.qty - used, 0));
+  const unused = Math.max(row.qty - used - returned, 0);
+  const total = row.qty || 1;
+  const seg = [
+    { k: "已使用", v: used, c: USE_COLORS.used },
+    { k: "已退回", v: returned, c: USE_COLORS.returned },
+    { k: "未使用", v: unused, c: USE_COLORS.unused },
+  ].filter((s) => s.v > 0);
+
+  return (
+    <div className="min-w-[150px]">
+      <div
+        className="flex h-2 w-full overflow-hidden rounded-full bg-surface-subtle"
+        title={seg.map((s) => `${s.k} ${s.v}${row.unit}`).join(" · ")}
+      >
+        {seg.map((s) => (
+          <span key={s.k} style={{ width: `${(s.v / total) * 100}%`, backgroundColor: s.c }} />
+        ))}
+      </div>
+      <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-caption text-text-secondary">
+        {seg.map((s) => (
+          <span key={s.k} className="inline-flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.c }} />
+            {s.k}
+            <span className="tabular-nums text-text-tertiary">{s.v}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 function ListCell({ items, mono }: { items: string[]; mono?: boolean }) {
   if (!items.length) return <span className="text-body-sm text-text-tertiary">—</span>;
@@ -75,9 +109,10 @@ const columns: ListColumn<DispenseRow>[] = [
   { key: "takenAt", label: "领取时间", date: true, filter: "date", render: (r) => <span className="text-body-sm text-text-secondary tabular-nums">{r.takenAt}</span> },
   { key: "operator", label: "领取人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
   {
-    key: "status", label: "药品状态", filter: "select",
-    render: (r) => <span className={statusTone[r.status]}>{r.status}</span>,
+    key: "status", label: "使用状态", filter: "select",
+    render: (r) => <UsageBar row={r} />,
   },
+
   {
     key: "users", label: "使用人员",
     render: (r) => <ListCell items={r.users} />,
@@ -135,7 +170,11 @@ function DispensePage() {
               <Field label="领取数量" value={`${detail.qty} ${detail.unit}`} />
               <Field label="领取时间" value={detail.takenAt} />
               <Field label="领取人员" value={detail.operator} />
-              <Field label="药品状态" value={detail.status} />
+              <div className="col-span-2">
+                <div className="text-caption text-text-tertiary mb-1.5">使用状态</div>
+                <UsageBar row={detail} />
+              </div>
+
             </div>
             <div>
               <div className="text-caption text-text-tertiary mb-1.5">使用人员（{detail.users.length}）</div>
