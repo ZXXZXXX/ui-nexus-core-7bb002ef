@@ -36,7 +36,9 @@
   --color-success: var(--state-success);
   --color-success-foreground: var(--bg-surface);
   --color-warning: var(--state-warning);
+  --color-alert: var(--state-alert);
   --color-warning-foreground: var(--text-primary);
+
   --color-ai: var(--effect-ai-purple);
   --color-ai-foreground: var(--bg-surface);
   --color-ai-cyan: var(--effect-ai-cyan);
