@@ -63,11 +63,12 @@ function UsageBar({ row }: { row: DispenseRow }) {
 
   return (
     <div className="group relative min-w-[150px] py-1.5">
-      <div className="flex h-2 w-full overflow-hidden rounded-full bg-surface-subtle">
+      <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-subtle [&>span:first-child]:rounded-l-full [&>span:last-child]:rounded-r-full">
         {seg.map((s) => (
           <span key={s.k} style={{ width: `${(s.v / total) * 100}%`, backgroundColor: s.c }} />
         ))}
       </div>
+
       <div className="pointer-events-none absolute left-0 bottom-full z-20 mb-1.5 hidden whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1.5 text-caption text-card shadow-lg group-hover:block">
         {seg.map((s) => (
           <span key={s.k} className="mr-2.5 inline-flex items-center gap-1 last:mr-0">
