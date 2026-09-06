@@ -260,6 +260,8 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                     time={row.requestedAt}
                     person={row.requester}
                     highlight={row.type === "出库"}
+                    tone="warning"
+
                   />
                   <div className="flex shrink-0 items-center pt-6">
                     <span className="h-[1px] w-4 bg-border" />
@@ -272,6 +274,8 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                     time={row.inboundAt}
                     person={row.inboundBy}
                     highlight={row.type === "入库"}
+                    tone="brand"
+
                   />
                 </div>
               </Section>
