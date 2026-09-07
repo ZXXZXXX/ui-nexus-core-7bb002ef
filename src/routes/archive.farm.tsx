@@ -63,7 +63,6 @@ function FarmPage() {
       columns={columns}
       searchKeys={["name", "id"]}
       searchPlaceholder="搜索牛场名称 / 编号"
-      primaryAction={{ label: "新建牛场" }}
       getRowKey={(f) => f.id}
       rowActions={() => (
         <>
