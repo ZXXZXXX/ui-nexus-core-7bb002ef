@@ -21,6 +21,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Pill, Plus, Lock, Trash2 } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 
@@ -43,6 +53,7 @@ type Drug = {
   brand?: string; // 商品名/品牌名
   ingredient?: string; // 主要成分
   spec: string; // 规格型号
+  price: number; // 单价（元）
   scanUnit?: string; // 最小扫码单位
   supplier?: string; // 供应商
   maker: string; // 生产厂家
@@ -77,6 +88,7 @@ const VARIABLE_OPTIONS = ["体重区间", "非盲乳数", "自定义变量"];
 const initialDrugs: Drug[] = [
   {
     id: "DR-0108",
+    price: 186.00,
     code: "01-00063",
     name: "5%盐酸头孢噻呋注射液（畜可健）",
     generic: "盐酸头孢噻呋注射液",
@@ -107,6 +119,7 @@ const initialDrugs: Drug[] = [
   },
   {
     id: "DR-0214",
+    price: 42.50,
     code: "02-00215",
     name: "口蹄疫疫苗 A 型",
     generic: "口蹄疫 A 型灭活疫苗",
@@ -135,6 +148,7 @@ const initialDrugs: Drug[] = [
   },
   {
     id: "DR-0306",
+    price: 132.00,
     code: "03-00108",
     name: "伊维菌素注射液",
     generic: "伊维菌素注射液",
@@ -164,6 +178,7 @@ const initialDrugs: Drug[] = [
   },
   {
     id: "DR-0412",
+    price: 9.80,
     code: "04-00072",
     name: "复合维生素",
     generic: "复合维生素",
@@ -192,6 +207,7 @@ const initialDrugs: Drug[] = [
   },
   {
     id: "DR-0521",
+    price: 75.00,
     code: "05-00033",
     name: "戊二醛消毒液",
     generic: "戊二醛溶液",
@@ -261,6 +277,10 @@ function DrugArchivePage() {
       ),
     },
     { key: "spec", label: "规格型号", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.spec}</span> },
+    {
+      key: "price", label: "单价", filter: "number", value: (d) => d.price,
+      render: (d) => <span className="text-body-sm tabular-nums text-text-secondary">¥{(d.price ?? 0).toFixed(2)}</span>,
+    },
     { key: "drugType", label: "类型", filter: "select", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.drugType}</span> },
     {
       key: "routes", label: "默认用药方式", filter: "select",
@@ -359,6 +379,7 @@ function DrugForm({
 }) {
   const readOnly = mode === "view";
   const [d, setD] = useState<Drug>(value);
+  const [confirmPrice, setConfirmPrice] = useState(false);
   const patch = (p: Partial<Drug>) => setD((s) => ({ ...s, ...p }));
 
   return (
@@ -440,6 +461,14 @@ function DrugForm({
             readOnly={readOnly}
             onChange={(v) => patch({ withdraw: v })}
             placeholder="如：7天"
+          />
+          <F
+            label="单价（元）"
+            required
+            value={String(d.price ?? "")}
+            readOnly={readOnly}
+            onChange={(v) => patch({ price: Number(v.replace(/[^\d.]/g, "")) || 0 })}
+            placeholder="如：186.00"
           />
           <FSelect
             label="默认用药单位"
@@ -572,12 +601,35 @@ function DrugForm({
           </Button>
           <Button
             className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-            onClick={() => onSave(d)}
+            onClick={() => (d.price !== value.price ? setConfirmPrice(true) : onSave(d))}
           >
             保存
           </Button>
         </SheetFooter>
       )}
+
+      <AlertDialog open={confirmPrice} onOpenChange={setConfirmPrice}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认修改单价？</AlertDialogTitle>
+            <AlertDialogDescription>
+              后续入库的本药品都会以最新单价（¥{(d.price ?? 0).toFixed(2)}）进行业务计算。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
+              onClick={() => {
+                setConfirmPrice(false);
+                onSave(d);
+              }}
+            >
+              确认保存
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
