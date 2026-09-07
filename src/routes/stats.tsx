@@ -1880,7 +1880,7 @@ function StatsPage() {
                 <Input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="搜索模板名称 / 筛选条件"
+                  placeholder="搜索模板名称"
                   className="h-9 w-[260px] pl-8 bg-white"
                 />
               </div>
