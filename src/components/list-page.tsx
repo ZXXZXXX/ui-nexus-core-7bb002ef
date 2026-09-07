@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -155,6 +155,16 @@ export function ListPage<T>({
     columns.filter((c) => !c.defaultHidden).map((c) => c.key),
   );
   const [draftVisible, setDraftVisible] = useState<string[]>(visible);
+  const colSignature = columns.map((c) => c.key).join("|");
+  const lastSignature = useRef(colSignature);
+  useEffect(() => {
+    if (lastSignature.current === colSignature) return;
+    lastSignature.current = colSignature;
+    const defaults = columns.filter((c) => !c.defaultHidden).map((c) => c.key);
+    setVisible(defaults);
+    setDraftVisible(defaults);
+  }, [colSignature, columns]);
+
 
 
   const shown = columns.filter((c) => visible.includes(c.key));
