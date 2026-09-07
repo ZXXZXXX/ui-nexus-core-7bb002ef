@@ -1941,9 +1941,6 @@ function StatsPage() {
                     <TableCell className="text-body-sm text-text-secondary max-w-[420px]">
                       {t.formula ?? describeFilters(t.filters)}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-body-sm">
-                      {countActive(t.filters)}
-                    </TableCell>
                     <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.createdAt}</TableCell>
