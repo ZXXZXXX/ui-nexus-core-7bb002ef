@@ -950,6 +950,7 @@ function VariableDoseEditor({
             <Plus className="h-3.5 w-3.5" /> 添加一组
           </Button>
         </div>
+        </>
       )}
     </div>
   );
