@@ -345,10 +345,23 @@ function DrugArchivePage() {
 
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white">
-          <SheetHeader>
-            <SheetTitle className="text-section-title">
-              {mode === "edit" ? "编辑药品" : mode === "create" ? "新建药品" : "药品详情"}
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white p-0">
+          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
+            <SheetTitle className="text-section-title flex items-center gap-2">
+              <span className="h-8 w-8 rounded-lg bg-brand-subtle text-primary inline-flex items-center justify-center shrink-0">
+                <Pill className="h-4 w-4" />
+              </span>
+              <span className="truncate">
+                {mode === "edit" ? "编辑药品" : mode === "create" ? "新建药品" : detail?.name || "药品详情"}
+              </span>
+              {detail?.code && mode !== "create" && (
+                <span className="font-mono text-caption text-text-tertiary shrink-0">{detail.code}</span>
+              )}
+              {detail && mode === "view" && (
+                <span className={detail.status === "启用" ? "tag tag-success" : "tag tag-muted"}>
+                  {detail.status}
+                </span>
+              )}
             </SheetTitle>
           </SheetHeader>
           {detail && (
@@ -362,6 +375,7 @@ function DrugArchivePage() {
           )}
         </SheetContent>
       </Sheet>
+
     </>
   );
 }
