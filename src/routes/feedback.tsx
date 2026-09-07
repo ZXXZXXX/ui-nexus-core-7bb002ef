@@ -302,10 +302,10 @@ function FeedbackAdminPage() {
               <TableRow className="bg-surface-subtle/60 hover:bg-surface-subtle/60">
                 <TableHead className="w-[110px]">编号</TableHead>
                 <TableHead className="w-[120px]">评分</TableHead>
-                <TableHead className="w-[110px]">反馈类型</TableHead>
+                <TableHead className="w-[100px] whitespace-nowrap">反馈类型</TableHead>
                 <TableHead className="min-w-[300px]">详细描述</TableHead>
                 <TableHead className="w-[180px]">上传人</TableHead>
-                <TableHead className="w-[150px]">上传时间</TableHead>
+                <TableHead className="w-[140px] whitespace-nowrap">上传时间</TableHead>
                 <TableHead className="w-[100px]">状态</TableHead>
                 <TableHead className="w-[120px] text-right">操作</TableHead>
               </TableRow>
@@ -326,7 +326,7 @@ function FeedbackAdminPage() {
                 >
                   <TableCell className="font-mono text-caption text-text-secondary">{r.id}</TableCell>
                   <TableCell><Stars n={r.rating} /></TableCell>
-                  <TableCell><Badge variant="secondary" className="font-normal">{r.topic}</Badge></TableCell>
+                  <TableCell><Badge variant="secondary" className="font-normal whitespace-nowrap">{r.topic}</Badge></TableCell>
                   <TableCell>
                     <TooltipProvider delayDuration={200}>
                       <Tooltip>
@@ -357,7 +357,7 @@ function FeedbackAdminPage() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-caption text-text-secondary tabular-nums">{r.createdAt}</TableCell>
+                  <TableCell className="text-caption text-text-secondary tabular-nums whitespace-nowrap">{r.createdAt}</TableCell>
                   <TableCell><VerdictTag v={r.verdict} /></TableCell>
                   <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <TooltipProvider delayDuration={200}>
