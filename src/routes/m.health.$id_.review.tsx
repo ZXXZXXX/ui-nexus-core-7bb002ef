@@ -69,6 +69,8 @@ function ReviewPage() {
   const [leavePrice, setLeavePrice] = useState("");
   const [leaveNote, setLeaveNote] = useState("");
   const [media, setMedia] = useState<number[]>([]);
+  const [anglePhotos, setAnglePhotos] = useState<AnglePhotos>(emptyAnglePhotos);
+  const [relatedOrder, setRelatedOrder] = useState<string | null>(null);
   const [needTransfer, setNeedTransfer] = useState(false);
   const [transferTo, setTransferTo] = useState("");
   const [transferConfirmOpen, setTransferConfirmOpen] = useState(false);
