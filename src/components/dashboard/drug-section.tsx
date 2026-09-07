@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pill } from "lucide-react";
 import { SectionCard, BarList, LineTrend, MiniStat, TimeTabs } from "./charts";
-import { useDataLevel } from "@/lib/dashboard-view";
+import { useDataLevel, useDashboardView } from "@/lib/dashboard-view";
 
 const BY_MONTH = "按月统计";
 const BY_YEAR = "按年统计";
@@ -57,6 +57,8 @@ export function DrugSection() {
   const [period, setPeriod] = useState(BY_MONTH);
   const [active, setActive] = useState(trendData[BY_MONTH]!.labels.length - 1);
   const { factor } = useDataLevel();
+  const { scope } = useDashboardView();
+  const showStockValue = scope === "farm-in";
   const raw = trendData[period];
   const t = { labels: raw.labels, points: raw.points.map((p) => Number((p * factor).toFixed(1))) };
   const idx = Math.min(active, t.labels.length - 1);
@@ -65,6 +67,8 @@ export function DrugSection() {
   const herd = Math.round((herdByMonth[label] ?? (period === BY_YEAR ? 51600 : 4300)) * factor);
   const perHead = (total * 10000) / herd;
   const comp = compositionFor(label, total);
+  // 当前库存药品金额（万元）：按当期用药规模估算的在库结存
+  const stockValue = Number((total * 1.35).toFixed(1));
 
   return (
     <SectionCard
@@ -109,6 +113,9 @@ export function DrugSection() {
           <div className="grid grid-cols-2 gap-3 mb-5">
             <MiniStat label={period === BY_YEAR ? "当年用药总费用" : "当月用药总费用"} value={total.toFixed(1)} unit="万元" tone="var(--brand)" />
             <MiniStat label={period === BY_YEAR ? "当年头均用药费用" : "当月头均用药费用"} value={perHead.toFixed(1)} unit="元/头" />
+            {showStockValue && (
+              <MiniStat label="当前库存药品金额" value={stockValue.toFixed(1)} unit="万元" />
+            )}
           </div>
           <p className="text-body text-text-secondary mb-3">各类药品费用占比</p>
           <BarList data={comp} unit=" 万元" />
