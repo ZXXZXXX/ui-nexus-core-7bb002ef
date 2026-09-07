@@ -35,7 +35,7 @@ const columns: ListColumn<Farm>[] = [
   { key: "slot", label: "仓位号", filter: "select", render: (f) => <span className="font-mono text-body-sm text-text-secondary">{f.slot}</span> },
   {
     key: "type", label: "牛场类型", filter: "select",
-    render: (f) => <span className={`tag ${f.type === "有机牧场" ? "tag-success" : "tag-neutral"}`}>{f.type}</span>,
+    render: (f) => <span className={`tag ${f.type === "有机牧场" ? "tag-success" : "tag-muted"}`}>{f.type}</span>,
   },
   {
     key: "barns", label: "牛舍数量", filter: "none",
