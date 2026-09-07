@@ -1896,9 +1896,6 @@ function StatsPage() {
                   新建筛选
                 </Button>
               )}
-                  新建筛选
-                </Button>
-              )}
             </div>
           </div>
 
