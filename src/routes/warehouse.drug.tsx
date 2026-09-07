@@ -669,13 +669,13 @@ function Section({
         </h3>
         {hint}
       </div>
-      <div className="rounded-xl border border-border px-4 py-4">{children}</div>
+      <div className="rounded-xl border border-border px-4 py-2">{children}</div>
     </section>
   );
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-5 gap-y-4">{children}</div>;
+  return <div className="grid grid-cols-2 gap-x-6 gap-y-0.5">{children}</div>;
 }
 
 
@@ -709,16 +709,16 @@ function F({
 }) {
   return (
     <div className={span2 ? "col-span-2" : ""}>
-      <Lbl label={label} required={required} />
       {readOnly ? (
-        <div
-          className={`mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1 ${
-            mono ? "font-mono" : ""
-          }`}
-        >
-          {value || <span className="text-text-tertiary">—</span>}
+        <div className="flex items-center gap-3 py-1.5 border-b border-border/60">
+          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+          <span className={`text-body-sm text-foreground truncate ${mono ? "font-mono" : ""}`}>
+            {value || <span className="text-text-tertiary">—</span>}
+          </span>
         </div>
       ) : (
+        <>
+        <Lbl label={label} required={required} />
         <Input
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
