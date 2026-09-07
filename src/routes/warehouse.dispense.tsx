@@ -74,10 +74,12 @@ function UsageBar({ row }: { row: DispenseRow }) {
         }}
         onMouseLeave={() => setTip(null)}
       >
-        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-subtle [&>span:first-child]:rounded-l-full [&>span:last-child]:rounded-r-full">
-          {seg.map((s) => (
-            <span key={s.k} style={{ width: `${(s.v / total) * 100}%`, backgroundColor: s.c }} />
-          ))}
+        <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-surface-subtle">
+          <div className="absolute inset-0 flex h-full w-full overflow-hidden rounded-full">
+            {seg.map((s) => (
+              <span key={s.k} className="h-full" style={{ width: `${(s.v / total) * 100}%`, backgroundColor: s.c }} />
+            ))}
+          </div>
         </div>
       </div>
 
