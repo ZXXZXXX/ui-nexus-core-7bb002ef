@@ -1,17 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { AppHeader } from "@/components/app-header";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ListPage, type ListColumn } from "@/components/list-page";
 import {
   Sheet,
   SheetContent,
@@ -19,16 +9,8 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Search, Star, ThumbsUp, ThumbsDown, ImageIcon, MessageSquare } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, ImageIcon, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -42,7 +24,16 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export const Route = createFileRoute("/feedback")({
-  head: () => ({ meta: [{ title: "反馈管理 — 奇点智牧" }] }),
+  head: () => ({
+    meta: [
+      { title: "反馈管理 — 奇点智牧" },
+      { name: "description", content: "汇总牧场用户提交的系统体验评分与改进建议，支持标注反馈价值。" },
+      { property: "og:title", content: "反馈管理 — 奇点智牧" },
+      { property: "og:description", content: "汇总牧场用户提交的系统体验评分与改进建议，支持标注反馈价值。" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: FeedbackAdminPage,
 });
 
@@ -53,11 +44,11 @@ type FeedbackRow = {
   rating: number; // 0-5，0 表示未评分
   topic: string;
   content: string;
-  images: number; // 图片数量
+  images: number;
   user: string;
   role: string;
   farm: string;
-  createdAt: string; // yyyy-mm-dd hh:mm
+  createdAt: string;
   verdict: Verdict;
 };
 
@@ -135,9 +126,7 @@ function Stars({ n }: { n: number }) {
       {[1, 2, 3, 4, 5].map((i) => (
         <Star
           key={i}
-          className={`h-3.5 w-3.5 ${
-            i <= n ? "fill-[#F5B301] text-[#F5B301]" : "text-border"
-          }`}
+          className={`h-3.5 w-3.5 ${i <= n ? "fill-[#F5B301] text-[#F5B301]" : "text-border"}`}
           strokeWidth={1.5}
         />
       ))}
@@ -146,53 +135,18 @@ function Stars({ n }: { n: number }) {
 }
 
 function VerdictTag({ v }: { v: Verdict }) {
-  if (v === "valuable")
-    return <span className="tag tag-success">有价值</span>;
+  if (v === "valuable") return <span className="tag tag-success">有价值</span>;
   if (v === "invalid")
     return <span className="tag" style={{ backgroundColor: "#F0F2F4", color: "#475569" }}>无价值</span>;
-  return <span className="text-caption text-text-tertiary">-</span>;
+  return <span className="tag" style={{ backgroundColor: "#FFF6E5", color: "#B77500" }}>待处理</span>;
 }
+
+const verdictText = (v: Verdict) => (v === "valuable" ? "有价值" : v === "invalid" ? "无价值" : "待处理");
 
 function FeedbackAdminPage() {
   const [list, setList] = useState<FeedbackRow[]>(initialData);
-  const [kw, setKw] = useState("");
-  const [topic, setTopic] = useState<string>("all");
-  const [verdict, setVerdict] = useState<string>("all");
-  const [rating, setRating] = useState<string>("all");
   const [detail, setDetail] = useState<FeedbackRow | null>(null);
-
-  const filtered = useMemo(() => {
-    return list.filter((r) => {
-      if (topic !== "all" && r.topic !== topic) return false;
-      if (verdict !== "all") {
-        if (verdict === "pending" && r.verdict !== null) return false;
-        if (verdict === "valuable" && r.verdict !== "valuable") return false;
-        if (verdict === "invalid" && r.verdict !== "invalid") return false;
-      }
-      if (rating !== "all") {
-        const n = Number(rating);
-        if (r.rating !== n) return false;
-      }
-      if (kw.trim()) {
-        const k = kw.trim().toLowerCase();
-        const hay = `${r.id} ${r.content} ${r.user} ${r.farm}`.toLowerCase();
-        if (!hay.includes(k)) return false;
-      }
-      return true;
-    });
-  }, [list, kw, topic, verdict, rating]);
-
-  const stats = useMemo(() => {
-    const total = list.length;
-    const pending = list.filter((r) => r.verdict === null).length;
-    const valuable = list.filter((r) => r.verdict === "valuable").length;
-    const invalid = list.filter((r) => r.verdict === "invalid").length;
-    const rated = list.filter((r) => r.rating > 0);
-    const avg = rated.length
-      ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length).toFixed(1)
-      : "—";
-    return { total, pending, valuable, invalid, avg };
-  }, [list]);
+  const [confirming, setConfirming] = useState<{ id: string; next: Verdict } | null>(null);
 
   const mark = (id: string, v: Verdict) => {
     setList((prev) => prev.map((r) => (r.id === id ? { ...r, verdict: v } : r)));
@@ -202,208 +156,169 @@ function FeedbackAdminPage() {
     );
   };
 
-  const [confirming, setConfirming] = useState<{ id: string; next: Verdict } | null>(null);
   const requestMark = (id: string, current: Verdict, next: Verdict) => {
-    if (current === next) {
-      mark(id, null);
-      return;
-    }
-    if (current === null) {
-      mark(id, next);
-      return;
-    }
+    if (current === next) return mark(id, null);
+    if (current === null) return mark(id, next);
     setConfirming({ id, next });
   };
-  const nextLabel = confirming?.next === "valuable" ? "有价值" : confirming?.next === "invalid" ? "无价值" : "";
+  const nextLabel = confirming ? verdictText(confirming.next) : "";
 
-  const STATUS_TABS: { key: string; label: string; count: number }[] = [
-    { key: "all", label: "全部", count: stats.total },
-    { key: "pending", label: "待处理", count: stats.pending },
-    { key: "valuable", label: "有价值", count: stats.valuable },
-    { key: "invalid", label: "无价值", count: stats.invalid },
-  ];
+  const columns = useMemo<ListColumn<FeedbackRow>[]>(
+    () => [
+      {
+        key: "id",
+        label: "编号",
+        required: true,
+        value: (r) => r.id,
+        render: (r) => <span className="font-mono text-caption text-text-secondary">{r.id}</span>,
+        className: "max-w-[86px]",
+      },
+      {
+        key: "rating",
+        label: "评分",
+        value: (r) => (r.rating ? `${r.rating} 星` : "未评分"),
+        filter: "select",
+        options: ["5 星", "4 星", "3 星", "2 星", "1 星", "未评分"],
+        render: (r) => <Stars n={r.rating} />,
+        className: "max-w-[110px]",
+      },
+      {
+        key: "topic",
+        label: "反馈类型",
+        value: (r) => r.topic,
+        filter: "select",
+        options: TOPICS,
+        render: (r) => (
+          <span className="tag" style={{ backgroundColor: "#F1F5F9", color: "#475569" }}>
+            {r.topic}
+          </span>
+        ),
+        className: "max-w-[96px]",
+      },
+      {
+        key: "content",
+        label: "详细描述",
+        required: true,
+        value: (r) => r.content,
+        render: (r) => (
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="truncate text-body text-foreground">{r.content}</span>
+                  {r.images > 0 && (
+                    <span className="shrink-0 inline-flex items-center gap-0.5 rounded bg-surface-subtle px-1.5 py-0.5 text-caption text-text-secondary">
+                      <ImageIcon className="h-3 w-3" />
+                      {r.images}
+                    </span>
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" align="start" className="max-w-sm whitespace-pre-wrap leading-relaxed">
+                {r.content}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ),
+        className: "col-span-2",
+      },
+      {
+        key: "user",
+        label: "上传人",
+        value: (r) => r.user,
+        render: (r) => (
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="h-7 w-7 shrink-0 rounded-full bg-brand-subtle text-primary text-caption flex items-center justify-center">
+              {r.user.slice(0, 1)}
+            </div>
+            <div className="min-w-0">
+              <div className="truncate text-body text-foreground">{r.user}</div>
+              <div className="truncate text-caption text-text-tertiary">
+                {r.role} · {r.farm}
+              </div>
+            </div>
+          </div>
+        ),
+      },
+      {
+        key: "farm",
+        label: "所属牧场",
+        value: (r) => r.farm,
+        filter: "select",
+        defaultHidden: true,
+      },
+      {
+        key: "createdAt",
+        label: "上传时间",
+        date: true,
+        value: (r) => r.createdAt,
+        render: (r) => (
+          <span className="text-caption text-text-secondary tabular-nums whitespace-nowrap">{r.createdAt}</span>
+        ),
+      },
+      {
+        key: "verdict",
+        label: "状态",
+        value: (r) => verdictText(r.verdict),
+        filter: "select",
+        options: ["待处理", "有价值", "无价值"],
+        render: (r) => <VerdictTag v={r.verdict} />,
+        className: "max-w-[88px]",
+      },
+    ],
+    [],
+  );
 
   return (
     <>
-      <AppHeader title="反馈管理" breadcrumb={["反馈管理"]} />
-      <main className="flex-1 px-6 py-6 space-y-4">
-        {/* 概览 */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="反馈总数" value={stats.total} suffix="条" />
-          <StatCard label="待处理" value={stats.pending} suffix="条" tone="warning" />
-          <StatCard label="有价值" value={stats.valuable} suffix="条" tone="success" />
-          <StatCard label="平均体验评分" value={stats.avg} suffix="/ 5" />
-        </div>
-
-        {/* 列表 */}
-        <Card className="border-border bg-card p-0 overflow-hidden">
-          {/* 状态分段 + 筛选栏 */}
-          <div className="px-4 pt-4 pb-3 space-y-3">
-            <div className="flex items-center justify-between gap-3 flex-wrap">
-              <div className="inline-flex items-center gap-1 rounded-lg bg-surface-subtle p-1">
-                {STATUS_TABS.map((t) => (
-                  <button
-                    key={t.key}
-                    onClick={() => setVerdict(t.key)}
-                    className={`h-8 rounded-md px-3 text-body-sm transition-colors ${
-                      verdict === t.key
-                        ? "bg-card text-foreground shadow-sm font-medium"
-                        : "text-text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {t.label}
-                    <span className="ml-1.5 text-caption text-text-tertiary tabular-nums">{t.count}</span>
-                  </button>
-                ))}
-              </div>
-              <div className="text-caption text-text-tertiary">共 {filtered.length} 条</div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
-                <Input
-                  value={kw}
-                  onChange={(e) => setKw(e.target.value)}
-                  placeholder="搜索内容 / 上传人 / 编号"
-                  className="h-9 w-72 pl-9 text-body-sm"
-                />
-              </div>
-              <Select value={topic} onValueChange={setTopic}>
-                <SelectTrigger className="h-9 w-36 text-body-sm"><SelectValue placeholder="反馈类型" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部类型</SelectItem>
-                  {TOPICS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={rating} onValueChange={setRating}>
-                <SelectTrigger className="h-9 w-36 text-body-sm"><SelectValue placeholder="评分" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部评分</SelectItem>
-                  {[5, 4, 3, 2, 1].map((n) => (
-                    <SelectItem key={n} value={String(n)}>{n} 星 · {RATING_LABELS[n]}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {(kw || topic !== "all" || rating !== "all" || verdict !== "all") && (
-                <Button
-                  variant="ghost"
-                  className="h-9 px-2 text-body-sm text-text-secondary"
-                  onClick={() => { setKw(""); setTopic("all"); setRating("all"); setVerdict("all"); }}
+      <ListPage<FeedbackRow>
+        title="反馈管理"
+        breadcrumb={["反馈管理"]}
+        rows={list}
+        columns={columns}
+        searchKeys={["content", "user"]}
+        searchPlaceholder="搜索描述 / 上传人"
+        getRowKey={(r) => r.id}
+        onRowClick={(r) => setDetail(r)}
+        emptyText="暂无符合条件的反馈"
+        actionsWidth={92}
+        rowActions={(r) => (
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  aria-label="标为有价值"
+                  onClick={() => requestMark(r.id, r.verdict, "valuable")}
+                  className={`h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${
+                    r.verdict === "valuable"
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-text-secondary hover:border-primary hover:text-primary"
+                  }`}
                 >
-                  重置
-                </Button>
-              )}
-            </div>
-          </div>
-
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-surface-subtle/60 hover:bg-surface-subtle/60">
-                <TableHead className="w-[110px]">编号</TableHead>
-                <TableHead className="w-[120px]">评分</TableHead>
-                <TableHead className="w-[100px] whitespace-nowrap">反馈类型</TableHead>
-                <TableHead className="min-w-[300px]">详细描述</TableHead>
-                <TableHead className="w-[180px]">上传人</TableHead>
-                <TableHead className="w-[140px] whitespace-nowrap">上传时间</TableHead>
-                <TableHead className="w-[100px]">状态</TableHead>
-                <TableHead className="w-[120px] text-right">操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center text-caption text-text-tertiary">
-                    暂无符合条件的反馈
-                  </TableCell>
-                </TableRow>
-              )}
-              {filtered.map((r) => (
-                <TableRow
-                  key={r.id}
-                  className="cursor-pointer hover:bg-surface-subtle/70 transition-colors"
-                  onClick={() => setDetail(r)}
+                  <ThumbsUp className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{r.verdict === "valuable" ? "取消有价值" : "标为有价值"}</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  aria-label="标为无价值"
+                  onClick={() => requestMark(r.id, r.verdict, "invalid")}
+                  className={`ml-1 h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${
+                    r.verdict === "invalid"
+                      ? "border-transparent text-white [background-color:var(--text-tertiary)]"
+                      : "border-border text-text-secondary hover:border-text-secondary hover:text-foreground"
+                  }`}
                 >
-                  <TableCell className="font-mono text-caption text-text-secondary">{r.id}</TableCell>
-                  <TableCell><Stars n={r.rating} /></TableCell>
-                  <TableCell><Badge variant="secondary" className="font-normal whitespace-nowrap">{r.topic}</Badge></TableCell>
-                  <TableCell>
-                    <TooltipProvider delayDuration={200}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <div className="flex items-center gap-2 min-w-[280px] max-w-[460px]">
-                            <span className="text-body-sm text-foreground text-left line-clamp-1">{r.content}</span>
-                            {r.images > 0 && (
-                              <span className="shrink-0 inline-flex items-center gap-0.5 rounded bg-surface-subtle px-1.5 py-0.5 text-caption text-text-secondary">
-                                <ImageIcon className="h-3 w-3" />{r.images}
-                              </span>
-                            )}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" align="start" className="max-w-sm whitespace-pre-wrap leading-relaxed">
-                          {r.content}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div className="h-7 w-7 shrink-0 rounded-full bg-brand-subtle text-primary text-caption flex items-center justify-center">
-                        {r.user.slice(0, 1)}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-body-sm text-foreground truncate">{r.user}</div>
-                        <div className="text-caption text-text-tertiary truncate">{r.role} · {r.farm}</div>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-caption text-text-secondary tabular-nums whitespace-nowrap">{r.createdAt}</TableCell>
-                  <TableCell><VerdictTag v={r.verdict} /></TableCell>
-                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                    <TooltipProvider delayDuration={200}>
-                      <div className="inline-flex items-center gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              aria-label="标为有价值"
-                              onClick={() => requestMark(r.id, r.verdict, "valuable")}
-                              className={`h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${
-                                r.verdict === "valuable"
-                                  ? "border-primary bg-primary text-primary-foreground"
-                                  : "border-border text-text-secondary hover:border-primary hover:text-primary"
-                              }`}
-                            >
-                              <ThumbsUp className="h-3.5 w-3.5" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>{r.verdict === "valuable" ? "取消有价值" : "标为有价值"}</TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              aria-label="标为无价值"
-                              onClick={() => requestMark(r.id, r.verdict, "invalid")}
-                              className={`h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${
-                                r.verdict === "invalid"
-                                  ? "border-transparent text-white [background-color:var(--text-tertiary)]"
-                                  : "border-border text-text-secondary hover:border-text-secondary hover:text-foreground"
-                              }`}
-                            >
-                              <ThumbsDown className="h-3.5 w-3.5" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>{r.verdict === "invalid" ? "取消无价值" : "标为无价值"}</TooltipContent>
-                        </Tooltip>
-                      </div>
-                    </TooltipProvider>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
-      </main>
-
+                  <ThumbsDown className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{r.verdict === "invalid" ? "取消无价值" : "标为无价值"}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      />
 
       {/* 详情抽屉 */}
       <Sheet open={!!detail} onOpenChange={(v) => !v && setDetail(null)}>
@@ -436,11 +351,15 @@ function FeedbackAdminPage() {
                     </div>
                   </Meta>
                   <Meta label="反馈类型">
-                    <Badge variant="secondary" className="font-normal">{detail.topic}</Badge>
+                    <span className="tag" style={{ backgroundColor: "#F1F5F9", color: "#475569" }}>
+                      {detail.topic}
+                    </span>
                   </Meta>
                   <Meta label="上传人">
                     <div className="text-body-sm text-foreground">{detail.user}</div>
-                    <div className="text-caption text-text-tertiary">{detail.role} · {detail.farm}</div>
+                    <div className="text-caption text-text-tertiary">
+                      {detail.role} · {detail.farm}
+                    </div>
                   </Meta>
                   <Meta label="上传时间">
                     <div className="text-body-sm text-foreground tabular-nums">{detail.createdAt}</div>
@@ -461,7 +380,10 @@ function FeedbackAdminPage() {
                   {detail.images > 0 ? (
                     <div className="grid grid-cols-3 gap-2">
                       {Array.from({ length: detail.images }).map((_, i) => (
-                        <div key={i} className="aspect-square rounded-md bg-gradient-to-br from-surface-subtle to-border border border-border flex items-center justify-center">
+                        <div
+                          key={i}
+                          className="aspect-square rounded-md bg-surface-subtle border border-border flex items-center justify-center"
+                        >
                           <ImageIcon className="h-5 w-5 text-text-tertiary" />
                         </div>
                       ))}
@@ -479,8 +401,8 @@ function FeedbackAdminPage() {
                     detail.verdict === "invalid"
                       ? "border-transparent text-white hover:text-white"
                       : detail.verdict === "valuable"
-                      ? "opacity-40"
-                      : ""
+                        ? "opacity-40"
+                        : ""
                   }`}
                   style={detail.verdict === "invalid" ? { backgroundColor: "#94A3B8" } : undefined}
                   onClick={() => requestMark(detail.id, detail.verdict, "invalid")}
@@ -494,8 +416,8 @@ function FeedbackAdminPage() {
                     detail.verdict === "valuable"
                       ? "bg-primary border-primary text-primary-foreground hover:bg-[var(--brand-hover)] hover:text-primary-foreground"
                       : detail.verdict === "invalid"
-                      ? "opacity-40"
-                      : ""
+                        ? "opacity-40"
+                        : ""
                   }`}
                   onClick={() => requestMark(detail.id, detail.verdict, "valuable")}
                 >
@@ -512,9 +434,7 @@ function FeedbackAdminPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>确认标注</AlertDialogTitle>
-            <AlertDialogDescription>
-              是否将其标注改为「{nextLabel}」？
-            </AlertDialogDescription>
+            <AlertDialogDescription>是否将其标注改为「{nextLabel}」？</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
@@ -530,36 +450,6 @@ function FeedbackAdminPage() {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  suffix,
-  tone,
-}: {
-  label: string;
-  value: string | number;
-  suffix?: string;
-  tone?: "success" | "warning" | "muted";
-}) {
-  const toneCls =
-    tone === "success"
-      ? "text-primary"
-      : tone === "warning"
-        ? "text-[#F5B301]"
-        : tone === "muted"
-          ? "text-text-tertiary"
-          : "text-foreground";
-  return (
-    <Card className="border-border bg-card p-4">
-      <div className="text-caption text-text-tertiary">{label}</div>
-      <div className={`mt-1 text-section-title tabular-nums ${toneCls}`}>
-        {value}
-        {suffix && <span className="text-caption text-text-tertiary ml-1">{suffix}</span>}
-      </div>
-    </Card>
   );
 }
 
