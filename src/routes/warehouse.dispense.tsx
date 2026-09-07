@@ -68,7 +68,7 @@ function UsageBar({ row }: { row: DispenseRow }) {
   return (
     <>
       <div
-        className="min-w-[150px] py-1.5"
+        className="w-full min-w-[120px] py-1.5"
         onMouseEnter={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           setTip({ x: r.left + r.width / 2, y: r.top });
