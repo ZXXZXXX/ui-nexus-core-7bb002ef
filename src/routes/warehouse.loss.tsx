@@ -129,7 +129,7 @@ function LossPage() {
     {
       key: "type", label: "损耗类型", filter: "select",
       render: (r) => (
-        {r.type === "-" ? <span className="text-body-sm text-text-tertiary">—</span> : <span className={r.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{r.type}</span>}
+        r.type === "-" ? <span className="text-body-sm text-text-tertiary">—</span> : <span className={r.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{r.type}</span>
       ),
     },
 
