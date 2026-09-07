@@ -35,17 +35,18 @@ type DispenseRow = {
   returnedQty: number; // 已退回数量
   users: string[]; // 使用人员
   cows: string[]; // 用药牛只耳号
+  usage: { user: string; cows: string[] }[]; // 按人员维度：该人员用于哪些牛只
   remark: string; // 备注（仅已退回有值）
 };
 
 const initial: DispenseRow[] = [
-  { id: "DP-3202", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 3, unit: "支", takenAt: "2026-05-12 10:36", operator: "李雨晴", status: "未使用", usedQty: 0, returnedQty: 0, users: ["李雨晴"], cows: ["1042"], remark: "" },
-  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", status: "已使用", usedQty: 2, returnedQty: 0, users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], remark: "" },
-  { id: "DP-3200", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 5, unit: "支", takenAt: "2026-05-12 08:15", operator: "陈晓东", status: "已使用", usedQty: 4, returnedQty: 1, users: ["陈晓东", "刘敏", "赵强"], cows: ["0431", "0432", "0455", "0478", "0509", "0611"], remark: "" },
-  { id: "DP-3199", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 10, unit: "瓶", takenAt: "2026-05-11 16:38", operator: "李雨晴", status: "已使用", usedQty: 7, returnedQty: 0, users: ["李雨晴"], cows: ["1201", "1202", "1233"], remark: "" },
-  { id: "DP-3198", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 2, unit: "桶", takenAt: "2026-05-11 14:02", operator: "孙库管", status: "已退回", usedQty: 0, returnedQty: 2, users: ["孙库管"], cows: [], remark: "3 号牛舍消毒改期，整桶未拆封退回一级库" },
-  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", usedQty: 1, returnedQty: 0, users: ["李雨晴", "周敏"], cows: ["3301", "3315"], remark: "" },
-  { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", usedQty: 1, returnedQty: 1, users: ["王建国"], cows: ["2210"], remark: "工单 WO-2350 已终止，未开封退回" },
+  { id: "DP-3202", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 3, unit: "支", takenAt: "2026-05-12 10:36", operator: "李雨晴", status: "未使用", usedQty: 0, returnedQty: 0, users: ["李雨晴"], cows: ["1042"], usage: [{ user: "李雨晴", cows: ["1042"] }], remark: "" },
+  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", status: "已使用", usedQty: 2, returnedQty: 0, users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], usage: [{ user: "李雨晴", cows: ["2087", "2091"] }, { user: "王建国", cows: ["3110", "3122"] }], remark: "" },
+  { id: "DP-3200", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 5, unit: "支", takenAt: "2026-05-12 08:15", operator: "陈晓东", status: "已使用", usedQty: 4, returnedQty: 1, users: ["陈晓东", "刘敏", "赵强"], cows: ["0431", "0432", "0455", "0478", "0509", "0611"], usage: [{ user: "陈晓东", cows: ["0431", "0432"] }, { user: "刘敏", cows: ["0455", "0478"] }, { user: "赵强", cows: ["0509", "0611"] }], remark: "" },
+  { id: "DP-3199", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 10, unit: "瓶", takenAt: "2026-05-11 16:38", operator: "李雨晴", status: "已使用", usedQty: 7, returnedQty: 0, users: ["李雨晴"], cows: ["1201", "1202", "1233"], usage: [{ user: "李雨晴", cows: ["1201", "1202", "1233"] }], remark: "" },
+  { id: "DP-3198", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 2, unit: "桶", takenAt: "2026-05-11 14:02", operator: "孙库管", status: "已退回", usedQty: 0, returnedQty: 2, users: ["孙库管"], cows: [], usage: [{ user: "孙库管", cows: [] }], remark: "3 号牛舍消毒改期，整桶未拆封退回一级库" },
+  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", usedQty: 1, returnedQty: 0, users: ["李雨晴", "周敏"], cows: ["3301", "3315"], usage: [{ user: "李雨晴", cows: ["3301"] }, { user: "周敏", cows: ["3315"] }], remark: "" },
+  { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", usedQty: 1, returnedQty: 1, users: ["王建国"], cows: ["2210"], usage: [{ user: "王建国", cows: ["2210"] }], remark: "工单 WO-2350 已终止，未开封退回" },
 ];
 
 const USE_COLORS = { unused: "#D5D9D7", used: "#23A969", returned: "#F09A3E" };
@@ -212,18 +213,28 @@ function DispensePage() {
 
             </div>
             <div>
-              <div className="text-caption text-text-tertiary mb-1.5">使用人员（{detail.users.length}）</div>
-              <div className="flex flex-wrap gap-1.5">
-                {detail.users.map((u) => (
-                  <span key={u} className="tag tag-muted">{u}</span>
-                ))}
+              <div className="text-caption text-text-tertiary mb-2">
+                使用明细（{detail.usage.length} 人 · {detail.cows.length} 头牛只）
               </div>
-            </div>
-            <div>
-              <div className="text-caption text-text-tertiary mb-1.5">用药牛只（{detail.cows.length}）</div>
-              <div className="flex flex-wrap gap-1.5">
-                {detail.cows.map((c) => (
-                  <span key={c} className="tag tag-muted font-mono">{c}</span>
+              <div className="space-y-2">
+                {detail.usage.map((u) => (
+                  <div key={u.user} className="rounded-lg border border-border p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-body text-foreground">{u.user}</span>
+                      <span className="text-caption text-text-tertiary tabular-nums">
+                        {u.cows.length} 头
+                      </span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {u.cows.length ? (
+                        u.cows.map((c) => (
+                          <span key={c} className="tag tag-muted font-mono">{c}</span>
+                        ))
+                      ) : (
+                        <span className="text-body-sm text-text-tertiary">未用于牛只</span>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
