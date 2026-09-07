@@ -97,7 +97,12 @@ function ReviewPage() {
     if (verdict === "abandon") {
       if (!abandonReason) return false;
       if (!finalAbandonReason) return false;
-      if (media.length === 0) return false;
+      if (abandonReason === "其他") {
+        if (media.length === 0) return false;
+        return true;
+      }
+      if (!anglePhotosDone(anglePhotos)) return false;
+      if (abandonReason === "淘汰处理" && !relatedOrder) return false;
       return true;
     }
     if (needTransfer && !transferTo) return false;
