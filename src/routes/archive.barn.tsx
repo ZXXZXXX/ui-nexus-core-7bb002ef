@@ -36,7 +36,7 @@ const columns: ListColumn<Barn>[] = [
   { key: "type", label: "类型", filter: "select", render: (b) => <span className="tag tag-muted">{b.type}</span> },
   {
     key: "stock", label: "存栏只数", filter: "number", value: (b) => b.stock,
-    render: (b) => <span className="tabular-nums text-body text-foreground">{b.stock} <span className="text-caption text-text-tertiary">头</span></span>,
+    render: (b) => <span className="tabular-nums text-body text-foreground">{b.stock}</span>,
   },
   {
     key: "updatedAt", label: "更新时间", date: true, filter: "date", defaultHidden: true,
