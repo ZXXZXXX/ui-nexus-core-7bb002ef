@@ -1837,9 +1837,6 @@ function StatsPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
-            <div className="flex items-center gap-2">
               <div className="group inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-white pl-2.5 pr-2 transition-colors hover:border-primary/40 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
                 <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary transition-colors group-focus-within:text-primary" />
                 <div className="relative">
