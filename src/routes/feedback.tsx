@@ -385,7 +385,7 @@ function FeedbackAdminPage() {
                               onClick={() => requestMark(r.id, r.verdict, "invalid")}
                               className={`h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${
                                 r.verdict === "invalid"
-                                  ? "border-transparent bg-text-tertiary text-white"
+                                  ? "border-transparent text-white [background-color:var(--text-tertiary)]"
                                   : "border-border text-text-secondary hover:border-text-secondary hover:text-foreground"
                               }`}
                             >
