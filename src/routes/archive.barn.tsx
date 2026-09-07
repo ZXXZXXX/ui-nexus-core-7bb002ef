@@ -31,7 +31,7 @@ const columns: ListColumn<Barn>[] = [
       </span>
     ),
   },
-  { key: "farm", label: "所属牧场", filter: "select", render: (b) => <span className="text-body-sm text-text-secondary">{b.farm}</span> },
+  
   { key: "desc", label: "牛舍描述", render: (b) => <span className="text-body-sm text-text-secondary" title={b.desc}>{b.desc}</span> },
   { key: "type", label: "类型", filter: "select", render: (b) => <span className="tag tag-muted">{b.type}</span> },
   {
