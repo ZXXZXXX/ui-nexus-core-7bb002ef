@@ -34,7 +34,7 @@ type LossReport = {
   reason: string; // 损耗原因
   reporter: string; // 上报人员
   value: number; // 损耗总估值
-  type: "牛只均摊" | "公共损耗"; // 损耗类型
+  type: "牛只均摊" | "公共损耗" | "-"; // 损耗类型（每晚定时判定，判定前为 "-"）
   stage: string;
   remark?: string;
   drugs: LossDrug[];
@@ -129,7 +129,7 @@ function LossPage() {
     {
       key: "type", label: "损耗类型", filter: "select",
       render: (r) => (
-        <span className={r.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{r.type}</span>
+        {r.type === "-" ? <span className="text-body-sm text-text-tertiary">—</span> : <span className={r.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{r.type}</span>}
       ),
     },
 
@@ -190,7 +190,7 @@ function LossPage() {
                   <div className="min-w-0">
                     <div className="text-caption text-text-tertiary">损耗类型</div>
                     <div className="mt-0.5">
-                      <span className={current.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{current.type}</span>
+                      {current.type === "-" ? <span className="text-body text-text-tertiary">—</span> : <span className={current.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{current.type}</span>}
                     </div>
                   </div>
                   <div className="col-span-2 min-w-0">
