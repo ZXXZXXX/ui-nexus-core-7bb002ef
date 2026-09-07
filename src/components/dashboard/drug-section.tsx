@@ -113,6 +113,9 @@ export function DrugSection() {
           <div className="grid grid-cols-2 gap-3 mb-5">
             <MiniStat label={period === BY_YEAR ? "当年用药总费用" : "当月用药总费用"} value={total.toFixed(1)} unit="万元" tone="var(--brand)" />
             <MiniStat label={period === BY_YEAR ? "当年头均用药费用" : "当月头均用药费用"} value={perHead.toFixed(1)} unit="元/头" />
+            {showStockValue && (
+              <MiniStat label="当前库存药品金额" value={stockValue.toFixed(1)} unit="万元" />
+            )}
           </div>
           <p className="text-body text-text-secondary mb-3">各类药品费用占比</p>
           <BarList data={comp} unit=" 万元" />
