@@ -10,18 +10,18 @@ export const Route = createFileRoute("/archive/farm")({
 });
 
 type Farm = {
-  id: string; name: string; region: string; area: string; manager: string;
-  stock: number; barns: number; status: string; createdAt: string;
+  id: string; name: string; region: string; slot: string; type: string; manager: string;
+  stock: number; barns: number; status: string;
 };
 
 const farms: Farm[] = [
-  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔", area: "1280 亩", manager: "张磊", stock: 1240, barns: 12, status: "运营中", createdAt: "2026-08-20" },
-  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒", area: "960 亩", manager: "李建国", stock: 856, barns: 8, status: "运营中", createdAt: "2026-08-15" },
-  { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔", area: "1450 亩", manager: "王志强", stock: 390, barns: 5, status: "筹建中", createdAt: "2026-07-02" },
+  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中" },
+  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中" },
+  { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔市", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "筹建中" },
 ];
 
 const columns: ListColumn<Farm>[] = [
-  { key: "id", label: "编号", required: true, render: (f) => <span className="font-mono text-body text-foreground">{f.id}</span> },
+  { key: "id", label: "牛场编号", required: true, render: (f) => <span className="font-mono text-body text-foreground">{f.id}</span> },
   {
     key: "name", label: "牛场名称", required: true,
     render: (f) => (
@@ -32,20 +32,25 @@ const columns: ListColumn<Farm>[] = [
     ),
   },
   { key: "region", label: "所在地区", filter: "select", render: (f) => <span className="text-body-sm text-text-secondary">{f.region}</span> },
-  { key: "area", label: "面积", render: (f) => <span className="text-body-sm text-text-secondary">{f.area}</span> },
-  { key: "manager", label: "负责人", filter: "select", render: (f) => <span className="text-body-sm text-text-secondary">{f.manager}</span> },
+  { key: "slot", label: "仓位号", filter: "select", render: (f) => <span className="font-mono text-body-sm text-text-secondary">{f.slot}</span> },
   {
-    key: "stock", label: "存栏 / 牛舍", filter: "none",
-    value: (f) => f.stock,
-    render: (f) => <span className="text-body-sm text-text-secondary">{f.stock} 头 / {f.barns} 个</span>,
+    key: "type", label: "牛场类型", filter: "select",
+    render: (f) => <span className={`tag ${f.type === "有机牧场" ? "tag-success" : "tag-neutral"}`}>{f.type}</span>,
   },
+  {
+    key: "barns", label: "牛舍数量", filter: "none",
+    value: (f) => f.barns,
+    render: (f) => <span className="text-body-sm text-text-secondary tabular-nums">{f.barns}</span>,
+  },
+  {
+    key: "stock", label: "存栏总数", filter: "none",
+    value: (f) => f.stock,
+    render: (f) => <span className="text-body-sm text-text-secondary tabular-nums">{f.stock}</span>,
+  },
+  { key: "manager", label: "负责人", filter: "select", render: (f) => <span className="text-body-sm text-text-secondary">{f.manager}</span> },
   {
     key: "status", label: "状态", filter: "select",
     render: (f) => <span className={`tag ${f.status === "运营中" ? "tag-success" : "tag-warning"}`}>{f.status}</span>,
-  },
-  {
-    key: "createdAt", label: "建档时间", date: true, filter: "date", defaultHidden: true,
-    render: (f) => <span className="text-body-sm text-text-secondary tabular-nums">{f.createdAt}</span>,
   },
 ];
 
