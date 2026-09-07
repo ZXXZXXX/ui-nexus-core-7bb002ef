@@ -68,7 +68,7 @@ function UsageBar({ row }: { row: DispenseRow }) {
   return (
     <>
       <div
-        className="w-full min-w-[120px] py-1.5"
+        className="w-[4.5em] py-1.5"
         onMouseEnter={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
           setTip({ x: r.left + r.width / 2, y: r.top });
@@ -146,6 +146,7 @@ const columns: ListColumn<DispenseRow>[] = [
   { key: "operator", label: "领取人员", filter: "select", render: (r) => <span className="text-body-sm text-text-secondary">{r.operator}</span> },
   {
     key: "status", label: "使用状态", filter: "select",
+    className: "w-[4.5em]",
     render: (r) => <UsageBar row={r} />,
   },
 
