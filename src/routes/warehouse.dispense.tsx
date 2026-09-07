@@ -61,28 +61,48 @@ function UsageBar({ row }: { row: DispenseRow }) {
     { k: "未使用", v: unused, c: USE_COLORS.unused },
   ].filter((s) => s.v > 0);
 
+  const [tip, setTip] = useState<{ x: number; y: number } | null>(null);
+
   return (
-    <div className="group relative min-w-[150px] py-1.5">
-      <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-subtle [&>span:first-child]:rounded-l-full [&>span:last-child]:rounded-r-full">
-        {seg.map((s) => (
-          <span key={s.k} style={{ width: `${(s.v / total) * 100}%`, backgroundColor: s.c }} />
-        ))}
+    <>
+      <div
+        className="min-w-[150px] py-1.5"
+        onMouseEnter={(e) => {
+          const r = e.currentTarget.getBoundingClientRect();
+          setTip({ x: r.left + r.width / 2, y: r.top });
+        }}
+        onMouseLeave={() => setTip(null)}
+      >
+        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-surface-subtle [&>span:first-child]:rounded-l-full [&>span:last-child]:rounded-r-full">
+          {seg.map((s) => (
+            <span key={s.k} style={{ width: `${(s.v / total) * 100}%`, backgroundColor: s.c }} />
+          ))}
+        </div>
       </div>
 
-      <div className="pointer-events-none absolute left-0 bottom-full z-20 mb-1.5 hidden whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1.5 text-caption text-card shadow-lg group-hover:block">
-        {seg.map((s) => (
-          <span key={s.k} className="mr-2.5 inline-flex items-center gap-1 last:mr-0">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.c }} />
-            {s.k}
-            <span className="tabular-nums">
-              {s.v} {row.unit}
-            </span>
-          </span>
-        ))}
-      </div>
-    </div>
+      {tip
+        ? createPortal(
+            <div
+              className="pointer-events-none fixed z-[100] -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-foreground px-2.5 py-1.5 text-caption text-card shadow-lg"
+              style={{ left: tip.x, top: tip.y - 6 }}
+            >
+              {seg.map((s) => (
+                <span key={s.k} className="mr-2.5 inline-flex items-center gap-1 last:mr-0">
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: s.c }} />
+                  {s.k}
+                  <span className="tabular-nums">
+                    {s.v} {row.unit}
+                  </span>
+                </span>
+              ))}
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
   );
 }
+
 
 
 
