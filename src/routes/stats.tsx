@@ -1929,9 +1929,11 @@ function StatsPage() {
                       >
                         查看结果
                       </Button>
-                      <Button size="sm" variant="ghost" className="h-8 px-2 hover:bg-transparent hover:font-semibold hover:text-text-primary" onClick={() => openBuilder(t)}>
-                        编辑
-                      </Button>
+                      {activeSection === "custom" && (
+                        <Button size="sm" variant="ghost" className="h-8 px-2 hover:bg-transparent hover:font-semibold hover:text-text-primary" onClick={() => openBuilder(t)}>
+                          编辑
+                        </Button>
+                      )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-text-tertiary hover:bg-transparent hover:text-text-primary">
