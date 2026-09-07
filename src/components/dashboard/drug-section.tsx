@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pill } from "lucide-react";
 import { SectionCard, BarList, LineTrend, MiniStat, TimeTabs } from "./charts";
-import { useDataLevel } from "@/lib/dashboard-view";
+import { useDataLevel, useDashboardView } from "@/lib/dashboard-view";
 
 const BY_MONTH = "按月统计";
 const BY_YEAR = "按年统计";
@@ -57,6 +57,8 @@ export function DrugSection() {
   const [period, setPeriod] = useState(BY_MONTH);
   const [active, setActive] = useState(trendData[BY_MONTH]!.labels.length - 1);
   const { factor } = useDataLevel();
+  const { scope } = useDashboardView();
+  const showStockValue = scope === "farm-in";
   const raw = trendData[period];
   const t = { labels: raw.labels, points: raw.points.map((p) => Number((p * factor).toFixed(1))) };
   const idx = Math.min(active, t.labels.length - 1);
