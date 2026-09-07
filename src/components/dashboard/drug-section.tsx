@@ -68,7 +68,7 @@ export function DrugSection() {
   const perHead = (total * 10000) / herd;
   const comp = compositionFor(label, total);
   // 当前库存药品金额（万元）：按当期用药规模估算的在库结存
-  const stockValue = Number((total * 1.35 * factor).toFixed(1));
+  const stockValue = Number((total * 1.35).toFixed(1));
 
   return (
     <SectionCard
