@@ -424,7 +424,7 @@ function DrugForm({
       >
         <Grid>
           <F label="商品编码" value={d.code} readOnly onChange={(v) => patch({ code: v })} mono />
-          <F label="药品ID" value={d.id || "系统生成"} readOnly mono />
+          
           <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
           <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
           <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
