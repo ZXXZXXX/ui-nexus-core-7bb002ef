@@ -725,6 +725,7 @@ function F({
           placeholder={placeholder}
           className={`h-9 mt-1 text-body-sm ${mono ? "font-mono" : ""}`}
         />
+        </>
       )}
     </div>
   );
