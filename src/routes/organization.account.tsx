@@ -341,7 +341,7 @@ function AccountPage() {
         if (filterFarms.length > 0 && !filterFarms.some((f) => farmsOf(a).includes(f))) return false;
         if (filterStatus !== "all" && a.status !== filterStatus) return false;
         if (kw) {
-          const hay = `${a.name} ${a.phone} ${a.wecomId ?? ""} ${a.wechatId ?? ""}`.toLowerCase();
+          const hay = `${a.name} ${a.phone} ${a.wecomId ?? ""}`.toLowerCase();
           if (!hay.includes(kw)) return false;
         }
         return true;
@@ -352,8 +352,8 @@ function AccountPage() {
       });
   }, [accounts, keyword, onlyInternal, filterRole, filterFarms, filterStatus]);
 
-  // 列宽：勾选 用户 类型 手机号 角色 关联牧场 企微ID 微信ID 状态 管理
-  const cols = "40px 1.5fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 140px 0.7fr 0.5fr";
+  // 列宽：勾选 用户 类型 手机号 角色 关联牧场 企微ID 状态 管理
+  const cols = "40px 1.5fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 0.7fr 0.5fr";
 
   const visibleIds = filteredAccounts.map((a) => a.id);
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
@@ -379,7 +379,7 @@ function AccountPage() {
               <Input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder="搜索姓名 / 手机号 / 企微 / 微信 ID"
+                placeholder="搜索姓名 / 手机号 / 企微 ID"
                 className="h-9 w-72 pl-9 text-body-sm"
               />
             </div>
