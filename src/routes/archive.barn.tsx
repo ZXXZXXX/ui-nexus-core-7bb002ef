@@ -17,7 +17,7 @@ const barns: Barn[] = [
   { id: "B-103", name: "3 号牛舍", farm: "1 号牧场", type: "干奶牛舍", stock: 298, desc: "干奶期及围产前期母牛", updatedAt: "2026-08-05" },
   { id: "B-104", name: "犊牛舍 A", farm: "1 号牧场", type: "犊牛舍", stock: 84, desc: "0-3 月龄犊牛单栏饲养", updatedAt: "2026-07-28" },
   { id: "B-105", name: "隔离区", farm: "1 号牧场", type: "隔离舍", stock: 6, desc: "新引进及疫病观察隔离", updatedAt: "2026-07-11" },
-  { id: "B-201", name: "1 号牛舍", farm: "2 号牧场", type: "泌乳牛舍", stock: 256, desc: "标准泌乳群，散栏自由采食", updatedAt: "2026-08-16" },
+  { id: "B-106", name: "后备牛舍", farm: "1 号牧场", type: "后备牛舍", stock: 168, desc: "4-14 月龄后备牛群", updatedAt: "2026-08-16" },
 ];
 
 const columns: ListColumn<Barn>[] = [
@@ -31,7 +31,7 @@ const columns: ListColumn<Barn>[] = [
       </span>
     ),
   },
-  { key: "farm", label: "所属牧场", filter: "select", render: (b) => <span className="text-body-sm text-text-secondary">{b.farm}</span> },
+  
   { key: "desc", label: "牛舍描述", render: (b) => <span className="text-body-sm text-text-secondary" title={b.desc}>{b.desc}</span> },
   { key: "type", label: "类型", filter: "select", render: (b) => <span className="tag tag-muted">{b.type}</span> },
   {
