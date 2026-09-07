@@ -1905,8 +1905,6 @@ function StatsPage() {
                 <TableRow className="bg-surface-subtle/60">
                   <TableHead className="sticky left-0 z-30 min-w-[220px] bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">模板名称</TableHead>
                   <TableHead className="min-w-[280px]">计算方式</TableHead>
-                  
-                  <TableHead className="text-right">条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
                   <TableHead>创建人</TableHead>
                   <TableHead>创建时间</TableHead>
@@ -1940,9 +1938,6 @@ function StatsPage() {
                     </TableCell>
                     <TableCell className="text-body-sm text-text-secondary max-w-[420px]">
                       {t.formula ?? describeFilters(t.filters)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums text-body-sm">
-                      {countActive(t.filters)}
                     </TableCell>
                     <TableCell className="text-right tabular-nums text-body-sm">{t.usage ?? 0}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary whitespace-nowrap">{t.creator}</TableCell>
