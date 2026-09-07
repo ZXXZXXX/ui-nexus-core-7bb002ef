@@ -527,6 +527,7 @@ export function CattleProfileDrawer({
 
         </div>
       </SheetContent>
+      <DeviceDataDialog device={activeDevice} onOpenChange={(v) => !v && setActiveDevice(null)} />
     </Sheet>
   );
 }
