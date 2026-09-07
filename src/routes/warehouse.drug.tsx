@@ -1036,6 +1036,7 @@ function FrequencyEditor({
           />
           <span className="text-body-sm text-text-secondary">次</span>
         </div>
+        </>
       )}
     </div>
   );
