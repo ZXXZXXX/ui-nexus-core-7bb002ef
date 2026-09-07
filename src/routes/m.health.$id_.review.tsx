@@ -308,14 +308,28 @@ function ReviewPage() {
                   </Field>
 
                   {abandonReason === "淘汰处理" && (
-                    <Field label="金额 (元)">
-                      <input
-                        type="number"
-                        value={leavePrice}
-                        onChange={(e) => setLeavePrice(e.target.value)}
-                        className={inputCls}
-                      />
-                    </Field>
+                    <>
+                      <Field label="金额 (元)">
+                        <input
+                          type="number"
+                          value={leavePrice}
+                          onChange={(e) => setLeavePrice(e.target.value)}
+                          className={inputCls}
+                        />
+                      </Field>
+                      <Field label="关联工单" required>
+                        <div className="space-y-2">
+                          {LEAVE_RELATED_ORDERS.map((o) => (
+                            <RelatedOrderCard
+                              key={o.id}
+                              order={o}
+                              selected={relatedOrder === o.id}
+                              onClick={() => setRelatedOrder(o.id)}
+                            />
+                          ))}
+                        </div>
+                      </Field>
+                    </>
                   )}
                   <Field label="备注">
                     <textarea
@@ -326,14 +340,8 @@ function ReviewPage() {
                       placeholder="补充说明"
                     />
                   </Field>
-                  <MediaGrid
-                    items={media}
-                    setItems={setMedia}
-                    max={9}
-                    required
-                    caption="现场照片 / 视频"
-                    helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
-                  />
+                  <CowAnglePhotos value={anglePhotos} onChange={setAnglePhotos} />
+
                 </div>
               )}
 
