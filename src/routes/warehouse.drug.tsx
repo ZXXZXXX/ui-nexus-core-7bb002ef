@@ -1077,7 +1077,7 @@ function FBool({
   required?: boolean;
 }) {
   return (
-    <div>
+    <div className="col-span-2">
       <Lbl label={label} required={required} />
       <div className="mt-1 h-9 flex items-center gap-2">
         <Switch checked={value} onCheckedChange={(v) => onChange?.(v)} disabled={readOnly} />
