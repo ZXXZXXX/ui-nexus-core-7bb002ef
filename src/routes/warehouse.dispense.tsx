@@ -213,18 +213,28 @@ function DispensePage() {
 
             </div>
             <div>
-              <div className="text-caption text-text-tertiary mb-1.5">使用人员（{detail.users.length}）</div>
-              <div className="flex flex-wrap gap-1.5">
-                {detail.users.map((u) => (
-                  <span key={u} className="tag tag-muted">{u}</span>
-                ))}
+              <div className="text-caption text-text-tertiary mb-2">
+                使用明细（{detail.usage.length} 人 · {detail.cows.length} 头牛只）
               </div>
-            </div>
-            <div>
-              <div className="text-caption text-text-tertiary mb-1.5">用药牛只（{detail.cows.length}）</div>
-              <div className="flex flex-wrap gap-1.5">
-                {detail.cows.map((c) => (
-                  <span key={c} className="tag tag-muted font-mono">{c}</span>
+              <div className="space-y-2">
+                {detail.usage.map((u) => (
+                  <div key={u.user} className="rounded-lg border border-border p-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-body text-foreground">{u.user}</span>
+                      <span className="text-caption text-text-tertiary tabular-nums">
+                        {u.cows.length} 头
+                      </span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {u.cows.length ? (
+                        u.cows.map((c) => (
+                          <span key={c} className="tag tag-muted font-mono">{c}</span>
+                        ))
+                      ) : (
+                        <span className="text-body-sm text-text-tertiary">未用于牛只</span>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
