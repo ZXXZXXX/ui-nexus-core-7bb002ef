@@ -110,7 +110,7 @@ export function DrugSection() {
             <span className="h-6 w-1 rounded-full bg-primary" />
             <p className="text-section-title text-foreground">{label}用药明细</p>
           </div>
-          <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className={`grid ${showStockValue ? "grid-cols-3" : "grid-cols-2"} gap-3 mb-5`}>
             <MiniStat label={period === BY_YEAR ? "当年用药总费用" : "当月用药总费用"} value={total.toFixed(1)} unit="万元" tone="var(--brand)" />
             <MiniStat label={period === BY_YEAR ? "当年头均用药费用" : "当月头均用药费用"} value={perHead.toFixed(1)} unit="元/头" />
             {showStockValue && (
