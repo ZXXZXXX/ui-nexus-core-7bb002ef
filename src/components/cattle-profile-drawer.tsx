@@ -13,9 +13,11 @@ import {
   MessageSquareWarning,
   ListChecks,
   Image as ImageIcon,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,12 +56,205 @@ type Device = {
   id: string;
   name: string;
   status: "正常" | "异常" | "-";
+  metrics?: { label: string; value: string; unit?: string; abnormal?: boolean }[];
+  alerts?: { time: string; text: string; level: "warn" | "danger" }[];
 };
 
 const DEVICES: Device[] = [
-  { kind: "collar", id: "D-COL-012", name: "颈环项圈 · Nedap", status: "正常" },
-  { kind: "ear", id: "D-EAR-088", name: "耳温设备 · smaXtec", status: "异常" },
+  {
+    kind: "collar",
+    id: "D-COL-012",
+    name: "颈环项圈 · Nedap",
+    status: "正常",
+    metrics: [
+      { label: "活动量", value: "128" },
+      { label: "反刍时长", value: "512", unit: "分钟" },
+      { label: "采食时长", value: "241", unit: "分钟" },
+      { label: "静卧时长", value: "687", unit: "分钟" },
+    ],
+    alerts: [],
+  },
+  {
+    kind: "ear",
+    id: "D-EAR-088",
+    name: "耳温设备 · smaXtec",
+    status: "异常",
+    metrics: [
+      { label: "当前耳温", value: "39.8", unit: "℃", abnormal: true },
+      { label: "24h 最高", value: "39.8", unit: "℃", abnormal: true },
+      { label: "24h 最低", value: "38.6", unit: "℃" },
+      { label: "个体基线", value: "38.7", unit: "℃" },
+    ],
+    alerts: [
+      { time: "2026-05-29 08:12", text: "耳部温度持续 2 小时高于 39.6℃", level: "danger" },
+      { time: "2026-05-28 21:40", text: "耳部温度较个体基线偏高 0.6℃", level: "warn" },
+    ],
+  },
 ];
+
+// 近 24 小时耳温采样（每 2 小时一次，单位 ℃）
+const EAR_TEMP_SERIES: { time: string; value: number }[] = [
+  { time: "10:00", value: 38.6 },
+  { time: "12:00", value: 38.7 },
+  { time: "14:00", value: 38.9 },
+  { time: "16:00", value: 39.0 },
+  { time: "18:00", value: 38.8 },
+  { time: "20:00", value: 38.7 },
+  { time: "22:00", value: 38.9 },
+  { time: "00:00", value: 39.2 },
+  { time: "02:00", value: 39.4 },
+  { time: "04:00", value: 39.5 },
+  { time: "06:00", value: 39.7 },
+  { time: "08:00", value: 39.8 },
+];
+
+function EarTempChart() {
+  const w = 640;
+  const h = 200;
+  const padL = 34;
+  const padR = 12;
+  const padT = 12;
+  const padB = 24;
+  const min = 38;
+  const max = 40.5;
+  const data = EAR_TEMP_SERIES;
+  const xStep = (w - padL - padR) / (data.length - 1);
+  const y = (v: number) => padT + ((max - v) / (max - min)) * (h - padT - padB);
+  const points = data.map((d, i) => ({ x: padL + i * xStep, y: y(d.value), ...d }));
+  const path = points.map((p, i) => `${i === 0 ? "M" : "L"}${p.x},${p.y}`).join(" ");
+  const area = `${path} L${points[points.length - 1].x},${h - padB} L${points[0].x},${h - padB} Z`;
+  const warnY = y(39.6);
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-[200px]">
+      <defs>
+        <linearGradient id="pcEarTempFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#00A14F" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#00A14F" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      {[38, 39, 40].map((v) => (
+        <g key={v}>
+          <line x1={padL} x2={w - padR} y1={y(v)} y2={y(v)} stroke="hsl(var(--border))" strokeDasharray="2 3" />
+          <text x={6} y={y(v) + 3} fontSize="10" fill="hsl(var(--text-tertiary))">{v.toFixed(0)}</text>
+        </g>
+      ))}
+      <line x1={padL} x2={w - padR} y1={warnY} y2={warnY} stroke="#CF1322" strokeDasharray="3 3" />
+      <text x={w - padR} y={warnY - 4} fontSize="10" fill="#CF1322" textAnchor="end">预警 39.6℃</text>
+      <path d={area} fill="url(#pcEarTempFill)" />
+      <path d={path} fill="none" stroke="#00A14F" strokeWidth="1.8" />
+      {points.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r="2.8" fill={p.value >= 39.6 ? "#CF1322" : "#00A14F"}>
+          <title>{`${p.time} · ${p.value}℃`}</title>
+        </circle>
+      ))}
+      {points.map((p, i) =>
+        i % 2 === 0 ? (
+          <text key={`t-${i}`} x={p.x} y={h - 7} fontSize="10" fill="hsl(var(--text-tertiary))" textAnchor="middle">
+            {p.time}
+          </text>
+        ) : null
+      )}
+    </svg>
+  );
+}
+
+function DeviceDataDialog({
+  device,
+  onOpenChange,
+}: {
+  device: Device | null;
+  onOpenChange: (v: boolean) => void;
+}) {
+  return (
+    <Dialog open={!!device} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[720px] bg-card">
+        {device && (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2.5">
+                <span
+                  className={`h-8 w-8 rounded-lg inline-flex items-center justify-center shrink-0 ${
+                    device.status === "异常" ? "bg-[#FFF1F0] text-[#CF1322]" : "bg-brand-subtle text-primary"
+                  }`}
+                >
+                  <Radio className="h-4 w-4" />
+                </span>
+                <span className="text-section">{device.name}</span>
+                <span className="text-caption text-text-tertiary font-mono">{device.id}</span>
+                <span
+                  className={
+                    device.status === "异常" ? "tag tag-danger" : device.status === "正常" ? "tag tag-success" : "tag tag-muted"
+                  }
+                >
+                  {device.status}
+                </span>
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-3">
+              {device.alerts && device.alerts.length > 0 && (
+                <div className="space-y-1.5">
+                  {device.alerts.map((a, i) => (
+                    <div
+                      key={i}
+                      className={`rounded-lg px-3 py-2 flex items-start gap-2 ${
+                        a.level === "danger" ? "bg-[#FFF1F0] text-[#CF1322]" : "bg-[#FFF7E6] text-[#B8860B]"
+                      }`}
+                    >
+                      <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+                      <div className="min-w-0">
+                        <div className="text-body-sm">{a.text}</div>
+                        <div className="text-caption opacity-80 mt-0.5">{a.time}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {device.metrics && device.metrics.length > 0 && (
+                <div className="grid grid-cols-4 gap-2.5">
+                  {device.metrics.map((m) => (
+                    <div key={m.label} className={`rounded-xl px-3 py-2.5 ${m.abnormal ? "bg-[#FFF1F0]" : "bg-muted/50"}`}>
+                      <div className="text-caption text-text-tertiary">{m.label}</div>
+                      <div className="mt-0.5">
+                        <span className={`text-[20px] font-semibold tabular-nums ${m.abnormal ? "text-[#CF1322]" : "text-foreground"}`}>
+                          {m.value}
+                        </span>
+                        {m.unit && <span className="text-caption text-text-tertiary ml-0.5">{m.unit}</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {device.kind === "ear" && (
+                <div className="rounded-xl bg-muted/50 p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="text-caption text-text-tertiary inline-flex items-center gap-1.5">
+                      <Activity className="h-3 w-3" /> 近 24 小时耳温变化
+                    </div>
+                    <div className="text-caption text-text-tertiary">单位 ℃</div>
+                  </div>
+                  <EarTempChart />
+                </div>
+              )}
+
+              {device.kind === "collar" && (
+                <div className="rounded-xl bg-muted/50 p-3 text-caption text-text-secondary">
+                  <span className="inline-flex items-center gap-1.5 text-text-tertiary">
+                    <Activity className="h-3 w-3" /> 近 24 小时
+                  </span>
+                  <div className="mt-1">详细趋势图待接入设备数据源。</div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 // 检查数据：各检查项目最近一次结果
 const EXAM_DATA: { name: string; result: string; date: string; abnormal?: boolean }[] = [
@@ -86,6 +281,7 @@ export function CattleProfileDrawer({
 
 
   const [observed, setObserved] = useState(false);
+  const [activeDevice, setActiveDevice] = useState<Device | null>(null);
 
   if (!cow) return null;
 
@@ -238,7 +434,12 @@ export function CattleProfileDrawer({
           <Panel title="外接设备" icon={<Watch className="h-4 w-4 text-primary" />} bodyClassName="p-3">
             <div className="grid grid-cols-2 gap-3">
               {DEVICES.map((d) => (
-                <div key={d.id} className="rounded-xl bg-muted/50 px-3 py-2.5 flex items-center gap-2.5">
+                <button
+                  type="button"
+                  key={d.id}
+                  onClick={() => setActiveDevice(d)}
+                  className="w-full text-left rounded-xl bg-muted/50 px-3 py-2.5 flex items-center gap-2.5 hover:bg-muted transition-colors"
+                >
                   <span
                     className={`h-8 w-8 rounded-lg inline-flex items-center justify-center shrink-0 ${
                       d.status === "异常" ? "bg-[#FFF1F0] text-[#CF1322]" : "bg-brand-subtle text-primary"
@@ -257,8 +458,10 @@ export function CattleProfileDrawer({
                   >
                     {d.status}
                   </span>
-                </div>
+                  <ChevronRight className="h-4 w-4 text-text-tertiary shrink-0" />
+                </button>
               ))}
+
             </div>
           </Panel>
 
@@ -324,6 +527,7 @@ export function CattleProfileDrawer({
 
         </div>
       </SheetContent>
+      <DeviceDataDialog device={activeDevice} onOpenChange={(v) => !v && setActiveDevice(null)} />
     </Sheet>
   );
 }
