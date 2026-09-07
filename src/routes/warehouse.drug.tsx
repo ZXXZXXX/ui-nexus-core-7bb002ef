@@ -345,10 +345,23 @@ function DrugArchivePage() {
 
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white">
-          <SheetHeader>
-            <SheetTitle className="text-section-title">
-              {mode === "edit" ? "编辑药品" : mode === "create" ? "新建药品" : "药品详情"}
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white p-0">
+          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
+            <SheetTitle className="text-section-title flex items-center gap-2">
+              <span className="h-8 w-8 rounded-lg bg-brand-subtle text-primary inline-flex items-center justify-center shrink-0">
+                <Pill className="h-4 w-4" />
+              </span>
+              <span className="truncate">
+                {mode === "edit" ? "编辑药品" : mode === "create" ? "新建药品" : detail?.name || "药品详情"}
+              </span>
+              {detail?.code && mode !== "create" && (
+                <span className="font-mono text-caption text-text-tertiary shrink-0">{detail.code}</span>
+              )}
+              {detail && mode === "view" && (
+                <span className={detail.status === "启用" ? "tag tag-success" : "tag tag-muted"}>
+                  {detail.status}
+                </span>
+              )}
             </SheetTitle>
           </SheetHeader>
           {detail && (
@@ -362,6 +375,7 @@ function DrugArchivePage() {
           )}
         </SheetContent>
       </Sheet>
+
     </>
   );
 }
@@ -383,23 +397,14 @@ function DrugForm({
   const patch = (p: Partial<Drug>) => setD((s) => ({ ...s, ...p }));
 
   return (
-    <div className="mt-4 space-y-6">
-      {/* 顶部标题条 */}
-      <div className="flex items-center justify-between rounded-md border border-border bg-surface-subtle px-3 py-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <Pill className="h-4 w-4 text-primary shrink-0" />
-          <span className="font-mono text-body-sm text-foreground">{d.code || "—"}</span>
-          <span className="text-text-tertiary">·</span>
-          <span className="text-body-sm text-foreground truncate">{d.name || "新药品"}</span>
-        </div>
-        <span
-          className={
-            d.status === "启用" ? "tag tag-success" : "tag tag-muted"
-          }
-        >
-          {d.status}
-        </span>
+    <div className="px-6 py-5 space-y-6">
+      {/* 顶部摘要条 */}
+      <div className="rounded-xl border border-border bg-surface-subtle px-4 py-3 grid grid-cols-3 gap-3">
+        <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(2)}`} />
+        <SummaryItem label="规格型号" value={d.spec || "—"} />
+        <SummaryItem label="休药期" value={d.withdraw || "—"} />
       </div>
+
 
       {/* Section 1: ERP 基础信息（只读） */}
       <Section
@@ -595,7 +600,7 @@ function DrugForm({
       </Section>
 
       {!readOnly && (
-        <SheetFooter className="gap-2 sticky bottom-0 bg-card pt-3 pb-1">
+        <SheetFooter className="gap-2 sticky bottom-0 -mx-6 px-6 bg-card border-t border-border py-3">
           <Button variant="outline" onClick={onCancel}>
             取消
           </Button>
@@ -607,6 +612,7 @@ function DrugForm({
           </Button>
         </SheetFooter>
       )}
+
 
       <AlertDialog open={confirmPrice} onOpenChange={setConfirmPrice}>
         <AlertDialogContent>
@@ -636,6 +642,15 @@ function DrugForm({
 
 /* ---------- 表单原子 ---------- */
 
+function SummaryItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className="text-body-sm text-foreground truncate mt-0.5">{value}</div>
+    </div>
+  );
+}
+
 function Section({
   title,
   hint,
@@ -647,18 +662,22 @@ function Section({
 }) {
   return (
     <section>
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-card-title text-foreground">{title}</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-card-title text-foreground flex items-center gap-2">
+          <span className="h-3.5 w-1 rounded-full bg-primary inline-block" />
+          {title}
+        </h3>
         {hint}
       </div>
-      <div className="rounded-md border border-border p-4">{children}</div>
+      <div className="rounded-xl border border-border px-4 py-4">{children}</div>
     </section>
   );
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-4 gap-y-3">{children}</div>;
+  return <div className="grid grid-cols-2 gap-x-5 gap-y-4">{children}</div>;
 }
+
 
 function Lbl({ label, required }: { label: string; required?: boolean }) {
   return (
@@ -693,7 +712,7 @@ function F({
       <Lbl label={label} required={required} />
       {readOnly ? (
         <div
-          className={`mt-1 h-9 flex items-center px-2 rounded-md bg-surface-subtle text-body-sm text-foreground ${
+          className={`mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1 ${
             mono ? "font-mono" : ""
           }`}
         >
@@ -730,7 +749,7 @@ function FLong({
     <div className="col-span-2">
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-9 px-2 py-2 rounded-md bg-surface-subtle text-body-sm text-foreground whitespace-pre-wrap">
+        <div className="mt-1 min-h-8 text-body-sm text-foreground whitespace-pre-wrap border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
@@ -764,7 +783,7 @@ function FSelect({
     <div>
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 h-9 flex items-center px-2 rounded-md bg-surface-subtle text-body-sm text-foreground">
+        <div className="mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
@@ -870,7 +889,7 @@ function VariableDoseEditor({
     <div className="col-span-2">
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-9 px-2 py-2 rounded-md bg-surface-subtle text-body-sm text-foreground whitespace-pre-wrap">
+        <div className="mt-1 min-h-8 text-body-sm text-foreground whitespace-pre-wrap border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
@@ -974,7 +993,7 @@ function FrequencyEditor({
     <div>
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 h-9 flex items-center px-2 rounded-md bg-surface-subtle text-body-sm text-foreground">
+        <div className="mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
