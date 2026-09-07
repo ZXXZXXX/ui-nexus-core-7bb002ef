@@ -11,6 +11,13 @@ import {
 import { MobileShell } from "@/components/mobile-shell";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { MediaGrid } from "@/components/m/media-grid";
+import {
+  CowAnglePhotos,
+  emptyAnglePhotos,
+  anglePhotosDone,
+  type AnglePhotos,
+} from "@/components/m/cow-angle-photos";
+import { RelatedOrderCard, type RelatedOrder } from "@/components/related-order-picker";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
 import { ConfirmAbortDialog } from "@/components/m/confirm-abort-dialog";
 import { ConfirmRevisitDialog } from "@/components/m/confirm-revisit-dialog";
@@ -28,6 +35,24 @@ type Verdict = "cure" | "abandon" | "revisit";
 const ABANDON_REASONS = ["牛只死亡", "淘汰处理", "其他"] as const;
 
 type AbandonReason = (typeof ABANDON_REASONS)[number];
+
+const LEAVE_RELATED_ORDERS: RelatedOrder[] = [
+  {
+    id: "WO-2298",
+    type: "疾病诊疗",
+    conclusion: "临床型乳房炎",
+    target: "#01-24-2298",
+    diagnosedAt: "2026-09-02 09:10",
+    recent: true,
+  },
+  {
+    id: "WO-2274",
+    type: "产后护理",
+    conclusion: "产后高危护理",
+    target: "#01-24-2298",
+    diagnosedAt: "2026-08-28 08:40",
+  },
+];
 
 const inputCls =
   "w-full h-11 px-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary";
@@ -69,6 +94,8 @@ function ReviewPage() {
   const [leavePrice, setLeavePrice] = useState("");
   const [leaveNote, setLeaveNote] = useState("");
   const [media, setMedia] = useState<number[]>([]);
+  const [anglePhotos, setAnglePhotos] = useState<AnglePhotos>(emptyAnglePhotos);
+  const [relatedOrder, setRelatedOrder] = useState<string | null>(null);
   const [needTransfer, setNeedTransfer] = useState(false);
   const [transferTo, setTransferTo] = useState("");
   const [transferConfirmOpen, setTransferConfirmOpen] = useState(false);
@@ -88,7 +115,12 @@ function ReviewPage() {
     if (verdict === "abandon") {
       if (!abandonReason) return false;
       if (!finalAbandonReason) return false;
-      if (media.length === 0) return false;
+      if (abandonReason === "其他") {
+        if (media.length === 0) return false;
+        return true;
+      }
+      if (!anglePhotosDone(anglePhotos)) return false;
+      if (abandonReason === "淘汰处理" && !relatedOrder) return false;
       return true;
     }
     if (needTransfer && !transferTo) return false;
@@ -294,14 +326,28 @@ function ReviewPage() {
                   </Field>
 
                   {abandonReason === "淘汰处理" && (
-                    <Field label="金额 (元)">
-                      <input
-                        type="number"
-                        value={leavePrice}
-                        onChange={(e) => setLeavePrice(e.target.value)}
-                        className={inputCls}
-                      />
-                    </Field>
+                    <>
+                      <Field label="金额 (元)">
+                        <input
+                          type="number"
+                          value={leavePrice}
+                          onChange={(e) => setLeavePrice(e.target.value)}
+                          className={inputCls}
+                        />
+                      </Field>
+                      <Field label="关联工单" required>
+                        <div className="space-y-2">
+                          {LEAVE_RELATED_ORDERS.map((o) => (
+                            <RelatedOrderCard
+                              key={o.id}
+                              order={o}
+                              selected={relatedOrder === o.id}
+                              onClick={() => setRelatedOrder(o.id)}
+                            />
+                          ))}
+                        </div>
+                      </Field>
+                    </>
                   )}
                   <Field label="备注">
                     <textarea
@@ -312,14 +358,8 @@ function ReviewPage() {
                       placeholder="补充说明"
                     />
                   </Field>
-                  <MediaGrid
-                    items={media}
-                    setItems={setMedia}
-                    max={9}
-                    required
-                    caption="现场照片 / 视频"
-                    helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
-                  />
+                  <CowAnglePhotos value={anglePhotos} onChange={setAnglePhotos} />
+
                 </div>
               )}
 
