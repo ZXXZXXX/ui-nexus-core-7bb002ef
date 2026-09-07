@@ -1018,14 +1018,8 @@ function StatsPage() {
   const activeCount = countActive(filters);
   const visibleTemplates = useMemo(() => {
     const k = query.trim().toLowerCase();
-    const list = k
-      ? templates.filter(
-          (t) =>
-            t.name.toLowerCase().includes(k) ||
-            t.desc.toLowerCase().includes(k) ||
-            describeFilters(t.filters).toLowerCase().includes(k),
-        )
-      : templates;
+    const list = k ? templates.filter((t) => t.name.toLowerCase().includes(k)) : templates;
+
     return [...list]
       .filter((t) => (t.section ?? "custom") === activeSection)
       .sort((a, b) => Number(!!b.favorite) - Number(!!a.favorite));
