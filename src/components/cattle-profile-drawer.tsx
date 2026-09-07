@@ -13,9 +13,11 @@ import {
   MessageSquareWarning,
   ListChecks,
   Image as ImageIcon,
+  AlertTriangle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
