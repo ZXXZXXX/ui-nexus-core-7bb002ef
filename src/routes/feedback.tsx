@@ -223,28 +223,34 @@ function FeedbackAdminPage() {
       },
       {
         key: "user",
-        label: "上传人",
+        label: "上传人员",
         value: (r) => r.user,
         render: (r) => (
           <div className="flex items-center gap-2 min-w-0">
             <div className="h-7 w-7 shrink-0 rounded-full bg-brand-subtle text-primary text-caption flex items-center justify-center">
               {r.user.slice(0, 1)}
             </div>
-            <div className="min-w-0">
-              <div className="truncate text-body text-foreground">{r.user}</div>
-              <div className="truncate text-caption text-text-tertiary">
-                {r.role} · {r.farm}
-              </div>
-            </div>
+            <span className="truncate text-body text-foreground">{r.user}</span>
           </div>
         ),
       },
       {
+        key: "role",
+        label: "人员角色",
+        value: (r) => r.role,
+        filter: "select",
+        render: (r) => (
+          <span className="text-body text-text-secondary whitespace-nowrap">{r.role}</span>
+        ),
+      },
+      {
         key: "farm",
-        label: "所属牧场",
+        label: "人员关联牧场",
         value: (r) => r.farm,
         filter: "select",
-        defaultHidden: true,
+        render: (r) => (
+          <span className="text-body text-text-secondary whitespace-nowrap">{r.farm}</span>
+        ),
       },
       {
         key: "createdAt",
