@@ -303,7 +303,7 @@ function FeedbackAdminPage() {
                 <TableHead className="w-[110px]">编号</TableHead>
                 <TableHead className="w-[120px]">评分</TableHead>
                 <TableHead className="w-[110px]">反馈类型</TableHead>
-                <TableHead>详细描述</TableHead>
+                <TableHead className="min-w-[300px]">详细描述</TableHead>
                 <TableHead className="w-[180px]">上传人</TableHead>
                 <TableHead className="w-[150px]">上传时间</TableHead>
                 <TableHead className="w-[100px]">状态</TableHead>
@@ -331,7 +331,7 @@ function FeedbackAdminPage() {
                     <TooltipProvider delayDuration={200}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <div className="flex items-center gap-2 max-w-[420px]">
+                          <div className="flex items-center gap-2 min-w-[280px] max-w-[460px]">
                             <span className="text-body-sm text-foreground text-left line-clamp-1">{r.content}</span>
                             {r.images > 0 && (
                               <span className="shrink-0 inline-flex items-center gap-0.5 rounded bg-surface-subtle px-1.5 py-0.5 text-caption text-text-secondary">
