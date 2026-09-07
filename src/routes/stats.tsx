@@ -1950,21 +1950,6 @@ function StatsPage() {
                           编辑
                         </Button>
                       )}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-text-tertiary hover:bg-transparent hover:text-text-primary">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => toggleFreeze(t.id)}
-                            className="text-body-sm"
-                          >
-                            {t.frozen ? "解冻模板" : "冻结模板"}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
