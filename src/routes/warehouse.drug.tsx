@@ -669,13 +669,13 @@ function Section({
         </h3>
         {hint}
       </div>
-      <div className="rounded-xl border border-border px-4 py-4">{children}</div>
+      <div className="rounded-xl border border-border px-4 py-2">{children}</div>
     </section>
   );
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-5 gap-y-4">{children}</div>;
+  return <div className="grid grid-cols-2 gap-x-6 gap-y-0.5">{children}</div>;
 }
 
 
@@ -709,22 +709,23 @@ function F({
 }) {
   return (
     <div className={span2 ? "col-span-2" : ""}>
-      <Lbl label={label} required={required} />
       {readOnly ? (
-        <div
-          className={`mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1 ${
-            mono ? "font-mono" : ""
-          }`}
-        >
-          {value || <span className="text-text-tertiary">—</span>}
+        <div className="flex items-center gap-3 py-1.5 border-b border-border/60">
+          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+          <span className={`text-body-sm text-foreground truncate ${mono ? "font-mono" : ""}`}>
+            {value || <span className="text-text-tertiary">—</span>}
+          </span>
         </div>
       ) : (
+        <>
+        <Lbl label={label} required={required} />
         <Input
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
           className={`h-9 mt-1 text-body-sm ${mono ? "font-mono" : ""}`}
         />
+        </>
       )}
     </div>
   );
@@ -747,18 +748,23 @@ function FLong({
 }) {
   return (
     <div className="col-span-2">
-      <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-8 text-body-sm text-foreground whitespace-pre-wrap border-b border-border/70 pb-1">
-          {value || <span className="text-text-tertiary">—</span>}
+        <div className="flex items-start gap-3 py-1.5 border-b border-border/60">
+          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+          <span className="text-body-sm text-foreground whitespace-pre-wrap">
+            {value || <span className="text-text-tertiary">—</span>}
+          </span>
         </div>
       ) : (
+        <>
+        <Lbl label={label} required={required} />
         <Textarea
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           placeholder={placeholder}
           className="mt-1 text-body-sm min-h-[64px]"
         />
+        </>
       )}
     </div>
   );
@@ -781,12 +787,16 @@ function FSelect({
 }) {
   return (
     <div>
-      <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1">
-          {value || <span className="text-text-tertiary">—</span>}
+        <div className="flex items-center gap-3 py-1.5 border-b border-border/60">
+          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+          <span className="text-body-sm text-foreground truncate">
+            {value || <span className="text-text-tertiary">—</span>}
+          </span>
         </div>
       ) : (
+        <>
+        <Lbl label={label} required={required} />
         <Select value={value} onValueChange={(v) => onChange?.(v)}>
           <SelectTrigger className="h-9 mt-1 text-body-sm">
             <SelectValue />
@@ -799,6 +809,7 @@ function FSelect({
             ))}
           </SelectContent>
         </Select>
+        </>
       )}
     </div>
   );
@@ -887,12 +898,16 @@ function VariableDoseEditor({
 
   return (
     <div className="col-span-2">
-      <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-8 text-body-sm text-foreground whitespace-pre-wrap border-b border-border/70 pb-1">
-          {value || <span className="text-text-tertiary">—</span>}
+        <div className="flex items-start gap-3 py-1.5 border-b border-border/60">
+          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+          <span className="text-body-sm text-foreground whitespace-pre-wrap">
+            {value || <span className="text-text-tertiary">—</span>}
+          </span>
         </div>
       ) : (
+        <>
+        <Lbl label={label} required={required} />
         <div className="mt-1 space-y-2">
           {rows.map((row, i) => (
             <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
@@ -935,6 +950,7 @@ function VariableDoseEditor({
             <Plus className="h-3.5 w-3.5" /> 添加一组
           </Button>
         </div>
+        </>
       )}
     </div>
   );
@@ -991,12 +1007,16 @@ function FrequencyEditor({
 
   return (
     <div>
-      <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1">
-          {value || <span className="text-text-tertiary">—</span>}
+        <div className="flex items-center gap-3 py-1.5 border-b border-border/60">
+          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+          <span className="text-body-sm text-foreground truncate">
+            {value || <span className="text-text-tertiary">—</span>}
+          </span>
         </div>
       ) : (
+        <>
+        <Lbl label={label} required={required} />
         <div className="mt-1 h-9 flex items-center gap-2">
           <span className="text-body-sm text-text-secondary">每</span>
           <Input
@@ -1016,6 +1036,7 @@ function FrequencyEditor({
           />
           <span className="text-body-sm text-text-secondary">次</span>
         </div>
+        </>
       )}
     </div>
   );
