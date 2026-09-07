@@ -1831,10 +1831,8 @@ function StatsPage() {
               </Button>
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground">{sectionTitle}</div>
-                <div className="text-caption text-text-tertiary mt-0.5">
-                  共 {visibleTemplates.length} 个指标模板 · 支持时间、牧场、牛只、疾病、处方等多维度筛选
-                </div>
               </div>
+
             </div>
 
             <div className="flex items-center gap-2">
