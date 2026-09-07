@@ -52,7 +52,7 @@ const initial: LossReport[] = [
     reason: "冷链断电",
     reporter: "孙库管",
     value: 660.0,
-    type: "公共损耗",
+    type: "-",
     stage: "储存保管",
     remark: "冷库压缩机夜间故障，疫苗温度超标。",
     photos: 3,
