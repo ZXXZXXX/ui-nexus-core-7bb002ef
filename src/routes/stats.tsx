@@ -2029,9 +2029,6 @@ function StatsPage() {
               </Button>
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground truncate">{resultTitle}</div>
-                <div className="text-caption text-text-tertiary mt-0.5">
-                  共 <span className="tabular-nums text-foreground font-medium">{resultMetric ? aggregatedMetricRows.length : filteredRows.length}</span> 条 · {describeFilters(resultFilters)}
-                </div>
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
