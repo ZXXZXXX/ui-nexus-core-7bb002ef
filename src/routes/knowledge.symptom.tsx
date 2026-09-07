@@ -275,12 +275,12 @@ function SymptomKBPage() {
       </main>
 
       <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
-        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle className="text-section-title">编辑症状</SheetTitle>
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none bg-white flex flex-col gap-0 p-0 overflow-hidden">
+          <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white">
+            <SheetTitle className="text-section-title">{editing?.name || "编辑症状"}</SheetTitle>
           </SheetHeader>
           {editing && (
-            <div className="mt-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
               <div className="space-y-1.5">
                 <Label className="text-body-sm text-text-secondary">症状名称</Label>
                 <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
