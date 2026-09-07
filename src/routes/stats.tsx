@@ -898,6 +898,9 @@ function StatsPage() {
   const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const [rangeFrom, setRangeFrom] = useState("");
+  const [rangeTo, setRangeTo] = useState(todayStr);
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [saveDesc, setSaveDesc] = useState("");
