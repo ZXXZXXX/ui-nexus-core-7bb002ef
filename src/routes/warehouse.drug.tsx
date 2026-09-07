@@ -397,23 +397,14 @@ function DrugForm({
   const patch = (p: Partial<Drug>) => setD((s) => ({ ...s, ...p }));
 
   return (
-    <div className="mt-4 space-y-6">
-      {/* 顶部标题条 */}
-      <div className="flex items-center justify-between rounded-md border border-border bg-surface-subtle px-3 py-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <Pill className="h-4 w-4 text-primary shrink-0" />
-          <span className="font-mono text-body-sm text-foreground">{d.code || "—"}</span>
-          <span className="text-text-tertiary">·</span>
-          <span className="text-body-sm text-foreground truncate">{d.name || "新药品"}</span>
-        </div>
-        <span
-          className={
-            d.status === "启用" ? "tag tag-success" : "tag tag-muted"
-          }
-        >
-          {d.status}
-        </span>
+    <div className="px-6 py-5 space-y-6">
+      {/* 顶部摘要条 */}
+      <div className="rounded-xl border border-border bg-surface-subtle px-4 py-3 grid grid-cols-3 gap-3">
+        <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(2)}`} />
+        <SummaryItem label="规格型号" value={d.spec || "—"} />
+        <SummaryItem label="休药期" value={d.withdraw || "—"} />
       </div>
+
 
       {/* Section 1: ERP 基础信息（只读） */}
       <Section
