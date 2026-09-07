@@ -6,6 +6,31 @@ import { toast } from "sonner";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
 import { MediaGrid } from "@/components/m/media-grid";
+import {
+  CowAnglePhotos,
+  emptyAnglePhotos,
+  anglePhotosDone,
+  type AnglePhotos,
+} from "@/components/m/cow-angle-photos";
+import { RelatedOrderCard, type RelatedOrder } from "@/components/related-order-picker";
+
+const LEAVE_RELATED_ORDERS: RelatedOrder[] = [
+  {
+    id: "WO-2298",
+    type: "疾病诊疗",
+    conclusion: "临床型乳房炎",
+    target: "#01-24-2298",
+    diagnosedAt: "2026-09-02 09:10",
+    recent: true,
+  },
+  {
+    id: "WO-2274",
+    type: "产后护理",
+    conclusion: "产后高危护理",
+    target: "#01-24-2298",
+    diagnosedAt: "2026-08-28 08:40",
+  },
+];
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Check } from "lucide-react";
 
