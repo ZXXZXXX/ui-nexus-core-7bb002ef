@@ -712,7 +712,7 @@ function F({
       <Lbl label={label} required={required} />
       {readOnly ? (
         <div
-          className={`mt-1 h-9 flex items-center px-2 rounded-md bg-surface-subtle text-body-sm text-foreground ${
+          className={`mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1 ${
             mono ? "font-mono" : ""
           }`}
         >
@@ -749,7 +749,7 @@ function FLong({
     <div className="col-span-2">
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-9 px-2 py-2 rounded-md bg-surface-subtle text-body-sm text-foreground whitespace-pre-wrap">
+        <div className="mt-1 min-h-8 text-body-sm text-foreground whitespace-pre-wrap border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
@@ -783,7 +783,7 @@ function FSelect({
     <div>
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 h-9 flex items-center px-2 rounded-md bg-surface-subtle text-body-sm text-foreground">
+        <div className="mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
@@ -889,7 +889,7 @@ function VariableDoseEditor({
     <div className="col-span-2">
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 min-h-9 px-2 py-2 rounded-md bg-surface-subtle text-body-sm text-foreground whitespace-pre-wrap">
+        <div className="mt-1 min-h-8 text-body-sm text-foreground whitespace-pre-wrap border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
@@ -993,7 +993,7 @@ function FrequencyEditor({
     <div>
       <Lbl label={label} required={required} />
       {readOnly ? (
-        <div className="mt-1 h-9 flex items-center px-2 rounded-md bg-surface-subtle text-body-sm text-foreground">
+        <div className="mt-1 min-h-8 flex items-center text-body-sm text-foreground border-b border-border/70 pb-1">
           {value || <span className="text-text-tertiary">—</span>}
         </div>
       ) : (
