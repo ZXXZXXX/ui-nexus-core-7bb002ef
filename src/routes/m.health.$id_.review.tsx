@@ -358,24 +358,16 @@ function ReviewPage() {
                       placeholder="补充说明"
                     />
                   </Field>
-                  <CowAnglePhotos value={anglePhotos} onChange={setAnglePhotos} />
-
-                </div>
-              )}
-
-              {/* 非放弃结论的现场材料 */}
-              {verdict && verdict !== "abandon" && (
-                <div className="rounded-xl bg-card border border-border p-4">
-                  <MediaGrid
-                    items={media}
-                    setItems={setMedia}
-                    max={9}
-                    required
-                    caption="现场照片 / 视频"
-                    helper="复查结论需上传或拍摄现场材料"
+                  <CowAnglePhotos
+                    value={anglePhotos}
+                    onChange={setAnglePhotos}
+                    title="现场照片"
+                    hint="请分别拍摄或上传牛只正面、左视角、右视角照片"
                   />
+
                 </div>
               )}
+
             </div>
           )}
 
