@@ -552,34 +552,35 @@ function PrescriptionPage() {
 
       {/* 详情抽屉 */}
       <Sheet open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
-        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white">
-          <SheetHeader>
-            <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
-              <span className="truncate">{viewing?.name || "处方详情"}</span>
-              {viewing?.code && (
-                <span className="text-body-sm font-normal font-mono text-text-tertiary shrink-0">
-                  {viewing.code}
-                </span>
-              )}
-            </SheetTitle>
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none bg-white flex flex-col gap-0 p-0 overflow-hidden">
+          <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white sticky top-0 z-10">
+            <div className="flex items-center justify-between gap-3">
+              <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+                <span className="truncate">{viewing?.name || "处方详情"}</span>
+                {viewing?.code && (
+                  <span className="text-body-sm font-normal font-mono text-text-tertiary shrink-0">
+                    {viewing.code}
+                  </span>
+                )}
+              </SheetTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 mr-8"
+                onClick={() => {
+                  if (viewing) {
+                    setEditing(structuredClone(viewing));
+                    setViewing(null);
+                  }
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" /> 编辑
+              </Button>
+            </div>
           </SheetHeader>
-          {viewing && <PrescriptionView r={viewing} />}
-          <SheetFooter className="mt-6 flex-row justify-end gap-2">
-            <Button variant="outline" onClick={() => setViewing(null)}>
-              关闭
-            </Button>
-            <Button
-              className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-              onClick={() => {
-                if (viewing) {
-                  setEditing(structuredClone(viewing));
-                  setViewing(null);
-                }
-              }}
-            >
-              编辑
-            </Button>
-          </SheetFooter>
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            {viewing && <PrescriptionView r={viewing} />}
+          </div>
         </SheetContent>
       </Sheet>
 
