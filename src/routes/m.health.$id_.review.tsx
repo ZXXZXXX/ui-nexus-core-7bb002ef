@@ -36,6 +36,24 @@ const ABANDON_REASONS = ["牛只死亡", "淘汰处理", "其他"] as const;
 
 type AbandonReason = (typeof ABANDON_REASONS)[number];
 
+const LEAVE_RELATED_ORDERS: RelatedOrder[] = [
+  {
+    id: "WO-2298",
+    type: "疾病诊疗",
+    conclusion: "临床型乳房炎",
+    target: "#01-24-2298",
+    diagnosedAt: "2026-09-02 09:10",
+    recent: true,
+  },
+  {
+    id: "WO-2274",
+    type: "产后护理",
+    conclusion: "产后高危护理",
+    target: "#01-24-2298",
+    diagnosedAt: "2026-08-28 08:40",
+  },
+];
+
 const inputCls =
   "w-full h-11 px-3 rounded-lg border border-border bg-card text-body-sm text-foreground outline-none focus:border-primary";
 
