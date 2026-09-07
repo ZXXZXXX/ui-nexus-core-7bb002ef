@@ -898,6 +898,9 @@ function StatsPage() {
   const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const [rangeFrom, setRangeFrom] = useState("");
+  const [rangeTo, setRangeTo] = useState(todayStr);
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
   const [saveDesc, setSaveDesc] = useState("");
@@ -1834,6 +1837,50 @@ function StatsPage() {
             </div>
 
             <div className="flex items-center gap-2">
+              <div className="group inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-white pl-2.5 pr-2 transition-colors hover:border-primary/40 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+                <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary transition-colors group-focus-within:text-primary" />
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={rangeFrom}
+                    max={rangeTo || undefined}
+                    onChange={(e) => setRangeFrom(e.target.value)}
+                    aria-label="开始日期"
+                    className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
+                  />
+                  {!rangeFrom && (
+                    <span className="pointer-events-none absolute inset-0 flex items-center rounded bg-white px-1 text-body-sm text-text-tertiary">
+                      不限
+                    </span>
+                  )}
+                </div>
+                <span className="h-px w-2 shrink-0 bg-border" />
+                <div className="relative flex items-center gap-1">
+                  <input
+                    type="date"
+                    value={rangeTo}
+                    min={rangeFrom || undefined}
+                    onChange={(e) => setRangeTo(e.target.value)}
+                    aria-label="结束日期"
+                    className="h-7 w-[110px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none transition-colors hover:bg-surface-subtle [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute"
+                  />
+                  {rangeTo === todayStr && (
+                    <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-caption text-primary">今日</span>
+                  )}
+                </div>
+                {(rangeFrom || rangeTo !== todayStr) && (
+                  <button
+                    onClick={() => {
+                      setRangeFrom("");
+                      setRangeTo(todayStr);
+                    }}
+                    aria-label="重置时间范围"
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-tertiary transition-colors hover:bg-surface-subtle hover:text-foreground"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
                 <Input
