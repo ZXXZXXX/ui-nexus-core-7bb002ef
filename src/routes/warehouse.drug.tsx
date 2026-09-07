@@ -346,23 +346,30 @@ function DrugArchivePage() {
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none overflow-y-auto bg-white p-0">
-          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
-            <SheetTitle className="text-section-title flex items-center gap-2">
-              <span className="h-8 w-8 rounded-lg bg-brand-subtle text-primary inline-flex items-center justify-center shrink-0">
-                <Pill className="h-4 w-4" />
-              </span>
-              <span className="truncate">
-                {mode === "edit" ? "编辑药品" : mode === "create" ? "新建药品" : detail?.name || "药品详情"}
-              </span>
-              {detail?.code && mode !== "create" && (
-                <span className="font-mono text-caption text-text-tertiary shrink-0">{detail.code}</span>
-              )}
-              {detail && mode === "view" && (
-                <span className={detail.status === "启用" ? "tag tag-success" : "tag tag-muted"}>
-                  {detail.status}
+          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border bg-white sticky top-0 z-10">
+            <div className="flex items-center justify-between gap-3">
+              <SheetTitle className="text-section-title flex items-center gap-2 min-w-0">
+                <span className="h-8 w-8 rounded-lg bg-brand-subtle text-primary inline-flex items-center justify-center shrink-0">
+                  <Pill className="h-4 w-4" />
                 </span>
+                <span className="truncate">
+                  {mode === "edit" ? "编辑药品" : mode === "create" ? "新建药品" : detail?.name || "药品详情"}
+                </span>
+                {detail?.code && mode !== "create" && (
+                  <span className="font-mono text-caption text-text-tertiary shrink-0">{detail.code}</span>
+                )}
+                {detail && mode === "view" && (
+                  <span className={detail.status === "启用" ? "tag tag-success" : "tag tag-muted"}>
+                    {detail.status}
+                  </span>
+                )}
+              </SheetTitle>
+              {mode === "view" && (
+                <Button variant="outline" size="sm" className="shrink-0 mr-8" onClick={() => setMode("edit")}>
+                  <Pencil className="h-3.5 w-3.5" /> 编辑
+                </Button>
               )}
-            </SheetTitle>
+            </div>
           </SheetHeader>
           {detail && (
             <DrugForm
