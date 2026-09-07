@@ -220,7 +220,6 @@ function FeedbackAdminPage() {
             </Tooltip>
           </TooltipProvider>
         ),
-        className: "col-span-2",
       },
       {
         key: "user",
