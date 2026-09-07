@@ -600,7 +600,7 @@ function DrugForm({
       </Section>
 
       {!readOnly && (
-        <SheetFooter className="gap-2 sticky bottom-0 bg-card pt-3 pb-1">
+        <SheetFooter className="gap-2 sticky bottom-0 -mx-6 px-6 bg-card border-t border-border py-3">
           <Button variant="outline" onClick={onCancel}>
             取消
           </Button>
@@ -612,6 +612,7 @@ function DrugForm({
           </Button>
         </SheetFooter>
       )}
+
 
       <AlertDialog open={confirmPrice} onOpenChange={setConfirmPrice}>
         <AlertDialogContent>
