@@ -31,7 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pill, Plus, Lock, Trash2 } from "lucide-react";
+import { Pill, Plus, Lock, Trash2, Pencil } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 
 
