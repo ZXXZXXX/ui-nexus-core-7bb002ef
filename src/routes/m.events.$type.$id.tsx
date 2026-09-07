@@ -958,11 +958,20 @@ function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
   const [price, setPrice] = useState("");
   const [note, setNote] = useState("");
   const [media, setMedia] = useState<number[]>([]);
+  const [anglePhotos, setAnglePhotos] = useState<AnglePhotos>(emptyAnglePhotos);
+  const [relatedOrder, setRelatedOrder] = useState<string | null>(null);
+
+  const isCowPhoto = reason === "淘汰" || reason === "死亡";
 
   const submit = () => {
     if (!date) return toast.error("请选择离场日期");
     if (!detail) return toast.error("请填写离场原因/详情");
-    if (media.length === 0) return toast.error("请上传或拍摄现场照片 / 视频");
+    if (isCowPhoto) {
+      if (!anglePhotosDone(anglePhotos)) return toast.error("请上传正面、左视角、右视角照片");
+      if (reason === "淘汰" && !relatedOrder) return toast.error("请选择关联工单");
+    } else if (media.length === 0) {
+      return toast.error("请上传或拍摄现场照片 / 视频");
+    }
     toast.success("离场记录已保存");
     onDone();
   };
@@ -1017,16 +1026,35 @@ function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
               <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className={inputCls} />
             </Field>
           )}
+          {reason === "淘汰" && (
+            <Field label="关联工单" required>
+              <div className="space-y-2">
+                {LEAVE_RELATED_ORDERS.map((o) => (
+                  <RelatedOrderCard
+                    key={o.id}
+                    order={o}
+                    selected={relatedOrder === o.id}
+                    onClick={() => setRelatedOrder(o.id)}
+                  />
+                ))}
+              </div>
+            </Field>
+          )}
           <div>
-            <MediaGrid
-              items={media}
-              setItems={setMedia}
-              max={9}
-              required
-              caption="现场照片 / 视频"
-              helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
-            />
+            {isCowPhoto ? (
+              <CowAnglePhotos value={anglePhotos} onChange={setAnglePhotos} />
+            ) : (
+              <MediaGrid
+                items={media}
+                setItems={setMedia}
+                max={9}
+                required
+                caption="现场照片 / 视频"
+                helper="离场事件需上传或拍摄现场材料，用于业务回溯追责"
+              />
+            )}
           </div>
+
           <Field label="备注">
 
             <textarea
