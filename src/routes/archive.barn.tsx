@@ -20,6 +20,13 @@ const barns: Barn[] = [
   { id: "B-201", name: "1 号牛舍", farm: "2 号牧场", type: "泌乳牛舍", stock: 256, desc: "标准泌乳群，散栏自由采食", updatedAt: "2026-08-16" },
 ];
 
+const typeTone: Record<string, string> = {
+  泌乳牛舍: "tag tag-success",
+  干奶牛舍: "tag tag-info",
+  犊牛舍: "tag tag-warning",
+  隔离舍: "tag tag-danger",
+};
+
 const columns: ListColumn<Barn>[] = [
   { key: "id", label: "编号", required: true, render: (b) => <span className="font-mono text-body text-foreground">{b.id}</span> },
   {
@@ -33,7 +40,7 @@ const columns: ListColumn<Barn>[] = [
   },
   { key: "farm", label: "所属牧场", filter: "select", render: (b) => <span className="text-body-sm text-text-secondary">{b.farm}</span> },
   { key: "desc", label: "牛舍描述", render: (b) => <span className="text-body-sm text-text-secondary" title={b.desc}>{b.desc}</span> },
-  { key: "type", label: "类型", filter: "select", render: (b) => <span className="tag tag-muted">{b.type}</span> },
+  { key: "type", label: "类型", filter: "select", render: (b) => <span className={typeTone[b.type] ?? "tag tag-muted"}>{b.type}</span> },
   {
     key: "stock", label: "存栏只数", filter: "number", value: (b) => b.stock,
     render: (b) => <span className="tabular-nums text-body text-foreground">{b.stock}</span>,
