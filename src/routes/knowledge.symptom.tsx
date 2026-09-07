@@ -298,7 +298,7 @@ function SymptomKBPage() {
               </div>
             </div>
           )}
-          <SheetFooter className="mt-6 flex-row justify-end gap-2">
+          <SheetFooter className="p-6 border-t border-border bg-white flex-row justify-end gap-2">
             <Button variant="outline" onClick={() => setEditing(null)}>取消</Button>
             <Button className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground" onClick={saveEdit}>保存</Button>
           </SheetFooter>
