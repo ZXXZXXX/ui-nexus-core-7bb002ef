@@ -642,6 +642,15 @@ function DrugForm({
 
 /* ---------- 表单原子 ---------- */
 
+function SummaryItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className="text-body-sm text-foreground truncate mt-0.5">{value}</div>
+    </div>
+  );
+}
+
 function Section({
   title,
   hint,
@@ -653,18 +662,22 @@ function Section({
 }) {
   return (
     <section>
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-card-title text-foreground">{title}</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-card-title text-foreground flex items-center gap-2">
+          <span className="h-3.5 w-1 rounded-full bg-primary inline-block" />
+          {title}
+        </h3>
         {hint}
       </div>
-      <div className="rounded-md border border-border p-4">{children}</div>
+      <div className="rounded-xl border border-border px-4 py-4">{children}</div>
     </section>
   );
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-4 gap-y-3">{children}</div>;
+  return <div className="grid grid-cols-2 gap-x-5 gap-y-4">{children}</div>;
 }
+
 
 function Lbl({ label, required }: { label: string; required?: boolean }) {
   return (
