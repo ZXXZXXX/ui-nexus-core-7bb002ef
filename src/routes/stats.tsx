@@ -1905,7 +1905,7 @@ function StatsPage() {
                 <TableRow className="bg-surface-subtle/60">
                   <TableHead className="sticky left-0 z-30 min-w-[220px] bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">模板名称</TableHead>
                   <TableHead className="min-w-[280px]">计算方式</TableHead>
-                  <TableHead>维度</TableHead>
+                  
                   <TableHead className="text-right">条件数量</TableHead>
                   <TableHead className="text-right">使用次数</TableHead>
                   <TableHead>创建人</TableHead>
@@ -1940,22 +1940,6 @@ function StatsPage() {
                     </TableCell>
                     <TableCell className="text-body-sm text-text-secondary max-w-[420px]">
                       {t.formula ?? describeFilters(t.filters)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1.5 min-w-[180px]">
-                        {(t.dimensions ?? CATEGORY_DIMENSIONS[t.category]).map((dim) => (
-                          <span
-                            key={dim}
-                            className="inline-flex items-center px-2 py-0.5 rounded-md text-caption whitespace-nowrap"
-                            style={{
-                              background: `color-mix(in oklab, ${DIMENSION_TONE[dim]} 12%, transparent)`,
-                              color: DIMENSION_TONE[dim],
-                            }}
-                          >
-                            {DIMENSION_LABEL[dim]}
-                          </span>
-                        ))}
-                      </div>
                     </TableCell>
                     <TableCell className="text-right tabular-nums text-body-sm">
                       {countActive(t.filters)}
