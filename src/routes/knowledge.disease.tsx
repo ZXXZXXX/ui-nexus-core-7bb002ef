@@ -453,29 +453,30 @@ function DiseaseKBPage() {
       {/* 查看抽屉 */}
       <Sheet open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
-          <SheetHeader className="px-6 pt-6 pb-2">
-            <SheetTitle className="text-section-title flex items-baseline gap-2">
-              <span>{viewing?.name ?? "疾病详情"}</span>
-              {viewing?.code && <span className="text-body-sm font-normal text-text-tertiary font-mono">{viewing.code}</span>}
-            </SheetTitle>
+          <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white sticky top-0 z-10">
+            <div className="flex items-center justify-between gap-3">
+              <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+                <span className="truncate">{viewing?.name ?? "疾病详情"}</span>
+                {viewing?.code && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{viewing.code}</span>}
+              </SheetTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 mr-8"
+                onClick={() => {
+                  if (viewing) {
+                    setEditing({ ...viewing, aliases: [...viewing.aliases], groups: [...viewing.groups], symptoms: viewing.symptoms.map((s) => ({ ...s })), prescriptions: viewing.prescriptions.map((p) => ({ ...p })) });
+                    setViewing(null);
+                  }
+                }}
+              >
+                <Pencil className="h-3.5 w-3.5" /> 编辑
+              </Button>
+            </div>
           </SheetHeader>
-          <div className="flex-1 overflow-y-auto px-6 py-2 space-y-4">
+          <div className="flex-1 overflow-y-auto px-6 py-3 space-y-4">
             {viewing && <DetailView value={viewing} />}
           </div>
-          <SheetFooter className="p-6 border-t border-border bg-white flex-row justify-end gap-2">
-            <Button variant="outline" onClick={() => setViewing(null)}>关闭</Button>
-            <Button
-              className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-              onClick={() => {
-                if (viewing) {
-                  setEditing({ ...viewing, aliases: [...viewing.aliases], groups: [...viewing.groups], symptoms: viewing.symptoms.map((s) => ({ ...s })), prescriptions: viewing.prescriptions.map((p) => ({ ...p })) });
-                  setViewing(null);
-                }
-              }}
-            >
-              编辑
-            </Button>
-          </SheetFooter>
         </SheetContent>
       </Sheet>
 
