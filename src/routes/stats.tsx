@@ -1748,10 +1748,8 @@ function StatsPage() {
         <main className="flex-1 px-6 py-6 space-y-5 bg-white">
           <div>
             <div className="text-card-title font-medium text-foreground">指标板块</div>
-            <div className="text-caption text-text-tertiary mt-0.5">
-              共 {sectionCards.length} 个板块 · {templates.length} 个指标模板，选择板块查看其下全部指标
-            </div>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {sectionCards.map((sec) => {
               const Icon = sec.icon;
@@ -1831,10 +1829,8 @@ function StatsPage() {
               </Button>
               <div className="min-w-0">
                 <div className="text-card-title font-medium text-foreground">{sectionTitle}</div>
-                <div className="text-caption text-text-tertiary mt-0.5">
-                  共 {visibleTemplates.length} 个指标模板 · 支持时间、牧场、牛只、疾病、处方等多维度筛选
-                </div>
               </div>
+
             </div>
 
             <div className="flex items-center gap-2">
@@ -1929,9 +1925,11 @@ function StatsPage() {
                       >
                         查看结果
                       </Button>
-                      <Button size="sm" variant="ghost" className="h-8 px-2 hover:bg-transparent hover:font-semibold hover:text-text-primary" onClick={() => openBuilder(t)}>
-                        编辑
-                      </Button>
+                      {activeSection === "custom" && (
+                        <Button size="sm" variant="ghost" className="h-8 px-2 hover:bg-transparent hover:font-semibold hover:text-text-primary" onClick={() => openBuilder(t)}>
+                          编辑
+                        </Button>
+                      )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button size="sm" variant="ghost" className="h-8 w-8 p-0 text-text-tertiary hover:bg-transparent hover:text-text-primary">
