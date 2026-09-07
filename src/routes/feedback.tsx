@@ -310,8 +310,8 @@ function FeedbackAdminPage() {
                       : "text-text-tertiary hover:text-foreground"
                   }`}
                 >
+                  <ThumbsDown className={`h-4 w-4 ${r.verdict === "invalid" ? "fill-current" : ""}`} />
 
-                  <ThumbsDown className="h-3.5 w-3.5" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>{r.verdict === "invalid" ? "取消无价值" : "标为无价值"}</TooltipContent>
