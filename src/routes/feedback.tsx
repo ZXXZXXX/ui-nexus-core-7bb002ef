@@ -157,7 +157,7 @@ function FeedbackAdminPage() {
   };
 
   const requestMark = (id: string, current: Verdict, next: Verdict) => {
-    if (current === next) return mark(id, null);
+    if (current === next) return;
     if (current === null) return mark(id, next);
     setConfirming({ id, next });
   };
@@ -297,7 +297,7 @@ function FeedbackAdminPage() {
                   <ThumbsUp className={`h-4 w-4 ${r.verdict === "valuable" ? "fill-current" : ""}`} />
                 </button>
               </TooltipTrigger>
-              <TooltipContent>{r.verdict === "valuable" ? "取消有价值" : "标为有价值"}</TooltipContent>
+              <TooltipContent>标为有价值</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -314,7 +314,7 @@ function FeedbackAdminPage() {
 
                 </button>
               </TooltipTrigger>
-              <TooltipContent>{r.verdict === "invalid" ? "取消无价值" : "标为无价值"}</TooltipContent>
+              <TooltipContent>标为无价值</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         )}
@@ -408,7 +408,7 @@ function FeedbackAdminPage() {
                   onClick={() => requestMark(detail.id, detail.verdict, "invalid")}
                 >
                   <ThumbsDown className="h-3.5 w-3.5 mr-1.5" />
-                  {detail.verdict === "invalid" ? "取消无价值" : "标为无价值"}
+                  标为无价值
                 </Button>
                 <Button
                   variant="outline"
@@ -422,7 +422,7 @@ function FeedbackAdminPage() {
                   onClick={() => requestMark(detail.id, detail.verdict, "valuable")}
                 >
                   <ThumbsUp className="h-3.5 w-3.5 mr-1.5" />
-                  {detail.verdict === "valuable" ? "取消有价值" : "标为有价值"}
+                  标为有价值
                 </Button>
               </div>
             </>
