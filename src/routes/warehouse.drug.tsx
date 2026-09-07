@@ -710,7 +710,7 @@ function F({
   return (
     <div className={span2 ? "col-span-2" : ""}>
       {readOnly ? (
-        <div className="flex items-center gap-3 py-1.5 border-b border-border/60">
+        <div className="flex items-center gap-3 py-1.5">
           <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
           <span className={`text-body-sm text-foreground truncate ${mono ? "font-mono" : ""}`}>
             {value || <span className="text-text-tertiary">—</span>}
@@ -749,7 +749,7 @@ function FLong({
   return (
     <div className="col-span-2">
       {readOnly ? (
-        <div className="flex items-start gap-3 py-1.5 border-b border-border/60">
+        <div className="flex items-start gap-3 py-1.5">
           <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
           <span className="text-body-sm text-foreground whitespace-pre-wrap">
             {value || <span className="text-text-tertiary">—</span>}
@@ -788,7 +788,7 @@ function FSelect({
   return (
     <div>
       {readOnly ? (
-        <div className="flex items-center gap-3 py-1.5 border-b border-border/60">
+        <div className="flex items-center gap-3 py-1.5">
           <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
           <span className="text-body-sm text-foreground truncate">
             {value || <span className="text-text-tertiary">—</span>}
@@ -899,7 +899,7 @@ function VariableDoseEditor({
   return (
     <div className="col-span-2">
       {readOnly ? (
-        <div className="flex items-start gap-3 py-1.5 border-b border-border/60">
+        <div className="flex items-start gap-3 py-1.5">
           <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
           <span className="text-body-sm text-foreground whitespace-pre-wrap">
             {value || <span className="text-text-tertiary">—</span>}
@@ -1008,7 +1008,7 @@ function FrequencyEditor({
   return (
     <div>
       {readOnly ? (
-        <div className="flex items-center gap-3 py-1.5 border-b border-border/60">
+        <div className="flex items-center gap-3 py-1.5">
           <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
           <span className="text-body-sm text-foreground truncate">
             {value || <span className="text-text-tertiary">—</span>}
@@ -1077,7 +1077,7 @@ function FBool({
   required?: boolean;
 }) {
   return (
-    <div>
+    <div className="col-span-2">
       <Lbl label={label} required={required} />
       <div className="mt-1 h-9 flex items-center gap-2">
         <Switch checked={value} onCheckedChange={(v) => onChange?.(v)} disabled={readOnly} />
