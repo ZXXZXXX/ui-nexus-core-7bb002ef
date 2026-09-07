@@ -341,7 +341,7 @@ function AccountPage() {
         if (filterFarms.length > 0 && !filterFarms.some((f) => farmsOf(a).includes(f))) return false;
         if (filterStatus !== "all" && a.status !== filterStatus) return false;
         if (kw) {
-          const hay = `${a.name} ${a.phone} ${a.wecomId ?? ""} ${a.wechatId ?? ""}`.toLowerCase();
+          const hay = `${a.name} ${a.phone} ${a.wecomId ?? ""}`.toLowerCase();
           if (!hay.includes(kw)) return false;
         }
         return true;
@@ -352,8 +352,8 @@ function AccountPage() {
       });
   }, [accounts, keyword, onlyInternal, filterRole, filterFarms, filterStatus]);
 
-  // 列宽：勾选 用户 类型 手机号 角色 关联牧场 企微ID 微信ID 状态 管理
-  const cols = "40px 1.5fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 140px 0.7fr 0.5fr";
+  // 列宽：勾选 用户 类型 手机号 角色 关联牧场 企微ID 状态 管理
+  const cols = "40px 1.5fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 0.7fr 0.5fr";
 
   const visibleIds = filteredAccounts.map((a) => a.id);
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
@@ -379,7 +379,7 @@ function AccountPage() {
               <Input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder="搜索姓名 / 手机号 / 企微 / 微信 ID"
+                placeholder="搜索姓名 / 手机号 / 企微 ID"
                 className="h-9 w-72 pl-9 text-body-sm"
               />
             </div>
@@ -546,7 +546,7 @@ function AccountPage() {
             <div>角色</div>
             <div>关联牧场</div>
             <div>企微 ID</div>
-            <div>微信 ID</div>
+            
             <div>状态</div>
             <div className="text-right">管理</div>
 
@@ -608,13 +608,6 @@ function AccountPage() {
               <div className="text-body-sm tabular-nums min-w-0 overflow-hidden">
                 {a.wecomId ? (
                   <span className="block truncate text-text-secondary font-mono" title="已脱敏显示">{maskId(a.wecomId)}</span>
-                ) : (
-                  <span className="tag tag-muted">未绑定</span>
-                )}
-              </div>
-              <div className="text-body-sm tabular-nums min-w-0 overflow-hidden">
-                {a.wechatId ? (
-                  <span className="block truncate text-text-secondary font-mono" title="已脱敏显示">{maskId(a.wechatId)}</span>
                 ) : (
                   <span className="tag tag-muted">未绑定</span>
                 )}
@@ -1206,13 +1199,6 @@ function AccountDrawerInner({
               editable={editable}
               onUnbind={() => setWecomId(null)}
               hint={editable && !wecomId && account.wecomId ? "保存后该用户需重新通过企业微信扫码绑定" : null}
-            />
-            <BindRow
-              label="微信 ID"
-              value={editable ? wechatId : account.wechatId}
-              editable={editable}
-              onUnbind={() => setWechatId(null)}
-              hint={editable && !wechatId && account.wechatId ? "保存后该用户需重新通过微信扫码绑定" : null}
             />
           </div>
         </section>
