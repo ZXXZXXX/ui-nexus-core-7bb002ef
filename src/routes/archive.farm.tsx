@@ -50,7 +50,7 @@ const columns: ListColumn<Farm>[] = [
   { key: "manager", label: "负责人", filter: "select", render: (f) => <span className="text-body-sm text-text-secondary">{f.manager}</span> },
   {
     key: "status", label: "状态", filter: "select",
-    render: (f) => <span className={`tag ${f.status === "运营中" ? "tag-success" : "tag-warning"}`}>{f.status}</span>,
+    render: (f) => <span className={`tag ${f.status === "运营中" ? "tag-success" : "tag-muted"}`}>{f.status}</span>,
   },
 ];
 
