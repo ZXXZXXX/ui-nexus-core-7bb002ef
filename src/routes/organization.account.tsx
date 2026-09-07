@@ -1207,13 +1207,6 @@ function AccountDrawerInner({
               onUnbind={() => setWecomId(null)}
               hint={editable && !wecomId && account.wecomId ? "保存后该用户需重新通过企业微信扫码绑定" : null}
             />
-            <BindRow
-              label="微信 ID"
-              value={editable ? wechatId : account.wechatId}
-              editable={editable}
-              onUnbind={() => setWechatId(null)}
-              hint={editable && !wechatId && account.wechatId ? "保存后该用户需重新通过微信扫码绑定" : null}
-            />
           </div>
         </section>
       </div>
