@@ -612,13 +612,6 @@ function AccountPage() {
                   <span className="tag tag-muted">未绑定</span>
                 )}
               </div>
-              <div className="text-body-sm tabular-nums min-w-0 overflow-hidden">
-                {a.wechatId ? (
-                  <span className="block truncate text-text-secondary font-mono" title="已脱敏显示">{maskId(a.wechatId)}</span>
-                ) : (
-                  <span className="tag tag-muted">未绑定</span>
-                )}
-              </div>
 
 
               <div><span className={`tag ${a.status === "启用" ? "tag-success" : "tag-muted"}`}>{a.status}</span></div>
