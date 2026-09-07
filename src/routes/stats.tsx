@@ -1748,10 +1748,8 @@ function StatsPage() {
         <main className="flex-1 px-6 py-6 space-y-5 bg-white">
           <div>
             <div className="text-card-title font-medium text-foreground">指标板块</div>
-            <div className="text-caption text-text-tertiary mt-0.5">
-              共 {sectionCards.length} 个板块 · {templates.length} 个指标模板，选择板块查看其下全部指标
-            </div>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {sectionCards.map((sec) => {
               const Icon = sec.icon;
