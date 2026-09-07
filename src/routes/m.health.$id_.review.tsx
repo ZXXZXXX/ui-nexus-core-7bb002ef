@@ -11,6 +11,13 @@ import {
 import { MobileShell } from "@/components/mobile-shell";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { MediaGrid } from "@/components/m/media-grid";
+import {
+  CowAnglePhotos,
+  emptyAnglePhotos,
+  anglePhotosDone,
+  type AnglePhotos,
+} from "@/components/m/cow-angle-photos";
+import { RelatedOrderCard, type RelatedOrder } from "@/components/related-order-picker";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
 import { ConfirmAbortDialog } from "@/components/m/confirm-abort-dialog";
 import { ConfirmRevisitDialog } from "@/components/m/confirm-revisit-dialog";
