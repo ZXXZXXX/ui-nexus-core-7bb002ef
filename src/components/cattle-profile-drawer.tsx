@@ -433,7 +433,12 @@ export function CattleProfileDrawer({
           <Panel title="外接设备" icon={<Watch className="h-4 w-4 text-primary" />} bodyClassName="p-3">
             <div className="grid grid-cols-2 gap-3">
               {DEVICES.map((d) => (
-                <div key={d.id} className="rounded-xl bg-muted/50 px-3 py-2.5 flex items-center gap-2.5">
+                <button
+                  type="button"
+                  key={d.id}
+                  onClick={() => setActiveDevice(d)}
+                  className="w-full text-left rounded-xl bg-muted/50 px-3 py-2.5 flex items-center gap-2.5 hover:bg-muted transition-colors"
+                >
                   <span
                     className={`h-8 w-8 rounded-lg inline-flex items-center justify-center shrink-0 ${
                       d.status === "异常" ? "bg-[#FFF1F0] text-[#CF1322]" : "bg-brand-subtle text-primary"
@@ -452,8 +457,10 @@ export function CattleProfileDrawer({
                   >
                     {d.status}
                   </span>
-                </div>
+                  <ChevronRight className="h-4 w-4 text-text-tertiary shrink-0" />
+                </button>
               ))}
+
             </div>
           </Panel>
 
