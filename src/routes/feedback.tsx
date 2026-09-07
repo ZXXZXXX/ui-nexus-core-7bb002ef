@@ -288,13 +288,13 @@ function FeedbackAdminPage() {
                 <button
                   aria-label="标为有价值"
                   onClick={() => requestMark(r.id, r.verdict, "valuable")}
-                  className={`h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${
+                  className={`h-8 w-8 flex items-center justify-center transition-colors ${
                     r.verdict === "valuable"
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border text-text-secondary hover:border-primary hover:text-primary"
+                      ? "text-primary"
+                      : "text-text-tertiary hover:text-primary"
                   }`}
                 >
-                  <ThumbsUp className="h-3.5 w-3.5" />
+                  <ThumbsUp className={`h-4 w-4 ${r.verdict === "valuable" ? "fill-current" : ""}`} />
                 </button>
               </TooltipTrigger>
               <TooltipContent>{r.verdict === "valuable" ? "取消有价值" : "标为有价值"}</TooltipContent>
@@ -304,12 +304,13 @@ function FeedbackAdminPage() {
                 <button
                   aria-label="标为无价值"
                   onClick={() => requestMark(r.id, r.verdict, "invalid")}
-                  className={`ml-1 h-8 w-8 rounded-md border flex items-center justify-center transition-colors ${
+                  className={`ml-1 h-8 w-8 flex items-center justify-center transition-colors ${
                     r.verdict === "invalid"
-                      ? "border-transparent text-white [background-color:var(--text-tertiary)]"
-                      : "border-border text-text-secondary hover:border-text-secondary hover:text-foreground"
+                      ? "[color:var(--text-tertiary)]"
+                      : "text-text-tertiary hover:text-foreground"
                   }`}
                 >
+
                   <ThumbsDown className="h-3.5 w-3.5" />
                 </button>
               </TooltipTrigger>
