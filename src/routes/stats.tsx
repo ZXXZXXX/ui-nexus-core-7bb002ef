@@ -1520,7 +1520,8 @@ function StatsPage() {
                       onMax={(v) => set("rxCostMax", v)}
                     />
                   </div>
-                </div>
+                </SubSection>
+
               </div>
 
             </Dimension>
