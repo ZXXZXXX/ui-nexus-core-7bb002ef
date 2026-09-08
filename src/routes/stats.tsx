@@ -1131,31 +1131,8 @@ function StatsPage() {
             )}
           </div>
 
-          {/* 时间维度 */}
-          <Dimension icon={CalendarDays} title="时间维度" tone="var(--brand)">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FieldBlock label="时间范围">
-                <Select value={filters.dateRange} onValueChange={(v) => set("dateRange", v)}>
-                  <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {DATE_PRESETS.map((d) => (
-                      <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FieldBlock>
-              {filters.dateRange === "custom" && (
-                <>
-                  <FieldBlock label="开始日期">
-                    <Input type="date" value={filters.dateStart} onChange={(e) => set("dateStart", e.target.value)} className="h-9 bg-white" />
-                  </FieldBlock>
-                  <FieldBlock label="结束日期">
-                    <Input type="date" value={filters.dateEnd} onChange={(e) => set("dateEnd", e.target.value)} className="h-9 bg-white" />
-                  </FieldBlock>
-                </>
-              )}
-            </div>
-          </Dimension>
+
+
 
 
 
