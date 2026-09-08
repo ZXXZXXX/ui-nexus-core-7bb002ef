@@ -131,7 +131,7 @@ const columns: ListColumn<Row>[] = [
   { key: "expiry", label: "效期", filter: "date", render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.expiry}</span> },
   { key: "purchaseDate", label: "采购时间", filter: "date", render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.purchaseDate}</span> },
   {
-    key: "price", label: "单价", filter: "number", value: (i) => i.price,
+    key: "price", label: "单价", filter: "number", align: "right", value: (i) => i.price,
     render: (i) => (
       <span className="text-body-sm tabular-nums text-text-secondary">¥{i.price.toFixed(4)}</span>
     ),
