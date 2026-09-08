@@ -896,6 +896,8 @@ function StatsPage() {
   const [resultMetric, setResultMetric] = useState<Template | null>(null);
   const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
   const [query, setQuery] = useState("");
   const todayStr = new Date().toISOString().slice(0, 10);
   const [rangeFrom, setRangeFrom] = useState("");
