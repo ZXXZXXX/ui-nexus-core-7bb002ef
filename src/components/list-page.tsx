@@ -415,7 +415,7 @@ export function ListPage<T>({
           <div className="flex items-center gap-4 px-6 h-12 text-table-header text-text-secondary border-b border-border bg-surface-subtle">
             <div className="grid gap-4 flex-1 min-w-0" style={gridStyle}>
               {shown.map((c) => (
-                <div key={c.key} className="truncate">
+                <div key={c.key} className={`truncate ${c.align === "right" ? "text-right" : ""}`}>
                   {c.label}
                 </div>
               ))}
