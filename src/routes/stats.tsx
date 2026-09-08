@@ -2122,9 +2122,10 @@ function RangeField({
   const presets = RANGE_PRESETS[unit] ?? RANGE_PRESETS["次"];
   const current = `${min}|${max}`;
   const value = presets.some((p) => p.value === current) ? current : "|";
+  const active = value !== "|";
   return (
-    <div>
-      <Label className="text-body-sm text-text-secondary mb-1.5 block">{label}</Label>
+    <div className="space-y-1.5">
+      <Label className="text-caption font-medium text-text-secondary block">{label}</Label>
       <Select
         value={value}
         onValueChange={(v) => {
@@ -2133,7 +2134,11 @@ function RangeField({
           onMax(hi);
         }}
       >
-        <SelectTrigger className="h-9 bg-white"><SelectValue /></SelectTrigger>
+        <SelectTrigger
+          className={`h-9 bg-white rounded-lg ${active ? "border-primary/40 bg-brand-subtle text-primary font-medium" : ""}`}
+        >
+          <SelectValue />
+        </SelectTrigger>
         <SelectContent>
           {presets.map((p) => (
             <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
@@ -2143,6 +2148,7 @@ function RangeField({
     </div>
   );
 }
+
 
 
 function FieldBlock({ label, children }: { label: string; children: React.ReactNode }) {
