@@ -1007,13 +1007,6 @@ function StatsPage() {
     setSaveDesc("");
   };
 
-  const toggleFreeze = (id: string) => {
-    const nextFrozen = !(templates.find((t) => t.id === id)?.frozen);
-    setTemplates((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, frozen: nextFrozen } : t)),
-    );
-    toast.success(nextFrozen ? "模板已冻结" : "模板已解冻");
-  };
 
   const toggleFav = (id: string) => {
     setTemplates((prev) =>
