@@ -1655,17 +1655,7 @@ function StatsPage() {
           )}
         </div>
 
-        <div className="border-t border-border px-6 py-4 flex items-center gap-3 bg-white">
-          <Button
-            className="h-10 px-5 bg-primary hover:bg-[var(--brand-hover)]"
-            onClick={() => {
-              setDrawerOpen(false);
-              runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`, cat);
-            }}
-          >
-            <Filter className="h-4 w-4 mr-1.5" />
-            查看筛选结果
-          </Button>
+        <div className="border-t border-border px-6 py-4 flex items-center justify-end gap-3 bg-white">
           {editingId ? (
             <Button variant="outline" className="h-10 px-5" onClick={() => { saveEdits(); setDrawerOpen(false); }}>
               <Save className="h-4 w-4 mr-1.5" />
@@ -1677,10 +1667,18 @@ function StatsPage() {
               保存为模板
             </Button>
           )}
-          <Button variant="ghost" className="h-10 px-5 ml-auto" onClick={() => setDrawerOpen(false)}>
-            取消
+          <Button
+            className="h-10 px-5 bg-primary hover:bg-[var(--brand-hover)]"
+            onClick={() => {
+              setDrawerOpen(false);
+              runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`, cat);
+            }}
+          >
+            <Filter className="h-4 w-4 mr-1.5" />
+            查看筛选结果
           </Button>
         </div>
+
       </SheetContent>
     </Sheet>
   );
