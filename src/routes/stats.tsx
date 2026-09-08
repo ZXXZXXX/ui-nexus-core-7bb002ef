@@ -1125,7 +1125,7 @@ function StatsPage() {
       <SheetContent side="right" className="bg-white w-full sm:max-w-[760px] p-0 flex flex-col">
         <SheetHeader className="px-6 py-4 border-b border-border">
           <SheetTitle>
-            {editingTemplate ? `编辑模板：${editingTemplate.name}` : `新建筛选 · ${TPL_CATEGORY_LABEL[cat]}分析`}
+            {editingTemplate ? "编辑模板" : `新建筛选 · ${TPL_CATEGORY_LABEL[cat]}分析`}
           </SheetTitle>
           <div className="text-caption text-text-tertiary mt-0.5">
             {CATEGORY_CARDS.find((c) => c.key === cat)?.desc}
@@ -1133,6 +1133,17 @@ function StatsPage() {
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          {editingTemplate && (
+            <div>
+              <Label className="text-body-sm">模板名称</Label>
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="请输入模板名称"
+                className="mt-1.5 h-9 bg-white"
+              />
+            </div>
+          )}
           <div className="flex items-center justify-end">
             {activeCount > 0 && (
               <button
@@ -1143,6 +1154,7 @@ function StatsPage() {
               </button>
             )}
           </div>
+
 
 
 
