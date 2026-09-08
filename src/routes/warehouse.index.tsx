@@ -133,7 +133,7 @@ const columns: ListColumn<Row>[] = [
   {
     key: "price", label: "单价", filter: "number", align: "right", value: (i) => i.price,
     render: (i) => (
-      <span className="text-body-sm tabular-nums text-text-secondary">¥{i.price.toFixed(4)}</span>
+      <span className="text-body-sm tabular-nums text-text-secondary">¥{i.price.toFixed(2)}</span>
     ),
   },
   {
