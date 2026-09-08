@@ -1132,7 +1132,7 @@ function StatsPage() {
           </div>
         </SheetHeader>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        <div className="flex-1 overflow-y-auto bg-surface-muted/40 px-6 py-5 space-y-5">
           {editingTemplate && (
             <div>
               <Label className="text-body-sm">模板名称</Label>
