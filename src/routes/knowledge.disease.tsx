@@ -670,7 +670,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 w-7 p-0 text-text-tertiary hover:text-[var(--state-danger)]"
+                className="h-7 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
                 onClick={() => onChange({ ...value, symptoms: value.symptoms.filter((_, i) => i !== idx) })}
                 aria-label="移除症状"
               >
@@ -742,7 +742,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 w-7 p-0 text-text-tertiary hover:text-[var(--state-danger)]"
+                  className="h-7 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
                   onClick={() => onChange({ ...value, prescriptions: value.prescriptions.filter((_, i) => i !== idx) })}
                   aria-label="移除处方"
                 >

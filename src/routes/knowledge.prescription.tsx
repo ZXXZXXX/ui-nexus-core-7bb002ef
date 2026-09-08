@@ -918,7 +918,7 @@ function DrugDetailRow({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-7 w-7 p-0 text-text-tertiary hover:text-[var(--state-danger)]"
+          className="h-7 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
           onClick={onRemove}
         >
           删除
@@ -1221,7 +1221,7 @@ function TaskDetailRow({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-6 w-6 p-0 text-text-tertiary hover:text-[var(--state-danger)]"
+          className="h-6 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
           onClick={onRemove}
         >
           删除
@@ -1536,7 +1536,6 @@ function MultiDrugPicker({
             size="sm"
             className="h-8 gap-1 border-dashed text-body-sm font-normal text-text-secondary"
           >
-            {""}
             {value.length === 0 ? "选择药品" : "添加替代药品"}
           </Button>
         </PopoverTrigger>
