@@ -1150,7 +1150,7 @@ function StatsPage() {
                 onClick={() => setFilters(DEFAULT_FILTERS)}
                 className="text-caption text-text-tertiary hover:text-foreground inline-flex items-center gap-1"
               >
-                <X className="h-3 w-3" /> 清空条件（{activeCount}）
+                清空条件（{activeCount}）
               </button>
             )}
           </div>
