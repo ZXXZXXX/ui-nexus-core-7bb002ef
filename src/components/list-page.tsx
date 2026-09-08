@@ -38,6 +38,8 @@ export type ListColumn<T> = {
   filter?: "text" | "select" | "number" | "date" | "none";
   /** options for select filter; auto-derived from data when omitted */
   options?: string[];
+  /** horizontal alignment of header + cell. default: left */
+  align?: "left" | "right";
   /** hidden by default in column settings */
   defaultHidden?: boolean;
   /** cannot be hidden */
@@ -413,7 +415,7 @@ export function ListPage<T>({
           <div className="flex items-center gap-4 px-6 h-12 text-table-header text-text-secondary border-b border-border bg-surface-subtle">
             <div className="grid gap-4 flex-1 min-w-0" style={gridStyle}>
               {shown.map((c) => (
-                <div key={c.key} className="truncate">
+                <div key={c.key} className={`truncate ${c.align === "right" ? "text-right" : ""}`}>
                   {c.label}
                 </div>
               ))}
@@ -439,7 +441,7 @@ export function ListPage<T>({
             >
               <div className="grid gap-4 flex-1 min-w-0" style={gridStyle}>
                 {shown.map((c) => (
-                  <div key={c.key} className={`min-w-0 truncate ${c.className ?? ""}`}>
+                  <div key={c.key} className={`min-w-0 truncate ${c.align === "right" ? "text-right" : ""} ${c.className ?? ""}`}>
                     {c.render ? c.render(row) : <span className="text-body text-foreground">{raw(c, row)}</span>}
                   </div>
                 ))}

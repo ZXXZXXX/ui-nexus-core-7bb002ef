@@ -279,7 +279,7 @@ function DrugArchivePage() {
     },
     { key: "spec", label: "规格型号", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.spec}</span> },
     {
-      key: "price", label: "单价", filter: "number", value: (d) => d.price,
+      key: "price", label: "单价", filter: "number", align: "right", value: (d) => d.price,
       render: (d) => <span className="text-body-sm tabular-nums text-text-secondary">¥{(d.price ?? 0).toFixed(4)}</span>,
     },
     { key: "drugType", label: "类型", filter: "select", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.drugType}</span> },
