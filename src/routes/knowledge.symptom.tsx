@@ -316,7 +316,7 @@ function SymptomKBPage() {
                 className="shrink-0 mr-8"
                 onClick={() => { if (viewing) { setEditing({ ...viewing }); setViewing(null); } }}
               >
-                <Pencil className="h-3.5 w-3.5" /> 编辑
+                编辑
               </Button>
             </div>
           </SheetHeader>

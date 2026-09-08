@@ -470,7 +470,7 @@ function DiseaseKBPage() {
                   }
                 }}
               >
-                <Pencil className="h-3.5 w-3.5" /> 编辑
+                编辑
               </Button>
             </div>
           </SheetHeader>
@@ -674,7 +674,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
                 onClick={() => onChange({ ...value, symptoms: value.symptoms.filter((_, i) => i !== idx) })}
                 aria-label="移除症状"
               >
-                <X className="h-3.5 w-3.5" />
+                移除
               </Button>
             </div>
           ))}
@@ -689,7 +689,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
               })
             }
           >
-            <Plus className="h-3.5 w-3.5" /> 关联症状
+            关联症状
           </Button>
         </div>
       </SectionCard>
@@ -746,7 +746,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
                   onClick={() => onChange({ ...value, prescriptions: value.prescriptions.filter((_, i) => i !== idx) })}
                   aria-label="移除处方"
                 >
-                  <X className="h-3.5 w-3.5" />
+                  移除
                 </Button>
               </div>
             ))}
