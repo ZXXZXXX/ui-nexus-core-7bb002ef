@@ -1874,7 +1874,7 @@ function StatsPage() {
               </TableHeader>
               <TableBody>
                 {visibleTemplates.map((t) => (
-                  <TableRow key={t.id} className="group">
+                  <TableRow key={t.id} className="group hover:bg-transparent data-[state=selected]:bg-transparent">
                     <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[var(--bg-surface-subtle)] group-data-[state=selected]:bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">
                       <div className="flex items-center gap-2 min-w-0">
                         <button
@@ -2017,7 +2017,7 @@ function StatsPage() {
               </TableHeader>
               <TableBody>
                 {resultMetric ? aggregatedMetricRows.map((r) => (
-                  <TableRow key={r.id} className="group">
+                  <TableRow key={r.id} className="group hover:bg-transparent data-[state=selected]:bg-transparent">
                     <TableCell className="text-body-sm font-medium text-foreground whitespace-nowrap sticky left-0 z-10 bg-white group-hover:bg-[var(--bg-surface-subtle)] group-data-[state=selected]:bg-[var(--bg-surface-subtle)] shadow-[1px_0_0_0_var(--border)]">{r.farm}</TableCell>
                     <TableCell className="text-body-sm text-text-secondary">
                       <span className="tabular-nums text-foreground">{r.numerator.toLocaleString()}</span>
@@ -2030,7 +2030,7 @@ function StatsPage() {
                     <TableCell className="text-right text-body-sm font-medium tabular-nums text-foreground">{r.value}</TableCell>
                   </TableRow>
                 )) : filteredRows.map((r) => (
-                    <TableRow key={r.id} className="group">
+                    <TableRow key={r.id} className="group hover:bg-transparent data-[state=selected]:bg-transparent">
                       {resultCols.map((c, i) => (
                         <TableCell
                           key={c.key}
