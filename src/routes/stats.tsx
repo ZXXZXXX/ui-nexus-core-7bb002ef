@@ -18,7 +18,6 @@ import {
   X,
   Check,
   Plus,
-  Building2,
   MoreHorizontal,
   CalendarDays,
   Users,
