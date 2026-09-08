@@ -1659,12 +1659,10 @@ function StatsPage() {
         <div className="border-t border-border px-6 py-4 flex items-center justify-end gap-3 bg-white">
           {editingId ? (
             <Button variant="outline" className="h-10 px-5" onClick={() => { saveEdits(); setDrawerOpen(false); }}>
-              <Save className="h-4 w-4 mr-1.5" />
               保存模板修改
             </Button>
           ) : (
             <Button variant="outline" className="h-10 px-5" onClick={() => openSave(filters)}>
-              <Save className="h-4 w-4 mr-1.5" />
               保存为模板
             </Button>
           )}
@@ -1675,9 +1673,9 @@ function StatsPage() {
               runFilter(filters, editingTemplate ? editingTemplate.name : `${TPL_CATEGORY_LABEL[cat]}分析结果`, cat);
             }}
           >
-            <Filter className="h-4 w-4 mr-1.5" />
             查看筛选结果
           </Button>
+
         </div>
 
       </SheetContent>
