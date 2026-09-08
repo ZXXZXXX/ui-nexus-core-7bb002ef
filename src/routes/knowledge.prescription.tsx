@@ -574,7 +574,7 @@ function PrescriptionPage() {
                   }
                 }}
               >
-                <Pencil className="h-3.5 w-3.5" /> 编辑
+                编辑
               </Button>
             </div>
           </SheetHeader>
@@ -825,7 +825,7 @@ function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) =>
               className="h-7 gap-1 text-body-sm font-normal"
               onClick={addDrug}
             >
-              <Plus className="h-3.5 w-3.5" /> 添加
+              添加
             </Button>
           }
         >
@@ -859,7 +859,7 @@ function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) =>
               className="h-7 gap-1 text-body-sm font-normal"
               onClick={addTask}
             >
-              <Plus className="h-3.5 w-3.5" /> 添加
+              添加
             </Button>
           }
         >
@@ -918,10 +918,10 @@ function DrugDetailRow({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-7 w-7 p-0 text-text-tertiary hover:text-[var(--state-danger)]"
+          className="h-7 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
           onClick={onRemove}
         >
-          <Trash2 className="h-4 w-4" />
+          删除
         </Button>
       </div>
 
@@ -1221,10 +1221,10 @@ function TaskDetailRow({
           type="button"
           variant="ghost"
           size="sm"
-          className="h-6 w-6 p-0 text-text-tertiary hover:text-[var(--state-danger)]"
+          className="h-6 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
           onClick={onRemove}
         >
-          <Trash2 className="h-3.5 w-3.5" />
+          删除
         </Button>
       </div>
 
@@ -1536,7 +1536,6 @@ function MultiDrugPicker({
             size="sm"
             className="h-8 gap-1 border-dashed text-body-sm font-normal text-text-secondary"
           >
-            <Plus className="h-3.5 w-3.5" />
             {value.length === 0 ? "选择药品" : "添加替代药品"}
           </Button>
         </PopoverTrigger>
@@ -1746,7 +1745,7 @@ function VariableDoseTable({
         className="inline-flex items-center gap-1 h-9 px-2 text-body-sm text-primary hover:underline"
       >
 
-        <Plus className="h-3.5 w-3.5" /> 添加区间
+        添加区间
       </button>
     </div>
   );
