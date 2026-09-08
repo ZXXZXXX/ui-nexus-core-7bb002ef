@@ -1460,9 +1460,9 @@ function StatsPage() {
                   );
                 })()}
 
-                <div className="pt-1 space-y-3">
-                  <div className="text-body-sm text-text-secondary">指标区间（留空表示不限）</div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <SubSection title="指标区间" hint="（留空表示不限）">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
+
                     <RangeField
                       label="发病头数"
                       unit="头"
