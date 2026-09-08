@@ -962,9 +962,18 @@ function StatsPage() {
 
   const saveEdits = () => {
     if (!editingId) return;
+    if (!editName.trim()) {
+      toast.error("请输入模板名称");
+      return;
+    }
     setTemplates((prev) =>
-      prev.map((t) => (t.id === editingId ? { ...t, filters: { ...filters }, desc: describeFilters(filters) } : t)),
+      prev.map((t) =>
+        t.id === editingId
+          ? { ...t, name: editName.trim(), filters: { ...filters }, desc: describeFilters(filters) }
+          : t,
+      ),
     );
+
     toast.success("模板已更新");
     setView("templates");
     setEditingId(null);
