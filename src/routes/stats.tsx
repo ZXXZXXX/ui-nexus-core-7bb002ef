@@ -1158,43 +1158,8 @@ function StatsPage() {
             </div>
           </Dimension>
 
-          {/* 牧场维度 */}
-          {showDim("farm") && (
-            <Dimension icon={Building2} title="牧场维度" tone="var(--effect-ai-purple)">
-              <div className="space-y-4">
-                {cat !== "staff" && (
-                  <FieldBlock label="区域">
-                    <Select value={filters.region} onValueChange={(v) => set("region", v)}>
-                      <SelectTrigger className="h-9 bg-white max-w-[240px]"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {REGION_OPTIONS.map((d) => (
-                          <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FieldBlock>
-                )}
-                <ChipGroup
-                  label="牧场（可多选）"
-                  options={
-                    filters.region === "all"
-                      ? FARM_NAMES
-                      : FARM_NAMES.filter((n) => REGION_OF[n] === filters.region)
-                  }
-                  selected={filters.farms}
-                  onToggle={(v) => toggleIn("farms", v)}
-                />
-                {cat !== "staff" && (
-                  <ChipGroup
-                    label="牛舍（可多选）"
-                    options={BARN_NAMES}
-                    selected={filters.barns}
-                    onToggle={(v) => toggleIn("barns", v)}
-                  />
-                )}
-              </div>
-            </Dimension>
-          )}
+
+
 
           {/* 牛只维度 */}
           {showDim("cattle") && (
