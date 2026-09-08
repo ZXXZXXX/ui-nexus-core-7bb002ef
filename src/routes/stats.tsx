@@ -504,7 +504,7 @@ type Template = {
   tone: string;
   filters: Filters;
   favorite?: boolean;
-  frozen?: boolean;
+  
   usage?: number;
   creator: string;
   createdAt: string;
