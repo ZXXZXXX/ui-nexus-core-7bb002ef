@@ -2247,14 +2247,7 @@ function countActive(f: Filters): number {
 
 function describeFilters(f: Filters): string {
   const parts: string[] = [];
-  if (f.dateRange === "custom" && (f.dateStart || f.dateEnd)) {
-    parts.push(`${f.dateStart || "不限"} ~ ${f.dateEnd || "不限"}`);
-  } else {
-    parts.push(DATE_PRESETS.find((d) => d.value === f.dateRange)?.label || "");
-  }
-  if (f.region !== "all") parts.push(f.region);
-  parts.push(f.farms.length ? `牧场 ${f.farms.join("、")}` : "全部牧场");
-  if (f.barns.length) parts.push(`牛舍 ${f.barns.join("、")}`);
+
   if (f.role !== "all") parts.push(ROLE_OPTIONS.find((d) => d.value === f.role)?.label || "");
   if (f.operators.length) parts.push(`人员 ${f.operators.join("、")}`);
   if (f.perfTypes.length) parts.push(`绩效 ${f.perfTypes.join("、")}`);
