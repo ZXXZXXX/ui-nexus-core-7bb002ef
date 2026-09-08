@@ -730,6 +730,7 @@ function F({
   label,
   value,
   onChange,
+  onBlur,
   readOnly,
   required,
   placeholder,
@@ -739,6 +740,7 @@ function F({
   label: string;
   value: string;
   onChange?: (v: string) => void;
+  onBlur?: () => void;
   readOnly?: boolean;
   required?: boolean;
   placeholder?: string;
@@ -760,6 +762,7 @@ function F({
         <Input
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
           className={`h-9 mt-1 text-body-sm ${mono ? "font-mono" : ""}`}
         />
