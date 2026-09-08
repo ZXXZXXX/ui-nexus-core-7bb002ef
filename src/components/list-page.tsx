@@ -441,7 +441,7 @@ export function ListPage<T>({
             >
               <div className="grid gap-4 flex-1 min-w-0" style={gridStyle}>
                 {shown.map((c) => (
-                  <div key={c.key} className={`min-w-0 truncate ${c.className ?? ""}`}>
+                  <div key={c.key} className={`min-w-0 truncate ${c.align === "right" ? "text-right" : ""} ${c.className ?? ""}`}>
                     {c.render ? c.render(row) : <span className="text-body text-foreground">{raw(c, row)}</span>}
                   </div>
                 ))}
