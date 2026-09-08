@@ -432,10 +432,10 @@ const DIMENSION_TONE: Record<DimensionKey, string> = {
 };
 
 const CATEGORY_DIMENSIONS: Record<TplCategory, DimensionKey[]> = {
-  cattle: ["farm", "cattle"],
-  disease: ["farm", "disease"],
-  drug: ["farm", "drug"],
-  staff: ["farm", "staff"],
+  cattle: ["cattle"],
+  disease: ["disease"],
+  drug: ["drug"],
+  staff: ["staff"],
 };
 
 const SECTION_CATEGORY: Record<string, TplCategory> = {
