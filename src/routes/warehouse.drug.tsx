@@ -280,7 +280,7 @@ function DrugArchivePage() {
     { key: "spec", label: "规格型号", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.spec}</span> },
     {
       key: "price", label: "单价", filter: "number", value: (d) => d.price,
-      render: (d) => <span className="text-body-sm tabular-nums text-text-secondary">¥{(d.price ?? 0).toFixed(3)}</span>,
+      render: (d) => <span className="text-body-sm tabular-nums text-text-secondary">¥{(d.price ?? 0).toFixed(4)}</span>,
     },
     { key: "drugType", label: "类型", filter: "select", render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.drugType}</span> },
     {
@@ -402,7 +402,7 @@ function DrugForm({
   const readOnly = mode === "view";
   const [d, setD] = useState<Drug>(value);
   const [confirmPrice, setConfirmPrice] = useState(false);
-  const [priceText, setPriceText] = useState(() => (value.price ?? 0).toFixed(3));
+  const [priceText, setPriceText] = useState(() => (value.price ?? 0).toFixed(4));
   const [priceEffectiveFrom, setPriceEffectiveFrom] = useState(
     () => new Date().toISOString().slice(0, 10),
   );
@@ -412,7 +412,7 @@ function DrugForm({
     <div className="px-6 py-5 space-y-6">
       {/* 顶部摘要条 */}
       <div className="rounded-xl border border-border bg-surface-subtle px-4 py-3 grid grid-cols-3 gap-3">
-        <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(3)}`} />
+        <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(4)}`} />
         <SummaryItem label="规格型号" value={d.spec || "—"} />
         <SummaryItem label="休药期" value={d.withdraw || "—"} />
       </div>
@@ -487,16 +487,16 @@ function DrugForm({
             onChange={(v) => {
               const t = v.replace(/[^\d.]/g, "");
               const [i0, f0 = ""] = t.split(".");
-              const next = t.includes(".") ? `${i0}.${f0.slice(0, 3)}` : i0;
+              const next = t.includes(".") ? `${i0}.${f0.slice(0, 4)}` : i0;
               setPriceText(next);
               patch({ price: Number(next) || 0 });
             }}
             onBlur={() => {
               const n = Number(priceText) || 0;
-              setPriceText(n.toFixed(3));
-              patch({ price: Number(n.toFixed(3)) });
+              setPriceText(n.toFixed(4));
+              patch({ price: Number(n.toFixed(4)) });
             }}
-            placeholder="如：186.000"
+            placeholder="如：186.0000"
           />
           <FSelect
             label="默认用药单位"
@@ -642,7 +642,7 @@ function DrugForm({
           <AlertDialogHeader>
             <AlertDialogTitle>确认修改单价？</AlertDialogTitle>
             <AlertDialogDescription>
-              该日期之后采购入库的本药品，都会以最新单价（¥{(d.price ?? 0).toFixed(3)}）进行业务计算；此前采购的库存仍沿用原单价。
+              该日期之后采购入库的本药品，都会以最新单价（¥{(d.price ?? 0).toFixed(4)}）进行业务计算；此前采购的库存仍沿用原单价。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="space-y-1.5">
