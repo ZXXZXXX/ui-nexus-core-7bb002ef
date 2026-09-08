@@ -38,6 +38,8 @@ export type ListColumn<T> = {
   filter?: "text" | "select" | "number" | "date" | "none";
   /** options for select filter; auto-derived from data when omitted */
   options?: string[];
+  /** horizontal alignment of header + cell. default: left */
+  align?: "left" | "right";
   /** hidden by default in column settings */
   defaultHidden?: boolean;
   /** cannot be hidden */
