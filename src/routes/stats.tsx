@@ -2151,10 +2151,32 @@ function RangeField({
 
 
 
+function FieldLabel({ label, hint, accent = true }: { label: string; hint?: string; accent?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-text-secondary">
+      <span className={`w-1 h-3 rounded-full ${accent ? "bg-primary" : "bg-border-strong"}`} />
+      {label}
+      {hint && <span className="text-caption font-normal text-text-tertiary ml-0.5">{hint}</span>}
+    </span>
+  );
+}
+
 function FieldBlock({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
-      <Label className="text-body-sm text-text-secondary mb-1.5 block">{label}</Label>
+    <div className="space-y-2">
+      <FieldLabel label={label} />
+      {children}
+    </div>
+  );
+}
+
+/** 指标区间等次级分组：浅底卡片 */
+function SubSection({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border bg-surface-muted/60 p-4">
+      <div className="mb-4">
+        <FieldLabel label={title} hint={hint} accent={false} />
+      </div>
       {children}
     </div>
   );
@@ -2172,18 +2194,17 @@ function Dimension({
   children: React.ReactNode;
 }) {
   return (
-    <section>
-      <div className="flex items-center gap-2 mb-3">
+    <section className="rounded-xl border border-border bg-white overflow-hidden">
+      <div className="flex items-center gap-2.5 px-5 py-3 border-b border-border-subtle">
         <span
-          className="h-6 w-6 rounded-md inline-flex items-center justify-center shrink-0"
+          className="h-7 w-7 rounded-lg inline-flex items-center justify-center shrink-0"
           style={{ background: `color-mix(in oklab, ${tone} 14%, transparent)`, color: tone }}
         >
-          <Icon className="h-3.5 w-3.5" strokeWidth={1.75} />
+          <Icon className="h-4 w-4" strokeWidth={1.75} />
         </span>
-        <span className="text-body font-medium text-foreground">{title}</span>
-        <span className="flex-1 h-px bg-border" />
+        <span className="text-card-title text-foreground">{title}</span>
       </div>
-      {children}
+      <div className="px-5 py-4">{children}</div>
     </section>
   );
 }
@@ -2203,9 +2224,12 @@ function ChipGroup({
   disabledOptions?: string[];
   hint?: string;
 }) {
+  const [name, extra] = label.includes("（")
+    ? [label.slice(0, label.indexOf("（")), label.slice(label.indexOf("（"))]
+    : [label, undefined];
   return (
-    <div>
-      <div className="text-body-sm text-text-secondary mb-2">{label}</div>
+    <div className="space-y-2">
+      <FieldLabel label={name} hint={extra} />
       <div className="flex flex-wrap gap-2">
         {options.map((o) => {
           const active = selected.includes(o);
@@ -2215,9 +2239,9 @@ function ChipGroup({
               key={o}
               disabled={disabled}
               onClick={() => !disabled && onToggle(o)}
-              className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-full text-body-sm border transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-md text-body-sm border transition-colors ${
                 active
-                  ? "border-primary bg-brand-subtle text-primary"
+                  ? "border-primary bg-brand-subtle text-primary font-medium"
                   : disabled
                     ? "border-border bg-surface-muted text-text-tertiary cursor-not-allowed opacity-60"
                     : "border-border bg-white text-text-secondary hover:border-primary/40 hover:text-foreground"
@@ -2233,6 +2257,7 @@ function ChipGroup({
     </div>
   );
 }
+
 
 
 // ============ util ============
