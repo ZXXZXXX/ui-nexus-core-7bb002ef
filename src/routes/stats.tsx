@@ -896,6 +896,8 @@ function StatsPage() {
   const [resultMetric, setResultMetric] = useState<Template | null>(null);
   const [resultBack] = useState<"templates">("templates");
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+
   const [query, setQuery] = useState("");
   const todayStr = new Date().toISOString().slice(0, 10);
   const [rangeFrom, setRangeFrom] = useState("");
@@ -933,12 +935,14 @@ function StatsPage() {
     if (t) {
       setFilters({ ...t.filters });
       setEditingId(t.id);
+      setEditName(t.name);
       setBuilderCat(t.category);
       setDrawerOpen(true);
       return;
     }
     setCatOpen(true);
   };
+
 
   const pickCategory = (c: TplCategory) => {
     setFilters(c === "staff" ? { ...DEFAULT_FILTERS, role: "vet" } : DEFAULT_FILTERS);
@@ -958,9 +962,18 @@ function StatsPage() {
 
   const saveEdits = () => {
     if (!editingId) return;
+    if (!editName.trim()) {
+      toast.error("请输入模板名称");
+      return;
+    }
     setTemplates((prev) =>
-      prev.map((t) => (t.id === editingId ? { ...t, filters: { ...filters }, desc: describeFilters(filters) } : t)),
+      prev.map((t) =>
+        t.id === editingId
+          ? { ...t, name: editName.trim(), filters: { ...filters }, desc: describeFilters(filters) }
+          : t,
+      ),
     );
+
     toast.success("模板已更新");
     setView("templates");
     setEditingId(null);
@@ -1112,7 +1125,7 @@ function StatsPage() {
       <SheetContent side="right" className="bg-white w-full sm:max-w-[760px] p-0 flex flex-col">
         <SheetHeader className="px-6 py-4 border-b border-border">
           <SheetTitle>
-            {editingTemplate ? `编辑模板：${editingTemplate.name}` : `新建筛选 · ${TPL_CATEGORY_LABEL[cat]}分析`}
+            {editingTemplate ? "编辑模板" : `新建筛选 · ${TPL_CATEGORY_LABEL[cat]}分析`}
           </SheetTitle>
           <div className="text-caption text-text-tertiary mt-0.5">
             {CATEGORY_CARDS.find((c) => c.key === cat)?.desc}
@@ -1120,6 +1133,17 @@ function StatsPage() {
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+          {editingTemplate && (
+            <div>
+              <Label className="text-body-sm">模板名称</Label>
+              <Input
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="请输入模板名称"
+                className="mt-1.5 h-9 bg-white"
+              />
+            </div>
+          )}
           <div className="flex items-center justify-end">
             {activeCount > 0 && (
               <button
@@ -1130,6 +1154,7 @@ function StatsPage() {
               </button>
             )}
           </div>
+
 
 
 
