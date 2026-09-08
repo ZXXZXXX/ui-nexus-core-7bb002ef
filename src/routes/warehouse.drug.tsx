@@ -54,6 +54,7 @@ type Drug = {
   ingredient?: string; // 主要成分
   spec: string; // 规格型号
   price: number; // 单价（元）
+  priceEffectiveFrom?: string; // 新单价生效时间（该日期后采购生效）
   scanUnit?: string; // 最小扫码单位
   supplier?: string; // 供应商
   maker: string; // 生产厂家
@@ -401,6 +402,9 @@ function DrugForm({
   const readOnly = mode === "view";
   const [d, setD] = useState<Drug>(value);
   const [confirmPrice, setConfirmPrice] = useState(false);
+  const [priceEffectiveFrom, setPriceEffectiveFrom] = useState(
+    () => new Date().toISOString().slice(0, 10),
+  );
   const patch = (p: Partial<Drug>) => setD((s) => ({ ...s, ...p }));
 
   return (
@@ -626,16 +630,31 @@ function DrugForm({
           <AlertDialogHeader>
             <AlertDialogTitle>确认修改单价？</AlertDialogTitle>
             <AlertDialogDescription>
-              后续入库的本药品都会以最新单价（¥{(d.price ?? 0).toFixed(2)}）进行业务计算。
+              该日期之后采购入库的本药品，都会以最新单价（¥{(d.price ?? 0).toFixed(2)}）进行业务计算；此前采购的库存仍沿用原单价。
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-1.5">
+            <Label className="text-body-sm text-text-secondary">生效时间</Label>
+            <Input
+              type="date"
+              value={priceEffectiveFrom}
+              onChange={(e) => setPriceEffectiveFrom(e.target.value)}
+              className="h-9"
+            />
+            <div className="text-caption text-text-tertiary">
+              {priceEffectiveFrom
+                ? `${priceEffectiveFrom} 及之后采购的药品按新单价计算`
+                : "请选择生效时间"}
+            </div>
+          </div>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
+              disabled={!priceEffectiveFrom}
               className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
               onClick={() => {
                 setConfirmPrice(false);
-                onSave(d);
+                onSave({ ...d, priceEffectiveFrom });
               }}
             >
               确认保存
