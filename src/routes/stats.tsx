@@ -933,12 +933,14 @@ function StatsPage() {
     if (t) {
       setFilters({ ...t.filters });
       setEditingId(t.id);
+      setEditName(t.name);
       setBuilderCat(t.category);
       setDrawerOpen(true);
       return;
     }
     setCatOpen(true);
   };
+
 
   const pickCategory = (c: TplCategory) => {
     setFilters(c === "staff" ? { ...DEFAULT_FILTERS, role: "vet" } : DEFAULT_FILTERS);
