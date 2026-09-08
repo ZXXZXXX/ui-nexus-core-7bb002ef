@@ -1105,7 +1105,7 @@ function StatsPage() {
   );
 
   const cat = builderCat ?? "cattle";
-  const builderDims = editingTemplate?.dimensions ?? CATEGORY_DIMENSIONS[cat];
+  const builderDims = CATEGORY_DIMENSIONS[cat];
   const showDim = (d: DimensionKey) => builderDims.includes(d);
 
   const builderDrawer = (
