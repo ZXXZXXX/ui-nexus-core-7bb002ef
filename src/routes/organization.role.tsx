@@ -489,19 +489,87 @@ function RolePage() {
       [drawerRole]: { ...prev[drawerRole], pc: { ...prev[drawerRole].pc, allowLogin: v } },
     }));
   };
-  const setPcModule = (k: PcModuleKey, v: boolean) => {
+  const mutateNav = (fn: (nav: NavPerms) => NavPerms) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
       ...prev,
       [drawerRole]: {
         ...prev[drawerRole],
-        pc: {
-          ...prev[drawerRole].pc,
-          modules: { ...prev[drawerRole].pc.modules, [k]: v },
-        },
+        pc: { ...prev[drawerRole].pc, nav: fn(prev[drawerRole].pc.nav) },
       },
     }));
   };
+
+  /** 一级菜单开关：关闭时连带关闭其下二级菜单与操作 */
+  const setGroupView = (gKey: string, v: boolean) =>
+    mutateNav((nav) => {
+      const g = nav[gKey];
+      return {
+        ...nav,
+        [gKey]: {
+          view: v,
+          actions: Object.fromEntries(
+            Object.keys(g.actions).map((k) => [k, v ? g.actions[k] : false]),
+          ),
+          leaves: Object.fromEntries(
+            Object.entries(g.leaves).map(([lk, lp]) => [
+              lk,
+              v
+                ? lp
+                : { view: false, actions: Object.fromEntries(Object.keys(lp.actions).map((k) => [k, false])) },
+            ]),
+          ),
+        },
+      };
+    });
+
+  /** 二级菜单查看开关：关闭时连带关闭其操作能力 */
+  const setLeafView = (gKey: string, lKey: string, v: boolean) =>
+    mutateNav((nav) => {
+      const lp = nav[gKey].leaves[lKey];
+      return {
+        ...nav,
+        [gKey]: {
+          ...nav[gKey],
+          view: v ? true : nav[gKey].view,
+          leaves: {
+            ...nav[gKey].leaves,
+            [lKey]: {
+              view: v,
+              actions: v
+                ? lp.actions
+                : Object.fromEntries(Object.keys(lp.actions).map((k) => [k, false])),
+            },
+          },
+        },
+      };
+    });
+
+  const setLeafAction = (gKey: string, lKey: string, aKey: string, v: boolean) =>
+    mutateNav((nav) => ({
+      ...nav,
+      [gKey]: {
+        ...nav[gKey],
+        leaves: {
+          ...nav[gKey].leaves,
+          [lKey]: {
+            view: v ? true : nav[gKey].leaves[lKey].view,
+            actions: { ...nav[gKey].leaves[lKey].actions, [aKey]: v },
+          },
+        },
+      },
+    }));
+
+  const setGroupAction = (gKey: string, aKey: string, v: boolean) =>
+    mutateNav((nav) => ({
+      ...nav,
+      [gKey]: {
+        ...nav[gKey],
+        view: v ? true : nav[gKey].view,
+        actions: { ...nav[gKey].actions, [aKey]: v },
+      },
+    }));
+
   const setWorkbenchView = (v: WorkbenchView) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
