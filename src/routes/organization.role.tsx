@@ -119,13 +119,24 @@ const miniEvents: {
   { key: "general", name: "普修", actions: { report: "可上报", execute: "可响应 / 执行" } },
 ];
 
-type PcPerms = { allowLogin: boolean; modules: Record<PcModuleKey, boolean> };
+/** 工作台可选的 4 套定制化看板视图 */
+export type WorkbenchView = "group" | "region" | "farm-report" | "farm-internal";
+
+const workbenchViews: { key: WorkbenchView; name: string; desc: string }[] = [
+  { key: "group", name: "集团级别运营看板", desc: "全集团口径汇总，面向集团高管" },
+  { key: "region", name: "区域级别运营看板", desc: "区域（中心）口径汇总，面向区域负责人" },
+  { key: "farm-report", name: "牧场客户汇报看板", desc: "对外汇报视角，默认隐藏药品、工单与预警告警" },
+  { key: "farm-internal", name: "牧场内部管理看板", desc: "牧场内部全量专题，面向场长与现场团队" },
+];
+
+type PcPerms = { allowLogin: boolean; modules: Record<PcModuleKey, boolean>; workbenchView: WorkbenchView };
 type MiniPerms = Record<MiniEventKey, Record<MiniActionKey, boolean>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
 function fullPc(allow = true, modules = true): PcPerms {
   return {
     allowLogin: allow,
+    workbenchView: "group",
     modules: pcModules.reduce(
       (acc, m) => ({ ...acc, [m.key]: modules }),
       {} as Record<PcModuleKey, boolean>,
