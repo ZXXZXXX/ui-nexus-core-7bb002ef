@@ -119,13 +119,24 @@ const miniEvents: {
   { key: "general", name: "普修", actions: { report: "可上报", execute: "可响应 / 执行" } },
 ];
 
-type PcPerms = { allowLogin: boolean; modules: Record<PcModuleKey, boolean> };
+/** 工作台可选的 4 套定制化看板视图 */
+export type WorkbenchView = "group" | "region" | "farm-report" | "farm-internal";
+
+const workbenchViews: { key: WorkbenchView; name: string; desc: string }[] = [
+  { key: "group", name: "集团级别运营看板", desc: "全集团口径汇总，面向集团高管" },
+  { key: "region", name: "区域级别运营看板", desc: "区域（中心）口径汇总，面向区域负责人" },
+  { key: "farm-report", name: "牧场客户汇报看板", desc: "对外汇报视角，默认隐藏药品、工单与预警告警" },
+  { key: "farm-internal", name: "牧场内部管理看板", desc: "牧场内部全量专题，面向场长与现场团队" },
+];
+
+type PcPerms = { allowLogin: boolean; modules: Record<PcModuleKey, boolean>; workbenchView: WorkbenchView };
 type MiniPerms = Record<MiniEventKey, Record<MiniActionKey, boolean>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
 function fullPc(allow = true, modules = true): PcPerms {
   return {
     allowLogin: allow,
+    workbenchView: "group",
     modules: pcModules.reduce(
       (acc, m) => ({ ...acc, [m.key]: modules }),
       {} as Record<PcModuleKey, boolean>,
@@ -148,9 +159,10 @@ function fullMini(v = true): MiniPerms {
     {} as MiniPerms,
   );
 }
-function partialPc(keys: PcModuleKey[]): PcPerms {
+function partialPc(keys: PcModuleKey[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
   return {
     allowLogin: true,
+    workbenchView,
     modules: pcModules.reduce(
       (acc, m) => ({ ...acc, [m.key]: m.required || keys.includes(m.key) }),
       {} as Record<PcModuleKey, boolean>,
@@ -186,7 +198,7 @@ const defaultPerms: RolePerms = {
     }),
   },
   assistant: {
-    pc: { allowLogin: false, modules: pcModules.reduce((a, m) => ({ ...a, [m.key]: false }), {} as Record<PcModuleKey, boolean>) },
+    pc: { allowLogin: false, workbenchView: "farm-internal", modules: pcModules.reduce((a, m) => ({ ...a, [m.key]: false }), {} as Record<PcModuleKey, boolean>) },
     mini: partialMini({
       disease: { execute: true },
       vaccine: { execute: true },
@@ -243,6 +255,7 @@ function RolePage() {
       [key]: {
         pc: {
           allowLogin: false,
+          workbenchView: "farm-internal" as WorkbenchView,
           modules: pcModules.reduce(
             (a, m) => ({ ...a, [m.key]: false }),
             {} as Record<PcModuleKey, boolean>,
@@ -309,6 +322,16 @@ function RolePage() {
           ...prev[drawerRole].pc,
           modules: { ...prev[drawerRole].pc.modules, [k]: v },
         },
+      },
+    }));
+  };
+  const setWorkbenchView = (v: WorkbenchView) => {
+    if (!drawerRole || !editable) return;
+    setPerms((prev) => ({
+      ...prev,
+      [drawerRole]: {
+        ...prev[drawerRole],
+        pc: { ...prev[drawerRole].pc, workbenchView: v },
       },
     }));
   };
@@ -659,6 +682,52 @@ function RolePage() {
                               </div>
                               <div className="text-caption text-text-tertiary mt-0.5">{m.desc}</div>
 
+                              {m.key === "workbench" && (
+                                <div className="mt-3 rounded-md bg-surface-subtle p-2 space-y-1">
+                                  <div className="px-1 pb-1 text-caption text-text-secondary">
+                                    选择该角色的工作台看板视图（4 选 1）
+                                  </div>
+                                  {workbenchViews.map((v) => {
+                                    const active = cur.pc.workbenchView === v.key;
+                                    return (
+                                      <button
+                                        key={v.key}
+                                        type="button"
+                                        disabled={!editable}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          setWorkbenchView(v.key);
+                                        }}
+                                        className={`w-full flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
+                                          active
+                                            ? "border-primary/40 bg-brand-subtle"
+                                            : "border-transparent bg-card hover:border-border"
+                                        } ${editable ? "cursor-pointer" : "cursor-default"}`}
+                                      >
+                                        <span
+                                          className={`mt-1 h-3 w-3 shrink-0 rounded-full border ${
+                                            active
+                                              ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
+                                              : "border-border bg-card"
+                                          }`}
+                                        />
+                                        <span className="min-w-0">
+                                          <span
+                                            className={`block text-body-sm ${
+                                              active ? "text-primary font-medium" : "text-foreground"
+                                            }`}
+                                          >
+                                            {v.name}
+                                          </span>
+                                          <span className="block text-caption text-text-tertiary mt-0.5">
+                                            {v.desc}
+                                          </span>
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
                           </label>
                         );
