@@ -198,7 +198,7 @@ const defaultPerms: RolePerms = {
     }),
   },
   assistant: {
-    pc: { allowLogin: false, modules: pcModules.reduce((a, m) => ({ ...a, [m.key]: false }), {} as Record<PcModuleKey, boolean>) },
+    pc: { allowLogin: false, workbenchView: "farm-internal", modules: pcModules.reduce((a, m) => ({ ...a, [m.key]: false }), {} as Record<PcModuleKey, boolean>) },
     mini: partialMini({
       disease: { execute: true },
       vaccine: { execute: true },
