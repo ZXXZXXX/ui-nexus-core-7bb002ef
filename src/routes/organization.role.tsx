@@ -159,9 +159,10 @@ function fullMini(v = true): MiniPerms {
     {} as MiniPerms,
   );
 }
-function partialPc(keys: PcModuleKey[]): PcPerms {
+function partialPc(keys: PcModuleKey[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
   return {
     allowLogin: true,
+    workbenchView,
     modules: pcModules.reduce(
       (acc, m) => ({ ...acc, [m.key]: m.required || keys.includes(m.key) }),
       {} as Record<PcModuleKey, boolean>,
