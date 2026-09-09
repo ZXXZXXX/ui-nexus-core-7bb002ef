@@ -682,6 +682,52 @@ function RolePage() {
                               </div>
                               <div className="text-caption text-text-tertiary mt-0.5">{m.desc}</div>
 
+                              {m.key === "workbench" && (
+                                <div className="mt-3 rounded-md bg-surface-subtle p-2 space-y-1">
+                                  <div className="px-1 pb-1 text-caption text-text-secondary">
+                                    选择该角色的工作台看板视图（4 选 1）
+                                  </div>
+                                  {workbenchViews.map((v) => {
+                                    const active = cur.pc.workbenchView === v.key;
+                                    return (
+                                      <button
+                                        key={v.key}
+                                        type="button"
+                                        disabled={!editable}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          setWorkbenchView(v.key);
+                                        }}
+                                        className={`w-full flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
+                                          active
+                                            ? "border-primary/40 bg-brand-subtle"
+                                            : "border-transparent bg-card hover:border-border"
+                                        } ${editable ? "cursor-pointer" : "cursor-default"}`}
+                                      >
+                                        <span
+                                          className={`mt-1 h-3 w-3 shrink-0 rounded-full border ${
+                                            active
+                                              ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
+                                              : "border-border bg-card"
+                                          }`}
+                                        />
+                                        <span className="min-w-0">
+                                          <span
+                                            className={`block text-body-sm ${
+                                              active ? "text-primary font-medium" : "text-foreground"
+                                            }`}
+                                          >
+                                            {v.name}
+                                          </span>
+                                          <span className="block text-caption text-text-tertiary mt-0.5">
+                                            {v.desc}
+                                          </span>
+                                        </span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              )}
                             </div>
                           </label>
                         );
