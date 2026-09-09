@@ -82,16 +82,181 @@ const initialRoles: Role[] = [
   { key: "assistant", name: "兽医助理", count: 6, scope: "健康执行 / 录入", desc: "协助兽医完成日常工作录入与执行，部分功能仅查看权限。", enabled: false, icon: HeartPulse },
 ];
 
-type PcModuleKey = "workbench" | "archive" | "health" | "drug" | "organization" | "knowledge";
+/** 与左侧菜单导航完全对应的权限结构 */
+type NavAction = { key: string; name: string };
+type NavLeaf = { key: string; name: string; actions?: NavAction[] };
+type NavGroupDef = {
+  key: string;
+  name: string;
+  desc: string;
+  kind?: "home";
+  children?: NavLeaf[];
+  actions?: NavAction[];
+  required?: boolean;
+};
 
-const pcModules: { key: PcModuleKey; name: string; desc: string; required?: boolean }[] = [
-  { key: "workbench", name: "工作台", desc: "首页数据看板与待办，仅展示当前角色已开通模块的相关数据", required: true },
-  { key: "archive", name: "牛只基础档案", desc: "牛场、牛舍、牛只档案的维护（不可关闭）", required: true },
-  { key: "health", name: "工单管理", desc: "疾病、疫苗、修蹄等健康事项的方案确认、诊断与执行计划" },
-  { key: "drug", name: "药品管理", desc: "药品档案、库存、调拨、取药与损耗管理" },
-  { key: "organization", name: "组织管理", desc: "账号、角色、租户与团队管理" },
-  { key: "knowledge", name: "知识库管理", desc: "疾病、症状、处方等诊疗知识维护" },
+const woActions: NavAction[] = [
+  { key: "create", name: "新建工单" },
+  { key: "assign", name: "下发 / 指派" },
+  { key: "diagnose", name: "诊断 / 确认方案" },
+  { key: "execute", name: "执行 / 完成" },
+  { key: "export", name: "导出" },
 ];
+
+const crudActions: NavAction[] = [
+  { key: "create", name: "新建" },
+  { key: "edit", name: "编辑" },
+  { key: "delete", name: "删除" },
+  { key: "export", name: "导出" },
+];
+
+const navSpec: NavGroupDef[] = [
+  {
+    key: "home",
+    name: "首页",
+    desc: "选择该角色进入首页时看到的看板视角（4 选 1）",
+    kind: "home",
+    required: true,
+  },
+  {
+    key: "archive",
+    name: "基础档案",
+    desc: "仅区分能否查看二级菜单界面，无其他操作能力",
+    children: [
+      { key: "farm", name: "牛场信息" },
+      { key: "barn", name: "牛舍信息" },
+      { key: "cattle", name: "牛只信息" },
+    ],
+  },
+  {
+    key: "workorder",
+    name: "工单管理",
+    desc: "可分别配置二级菜单的查看与操作能力",
+    children: [
+      { key: "disease", name: "疾病治疗", actions: woActions },
+      { key: "vaccine", name: "疫苗免疫", actions: woActions },
+      { key: "postpartum", name: "产后护理", actions: woActions },
+      { key: "hoof", name: "修蹄工单", actions: woActions },
+      { key: "drying", name: "干奶工单", actions: woActions },
+      { key: "deworm", name: "驱虫工单", actions: woActions },
+      { key: "general", name: "普修工单", actions: woActions },
+    ],
+  },
+  {
+    key: "drug",
+    name: "药品管理",
+    desc: "可分别配置二级菜单的查看与操作能力",
+    children: [
+      {
+        key: "drug-file",
+        name: "药品档案",
+        actions: [
+          { key: "create", name: "新建药品" },
+          { key: "edit", name: "编辑 / 调价" },
+          { key: "delete", name: "删除" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "stock",
+        name: "药品库存",
+        actions: [
+          { key: "inbound", name: "入库登记" },
+          { key: "adjust", name: "库存调整" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "transfer",
+        name: "调拨记录",
+        actions: [
+          { key: "create", name: "发起调拨" },
+          { key: "audit", name: "审核" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "dispense",
+        name: "取药记录",
+        actions: [
+          { key: "create", name: "登记取药" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "loss",
+        name: "损耗管理",
+        actions: [
+          { key: "create", name: "登记损耗" },
+          { key: "audit", name: "判定 / 审核" },
+          { key: "export", name: "导出" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "diagnosis",
+    name: "诊疗管理",
+    desc: "可分别配置二级菜单的查看与维护能力",
+    children: [
+      { key: "disease", name: "疾病管理", actions: crudActions },
+      { key: "symptom", name: "症状管理", actions: crudActions },
+      { key: "prescription", name: "处方管理", actions: crudActions },
+    ],
+  },
+  {
+    key: "org",
+    name: "组织管理",
+    desc: "可分别配置二级菜单的查看与管理能力",
+    children: [
+      {
+        key: "account",
+        name: "账号管理",
+        actions: [
+          { key: "create", name: "新建账号" },
+          { key: "edit", name: "编辑" },
+          { key: "toggle", name: "启用 / 停用" },
+        ],
+      },
+      {
+        key: "role",
+        name: "角色管理",
+        actions: [
+          { key: "create", name: "新建角色" },
+          { key: "edit", name: "编辑权限" },
+          { key: "delete", name: "删除" },
+        ],
+      },
+      {
+        key: "tenant",
+        name: "租户管理",
+        actions: [
+          { key: "edit", name: "编辑" },
+          { key: "toggle", name: "启用 / 停用" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "stats",
+    name: "统计分析",
+    desc: "一级菜单，可配置查看与操作能力",
+    actions: [
+      { key: "custom", name: "自定义分析（新建 / 编辑模板）" },
+      { key: "export", name: "导出" },
+    ],
+  },
+  {
+    key: "feedback",
+    name: "反馈管理",
+    desc: "一级菜单，可配置查看与操作能力",
+    actions: [
+      { key: "mark", name: "标注有价值 / 无价值" },
+      { key: "export", name: "导出" },
+    ],
+  },
+];
+
 
 
 type MiniEventKey =
@@ -129,19 +294,39 @@ const workbenchViews: { key: WorkbenchView; name: string; desc: string }[] = [
   { key: "farm-internal", name: "牧场内部管理看板", desc: "牧场内部全量专题，面向场长与现场团队" },
 ];
 
-type PcPerms = { allowLogin: boolean; modules: Record<PcModuleKey, boolean>; workbenchView: WorkbenchView };
+type LeafPerm = { view: boolean; actions: Record<string, boolean> };
+type GroupPerm = { view: boolean; leaves: Record<string, LeafPerm>; actions: Record<string, boolean> };
+type NavPerms = Record<string, GroupPerm>;
+type PcPerms = { allowLogin: boolean; nav: NavPerms; workbenchView: WorkbenchView };
 type MiniPerms = Record<MiniEventKey, Record<MiniActionKey, boolean>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
-function fullPc(allow = true, modules = true): PcPerms {
-  return {
-    allowLogin: allow,
-    workbenchView: "group",
-    modules: pcModules.reduce(
-      (acc, m) => ({ ...acc, [m.key]: modules }),
-      {} as Record<PcModuleKey, boolean>,
-    ),
-  };
+function buildNav(on: boolean, groupKeys?: string[]): NavPerms {
+  return navSpec.reduce((acc, g) => {
+    const gOn = groupKeys ? !!g.required || groupKeys.includes(g.key) : on;
+    acc[g.key] = {
+      view: gOn,
+      actions: (g.actions ?? []).reduce(
+        (a, act) => ({ ...a, [act.key]: gOn }),
+        {} as Record<string, boolean>,
+      ),
+      leaves: (g.children ?? []).reduce((a, leaf) => {
+        a[leaf.key] = {
+          view: gOn,
+          actions: (leaf.actions ?? []).reduce(
+            (x, act) => ({ ...x, [act.key]: gOn }),
+            {} as Record<string, boolean>,
+          ),
+        };
+        return a;
+      }, {} as Record<string, LeafPerm>),
+    };
+    return acc;
+  }, {} as NavPerms);
+}
+
+function fullPc(allow = true, on = true): PcPerms {
+  return { allowLogin: allow, workbenchView: "group", nav: buildNav(on) };
 }
 type MiniEventDef = (typeof miniEvents)[number];
 const hasAction = (e: MiniEventDef, a: MiniActionKey) => !!e.actions[a];
@@ -159,15 +344,8 @@ function fullMini(v = true): MiniPerms {
     {} as MiniPerms,
   );
 }
-function partialPc(keys: PcModuleKey[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
-  return {
-    allowLogin: true,
-    workbenchView,
-    modules: pcModules.reduce(
-      (acc, m) => ({ ...acc, [m.key]: m.required || keys.includes(m.key) }),
-      {} as Record<PcModuleKey, boolean>,
-    ),
-  };
+function partialPc(keys: string[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
+  return { allowLogin: true, workbenchView, nav: buildNav(false, keys) };
 }
 
 function partialMini(map: Partial<Record<MiniEventKey, Partial<Record<MiniActionKey, boolean>>>>): MiniPerms {
@@ -184,11 +362,11 @@ function partialMini(map: Partial<Record<MiniEventKey, Partial<Record<MiniAction
 const defaultPerms: RolePerms = {
   admin: { pc: fullPc(true, true), mini: fullMini(true) },
   manager: {
-    pc: partialPc(["health", "drug", "archive", "knowledge"]),
+    pc: partialPc(["workorder", "drug", "archive", "diagnosis", "stats", "feedback"]),
     mini: fullMini(true),
   },
   vet: {
-    pc: partialPc(["health", "drug", "knowledge"]),
+    pc: partialPc(["workorder", "drug", "diagnosis", "archive"]),
     mini: partialMini({
       disease: { report: true, execute: true },
       vaccine: { report: true, execute: true },
@@ -198,7 +376,7 @@ const defaultPerms: RolePerms = {
     }),
   },
   assistant: {
-    pc: { allowLogin: false, workbenchView: "farm-internal", modules: pcModules.reduce((a, m) => ({ ...a, [m.key]: false }), {} as Record<PcModuleKey, boolean>) },
+    pc: { allowLogin: false, workbenchView: "farm-internal", nav: buildNav(false) },
     mini: partialMini({
       disease: { execute: true },
       vaccine: { execute: true },
@@ -209,6 +387,7 @@ const defaultPerms: RolePerms = {
     }),
   },
 };
+
 
 type ViewMode = "detail" | "edit";
 
@@ -256,11 +435,9 @@ function RolePage() {
         pc: {
           allowLogin: false,
           workbenchView: "farm-internal" as WorkbenchView,
-          modules: pcModules.reduce(
-            (a, m) => ({ ...a, [m.key]: false }),
-            {} as Record<PcModuleKey, boolean>,
-          ),
+          nav: buildNav(false),
         },
+
         mini: miniEvents.reduce(
           (a, e) => ({ ...a, [e.key]: { report: false, execute: false } }),
           {} as MiniPerms,
@@ -312,19 +489,87 @@ function RolePage() {
       [drawerRole]: { ...prev[drawerRole], pc: { ...prev[drawerRole].pc, allowLogin: v } },
     }));
   };
-  const setPcModule = (k: PcModuleKey, v: boolean) => {
+  const mutateNav = (fn: (nav: NavPerms) => NavPerms) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
       ...prev,
       [drawerRole]: {
         ...prev[drawerRole],
-        pc: {
-          ...prev[drawerRole].pc,
-          modules: { ...prev[drawerRole].pc.modules, [k]: v },
-        },
+        pc: { ...prev[drawerRole].pc, nav: fn(prev[drawerRole].pc.nav) },
       },
     }));
   };
+
+  /** 一级菜单开关：关闭时连带关闭其下二级菜单与操作 */
+  const setGroupView = (gKey: string, v: boolean) =>
+    mutateNav((nav) => {
+      const g = nav[gKey];
+      return {
+        ...nav,
+        [gKey]: {
+          view: v,
+          actions: Object.fromEntries(
+            Object.keys(g.actions).map((k) => [k, v ? g.actions[k] : false]),
+          ),
+          leaves: Object.fromEntries(
+            Object.entries(g.leaves).map(([lk, lp]) => [
+              lk,
+              v
+                ? lp
+                : { view: false, actions: Object.fromEntries(Object.keys(lp.actions).map((k) => [k, false])) },
+            ]),
+          ),
+        },
+      };
+    });
+
+  /** 二级菜单查看开关：关闭时连带关闭其操作能力 */
+  const setLeafView = (gKey: string, lKey: string, v: boolean) =>
+    mutateNav((nav) => {
+      const lp = nav[gKey].leaves[lKey];
+      return {
+        ...nav,
+        [gKey]: {
+          ...nav[gKey],
+          view: v ? true : nav[gKey].view,
+          leaves: {
+            ...nav[gKey].leaves,
+            [lKey]: {
+              view: v,
+              actions: v
+                ? lp.actions
+                : Object.fromEntries(Object.keys(lp.actions).map((k) => [k, false])),
+            },
+          },
+        },
+      };
+    });
+
+  const setLeafAction = (gKey: string, lKey: string, aKey: string, v: boolean) =>
+    mutateNav((nav) => ({
+      ...nav,
+      [gKey]: {
+        ...nav[gKey],
+        leaves: {
+          ...nav[gKey].leaves,
+          [lKey]: {
+            view: v ? true : nav[gKey].leaves[lKey].view,
+            actions: { ...nav[gKey].leaves[lKey].actions, [aKey]: v },
+          },
+        },
+      },
+    }));
+
+  const setGroupAction = (gKey: string, aKey: string, v: boolean) =>
+    mutateNav((nav) => ({
+      ...nav,
+      [gKey]: {
+        ...nav[gKey],
+        view: v ? true : nav[gKey].view,
+        actions: { ...nav[gKey].actions, [aKey]: v },
+      },
+    }));
+
   const setWorkbenchView = (v: WorkbenchView) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
@@ -654,91 +899,167 @@ function RolePage() {
                   </div>
 
                   {cur.pc.allowLogin ? (
-                    <div className="rounded-md border border-border overflow-hidden">
-                      {pcModules.map((m, idx) => {
-                        const checked = cur.pc.modules[m.key];
-                        const locked = !!m.required;
+                    <div className="space-y-3">
+                      {navSpec.map((g) => {
+                        const gp = cur.pc.nav[g.key];
+                        if (!gp) return null;
+                        const locked = !!g.required;
                         return (
-                          <label
-                            key={m.key}
-                            className={`flex items-start gap-3 px-4 py-3 hover:bg-surface-subtle ${
-                              idx > 0 ? "border-t border-border" : ""
-                            } ${editable && !locked ? "cursor-pointer" : "cursor-default"}`}
-                          >
-                            <Checkbox
-                              checked={locked ? true : checked}
-                              disabled={!editable || locked}
-                              onCheckedChange={(v) => !locked && setPcModule(m.key, !!v)}
-                              className="mt-0.5"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <div className="text-body-sm font-medium text-foreground inline-flex items-center gap-1.5">
-                                {m.name}
-                                {locked && (
-                                  <span className="text-caption text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0 leading-5">
-                                    不可关闭
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-caption text-text-tertiary mt-0.5">{m.desc}</div>
-
-                              {m.key === "workbench" && (
-                                <div className="mt-3 rounded-md bg-surface-subtle p-2 space-y-1">
-                                  <div className="px-1 pb-1 text-caption text-text-secondary">
-                                    选择该角色的工作台看板视图（4 选 1）
-                                  </div>
-                                  {workbenchViews.map((v) => {
-                                    const active = cur.pc.workbenchView === v.key;
-                                    return (
-                                      <button
-                                        key={v.key}
-                                        type="button"
-                                        disabled={!editable}
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          setWorkbenchView(v.key);
-                                        }}
-                                        className={`w-full flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
-                                          active
-                                            ? "border-primary/40 bg-brand-subtle"
-                                            : "border-transparent bg-card hover:border-border"
-                                        } ${editable ? "cursor-pointer" : "cursor-default"}`}
-                                      >
-                                        <span
-                                          className={`mt-1 h-3 w-3 shrink-0 rounded-full border ${
-                                            active
-                                              ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
-                                              : "border-border bg-card"
-                                          }`}
-                                        />
-                                        <span className="min-w-0">
-                                          <span
-                                            className={`block text-body-sm ${
-                                              active ? "text-primary font-medium" : "text-foreground"
-                                            }`}
-                                          >
-                                            {v.name}
-                                          </span>
-                                          <span className="block text-caption text-text-tertiary mt-0.5">
-                                            {v.desc}
-                                          </span>
-                                        </span>
-                                      </button>
-                                    );
-                                  })}
+                          <div key={g.key} className="rounded-md border border-border overflow-hidden">
+                            {/* 一级菜单 */}
+                            <div className="flex items-start gap-3 px-4 py-3 bg-surface-subtle">
+                              <Checkbox
+                                checked={locked ? true : gp.view}
+                                disabled={!editable || locked}
+                                onCheckedChange={(v) => !locked && setGroupView(g.key, !!v)}
+                                className="mt-0.5"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="text-body-sm font-medium text-foreground inline-flex items-center gap-1.5">
+                                  {g.name}
+                                  {locked && (
+                                    <span className="text-caption text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0 leading-5">
+                                      不可关闭
+                                    </span>
+                                  )}
                                 </div>
-                              )}
+                                <div className="text-caption text-text-tertiary mt-0.5">{g.desc}</div>
+                              </div>
                             </div>
-                          </label>
+
+                            {/* 首页：4 类视角平铺 */}
+                            {g.kind === "home" && (
+                              <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {workbenchViews.map((v) => {
+                                  const active = cur.pc.workbenchView === v.key;
+                                  return (
+                                    <button
+                                      key={v.key}
+                                      type="button"
+                                      disabled={!editable}
+                                      onClick={() => setWorkbenchView(v.key)}
+                                      className={`flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
+                                        active
+                                          ? "border-primary/40 bg-brand-subtle"
+                                          : "border-border bg-card hover:border-primary/30"
+                                      } ${editable ? "cursor-pointer" : "cursor-default"}`}
+                                    >
+                                      <span
+                                        className={`mt-1 h-3 w-3 shrink-0 rounded-full border ${
+                                          active
+                                            ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
+                                            : "border-border bg-card"
+                                        }`}
+                                      />
+                                      <span className="min-w-0">
+                                        <span
+                                          className={`block text-body-sm ${
+                                            active ? "text-primary font-medium" : "text-foreground"
+                                          }`}
+                                        >
+                                          {v.name}
+                                        </span>
+                                        <span className="block text-caption text-text-tertiary mt-0.5">
+                                          {v.desc}
+                                        </span>
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* 一级菜单自身的操作能力 */}
+                            {!!g.actions?.length && (
+                              <div className="px-4 py-3 flex flex-wrap gap-x-5 gap-y-2">
+                                {g.actions.map((act) => (
+                                  <label
+                                    key={act.key}
+                                    className={`inline-flex items-center gap-2 ${
+                                      editable ? "cursor-pointer" : "cursor-default"
+                                    }`}
+                                  >
+                                    <Checkbox
+                                      checked={gp.actions[act.key]}
+                                      disabled={!editable || !gp.view}
+                                      onCheckedChange={(v) => setGroupAction(g.key, act.key, !!v)}
+                                      className="h-[16px] w-[16px]"
+                                    />
+                                    <span className="text-caption text-text-secondary">{act.name}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* 二级菜单 */}
+                            {!!g.children?.length && (
+                              <div>
+                                {g.children.map((leaf) => {
+                                  const lp = gp.leaves[leaf.key];
+                                  if (!lp) return null;
+                                  return (
+                                    <div
+                                      key={leaf.key}
+                                      className="border-t border-border px-4 py-2.5"
+                                    >
+                                      <label
+                                        className={`inline-flex items-center gap-2 ${
+                                          editable ? "cursor-pointer" : "cursor-default"
+                                        }`}
+                                      >
+                                        <Checkbox
+                                          checked={lp.view}
+                                          disabled={!editable || !gp.view}
+                                          onCheckedChange={(v) => setLeafView(g.key, leaf.key, !!v)}
+                                          className="h-[16px] w-[16px]"
+                                        />
+                                        <span className="text-body-sm text-foreground">
+                                          {leaf.name}
+                                        </span>
+                                        <span className="text-caption text-text-tertiary">
+                                          可查看
+                                        </span>
+                                      </label>
+
+                                      {!!leaf.actions?.length && (
+                                        <div className="mt-2 ml-6 flex flex-wrap gap-x-5 gap-y-2">
+                                          {leaf.actions.map((act) => (
+                                            <label
+                                              key={act.key}
+                                              className={`inline-flex items-center gap-2 ${
+                                                editable ? "cursor-pointer" : "cursor-default"
+                                              }`}
+                                            >
+                                              <Checkbox
+                                                checked={lp.actions[act.key]}
+                                                disabled={!editable || !lp.view}
+                                                onCheckedChange={(v) =>
+                                                  setLeafAction(g.key, leaf.key, act.key, !!v)
+                                                }
+                                                className="h-[16px] w-[16px]"
+                                              />
+                                              <span className="text-caption text-text-secondary">
+                                                {act.name}
+                                              </span>
+                                            </label>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>
-
                   ) : (
                     <div className="rounded-md border border-dashed border-border bg-surface-subtle px-4 py-6 text-center text-body-sm text-text-tertiary">
                       已关闭 PC 端登录权限
                     </div>
                   )}
+
 
                 </section>
 
