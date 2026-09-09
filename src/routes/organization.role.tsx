@@ -294,19 +294,39 @@ const workbenchViews: { key: WorkbenchView; name: string; desc: string }[] = [
   { key: "farm-internal", name: "牧场内部管理看板", desc: "牧场内部全量专题，面向场长与现场团队" },
 ];
 
-type PcPerms = { allowLogin: boolean; modules: Record<PcModuleKey, boolean>; workbenchView: WorkbenchView };
+type LeafPerm = { view: boolean; actions: Record<string, boolean> };
+type GroupPerm = { view: boolean; leaves: Record<string, LeafPerm>; actions: Record<string, boolean> };
+type NavPerms = Record<string, GroupPerm>;
+type PcPerms = { allowLogin: boolean; nav: NavPerms; workbenchView: WorkbenchView };
 type MiniPerms = Record<MiniEventKey, Record<MiniActionKey, boolean>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
-function fullPc(allow = true, modules = true): PcPerms {
-  return {
-    allowLogin: allow,
-    workbenchView: "group",
-    modules: pcModules.reduce(
-      (acc, m) => ({ ...acc, [m.key]: modules }),
-      {} as Record<PcModuleKey, boolean>,
-    ),
-  };
+function buildNav(on: boolean, groupKeys?: string[]): NavPerms {
+  return navSpec.reduce((acc, g) => {
+    const gOn = groupKeys ? !!g.required || groupKeys.includes(g.key) : on;
+    acc[g.key] = {
+      view: gOn,
+      actions: (g.actions ?? []).reduce(
+        (a, act) => ({ ...a, [act.key]: gOn }),
+        {} as Record<string, boolean>,
+      ),
+      leaves: (g.children ?? []).reduce((a, leaf) => {
+        a[leaf.key] = {
+          view: gOn,
+          actions: (leaf.actions ?? []).reduce(
+            (x, act) => ({ ...x, [act.key]: gOn }),
+            {} as Record<string, boolean>,
+          ),
+        };
+        return a;
+      }, {} as Record<string, LeafPerm>),
+    };
+    return acc;
+  }, {} as NavPerms);
+}
+
+function fullPc(allow = true, on = true): PcPerms {
+  return { allowLogin: allow, workbenchView: "group", nav: buildNav(on) };
 }
 type MiniEventDef = (typeof miniEvents)[number];
 const hasAction = (e: MiniEventDef, a: MiniActionKey) => !!e.actions[a];
@@ -324,15 +344,8 @@ function fullMini(v = true): MiniPerms {
     {} as MiniPerms,
   );
 }
-function partialPc(keys: PcModuleKey[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
-  return {
-    allowLogin: true,
-    workbenchView,
-    modules: pcModules.reduce(
-      (acc, m) => ({ ...acc, [m.key]: m.required || keys.includes(m.key) }),
-      {} as Record<PcModuleKey, boolean>,
-    ),
-  };
+function partialPc(keys: string[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
+  return { allowLogin: true, workbenchView, nav: buildNav(false, keys) };
 }
 
 function partialMini(map: Partial<Record<MiniEventKey, Partial<Record<MiniActionKey, boolean>>>>): MiniPerms {
@@ -349,11 +362,11 @@ function partialMini(map: Partial<Record<MiniEventKey, Partial<Record<MiniAction
 const defaultPerms: RolePerms = {
   admin: { pc: fullPc(true, true), mini: fullMini(true) },
   manager: {
-    pc: partialPc(["health", "drug", "archive", "knowledge"]),
+    pc: partialPc(["workorder", "drug", "archive", "diagnosis", "stats", "feedback"]),
     mini: fullMini(true),
   },
   vet: {
-    pc: partialPc(["health", "drug", "knowledge"]),
+    pc: partialPc(["workorder", "drug", "diagnosis", "archive"]),
     mini: partialMini({
       disease: { report: true, execute: true },
       vaccine: { report: true, execute: true },
@@ -363,7 +376,7 @@ const defaultPerms: RolePerms = {
     }),
   },
   assistant: {
-    pc: { allowLogin: false, workbenchView: "farm-internal", modules: pcModules.reduce((a, m) => ({ ...a, [m.key]: false }), {} as Record<PcModuleKey, boolean>) },
+    pc: { allowLogin: false, workbenchView: "farm-internal", nav: buildNav(false) },
     mini: partialMini({
       disease: { execute: true },
       vaccine: { execute: true },
@@ -374,6 +387,7 @@ const defaultPerms: RolePerms = {
     }),
   },
 };
+
 
 type ViewMode = "detail" | "edit";
 
