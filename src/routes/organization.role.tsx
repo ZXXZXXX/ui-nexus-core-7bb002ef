@@ -325,6 +325,16 @@ function RolePage() {
       },
     }));
   };
+  const setWorkbenchView = (v: WorkbenchView) => {
+    if (!drawerRole || !editable) return;
+    setPerms((prev) => ({
+      ...prev,
+      [drawerRole]: {
+        ...prev[drawerRole],
+        pc: { ...prev[drawerRole].pc, workbenchView: v },
+      },
+    }));
+  };
   const setMini = (e: MiniEventKey, a: MiniActionKey, v: boolean) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
