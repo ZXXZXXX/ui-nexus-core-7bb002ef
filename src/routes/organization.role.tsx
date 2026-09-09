@@ -435,11 +435,9 @@ function RolePage() {
         pc: {
           allowLogin: false,
           workbenchView: "farm-internal" as WorkbenchView,
-          modules: pcModules.reduce(
-            (a, m) => ({ ...a, [m.key]: false }),
-            {} as Record<PcModuleKey, boolean>,
-          ),
+          nav: buildNav(false),
         },
+
         mini: miniEvents.reduce(
           (a, e) => ({ ...a, [e.key]: { report: false, execute: false } }),
           {} as MiniPerms,
