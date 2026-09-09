@@ -82,16 +82,181 @@ const initialRoles: Role[] = [
   { key: "assistant", name: "兽医助理", count: 6, scope: "健康执行 / 录入", desc: "协助兽医完成日常工作录入与执行，部分功能仅查看权限。", enabled: false, icon: HeartPulse },
 ];
 
-type PcModuleKey = "workbench" | "archive" | "health" | "drug" | "organization" | "knowledge";
+/** 与左侧菜单导航完全对应的权限结构 */
+type NavAction = { key: string; name: string };
+type NavLeaf = { key: string; name: string; actions?: NavAction[] };
+type NavGroupDef = {
+  key: string;
+  name: string;
+  desc: string;
+  kind?: "home";
+  children?: NavLeaf[];
+  actions?: NavAction[];
+  required?: boolean;
+};
 
-const pcModules: { key: PcModuleKey; name: string; desc: string; required?: boolean }[] = [
-  { key: "workbench", name: "工作台", desc: "首页数据看板与待办，仅展示当前角色已开通模块的相关数据", required: true },
-  { key: "archive", name: "牛只基础档案", desc: "牛场、牛舍、牛只档案的维护（不可关闭）", required: true },
-  { key: "health", name: "工单管理", desc: "疾病、疫苗、修蹄等健康事项的方案确认、诊断与执行计划" },
-  { key: "drug", name: "药品管理", desc: "药品档案、库存、调拨、取药与损耗管理" },
-  { key: "organization", name: "组织管理", desc: "账号、角色、租户与团队管理" },
-  { key: "knowledge", name: "知识库管理", desc: "疾病、症状、处方等诊疗知识维护" },
+const woActions: NavAction[] = [
+  { key: "create", name: "新建工单" },
+  { key: "assign", name: "下发 / 指派" },
+  { key: "diagnose", name: "诊断 / 确认方案" },
+  { key: "execute", name: "执行 / 完成" },
+  { key: "export", name: "导出" },
 ];
+
+const crudActions: NavAction[] = [
+  { key: "create", name: "新建" },
+  { key: "edit", name: "编辑" },
+  { key: "delete", name: "删除" },
+  { key: "export", name: "导出" },
+];
+
+const navSpec: NavGroupDef[] = [
+  {
+    key: "home",
+    name: "首页",
+    desc: "选择该角色进入首页时看到的看板视角（4 选 1）",
+    kind: "home",
+    required: true,
+  },
+  {
+    key: "archive",
+    name: "基础档案",
+    desc: "仅区分能否查看二级菜单界面，无其他操作能力",
+    children: [
+      { key: "farm", name: "牛场信息" },
+      { key: "barn", name: "牛舍信息" },
+      { key: "cattle", name: "牛只信息" },
+    ],
+  },
+  {
+    key: "workorder",
+    name: "工单管理",
+    desc: "可分别配置二级菜单的查看与操作能力",
+    children: [
+      { key: "disease", name: "疾病治疗", actions: woActions },
+      { key: "vaccine", name: "疫苗免疫", actions: woActions },
+      { key: "postpartum", name: "产后护理", actions: woActions },
+      { key: "hoof", name: "修蹄工单", actions: woActions },
+      { key: "drying", name: "干奶工单", actions: woActions },
+      { key: "deworm", name: "驱虫工单", actions: woActions },
+      { key: "general", name: "普修工单", actions: woActions },
+    ],
+  },
+  {
+    key: "drug",
+    name: "药品管理",
+    desc: "可分别配置二级菜单的查看与操作能力",
+    children: [
+      {
+        key: "drug-file",
+        name: "药品档案",
+        actions: [
+          { key: "create", name: "新建药品" },
+          { key: "edit", name: "编辑 / 调价" },
+          { key: "delete", name: "删除" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "stock",
+        name: "药品库存",
+        actions: [
+          { key: "inbound", name: "入库登记" },
+          { key: "adjust", name: "库存调整" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "transfer",
+        name: "调拨记录",
+        actions: [
+          { key: "create", name: "发起调拨" },
+          { key: "audit", name: "审核" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "dispense",
+        name: "取药记录",
+        actions: [
+          { key: "create", name: "登记取药" },
+          { key: "export", name: "导出" },
+        ],
+      },
+      {
+        key: "loss",
+        name: "损耗管理",
+        actions: [
+          { key: "create", name: "登记损耗" },
+          { key: "audit", name: "判定 / 审核" },
+          { key: "export", name: "导出" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "diagnosis",
+    name: "诊疗管理",
+    desc: "可分别配置二级菜单的查看与维护能力",
+    children: [
+      { key: "disease", name: "疾病管理", actions: crudActions },
+      { key: "symptom", name: "症状管理", actions: crudActions },
+      { key: "prescription", name: "处方管理", actions: crudActions },
+    ],
+  },
+  {
+    key: "org",
+    name: "组织管理",
+    desc: "可分别配置二级菜单的查看与管理能力",
+    children: [
+      {
+        key: "account",
+        name: "账号管理",
+        actions: [
+          { key: "create", name: "新建账号" },
+          { key: "edit", name: "编辑" },
+          { key: "toggle", name: "启用 / 停用" },
+        ],
+      },
+      {
+        key: "role",
+        name: "角色管理",
+        actions: [
+          { key: "create", name: "新建角色" },
+          { key: "edit", name: "编辑权限" },
+          { key: "delete", name: "删除" },
+        ],
+      },
+      {
+        key: "tenant",
+        name: "租户管理",
+        actions: [
+          { key: "edit", name: "编辑" },
+          { key: "toggle", name: "启用 / 停用" },
+        ],
+      },
+    ],
+  },
+  {
+    key: "stats",
+    name: "统计分析",
+    desc: "一级菜单，可配置查看与操作能力",
+    actions: [
+      { key: "custom", name: "自定义分析（新建 / 编辑模板）" },
+      { key: "export", name: "导出" },
+    ],
+  },
+  {
+    key: "feedback",
+    name: "反馈管理",
+    desc: "一级菜单，可配置查看与操作能力",
+    actions: [
+      { key: "mark", name: "标注有价值 / 无价值" },
+      { key: "export", name: "导出" },
+    ],
+  },
+];
+
 
 
 type MiniEventKey =
