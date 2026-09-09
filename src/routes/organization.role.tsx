@@ -255,6 +255,7 @@ function RolePage() {
       [key]: {
         pc: {
           allowLogin: false,
+          workbenchView: "farm-internal" as WorkbenchView,
           modules: pcModules.reduce(
             (a, m) => ({ ...a, [m.key]: false }),
             {} as Record<PcModuleKey, boolean>,
