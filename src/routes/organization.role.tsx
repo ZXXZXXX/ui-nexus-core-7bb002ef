@@ -899,91 +899,167 @@ function RolePage() {
                   </div>
 
                   {cur.pc.allowLogin ? (
-                    <div className="rounded-md border border-border overflow-hidden">
-                      {pcModules.map((m, idx) => {
-                        const checked = cur.pc.modules[m.key];
-                        const locked = !!m.required;
+                    <div className="space-y-3">
+                      {navSpec.map((g) => {
+                        const gp = cur.pc.nav[g.key];
+                        if (!gp) return null;
+                        const locked = !!g.required;
                         return (
-                          <label
-                            key={m.key}
-                            className={`flex items-start gap-3 px-4 py-3 hover:bg-surface-subtle ${
-                              idx > 0 ? "border-t border-border" : ""
-                            } ${editable && !locked ? "cursor-pointer" : "cursor-default"}`}
-                          >
-                            <Checkbox
-                              checked={locked ? true : checked}
-                              disabled={!editable || locked}
-                              onCheckedChange={(v) => !locked && setPcModule(m.key, !!v)}
-                              className="mt-0.5"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <div className="text-body-sm font-medium text-foreground inline-flex items-center gap-1.5">
-                                {m.name}
-                                {locked && (
-                                  <span className="text-caption text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0 leading-5">
-                                    不可关闭
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-caption text-text-tertiary mt-0.5">{m.desc}</div>
-
-                              {m.key === "workbench" && (
-                                <div className="mt-3 rounded-md bg-surface-subtle p-2 space-y-1">
-                                  <div className="px-1 pb-1 text-caption text-text-secondary">
-                                    选择该角色的工作台看板视图（4 选 1）
-                                  </div>
-                                  {workbenchViews.map((v) => {
-                                    const active = cur.pc.workbenchView === v.key;
-                                    return (
-                                      <button
-                                        key={v.key}
-                                        type="button"
-                                        disabled={!editable}
-                                        onClick={(e) => {
-                                          e.preventDefault();
-                                          setWorkbenchView(v.key);
-                                        }}
-                                        className={`w-full flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
-                                          active
-                                            ? "border-primary/40 bg-brand-subtle"
-                                            : "border-transparent bg-card hover:border-border"
-                                        } ${editable ? "cursor-pointer" : "cursor-default"}`}
-                                      >
-                                        <span
-                                          className={`mt-1 h-3 w-3 shrink-0 rounded-full border ${
-                                            active
-                                              ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
-                                              : "border-border bg-card"
-                                          }`}
-                                        />
-                                        <span className="min-w-0">
-                                          <span
-                                            className={`block text-body-sm ${
-                                              active ? "text-primary font-medium" : "text-foreground"
-                                            }`}
-                                          >
-                                            {v.name}
-                                          </span>
-                                          <span className="block text-caption text-text-tertiary mt-0.5">
-                                            {v.desc}
-                                          </span>
-                                        </span>
-                                      </button>
-                                    );
-                                  })}
+                          <div key={g.key} className="rounded-md border border-border overflow-hidden">
+                            {/* 一级菜单 */}
+                            <div className="flex items-start gap-3 px-4 py-3 bg-surface-subtle">
+                              <Checkbox
+                                checked={locked ? true : gp.view}
+                                disabled={!editable || locked}
+                                onCheckedChange={(v) => !locked && setGroupView(g.key, !!v)}
+                                className="mt-0.5"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <div className="text-body-sm font-medium text-foreground inline-flex items-center gap-1.5">
+                                  {g.name}
+                                  {locked && (
+                                    <span className="text-caption text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0 leading-5">
+                                      不可关闭
+                                    </span>
+                                  )}
                                 </div>
-                              )}
+                                <div className="text-caption text-text-tertiary mt-0.5">{g.desc}</div>
+                              </div>
                             </div>
-                          </label>
+
+                            {/* 首页：4 类视角平铺 */}
+                            {g.kind === "home" && (
+                              <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {workbenchViews.map((v) => {
+                                  const active = cur.pc.workbenchView === v.key;
+                                  return (
+                                    <button
+                                      key={v.key}
+                                      type="button"
+                                      disabled={!editable}
+                                      onClick={() => setWorkbenchView(v.key)}
+                                      className={`flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
+                                        active
+                                          ? "border-primary/40 bg-brand-subtle"
+                                          : "border-border bg-card hover:border-primary/30"
+                                      } ${editable ? "cursor-pointer" : "cursor-default"}`}
+                                    >
+                                      <span
+                                        className={`mt-1 h-3 w-3 shrink-0 rounded-full border ${
+                                          active
+                                            ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
+                                            : "border-border bg-card"
+                                        }`}
+                                      />
+                                      <span className="min-w-0">
+                                        <span
+                                          className={`block text-body-sm ${
+                                            active ? "text-primary font-medium" : "text-foreground"
+                                          }`}
+                                        >
+                                          {v.name}
+                                        </span>
+                                        <span className="block text-caption text-text-tertiary mt-0.5">
+                                          {v.desc}
+                                        </span>
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* 一级菜单自身的操作能力 */}
+                            {!!g.actions?.length && (
+                              <div className="px-4 py-3 flex flex-wrap gap-x-5 gap-y-2">
+                                {g.actions.map((act) => (
+                                  <label
+                                    key={act.key}
+                                    className={`inline-flex items-center gap-2 ${
+                                      editable ? "cursor-pointer" : "cursor-default"
+                                    }`}
+                                  >
+                                    <Checkbox
+                                      checked={gp.actions[act.key]}
+                                      disabled={!editable || !gp.view}
+                                      onCheckedChange={(v) => setGroupAction(g.key, act.key, !!v)}
+                                      className="h-[16px] w-[16px]"
+                                    />
+                                    <span className="text-caption text-text-secondary">{act.name}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* 二级菜单 */}
+                            {!!g.children?.length && (
+                              <div>
+                                {g.children.map((leaf) => {
+                                  const lp = gp.leaves[leaf.key];
+                                  if (!lp) return null;
+                                  return (
+                                    <div
+                                      key={leaf.key}
+                                      className="border-t border-border px-4 py-2.5"
+                                    >
+                                      <label
+                                        className={`inline-flex items-center gap-2 ${
+                                          editable ? "cursor-pointer" : "cursor-default"
+                                        }`}
+                                      >
+                                        <Checkbox
+                                          checked={lp.view}
+                                          disabled={!editable || !gp.view}
+                                          onCheckedChange={(v) => setLeafView(g.key, leaf.key, !!v)}
+                                          className="h-[16px] w-[16px]"
+                                        />
+                                        <span className="text-body-sm text-foreground">
+                                          {leaf.name}
+                                        </span>
+                                        <span className="text-caption text-text-tertiary">
+                                          可查看
+                                        </span>
+                                      </label>
+
+                                      {!!leaf.actions?.length && (
+                                        <div className="mt-2 ml-6 flex flex-wrap gap-x-5 gap-y-2">
+                                          {leaf.actions.map((act) => (
+                                            <label
+                                              key={act.key}
+                                              className={`inline-flex items-center gap-2 ${
+                                                editable ? "cursor-pointer" : "cursor-default"
+                                              }`}
+                                            >
+                                              <Checkbox
+                                                checked={lp.actions[act.key]}
+                                                disabled={!editable || !lp.view}
+                                                onCheckedChange={(v) =>
+                                                  setLeafAction(g.key, leaf.key, act.key, !!v)
+                                                }
+                                                className="h-[16px] w-[16px]"
+                                              />
+                                              <span className="text-caption text-text-secondary">
+                                                {act.name}
+                                              </span>
+                                            </label>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>
-
                   ) : (
                     <div className="rounded-md border border-dashed border-border bg-surface-subtle px-4 py-6 text-center text-body-sm text-text-tertiary">
                       已关闭 PC 端登录权限
                     </div>
                   )}
+
 
                 </section>
 
