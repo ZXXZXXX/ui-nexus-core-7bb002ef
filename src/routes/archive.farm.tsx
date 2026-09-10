@@ -26,7 +26,6 @@ type Farm = {
 };
 
 const regionOf = (f: Farm) => `${f.province}${f.city}${f.district}`;
-const fullAddress = (f: Farm) => `${regionOf(f)}${f.address}`;
 
 const initialFarms: Farm[] = [
   { id: "F001", name: "1 号牧场", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "内蒙古晟安畜牧服务有限公司", province: "内蒙古自治区", city: "呼伦贝尔市", district: "海拉尔区", address: "牧原路 18 号", withdrawalFactor: 2 },
