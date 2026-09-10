@@ -67,7 +67,7 @@ const initialSystems: SystemRow[] = [
   {
     id: "S-ERP",
     kind: "erp",
-    name: "用友 U8 Cloud",
+    name: "金蝶云",
     apiUrl: "https://erp.qidian-farm.com/openapi",
     appKey: "erp_ak_2b77de",
     appSecret: "••••••••••••",
@@ -78,6 +78,7 @@ const initialSystems: SystemRow[] = [
       { id: "B2", name: "华北区帐套", code: "002", apiUrl: "https://erp.qidian-farm.com/openapi/002", enabled: true },
     ],
   },
+
   {
     id: "S-EXT-1",
     kind: "external",
@@ -268,7 +269,7 @@ function IntegrationPage() {
                 </h4>
               </div>
               <Field label="系统名称" required>
-                <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="如：用友 U8 Cloud" className="h-9 bg-card border-border text-body-sm" />
+                <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="如：金蝶云" className="h-9 bg-card border-border text-body-sm" />
               </Field>
               <Field label="API 地址" required>
                 <Input value={form.apiUrl} onChange={(e) => set("apiUrl", e.target.value)} placeholder="https://" className="h-9 bg-card border-border text-body-sm font-mono" />
