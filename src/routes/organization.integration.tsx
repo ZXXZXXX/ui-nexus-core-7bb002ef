@@ -412,11 +412,11 @@ function SystemLogo({ name, domain }: { name: string; domain?: string }) {
   const [failed, setFailed] = useState(false);
   const src = domain && token ? `https://img.logo.dev/${domain}?token=${token}&size=80&format=png` : undefined;
   return (
-    <div className="h-9 w-9 shrink-0 rounded-lg border border-border bg-card overflow-hidden flex items-center justify-center">
+    <div className="h-8 w-8 shrink-0 rounded-md bg-brand-subtle overflow-hidden flex items-center justify-center">
       {src && !failed ? (
         <img src={src} alt={`${name} logo`} className="h-full w-full object-contain" loading="lazy" onError={() => setFailed(true)} />
       ) : (
-        <span className="text-body-sm text-text-tertiary">{name.slice(0, 1)}</span>
+        <span className="text-body-sm font-medium text-primary">{name.slice(0, 1)}</span>
       )}
     </div>
   );
