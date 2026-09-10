@@ -260,7 +260,7 @@ function FarmPage() {
                   <Label className="text-caption text-text-tertiary">详细地址</Label>
                   <Input value={editing.address} onChange={(e) => setEditing({ ...editing, address: e.target.value })} placeholder="街道、门牌号等详细信息" className="h-9 bg-card border-border text-body-sm" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="col-span-2 space-y-1.5">
                   <Label className="text-caption text-text-tertiary">关联 ERP 帐套</Label>
                   <Select
                     value={editing.erpBook || "__none__"}
