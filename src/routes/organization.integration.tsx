@@ -136,11 +136,11 @@ const initialSystems: SystemRow[] = [
   {
     id: "S-EXT-1",
     kind: "external",
-    name: "企业微信开放平台",
-    apiUrl: "https://qyapi.weixin.qq.com/cgi-bin",
-    appKey: "ww1234567890abcdef",
+    name: "i人事",
+    apiUrl: "https://api.ihr360.com/openapi",
+    appKey: "ihr_ak_5c93af",
     appSecret: "••••••••••••",
-    remark: "组织架构与消息推送",
+    remark: "人事组织架构与人员信息同步",
     enabled: true,
   },
 ];
