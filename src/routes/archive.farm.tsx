@@ -74,9 +74,19 @@ const columns: ListColumn<Farm>[] = [
   },
 ];
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className="text-body-sm text-foreground">{children}</div>
+    </div>
+  );
+}
+
 function FarmPage() {
   const [farms, setFarms] = useState<Farm[]>(initialFarms);
   const [editing, setEditing] = useState<Farm | null>(null);
+  const [detail, setDetail] = useState<Farm | null>(null);
   const [book, setBook] = useState("");
 
   const openEdit = (f: Farm) => {
