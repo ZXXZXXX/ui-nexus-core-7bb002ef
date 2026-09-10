@@ -25,7 +25,7 @@ export const Route = createFileRoute("/archive/farm")({
 type Farm = {
   id: string; name: string; region: string; slot: string; type: string; manager: string;
   stock: number; barns: number; status: string; erpBook: string;
-  address: string; withdrawalFactor: number; owner: string;
+  address: string; withdrawalFactor: 1 | 2; owner: string;
 };
 
 const initialFarms: Farm[] = [
@@ -177,7 +177,7 @@ function FarmPage() {
                 <Field label="牛场类型">
                   <span className={`tag ${detail.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{detail.type}</span>
                 </Field>
-                <Field label="休药期倍数"><span className="tabular-nums">{detail.withdrawalFactor}×</span></Field>
+                <Field label="休药期倍数">{detail.withdrawalFactor} 倍</Field>
                 <Field label="存栏总数"><span className="tabular-nums">{detail.stock}</span></Field>
                 <Field label="牛舍数量"><span className="tabular-nums">{detail.barns}</span></Field>
                 <Field label="负责人">{detail.manager}</Field>
