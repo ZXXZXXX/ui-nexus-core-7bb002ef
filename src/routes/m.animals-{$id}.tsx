@@ -759,14 +759,20 @@ type MoveRecord = {
   orderId: string | null;
   reason: string;
   operator: string;
+  farm: string;
+  /** 跨牧场转入 / 转出 */
+  crossFarm?: boolean;
 };
 
+const CURRENT_FARM = "1 号牧场";
+
 const ALL_MOVES: MoveRecord[] = [
-  { id: "MV-0518", date: "2026-05-18", from: "1 号牛舍", to: "3 号牛舍", orderId: "WO-2026-0518", reason: "疾病治疗", operator: "李雨晴" },
-  { id: "MV-0410", date: "2026-04-10", from: "隔离舍", to: "1 号牛舍", orderId: "WO-2026-0405", reason: "治愈", operator: "李雨晴" },
-  { id: "MV-0320", date: "2026-03-20", from: "1 号牛舍", to: "隔离舍", orderId: "WO-2026-0318", reason: "继续观察", operator: "李雨晴" },
-  { id: "MV-0301", date: "2026-03-01", from: "犊牛舍", to: "1 号牛舍", orderId: null, reason: "调群", operator: "王场长" },
-  { id: "MV-0101", date: "2026-01-10", from: "产房", to: "犊牛舍", orderId: null, reason: "断奶分群", operator: "周凯" },
+  { id: "MV-0518", date: "2026-05-18", farm: "1 号牧场", from: "1 号牛舍", to: "3 号牛舍", orderId: "WO-2026-0518", reason: "疾病治疗", operator: "李雨晴" },
+  { id: "MV-0410", date: "2026-04-10", farm: "1 号牧场", from: "病牛舍", to: "1 号牛舍", orderId: "WO-2026-0405", reason: "治愈", operator: "李雨晴" },
+  { id: "MV-0320", date: "2026-03-20", farm: "1 号牧场", from: "1 号牛舍", to: "病牛舍", orderId: "WO-2026-0318", reason: "继续观察", operator: "李雨晴" },
+  { id: "MV-0301", date: "2026-03-01", farm: "1 号牧场", from: "2 号牧场 · 2 号牛舍", to: "1 号牧场 · 1 号牛舍", orderId: null, reason: "跨场调群转入", operator: "王场长", crossFarm: true },
+  { id: "MV-0212", date: "2026-02-12", farm: "2 号牧场", from: "犊牛舍", to: "2 号牛舍", orderId: null, reason: "断奶分群", operator: "周凯" },
+  { id: "MV-0101", date: "2026-01-10", farm: "2 号牧场", from: "产房", to: "犊牛舍", orderId: null, reason: "初生转群", operator: "周凯" },
 ];
 
 function MoveHistory() {
