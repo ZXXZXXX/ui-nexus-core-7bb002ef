@@ -141,8 +141,8 @@ function FarmPage() {
             <Button variant="outline" onClick={() => setEditing(null)}>取消</Button>
             <Button onClick={save} className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground">保存</Button>
           </DialogFooter>
-        </DialogFooter>
         </DialogContent>
+
       </Dialog>
     </>
   );
