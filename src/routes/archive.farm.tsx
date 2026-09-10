@@ -10,6 +10,8 @@ import { Building2, MoreHorizontal, Trash2 } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { toast } from "sonner";
 import { ERP_BOOKS } from "@/data/erp-books";
+import { Switch } from "@/components/ui/switch";
+import { REGIONS, citiesOf, districtsOf } from "@/data/regions";
 
 export const Route = createFileRoute("/archive/farm")({
   head: () => ({ meta: [{ title: "牛场信息 — 奇点智牧" }] }),
