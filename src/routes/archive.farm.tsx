@@ -43,7 +43,7 @@ const columns: ListColumn<Farm>[] = [
       </span>
     ),
   },
-  { key: "region", label: "所在地区", filter: "select", render: (f) => <span className="text-body-sm text-text-secondary">{f.region}</span> },
+  { key: "region", label: "所在地区", filter: "select", value: (f) => `${f.province}·${f.city}`, render: (f) => <span className="text-body-sm text-text-secondary">{f.province}·{f.city}</span> },
   { key: "slot", label: "仓位号", filter: "select", render: (f) => <span className="font-mono text-body-sm text-text-secondary">{f.slot}</span> },
   {
     key: "type", label: "牛场类型", filter: "select",
