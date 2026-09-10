@@ -88,19 +88,21 @@ function FarmPage() {
   const [farms, setFarms] = useState<Farm[]>(initialFarms);
   const [editing, setEditing] = useState<Farm | null>(null);
   const [detail, setDetail] = useState<Farm | null>(null);
-  const [book, setBook] = useState("");
 
-  const openEdit = (f: Farm) => {
-    setEditing(f);
-    setBook(f.erpBook);
-  };
+  const openEdit = (f: Farm) => setEditing({ ...f });
 
   const save = () => {
     if (!editing) return;
-    setFarms((prev) => prev.map((f) => (f.id === editing.id ? { ...f, erpBook: book.trim() } : f)));
+    if (!editing.name.trim()) {
+      toast.error("请填写牛场名称");
+      return;
+    }
+    const next = { ...editing, name: editing.name.trim(), erpBook: editing.erpBook.trim() };
+    setFarms((prev) => prev.map((f) => (f.id === next.id ? next : f)));
     setEditing(null);
-    toast.success("ERP 帐套已更新");
+    toast.success("牛场信息已更新");
   };
+
 
   return (
     <>
