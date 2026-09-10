@@ -333,6 +333,14 @@ function IntegrationPage() {
                         <Field label="帐套 API 地址">
                           <Input value={b.apiUrl} onChange={(e) => updateBook(b.id, { apiUrl: e.target.value })} placeholder="https://" className="h-9 bg-card border-border text-body-sm font-mono" />
                         </Field>
+                        <div className="grid grid-cols-2 gap-3">
+                          <Field label="帐套 AppKey">
+                            <Input value={b.appKey} onChange={(e) => updateBook(b.id, { appKey: e.target.value })} placeholder="接口账号 / AppKey" className="h-9 bg-card border-border text-body-sm font-mono" />
+                          </Field>
+                          <Field label="帐套 AppSecret">
+                            <Input value={b.appSecret} onChange={(e) => updateBook(b.id, { appSecret: e.target.value })} placeholder="接口密钥" className="h-9 bg-card border-border text-body-sm font-mono" />
+                          </Field>
+                        </div>
                         <div className="flex items-center justify-between">
                           <span className="text-body-sm text-foreground">启用该帐套</span>
                           <Switch checked={b.enabled} onCheckedChange={(v) => updateBook(b.id, { enabled: v })} />
