@@ -785,12 +785,22 @@ function MoveHistory() {
   }
   return (
     <div className="space-y-2">
-      <div className="text-caption text-text-tertiary mb-1">共 {ALL_MOVES.length} 条</div>
+      <div className="text-caption text-text-tertiary mb-1">
+        共 {ALL_MOVES.length} 条
+        {ALL_MOVES.some((m) => m.farm !== CURRENT_FARM || m.crossFarm)
+          ? ` · 含原牧场记录 ${ALL_MOVES.filter((m) => m.farm !== CURRENT_FARM || m.crossFarm).length} 条`
+          : ""}
+      </div>
       {ALL_MOVES.map((m) => (
         <div key={m.id} className="rounded-xl border border-border bg-card p-3">
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <span className="font-mono text-caption text-text-secondary">{m.date}</span>
             <span className="text-caption text-text-tertiary">· 操作人 {m.operator}</span>
+            {m.crossFarm ? (
+              <span className="tag tag-info">跨牧场转入</span>
+            ) : m.farm !== CURRENT_FARM ? (
+              <span className="tag tag-muted">原牧场 · {m.farm}</span>
+            ) : null}
           </div>
           <div className="flex items-center gap-2 text-body-sm text-foreground">
             <span className="flex-1 min-w-0 truncate">{m.from}</span>
