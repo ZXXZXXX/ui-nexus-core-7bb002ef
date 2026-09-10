@@ -135,7 +135,7 @@ function BarnPage() {
         getRowKey={(b) => b.id}
         rowActions={(b) => (
           <>
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground" onClick={() => setDetail(b)}>查看</Button>
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground" onClick={() => openView(b)}>查看</Button>
             <Button
               variant="ghost"
               size="sm"
