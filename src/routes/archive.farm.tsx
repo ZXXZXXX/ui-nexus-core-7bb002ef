@@ -302,6 +302,30 @@ function FarmPage() {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={!!pendingStatus} onOpenChange={(o) => !o && setPendingStatus(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{pendingStatus === "运营中" ? "确认启用该牛场？" : "确认停用该牛场？"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingStatus === "运营中"
+                ? "启用后该牛场将恢复运营，相关业务功能重新开放。"
+                : "停用后该牛场将被冻结，相关业务将无法继续操作。"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (editing && pendingStatus) setEditing({ ...editing, status: pendingStatus });
+                setPendingStatus(null);
+              }}
+            >
+              确认
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
