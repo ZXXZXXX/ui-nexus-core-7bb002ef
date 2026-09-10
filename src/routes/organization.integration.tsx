@@ -94,7 +94,7 @@ const initialSystems: SystemRow[] = [
 const KIND_META: Record<SysKind, { title: string; desc: string; limit: string; icon: typeof Beef }> = {
   herd: { title: "牛群系统", desc: "同步牛只档案、繁育与生产数据", limit: "仅允许接入 1 个系统", icon: Beef },
   erp: { title: "ERP 系统", desc: "对接采购、库存与财务凭证", limit: "仅允许接入 1 个系统，可配置多个帐套", icon: Boxes },
-  external: { title: "人事系统", desc: "人事与组织人员数据接口", limit: "可接入多个系统", icon: Link2 },
+  external: { title: "人事系统", desc: "人事与组织人员数据接口", limit: "仅允许接入 1 个系统", icon: Link2 },
 };
 
 function emptyForm(kind: SysKind): SystemRow {
@@ -125,7 +125,7 @@ function IntegrationPage() {
   const submit = () => {
     if (!form.name.trim()) return toast.error("请填写系统名称");
     if (!form.apiUrl.trim()) return toast.error("请填写 API 地址");
-    if (!editing && form.kind !== "external" && of(form.kind).length >= 1) {
+    if (!editing && of(form.kind).length >= 1) {
       return toast.error(`${KIND_META[form.kind].title}只能接入 1 个系统`);
     }
     if (form.kind === "erp" && (form.books ?? []).some((b) => !b.name.trim() || !b.code.trim())) {
