@@ -14,7 +14,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Beef, Boxes, Layers, Link2, Plus, Info } from "lucide-react";
+import { Beef, Boxes, Layers, Link2, Info } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/organization/integration")({
@@ -77,6 +77,7 @@ type SystemRow = {
   appKey: string;
   appSecret: string;
   remark: string;
+  domain?: string;
   enabled: boolean;
   books?: Book[];
 };
@@ -87,6 +88,7 @@ const initialSystems: SystemRow[] = [
     kind: "herd",
     name: "一牧云牛群管理系统",
     apiUrl: "https://api.yimuyun.com/v2/herd",
+    domain: "yimuyun.com",
     appKey: "herd_ak_8f21c9",
     appSecret: "••••••••••••",
     remark: "牛只基础档案与繁育数据同步",
@@ -97,6 +99,7 @@ const initialSystems: SystemRow[] = [
     kind: "erp",
     name: "金蝶云",
     apiUrl: "https://erp.qidian-farm.com/openapi",
+    domain: "kingdee.com",
     appKey: "erp_ak_2b77de",
     appSecret: "••••••••••••",
     remark: "药品采购与费用凭证对接",
@@ -138,6 +141,7 @@ const initialSystems: SystemRow[] = [
     kind: "external",
     name: "i人事",
     apiUrl: "https://api.ihr360.com/openapi",
+    domain: "ihr360.com",
     appKey: "ihr_ak_5c93af",
     appSecret: "••••••••••••",
     remark: "人事组织架构与人员信息同步",
@@ -239,18 +243,12 @@ function IntegrationPage() {
           {(["herd", "erp", "external"] as SysKind[]).map((kind) => {
             const meta = KIND_META[kind];
             const rows = of(kind);
-            const Icon = meta.icon;
             return (
               <section key={kind} className="space-y-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-brand-subtle flex items-center justify-center shrink-0">
-                    <Icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-section-title text-foreground leading-tight">{meta.title}</div>
-                    <div className="text-caption text-text-tertiary">{meta.desc}</div>
-                  </div>
-                  <span className="tag tag-muted ml-auto shrink-0">{meta.limit}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-body-sm text-text-tertiary">{meta.title}</span>
+                  <span className="text-caption text-text-tertiary/70 truncate">{meta.desc}</span>
+                  <span className="text-caption text-text-tertiary/70 ml-auto shrink-0">{meta.limit}</span>
                 </div>
 
                 {rows.length === 0 ? (
@@ -262,6 +260,8 @@ function IntegrationPage() {
                     {rows.map((s) => (
                       <Card key={s.id} className="border-border bg-card overflow-hidden p-0">
                         <div className="flex items-start justify-between gap-4 px-5 py-4">
+                          <div className="flex items-start gap-3 min-w-0">
+                          <SystemLogo name={s.name} domain={s.domain} />
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-card-title text-foreground truncate">{s.name}</span>
@@ -272,6 +272,7 @@ function IntegrationPage() {
                             {s.remark && (
                               <div className="text-caption text-text-tertiary mt-1 truncate">{s.remark}</div>
                             )}
+                          </div>
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
                             <Button variant="outline" size="sm" onClick={() => openEdit(s)}>编辑/配置</Button>
@@ -407,6 +408,21 @@ function IntegrationPage() {
         </SheetContent>
       </Sheet>
     </>
+  );
+}
+
+function SystemLogo({ name, domain }: { name: string; domain?: string }) {
+  const token = import.meta.env['VITE_LOVABLE_CONNECTOR_LOGO_DEV_API_KEY'] as string | undefined;
+  const [failed, setFailed] = useState(false);
+  const src = domain && token ? `https://img.logo.dev/${domain}?token=${token}&size=80&format=png` : undefined;
+  return (
+    <div className="h-9 w-9 shrink-0 rounded-lg border border-border bg-card overflow-hidden flex items-center justify-center">
+      {src && !failed ? (
+        <img src={src} alt={`${name} logo`} className="h-full w-full object-contain" loading="lazy" onError={() => setFailed(true)} />
+      ) : (
+        <span className="text-body-sm text-text-tertiary">{name.slice(0, 1)}</span>
+      )}
+    </div>
   );
 }
 
