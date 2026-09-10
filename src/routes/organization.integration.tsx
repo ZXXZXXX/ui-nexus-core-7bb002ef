@@ -242,15 +242,10 @@ function IntegrationPage() {
             const Icon = meta.icon;
             return (
               <section key={kind} className="space-y-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-brand-subtle flex items-center justify-center shrink-0">
-                    <Icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-section-title text-foreground leading-tight">{meta.title}</div>
-                    <div className="text-caption text-text-tertiary">{meta.desc}</div>
-                  </div>
-                  <span className="tag tag-muted ml-auto shrink-0">{meta.limit}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-body-sm text-text-tertiary">{meta.title}</span>
+                  <span className="text-caption text-text-tertiary/70 truncate">{meta.desc}</span>
+                  <span className="text-caption text-text-tertiary/70 ml-auto shrink-0">{meta.limit}</span>
                 </div>
 
                 {rows.length === 0 ? (
@@ -262,6 +257,8 @@ function IntegrationPage() {
                     {rows.map((s) => (
                       <Card key={s.id} className="border-border bg-card overflow-hidden p-0">
                         <div className="flex items-start justify-between gap-4 px-5 py-4">
+                          <div className="flex items-start gap-3 min-w-0">
+                          <SystemLogo name={s.name} domain={s.domain} />
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="text-card-title text-foreground truncate">{s.name}</span>
