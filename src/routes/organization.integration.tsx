@@ -253,8 +253,14 @@ function IntegrationPage() {
                   </div>
 
                   {rows.length === 0 ? (
-                    <div className="text-body-sm text-text-tertiary py-2">暂未接入</div>
+                    <div className="flex items-center gap-3 py-2">
+                      <span className="text-body-sm text-text-tertiary">暂未接入</span>
+                      <Button variant="ghost" size="sm" className="ml-auto shrink-0 text-primary" onClick={() => openCreate(kind)}>
+                        新增配置
+                      </Button>
+                    </div>
                   ) : (
+
                     rows.map((s) => (
                       <div key={s.id} className="flex items-center gap-3 py-1">
                         <SystemLogo name={s.name} domain={s.domain} />
