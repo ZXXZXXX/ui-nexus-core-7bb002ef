@@ -348,7 +348,7 @@ type Rec = { date: string; qty: number; via: string; operator: string; note?: st
 
 const inbound: Record<string, Rec[]> = {
   "01-00063": [
-    { date: "2026-08-20 09:12", qty: 20, via: "调拨入库", operator: "王磊", note: "由中心库调拨" },
+    { date: "2026-08-20 09:12", qty: 20, via: "调拨入库", operator: "王磊", note: "" },
     { date: "2026-08-02 14:30", qty: 40, via: "采购入库", operator: "李静" },
   ],
   "02-00214": [
@@ -370,8 +370,8 @@ const inbound: Record<string, Rec[]> = {
 
 const outbound: Record<string, Rec[]> = {
   "01-00063": [
-    { date: "2026-08-20 17:40", qty: 18, via: "用药领取", operator: "陈涛", note: "乳房炎治疗工单" },
-    { date: "2026-08-10 18:30", qty: 1, via: "盘点差异\n", operator: "赵敏", note: "盘点实物少于账面，调减 1" },
+    { date: "2026-08-20 17:40", qty: 18, via: "用药领取", operator: "陈涛", note: "" },
+    { date: "2026-08-10 18:30", qty: 1, via: "盘点差异\n", operator: "赵敏", note: "" },
     { date: "2026-08-02 18:05", qty: 12, via: "用药领取", operator: "陈涛" },
   ],
   "02-00214": [
