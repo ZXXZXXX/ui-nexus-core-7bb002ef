@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Home } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
@@ -56,6 +57,7 @@ function BarnPage() {
   const [current, setCurrent] = useState<Barn | null>(null);
   const [mode, setMode] = useState<"view" | "edit">("view");
   const [editing, setEditing] = useState<Barn | null>(null);
+  const [customType, setCustomType] = useState(false);
 
   const knownTypes = useMemo(
     () => Array.from(new Set(barns.map((b) => b.type))),
@@ -66,16 +68,19 @@ function BarnPage() {
     setCurrent(b);
     setEditing({ ...b });
     setMode("view");
+    setCustomType(false);
   };
   const openEdit = (b: Barn) => {
     setCurrent(b);
     setEditing({ ...b });
     setMode("edit");
+    setCustomType(false);
   };
   const closeSheet = () => {
     setCurrent(null);
     setEditing(null);
     setMode("view");
+    setCustomType(false);
   };
 
   const save = () => {
