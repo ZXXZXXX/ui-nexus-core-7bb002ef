@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Beef, Plus, Search, SlidersHorizontal, MoreHorizontal, Trash2, FilePlus2, Baby, Stethoscope, ArrowRightLeft, LogOut, Upload } from "lucide-react";
+import { Beef, Plus, Search, SlidersHorizontal, MoreHorizontal, FilePlus2, Baby, Stethoscope, ArrowRightLeft, LogOut, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { CattleProfileDrawer, type CattleProfile } from "@/components/cattle-profile-drawer";
@@ -165,12 +165,6 @@ function CattlePage() {
                         </DropdownMenuItem>
                       </DropdownMenuSubContent>
                     </DropdownMenuSub>
-                    <DropdownMenuItem
-                      className="text-[var(--state-danger)] focus:text-[var(--state-danger)]"
-                      onClick={() => toast.success(`已删除 #${c.ear} 的档案`)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-2" /> 删除档案
-                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>

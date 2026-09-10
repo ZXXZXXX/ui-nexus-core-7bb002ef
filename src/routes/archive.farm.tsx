@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Building2, MoreHorizontal, Trash2 } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { toast } from "sonner";
 import { ERP_BOOKS } from "@/data/erp-books";
@@ -120,18 +119,6 @@ function FarmPage() {
           <>
             <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground" onClick={() => setDetail(f)}>查看</Button>
             <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => openEdit(f)}>编辑</Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-text-secondary hover:bg-surface-subtle hover:text-foreground" aria-label="更多">
-                  <MoreHorizontal className="h-3.5 w-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-28">
-                <DropdownMenuItem className="text-[var(--state-danger)] focus:text-[var(--state-danger)]">
-                  <Trash2 className="h-3.5 w-3.5 mr-2" /> 删除
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </>
         )}
       />
