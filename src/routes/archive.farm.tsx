@@ -161,10 +161,8 @@ function FarmPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                <Field label="牛场名称">{detail.name}</Field>
-                <Field label="所在地区">{detail.province} / {detail.city} / {detail.district}</Field>
                 <div className="col-span-2">
-                  <Field label="详细地址">{fullAddress(detail)}</Field>
+                  <Field label="牛场地点">{fullAddress(detail)}</Field>
                 </div>
                 <div className="col-span-2">
                   <Field label="关联 ERP 帐套">
@@ -176,10 +174,6 @@ function FarmPage() {
                 </Field>
                 <Field label="休药期倍数">{detail.withdrawalFactor} 倍</Field>
                 <Field label="负责人">{detail.manager}</Field>
-                <Field label="牛场状态">
-                  <span className={`tag ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>
-                </Field>
-                
               </div>
             </div>
           )}
