@@ -202,7 +202,18 @@ function FarmPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-caption text-text-tertiary">关联 ERP 帐套</Label>
-                  <Input value={editing.erpBook} onChange={(e) => setEditing({ ...editing, erpBook: e.target.value })} placeholder="如：集团总账套（001）" className="h-9 bg-card border-border text-body-sm" />
+                  <Select
+                    value={editing.erpBook || "__none__"}
+                    onValueChange={(v) => setEditing({ ...editing, erpBook: v === "__none__" ? "" : v })}
+                  >
+                    <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="选择帐套" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">未绑定</SelectItem>
+                      {ERP_BOOKS.map((b) => (
+                        <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-caption text-text-tertiary">牛场类型</Label>
