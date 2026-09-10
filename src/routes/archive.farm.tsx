@@ -134,39 +134,32 @@ function FarmPage() {
         )}
       />
 
-      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-card-title text-foreground">编辑牛场</DialogTitle>
-            <DialogDescription className="text-caption text-text-tertiary">
-              {editing?.name} · {editing?.id}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-1.5">
-            <Label className="text-caption text-text-tertiary">ERP 帐套</Label>
-            <Input
-              value={book}
-              onChange={(e) => setBook(e.target.value)}
-              placeholder="如：集团总账套（001）"
-              className="h-9 bg-card border-border text-body-sm"
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setEditing(null)}>取消</Button>
-            <Button onClick={save} className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground">保存</Button>
-          </DialogFooter>
-        </DialogContent>
-
-      </Dialog>
-
+      {/* 查看抽屉 */}
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
-        <SheetContent className="w-[480px] sm:max-w-[480px] overflow-y-auto p-0">
-          <SheetHeader className="px-6 py-4 border-b border-border">
-            <SheetTitle className="text-card-title text-foreground">{detail?.name}</SheetTitle>
-            <SheetDescription className="text-caption text-text-tertiary">牛场详情</SheetDescription>
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
+          <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white">
+            <div className="flex items-center justify-between gap-3">
+              <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+                <span className="truncate">{detail?.name ?? "牛场详情"}</span>
+                {detail && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{detail.id}</span>}
+              </SheetTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 mr-8"
+                onClick={() => {
+                  if (detail) {
+                    openEdit(detail);
+                    setDetail(null);
+                  }
+                }}
+              >
+                编辑
+              </Button>
+            </div>
           </SheetHeader>
           {detail && (
-            <div className="px-6 py-5 space-y-5">
+            <div className="flex-1 overflow-y-auto px-6 py-5">
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                 <Field label="牛场编码"><span className="font-mono">{detail.id}</span></Field>
                 <Field label="牛场名称">{detail.name}</Field>
@@ -190,6 +183,81 @@ function FarmPage() {
               </div>
             </div>
           )}
+        </SheetContent>
+      </Sheet>
+
+      {/* 编辑抽屉 */}
+      <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
+          <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white">
+            <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+              <span className="truncate">{editing?.name || "编辑牛场"}</span>
+              {editing && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{editing.id}</span>}
+            </SheetTitle>
+          </SheetHeader>
+          {editing && (
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <Field label="牛场编码"><span className="font-mono">{editing.id}</span></Field>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛场名称</Label>
+                  <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                </div>
+                <div className="col-span-2 space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛场地点</Label>
+                  <Input value={editing.address} onChange={(e) => setEditing({ ...editing, address: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">关联 ERP 帐套</Label>
+                  <Input value={editing.erpBook} onChange={(e) => setEditing({ ...editing, erpBook: e.target.value })} placeholder="如：集团总账套（001）" className="h-9 bg-card border-border text-body-sm" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛场类型</Label>
+                  <Select value={editing.type} onValueChange={(v) => setEditing({ ...editing, type: v })}>
+                    <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="普通牧场">普通牧场</SelectItem>
+                      <SelectItem value="有机牧场">有机牧场</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">休药期倍数</Label>
+                  <Select value={String(editing.withdrawalFactor)} onValueChange={(v) => setEditing({ ...editing, withdrawalFactor: v === "2" ? 2 : 1 })}>
+                    <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 倍</SelectItem>
+                      <SelectItem value="2">2 倍</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛场状态</Label>
+                  <Select value={editing.status} onValueChange={(v) => setEditing({ ...editing, status: v })}>
+                    <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="运营中">运营中</SelectItem>
+                      <SelectItem value="已冻结">已冻结</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
+                <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">负责人</Label>
+                  <Input value={editing.manager} onChange={(e) => setEditing({ ...editing, manager: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛场负责人</Label>
+                  <Input value={editing.owner} onChange={(e) => setEditing({ ...editing, owner: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                </div>
+              </div>
+            </div>
+          )}
+          <SheetFooter className="p-6 border-t border-border bg-white flex-row justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditing(null)}>取消</Button>
+            <Button className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground" onClick={save}>保存</Button>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </>
