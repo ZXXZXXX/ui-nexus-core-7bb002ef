@@ -3,15 +3,11 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Home } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/archive/barn")({
   head: () => ({ meta: [{ title: "牛舍信息 — 奇点智牧" }] }),
@@ -46,26 +42,43 @@ function typeTone(type: string) {
   return TAG_PALETTE[h % TAG_PALETTE.length];
 }
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className="text-body-sm text-foreground">{children}</div>
+    </div>
+  );
+}
+
 function BarnPage() {
   const [barns, setBarns] = useState<Barn[]>(initialBarns);
+  const [detail, setDetail] = useState<Barn | null>(null);
   const [editing, setEditing] = useState<Barn | null>(null);
-  const [draftType, setDraftType] = useState("");
 
   const knownTypes = useMemo(
     () => Array.from(new Set(barns.map((b) => b.type))),
     [barns],
   );
 
-  const openEdit = (b: Barn) => {
-    setEditing(b);
-    setDraftType(b.type);
-  };
+  const openEdit = (b: Barn) => setEditing({ ...b });
 
   const save = () => {
-    const t = draftType.trim();
-    if (!editing || !t) return;
-    setBarns((prev) => prev.map((b) => (b.id === editing.id ? { ...b, type: t } : b)));
+    if (!editing) return;
+    const name = editing.name.trim();
+    const type = editing.type.trim();
+    if (!name) {
+      toast.error("请填写牛舍名称");
+      return;
+    }
+    if (!type) {
+      toast.error("请填写牛舍类型");
+      return;
+    }
+    const next = { ...editing, name, type, desc: editing.desc.trim() };
+    setBarns((prev) => prev.map((b) => (b.id === next.id ? next : b)));
     setEditing(null);
+    toast.success("牛舍信息已更新");
   };
 
   const columns: ListColumn<Barn>[] = [
@@ -105,7 +118,7 @@ function BarnPage() {
         getRowKey={(b) => b.id}
         rowActions={(b) => (
           <>
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">查看</Button>
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground" onClick={() => setDetail(b)}>查看</Button>
             <Button
               variant="ghost"
               size="sm"
@@ -118,38 +131,104 @@ function BarnPage() {
         )}
       />
 
-      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
-        <DialogContent className="sm:max-w-[420px] bg-card">
-          <DialogHeader>
-            <DialogTitle className="text-section-title">编辑牛舍 · {editing?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <Label htmlFor="barn-type" className="text-body-sm text-text-secondary">牛舍类型</Label>
-            <Input
-              id="barn-type"
-              list="barn-type-options"
-              value={draftType}
-              onChange={(e) => setDraftType(e.target.value)}
-              placeholder="选择已有类型或输入新类型"
-            />
-            <datalist id="barn-type-options">
-              {knownTypes.map((t) => (
-                <option key={t} value={t} />
-              ))}
-            </datalist>
-            {draftType.trim() && (
-              <div className="pt-1 flex items-center gap-2">
-                <span className="text-caption text-text-tertiary">标签预览</span>
-                <span className={typeTone(draftType.trim())}>{draftType.trim()}</span>
+      {/* 查看抽屉 */}
+      <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
+          <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white">
+            <div className="flex items-center justify-between gap-3">
+              <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+                <span className="truncate">{detail?.name ?? "牛舍详情"}</span>
+                {detail && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{detail.id}</span>}
+              </SheetTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                className="shrink-0 mr-8"
+                onClick={() => {
+                  if (detail) {
+                    openEdit(detail);
+                    setDetail(null);
+                  }
+                }}
+              >
+                编辑
+              </Button>
+            </div>
+          </SheetHeader>
+          {detail && (
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <Field label="牛舍名称">{detail.name}</Field>
+                <Field label="所属牧场">{detail.farm}</Field>
+                <Field label="牛舍类型"><span className={typeTone(detail.type)}>{detail.type}</span></Field>
+                <Field label="存栏只数"><span className="tabular-nums">{detail.stock}</span></Field>
+                <Field label="更新时间"><span className="tabular-nums">{detail.updatedAt}</span></Field>
+                <div className="col-span-2">
+                  <Field label="牛舍描述">{detail.desc || <span className="text-text-tertiary">暂无描述</span>}</Field>
+                </div>
               </div>
-            )}
-          </div>
-          <DialogFooter>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+
+      {/* 编辑抽屉 */}
+      <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
+          <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white">
+            <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+              <span className="truncate">{editing?.name || "编辑牛舍"}</span>
+              {editing && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{editing.id}</span>}
+            </SheetTitle>
+          </SheetHeader>
+          {editing && (
+            <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛舍名称</Label>
+                  <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                </div>
+                <Field label="所属牧场">{editing.farm}</Field>
+                <div className="space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛舍类型</Label>
+                  <Input
+                    list="barn-type-options"
+                    value={editing.type}
+                    onChange={(e) => setEditing({ ...editing, type: e.target.value })}
+                    placeholder="选择已有类型或输入新类型"
+                    className="h-9 bg-card border-border text-body-sm"
+                  />
+                  <datalist id="barn-type-options">
+                    {knownTypes.map((t) => (
+                      <option key={t} value={t} />
+                    ))}
+                  </datalist>
+                  {editing.type.trim() && (
+                    <div className="pt-1 flex items-center gap-2">
+                      <span className="text-caption text-text-tertiary">标签预览</span>
+                      <span className={typeTone(editing.type.trim())}>{editing.type.trim()}</span>
+                    </div>
+                  )}
+                </div>
+                <Field label="存栏只数"><span className="tabular-nums">{editing.stock}</span></Field>
+                <div className="col-span-2 space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">牛舍描述</Label>
+                  <Textarea
+                    value={editing.desc}
+                    onChange={(e) => setEditing({ ...editing, desc: e.target.value })}
+                    placeholder="牛舍用途、设施等说明"
+                    className="min-h-20 bg-card border-border text-body-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          <SheetFooter className="p-6 border-t border-border bg-white flex-row justify-end gap-2">
             <Button variant="outline" onClick={() => setEditing(null)}>取消</Button>
-            <Button onClick={save} disabled={!draftType.trim()}>保存</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <Button className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground" onClick={save}>保存</Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
