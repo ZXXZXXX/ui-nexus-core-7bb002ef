@@ -1,8 +1,20 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Building2, MoreHorizontal, Trash2 } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/archive/farm")({
   head: () => ({ meta: [{ title: "牛场信息 — 奇点智牧" }] }),
@@ -11,13 +23,13 @@ export const Route = createFileRoute("/archive/farm")({
 
 type Farm = {
   id: string; name: string; region: string; slot: string; type: string; manager: string;
-  stock: number; barns: number; status: string;
+  stock: number; barns: number; status: string; erpBook: string;
 };
 
-const farms: Farm[] = [
-  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中" },
-  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中" },
-  { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔市", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "已冻结" },
+const initialFarms: Farm[] = [
+  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "集团总账套（001）" },
+  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中", erpBook: "华北区帐套（002）" },
+  { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔市", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "已冻结", erpBook: "" },
 ];
 
 const columns: ListColumn<Farm>[] = [
@@ -38,6 +50,13 @@ const columns: ListColumn<Farm>[] = [
     render: (f) => <span className={`tag ${f.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{f.type}</span>,
   },
   {
+    key: "erpBook", label: "ERP 帐套", filter: "select",
+    value: (f) => f.erpBook || "未绑定",
+    render: (f) => (
+      <span className="text-body-sm text-text-secondary truncate">{f.erpBook || <span className="text-text-tertiary">未绑定</span>}</span>
+    ),
+  },
+  {
     key: "barns", label: "牛舍数量", filter: "none",
     value: (f) => f.barns,
     render: (f) => <span className="text-body-sm text-text-secondary tabular-nums">{f.barns}</span>,
@@ -55,33 +74,76 @@ const columns: ListColumn<Farm>[] = [
 ];
 
 function FarmPage() {
+  const [farms, setFarms] = useState<Farm[]>(initialFarms);
+  const [editing, setEditing] = useState<Farm | null>(null);
+  const [book, setBook] = useState("");
+
+  const openEdit = (f: Farm) => {
+    setEditing(f);
+    setBook(f.erpBook);
+  };
+
+  const save = () => {
+    if (!editing) return;
+    setFarms((prev) => prev.map((f) => (f.id === editing.id ? { ...f, erpBook: book.trim() } : f)));
+    setEditing(null);
+    toast.success("ERP 帐套已更新");
+  };
+
   return (
-    <ListPage<Farm>
-      title="牛场信息"
-      breadcrumb={["基础档案", "牛场信息"]}
-      rows={farms}
-      columns={columns}
-      searchKeys={["name", "id"]}
-      searchPlaceholder="搜索牛场名称 / 编号"
-      getRowKey={(f) => f.id}
-      rowActions={() => (
-        <>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">查看</Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary">编辑</Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-text-secondary hover:bg-surface-subtle hover:text-foreground" aria-label="更多">
-                <MoreHorizontal className="h-3.5 w-3.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28">
-              <DropdownMenuItem className="text-[var(--state-danger)] focus:text-[var(--state-danger)]">
-                <Trash2 className="h-3.5 w-3.5 mr-2" /> 删除
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
-      )}
-    />
+    <>
+      <ListPage<Farm>
+        title="牛场信息"
+        breadcrumb={["基础档案", "牛场信息"]}
+        rows={farms}
+        columns={columns}
+        searchKeys={["name", "id"]}
+        searchPlaceholder="搜索牛场名称 / 编号"
+        getRowKey={(f) => f.id}
+        rowActions={(f) => (
+          <>
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">查看</Button>
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => openEdit(f)}>编辑</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-text-secondary hover:bg-surface-subtle hover:text-foreground" aria-label="更多">
+                  <MoreHorizontal className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-28">
+                <DropdownMenuItem className="text-[var(--state-danger)] focus:text-[var(--state-danger)]">
+                  <Trash2 className="h-3.5 w-3.5 mr-2" /> 删除
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        )}
+      />
+
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-card-title text-foreground">编辑牛场</DialogTitle>
+            <DialogDescription className="text-caption text-text-tertiary">
+              {editing?.name} · {editing?.id}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1.5">
+            <Label className="text-caption text-text-tertiary">ERP 帐套</Label>
+            <Input
+              value={book}
+              onChange={(e) => setBook(e.target.value)}
+              placeholder="如：集团总账套（001）"
+              className="h-9 bg-card border-border text-body-sm"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>取消</Button>
+            <Button onClick={save} className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground">保存</Button>
+          </DialogFooter>
+        </DialogContent>
+
+      </Dialog>
+    </>
   );
 }
