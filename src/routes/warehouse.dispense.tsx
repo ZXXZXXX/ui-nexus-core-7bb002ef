@@ -51,8 +51,8 @@ const initial: DispenseRow[] = [
 ];
 
 const USE_COLORS = {
-  unused: "var(--border-default, #D5D9D7)",
-  used: "var(--brand-green, #00A14F)",
+  unused: "var(--border-default)",
+  used: "var(--brand)",
   returned: "var(--state-info)",
   lost: "var(--state-danger)",
 };
