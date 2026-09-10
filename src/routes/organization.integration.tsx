@@ -163,95 +163,90 @@ function IntegrationPage() {
   return (
     <>
       <AppHeader title="第三方系统管理" breadcrumb={["组织管理", "第三方系统管理"]} />
-      <main className="flex-1 px-6 py-6 space-y-6">
-        {(["herd", "erp", "external"] as SysKind[]).map((kind) => {
-          const meta = KIND_META[kind];
-          const rows = of(kind);
-          const canAdd = kind === "external" || rows.length === 0;
-          const Icon = meta.icon;
-          return (
-            <section key={kind} className="space-y-3">
-              <div className="flex items-center justify-between gap-3 flex-wrap">
+      <main className="flex-1 px-6 py-6">
+        <div className="mx-auto w-full max-w-5xl space-y-8">
+          {(["herd", "erp", "external"] as SysKind[]).map((kind) => {
+            const meta = KIND_META[kind];
+            const rows = of(kind);
+            const Icon = meta.icon;
+            return (
+              <section key={kind} className="space-y-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="h-9 w-9 rounded-lg bg-brand-subtle flex items-center justify-center">
+                  <div className="h-8 w-8 rounded-lg bg-brand-subtle flex items-center justify-center shrink-0">
                     <Icon className="h-4 w-4 text-primary" strokeWidth={1.75} />
                   </div>
-                  <div>
-                    <div className="text-section-title text-foreground">{meta.title}</div>
-                    <div className="text-caption text-text-tertiary">{meta.desc} · {meta.limit}</div>
+                  <div className="min-w-0">
+                    <div className="text-section-title text-foreground leading-tight">{meta.title}</div>
+                    <div className="text-caption text-text-tertiary">{meta.desc}</div>
                   </div>
+                  <span className="tag tag-muted ml-auto shrink-0">{meta.limit}</span>
                 </div>
-              </div>
 
-              {rows.length === 0 ? (
-                <Card className="border-dashed border-border bg-card p-8 text-center text-body-sm text-text-tertiary">
-                  暂未接入{meta.title}
-                </Card>
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {rows.map((s) => (
-                    <Card key={s.id} className="border-border bg-card p-5 space-y-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="text-card-title text-foreground truncate">{s.name}</div>
-                          <div className="text-caption text-text-tertiary font-mono truncate">{s.apiUrl}</div>
-                        </div>
-                        <span className={`tag ${s.enabled ? "tag-success" : "tag-muted"}`}>
-                          {s.enabled ? "已启用" : "已停用"}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-border">
-                        <div>
-                          <div className="text-caption text-text-tertiary">AppKey</div>
-                          <div className="text-body-sm text-foreground font-mono truncate">{s.appKey || "—"}</div>
-                        </div>
-                        <div>
-                          <div className="text-caption text-text-tertiary">AppSecret</div>
-                          <div className="text-body-sm text-foreground font-mono truncate">{s.appSecret || "—"}</div>
-                        </div>
-                      </div>
-
-                      {s.kind === "erp" && (
-                        <div className="pt-2 border-t border-border space-y-1.5">
-                          <div className="flex items-center gap-1.5 text-caption text-text-tertiary">
-                            <Layers className="h-3 w-3" /> 帐套（{s.books?.length ?? 0}）
-                          </div>
-                          {(s.books ?? []).length === 0 ? (
-                            <div className="text-body-sm text-text-tertiary">暂无帐套</div>
-                          ) : (
-                            <div className="space-y-1">
-                              {(s.books ?? []).map((b) => (
-                                <div key={b.id} className="flex items-center justify-between gap-2 rounded-md bg-muted/40 px-2.5 py-1.5">
-                                  <span className="text-body-sm text-foreground truncate">{b.name}</span>
-                                  <span className="text-caption text-text-tertiary font-mono shrink-0">{b.code}</span>
-                                </div>
-                              ))}
+                {rows.length === 0 ? (
+                  <Card className="border-dashed border-border bg-card px-6 py-10 text-center text-body-sm text-text-tertiary">
+                    暂未接入{meta.title}
+                  </Card>
+                ) : (
+                  <div className="space-y-3">
+                    {rows.map((s) => (
+                      <Card key={s.id} className="border-border bg-card overflow-hidden p-0">
+                        <div className="flex items-start justify-between gap-4 px-5 py-4">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-card-title text-foreground truncate">{s.name}</span>
+                              <span className={`tag shrink-0 ${s.enabled ? "tag-success" : "tag-muted"}`}>
+                                {s.enabled ? "已启用" : "已停用"}
+                              </span>
                             </div>
-                          )}
+                            {s.remark && (
+                              <div className="text-caption text-text-tertiary mt-1 truncate">{s.remark}</div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <Switch checked={s.enabled} onCheckedChange={(v) => toggle(s.id, v)} />
+                            <Button variant="outline" size="sm" onClick={() => openEdit(s)}>配置</Button>
+                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => remove(s.id)}>解除接入</Button>
+                          </div>
                         </div>
-                      )}
 
-                      {s.remark && <div className="text-caption text-text-tertiary">{s.remark}</div>}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-3 border-t border-border bg-muted/30 px-5 py-3.5">
+                          <InfoItem label="API 地址" value={s.apiUrl} mono />
+                          <InfoItem label="AppKey" value={s.appKey} mono />
+                          <InfoItem label="AppSecret" value={s.appSecret} mono />
+                        </div>
 
-                      <div className="flex items-center justify-between pt-3 border-t border-border">
-                        <div className="flex items-center gap-2">
-                          <span className="text-caption text-text-tertiary">启用</span>
-                          <Switch checked={s.enabled} onCheckedChange={(v) => toggle(s.id, v)} />
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm" onClick={() => openEdit(s)}>配置</Button>
-                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => remove(s.id)}>解除接入</Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </section>
-          );
-        })}
+                        {s.kind === "erp" && (
+                          <div className="border-t border-border px-5 py-3.5 space-y-2">
+                            <div className="flex items-center gap-1.5 text-caption text-text-tertiary">
+                              <Layers className="h-3 w-3" /> 帐套（{s.books?.length ?? 0}）
+                            </div>
+                            {(s.books ?? []).length === 0 ? (
+                              <div className="text-body-sm text-text-tertiary">暂无帐套</div>
+                            ) : (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {(s.books ?? []).map((b) => (
+                                  <div
+                                    key={b.id}
+                                    className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                                  >
+                                    <span className="text-body-sm text-foreground truncate">{b.name}</span>
+                                    <span className="text-caption text-text-tertiary font-mono shrink-0">{b.code}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </section>
+            );
+          })}
+        </div>
       </main>
+
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none p-0 flex flex-col gap-0">
@@ -362,6 +357,15 @@ function Field({ label, required, children }: { label: string; required?: boolea
         {required && <span className="text-destructive ml-0.5">*</span>}
       </Label>
       {children}
+    </div>
+  );
+}
+
+function InfoItem({ label, value, mono }: { label: string; value?: string; mono?: boolean }) {
+  return (
+    <div className="min-w-0">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className={`text-body-sm text-foreground truncate ${mono ? "font-mono" : ""}`}>{value || "—"}</div>
     </div>
   );
 }
