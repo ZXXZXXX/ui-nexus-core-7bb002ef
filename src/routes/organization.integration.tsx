@@ -205,8 +205,7 @@ function IntegrationPage() {
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
                             <Switch checked={s.enabled} onCheckedChange={(v) => toggle(s.id, v)} />
-                            <Button variant="outline" size="sm" onClick={() => openEdit(s)}>配置</Button>
-                            <Button variant="ghost" size="sm" className="text-destructive" onClick={() => remove(s.id)}>解除接入</Button>
+                            <Button variant="outline" size="sm" onClick={() => openEdit(s)}>编辑/配置</Button>
                           </div>
                         </div>
 
@@ -338,7 +337,19 @@ function IntegrationPage() {
             )}
           </div>
 
-          <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-background">
+          <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-background">
+            {editing && (
+              <Button
+                variant="ghost"
+                className="text-destructive mr-auto"
+                onClick={() => {
+                  remove(form.id);
+                  setOpen(false);
+                }}
+              >
+                解除接入
+              </Button>
+            )}
             <Button variant="outline" onClick={() => setOpen(false)}>取消</Button>
             <Button onClick={submit} className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground">
               {editing ? "保存配置" : "确认接入"}
