@@ -165,12 +165,6 @@ function CattlePage() {
                         </DropdownMenuItem>
                       </DropdownMenuSubContent>
                     </DropdownMenuSub>
-                    <DropdownMenuItem
-                      className="text-[var(--state-danger)] focus:text-[var(--state-danger)]"
-                      onClick={() => toast.success(`已删除 #${c.ear} 的档案`)}
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-2" /> 删除档案
-                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
