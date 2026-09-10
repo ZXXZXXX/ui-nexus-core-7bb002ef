@@ -177,7 +177,7 @@ function FarmPage() {
                 <Field label="牛场状态">
                   <span className={`tag ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>
                 </Field>
-                <Field label="牛场负责人">{detail.owner}</Field>
+                
               </div>
             </div>
           )}
