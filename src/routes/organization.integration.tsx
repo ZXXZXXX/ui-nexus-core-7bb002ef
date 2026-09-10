@@ -204,7 +204,6 @@ function IntegrationPage() {
                             )}
                           </div>
                           <div className="flex items-center gap-3 shrink-0">
-                            <Switch checked={s.enabled} onCheckedChange={(v) => toggle(s.id, v)} />
                             <Button variant="outline" size="sm" onClick={() => openEdit(s)}>编辑/配置</Button>
                           </div>
                         </div>
