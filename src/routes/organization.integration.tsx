@@ -277,18 +277,6 @@ function IntegrationPage() {
                             <Button variant="outline" size="sm" onClick={() => openEdit(s)}>编辑/配置</Button>
                           </div>
                         </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-3 border-t border-border bg-muted/30 px-5 py-3.5">
-                          <InfoItem label="API 地址" value={s.apiUrl} mono />
-                          <InfoItem label="AppKey" value={s.appKey} mono />
-                          <InfoItem label="AppSecret" value={s.appSecret} mono />
-                        </div>
-
-                        {s.kind === "erp" && (
-                          <div className="border-t border-border px-5 py-2.5 flex items-center gap-1.5 text-caption text-text-tertiary">
-                            <Layers className="h-3 w-3" /> 帐套（{s.books?.length ?? 0}）
-                          </div>
-                        )}
                       </Card>
                     ))}
                   </div>
