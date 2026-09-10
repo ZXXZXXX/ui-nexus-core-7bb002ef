@@ -149,6 +149,16 @@ function FarmPage() {
           </SheetHeader>
           {detail && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="mb-5 grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-surface-subtle px-4 py-3">
+                  <div className="text-caption text-text-tertiary">存栏总数</div>
+                  <div className="text-page-title tabular-nums text-foreground">{detail.stock}</div>
+                </div>
+                <div className="rounded-lg bg-surface-subtle px-4 py-3">
+                  <div className="text-caption text-text-tertiary">牛舍数量</div>
+                  <div className="text-page-title tabular-nums text-foreground">{detail.barns}</div>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                 <Field label="牛场名称">{detail.name}</Field>
                 <Field label="所在地区">{detail.province} / {detail.city} / {detail.district}</Field>
