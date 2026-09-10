@@ -353,7 +353,10 @@ function IntegrationPage() {
                       <div key={b.id} className="rounded-md border border-border bg-card p-4 space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="text-body-sm font-medium text-foreground">帐套 {i + 1}</span>
-                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => removeBook(b.id)}>删除</Button>
+                          <div className="flex items-center gap-2">
+                            <span className="text-caption text-text-tertiary">启用该帐套</span>
+                            <Switch checked={b.enabled} onCheckedChange={(v) => updateBook(b.id, { enabled: v })} />
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <Field label="帐套名称" required>
@@ -375,9 +378,8 @@ function IntegrationPage() {
                             </Field>
                           ))}
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-body-sm text-foreground">启用该帐套</span>
-                          <Switch checked={b.enabled} onCheckedChange={(v) => updateBook(b.id, { enabled: v })} />
+                        <div className="flex items-center justify-end">
+                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => removeBook(b.id)}>删除</Button>
                         </div>
                       </div>
                     ))}
