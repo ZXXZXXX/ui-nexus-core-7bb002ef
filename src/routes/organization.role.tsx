@@ -410,13 +410,12 @@ function RolePage() {
 
   const [draftRoleKey, setDraftRoleKey] = useState<string | null>(null);
 
-  /** 权限树展开状态：默认全部展开 */
+  /** 权限树展开状态：一级默认展开，二级默认收起 */
   const [treeOpen, setTreeOpen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(navSpec.map((g) => [g.key, true])),
   );
-  const toggleNode = (k: string) =>
-    setTreeOpen((m) => ({ ...m, [k]: m[k] === undefined ? false : !m[k] }));
-  const isOpen = (k: string) => treeOpen[k] !== false;
+  const toggleNode = (k: string) => setTreeOpen((m) => ({ ...m, [k]: !m[k] }));
+  const isOpen = (k: string) => !!treeOpen[k];
 
   const startCreate = () => {
     if (!canManage) return;
