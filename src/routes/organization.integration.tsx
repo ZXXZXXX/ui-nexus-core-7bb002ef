@@ -38,6 +38,8 @@ type Book = {
   name: string;
   code: string;
   apiUrl: string;
+  appKey: string;
+  appSecret: string;
   enabled: boolean;
 };
 
@@ -74,8 +76,8 @@ const initialSystems: SystemRow[] = [
     remark: "药品采购与费用凭证对接",
     enabled: true,
     books: [
-      { id: "B1", name: "集团总账套", code: "001", apiUrl: "https://erp.qidian-farm.com/openapi/001", enabled: true },
-      { id: "B2", name: "华北区帐套", code: "002", apiUrl: "https://erp.qidian-farm.com/openapi/002", enabled: true },
+      { id: "B1", name: "集团总账套", code: "001", apiUrl: "https://erp.qidian-farm.com/openapi/001", appKey: "kd_ak_001", appSecret: "••••••••••••", enabled: true },
+      { id: "B2", name: "华北区帐套", code: "002", apiUrl: "https://erp.qidian-farm.com/openapi/002", appKey: "kd_ak_002", appSecret: "••••••••••••", enabled: true },
     ],
   },
 
@@ -154,7 +156,7 @@ function IntegrationPage() {
   const addBook = () =>
     setForm((f) => ({
       ...f,
-      books: [...(f.books ?? []), { id: `B-${Date.now()}`, name: "", code: "", apiUrl: "", enabled: true }],
+      books: [...(f.books ?? []), { id: `B-${Date.now()}`, name: "", code: "", apiUrl: "", appKey: "", appSecret: "", enabled: true }],
     }));
   const updateBook = (id: string, patch: Partial<Book>) =>
     setForm((f) => ({ ...f, books: (f.books ?? []).map((b) => (b.id === id ? { ...b, ...patch } : b)) }));
@@ -226,10 +228,17 @@ function IntegrationPage() {
                                 {(s.books ?? []).map((b) => (
                                   <div
                                     key={b.id}
-                                    className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                                    className="rounded-md border border-border px-3 py-2 space-y-2"
                                   >
-                                    <span className="text-body-sm text-foreground truncate">{b.name}</span>
-                                    <span className="text-caption text-text-tertiary font-mono shrink-0">{b.code}</span>
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="text-body-sm text-foreground truncate">{b.name}</span>
+                                      <span className="text-caption text-text-tertiary font-mono shrink-0">{b.code}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-y-1.5">
+                                      <InfoItem label="API 地址" value={b.apiUrl} mono />
+                                      <InfoItem label="AppKey" value={b.appKey} mono />
+                                      <InfoItem label="AppSecret" value={b.appSecret} mono />
+                                    </div>
                                   </div>
                                 ))}
                               </div>
