@@ -37,11 +37,37 @@ type Book = {
   id: string;
   name: string;
   code: string;
-  apiUrl: string;
+  clientId: string;
+  clientSecret: string;
   appKey: string;
-  appSecret: string;
+  instanceId: string;
+  customClientId: string;
+  customClientSecret: string;
+  customAppKey: string;
+  customInstanceId: string;
   enabled: boolean;
 };
+
+type BookFieldKey =
+  | "clientId"
+  | "clientSecret"
+  | "appKey"
+  | "instanceId"
+  | "customClientId"
+  | "customClientSecret"
+  | "customAppKey"
+  | "customInstanceId";
+
+const BOOK_FIELDS: { key: BookFieldKey; label: string }[] = [
+  { key: "clientId", label: "ClientId" },
+  { key: "clientSecret", label: "ClientSecret" },
+  { key: "appKey", label: "AppKey" },
+  { key: "instanceId", label: "InstanceId" },
+  { key: "customClientId", label: "CustomClientId" },
+  { key: "customClientSecret", label: "CustomClientSecret" },
+  { key: "customAppKey", label: "CustomAppKey" },
+  { key: "customInstanceId", label: "CustomInstanceId" },
+];
 
 type SystemRow = {
   id: string;
@@ -76,8 +102,34 @@ const initialSystems: SystemRow[] = [
     remark: "药品采购与费用凭证对接",
     enabled: true,
     books: [
-      { id: "B1", name: "集团总账套", code: "001", apiUrl: "https://erp.qidian-farm.com/openapi/001", appKey: "kd_ak_001", appSecret: "••••••••••••", enabled: true },
-      { id: "B2", name: "华北区帐套", code: "002", apiUrl: "https://erp.qidian-farm.com/openapi/002", appKey: "kd_ak_002", appSecret: "••••••••••••", enabled: true },
+      {
+        id: "B1",
+        name: "内蒙古晟安畜牧服务有限公司",
+        code: "1339492152346189312",
+        clientId: "287468",
+        clientSecret: "4022211ee6e5180cfa263081",
+        appKey: "vcGwysTa",
+        instanceId: "306147945068236800",
+        customClientId: "287468",
+        customClientSecret: "4022211ee6e5180cfa263081",
+        customAppKey: "vcGwysTa",
+        customInstanceId: "306147945068236800",
+        enabled: true,
+      },
+      {
+        id: "B2",
+        name: "连云港晟安畜牧服务有限公司",
+        code: "1341719110069057024",
+        clientId: "341214",
+        clientSecret: "5a18423d2608389d1f9603b",
+        appKey: "QWuHcrwb",
+        instanceId: "525438283317121024",
+        customClientId: "341214",
+        customClientSecret: "5a18423d2608389d1f9603b",
+        customAppKey: "QWuHcrwb",
+        customInstanceId: "525438283317121024",
+        enabled: true,
+      },
     ],
   },
 
@@ -156,7 +208,23 @@ function IntegrationPage() {
   const addBook = () =>
     setForm((f) => ({
       ...f,
-      books: [...(f.books ?? []), { id: `B-${Date.now()}`, name: "", code: "", apiUrl: "", appKey: "", appSecret: "", enabled: true }],
+      books: [
+        ...(f.books ?? []),
+        {
+          id: `B-${Date.now()}`,
+          name: "",
+          code: "",
+          clientId: "",
+          clientSecret: "",
+          appKey: "",
+          instanceId: "",
+          customClientId: "",
+          customClientSecret: "",
+          customAppKey: "",
+          customInstanceId: "",
+          enabled: true,
+        },
+      ],
     }));
   const updateBook = (id: string, patch: Partial<Book>) =>
     setForm((f) => ({ ...f, books: (f.books ?? []).map((b) => (b.id === id ? { ...b, ...patch } : b)) }));
@@ -234,10 +302,10 @@ function IntegrationPage() {
                                       <span className="text-body-sm text-foreground truncate">{b.name}</span>
                                       <span className="text-caption text-text-tertiary font-mono shrink-0">{b.code}</span>
                                     </div>
-                                    <div className="grid grid-cols-1 gap-y-1.5">
-                                      <InfoItem label="API 地址" value={b.apiUrl} mono />
-                                      <InfoItem label="AppKey" value={b.appKey} mono />
-                                      <InfoItem label="AppSecret" value={b.appSecret} mono />
+                                    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                                      {BOOK_FIELDS.map((f) => (
+                                        <InfoItem key={f.key} label={f.label} value={b[f.key]} mono />
+                                      ))}
                                     </div>
                                   </div>
                                 ))}
@@ -330,16 +398,17 @@ function IntegrationPage() {
                             <Input value={b.code} onChange={(e) => updateBook(b.id, { code: e.target.value })} placeholder="如：001" className="h-9 bg-card border-border text-body-sm font-mono" />
                           </Field>
                         </div>
-                        <Field label="帐套 API 地址">
-                          <Input value={b.apiUrl} onChange={(e) => updateBook(b.id, { apiUrl: e.target.value })} placeholder="https://" className="h-9 bg-card border-border text-body-sm font-mono" />
-                        </Field>
                         <div className="grid grid-cols-2 gap-3">
-                          <Field label="帐套 AppKey">
-                            <Input value={b.appKey} onChange={(e) => updateBook(b.id, { appKey: e.target.value })} placeholder="接口账号 / AppKey" className="h-9 bg-card border-border text-body-sm font-mono" />
-                          </Field>
-                          <Field label="帐套 AppSecret">
-                            <Input value={b.appSecret} onChange={(e) => updateBook(b.id, { appSecret: e.target.value })} placeholder="接口密钥" className="h-9 bg-card border-border text-body-sm font-mono" />
-                          </Field>
+                          {BOOK_FIELDS.map((f) => (
+                            <Field key={f.key} label={f.label}>
+                              <Input
+                                value={b[f.key]}
+                                onChange={(e) => updateBook(b.id, { [f.key]: e.target.value })}
+                                placeholder={f.label}
+                                className="h-9 bg-card border-border text-body-sm font-mono"
+                              />
+                            </Field>
+                          ))}
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-body-sm text-foreground">启用该帐套</span>
