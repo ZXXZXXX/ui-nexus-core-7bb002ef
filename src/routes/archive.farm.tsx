@@ -85,11 +85,26 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function FarmPage() {
   const [farms, setFarms] = useState<Farm[]>(initialFarms);
+  const [current, setCurrent] = useState<Farm | null>(null);
+  const [mode, setMode] = useState<"view" | "edit">("view");
   const [editing, setEditing] = useState<Farm | null>(null);
-  const [detail, setDetail] = useState<Farm | null>(null);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
-  const openEdit = (f: Farm) => setEditing({ ...f });
+  const openView = (f: Farm) => {
+    setCurrent(f);
+    setEditing({ ...f });
+    setMode("view");
+  };
+  const openEdit = (f: Farm) => {
+    setCurrent(f);
+    setEditing({ ...f });
+    setMode("edit");
+  };
+  const closeSheet = () => {
+    setCurrent(null);
+    setEditing(null);
+    setMode("view");
+  };
 
   const save = () => {
     if (!editing) return;
@@ -99,7 +114,9 @@ function FarmPage() {
     }
     const next = { ...editing, name: editing.name.trim(), erpBook: editing.erpBook.trim() };
     setFarms((prev) => prev.map((f) => (f.id === next.id ? next : f)));
-    setEditing(null);
+    setCurrent(next);
+    setEditing({ ...next });
+    setMode("view");
     toast.success("牛场信息已更新");
   };
 
