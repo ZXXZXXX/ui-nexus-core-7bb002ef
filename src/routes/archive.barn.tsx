@@ -10,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Home } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 
