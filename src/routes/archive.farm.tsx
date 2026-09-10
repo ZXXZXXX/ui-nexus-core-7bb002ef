@@ -11,6 +11,7 @@ import { ListPage, type ListColumn } from "@/components/list-page";
 import { toast } from "sonner";
 import { ERP_BOOKS } from "@/data/erp-books";
 import { Switch } from "@/components/ui/switch";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { REGIONS, citiesOf, districtsOf } from "@/data/regions";
 
 export const Route = createFileRoute("/archive/farm")({
@@ -88,6 +89,7 @@ function FarmPage() {
   const [farms, setFarms] = useState<Farm[]>(initialFarms);
   const [editing, setEditing] = useState<Farm | null>(null);
   const [detail, setDetail] = useState<Farm | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
   const openEdit = (f: Farm) => setEditing({ ...f });
 
@@ -190,10 +192,21 @@ function FarmPage() {
       <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
           <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white">
-            <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
-              <span className="truncate">{editing?.name || "编辑牛场"}</span>
-              {editing && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{editing.id}</span>}
-            </SheetTitle>
+            <div className="flex items-center justify-between gap-3">
+              <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+                <span className="truncate">{editing?.name || "编辑牛场"}</span>
+                {editing && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{editing.id}</span>}
+              </SheetTitle>
+              {editing && (
+                <div className="flex items-center gap-2 shrink-0 mr-8">
+                  <span className="text-body-sm text-text-secondary">{editing.status === "运营中" ? "运营中" : "已冻结"}</span>
+                  <Switch
+                    checked={editing.status === "运营中"}
+                    onCheckedChange={(v) => setPendingStatus(v ? "运营中" : "已冻结")}
+                  />
+                </div>
+              )}
+            </div>
           </SheetHeader>
           {editing && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
@@ -281,16 +294,6 @@ function FarmPage() {
                 </div>
                 <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
                 <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
-                <div className="col-span-2 flex items-center justify-between rounded-md border border-border bg-card px-3 py-2.5">
-                  <div>
-                    <div className="text-body-sm text-foreground">牛场状态</div>
-                    <div className="text-caption text-text-tertiary">关闭后该牛场将被冻结</div>
-                  </div>
-                  <Switch
-                    checked={editing.status === "运营中"}
-                    onCheckedChange={(v) => setEditing({ ...editing, status: v ? "运营中" : "已冻结" })}
-                  />
-                </div>
               </div>
             </div>
           )}
@@ -300,6 +303,30 @@ function FarmPage() {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={!!pendingStatus} onOpenChange={(o) => !o && setPendingStatus(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{pendingStatus === "运营中" ? "确认启用该牛场？" : "确认停用该牛场？"}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingStatus === "运营中"
+                ? "启用后该牛场将恢复运营，相关业务功能重新开放。"
+                : "停用后该牛场将被冻结，相关业务将无法继续操作。"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (editing && pendingStatus) setEditing({ ...editing, status: pendingStatus });
+                setPendingStatus(null);
+              }}
+            >
+              确认
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
