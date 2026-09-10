@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { ERP_BOOKS } from "@/data/erp-books";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { REGIONS, citiesOf, districtsOf } from "@/data/regions";
+import { RegionCascader } from "@/components/region-cascader";
 
 export const Route = createFileRoute("/archive/farm")({
   head: () => ({ meta: [{ title: "牛场信息 — 奇点智牧" }] }),
