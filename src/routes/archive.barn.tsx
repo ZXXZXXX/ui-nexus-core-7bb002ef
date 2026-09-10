@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Home, MoreHorizontal, Trash2 } from "lucide-react";
+import { Home } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 
 export const Route = createFileRoute("/archive/barn")({
