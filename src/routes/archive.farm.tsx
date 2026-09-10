@@ -88,6 +88,7 @@ function FarmPage() {
   const [farms, setFarms] = useState<Farm[]>(initialFarms);
   const [editing, setEditing] = useState<Farm | null>(null);
   const [detail, setDetail] = useState<Farm | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
   const openEdit = (f: Farm) => setEditing({ ...f });
 
