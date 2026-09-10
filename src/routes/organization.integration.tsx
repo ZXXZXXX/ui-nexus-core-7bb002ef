@@ -378,9 +378,8 @@ function IntegrationPage() {
                             </Field>
                           ))}
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-body-sm text-foreground">启用该帐套</span>
-                          <Switch checked={b.enabled} onCheckedChange={(v) => updateBook(b.id, { enabled: v })} />
+                        <div className="flex items-center justify-end">
+                          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => removeBook(b.id)}>删除</Button>
                         </div>
                       </div>
                     ))}
