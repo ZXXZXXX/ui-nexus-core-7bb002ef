@@ -50,7 +50,12 @@ const initial: DispenseRow[] = [
   { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", usedQty: 1, returnedQty: 1, lostQty: 0, users: ["王建国"], cows: ["2210"], usage: [{ user: "王建国", cows: ["2210"] }], remark: "工单 WO-2350 已终止，未开封退回" },
 ];
 
-const USE_COLORS = { unused: "#D5D9D7", used: "#23A969", returned: "#3B82F6", lost: "#E5484D" };
+const USE_COLORS = {
+  unused: "var(--border-default)",
+  used: "var(--brand)",
+  returned: "var(--state-info)",
+  lost: "var(--state-danger)",
+};
 
 /** 横向堆积条形图：已使用（绿） / 已退回（蓝） / 损耗（红） / 未使用（灰） */
 function UsageBar({ row }: { row: DispenseRow }) {
