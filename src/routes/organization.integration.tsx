@@ -21,9 +21,9 @@ export const Route = createFileRoute("/organization/integration")({
   head: () => ({
     meta: [
       { title: "第三方系统管理 — 奇点智牧" },
-      { name: "description", content: "统一管理牛群系统、ERP 系统与外部系统的接口对接与帐套配置。" },
+      { name: "description", content: "统一管理牛群系统、ERP 系统与人事系统的接口对接与帐套配置。" },
       { property: "og:title", content: "第三方系统管理 — 奇点智牧" },
-      { property: "og:description", content: "统一管理牛群系统、ERP 系统与外部系统的接口对接与帐套配置。" },
+      { property: "og:description", content: "统一管理牛群系统、ERP 系统与人事系统的接口对接与帐套配置。" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -93,7 +93,7 @@ const initialSystems: SystemRow[] = [
 const KIND_META: Record<SysKind, { title: string; desc: string; limit: string; icon: typeof Beef }> = {
   herd: { title: "牛群系统", desc: "同步牛只档案、繁育与生产数据", limit: "仅允许接入 1 个系统", icon: Beef },
   erp: { title: "ERP 系统", desc: "对接采购、库存与财务凭证", limit: "仅允许接入 1 个系统，可配置多个帐套", icon: Boxes },
-  external: { title: "外部系统", desc: "其他第三方平台接口", limit: "可接入多个系统", icon: Link2 },
+  external: { title: "人事系统", desc: "人事与组织人员数据接口", limit: "可接入多个系统", icon: Link2 },
 };
 
 function emptyForm(kind: SysKind): SystemRow {
