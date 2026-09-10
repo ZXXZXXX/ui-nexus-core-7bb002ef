@@ -159,10 +159,10 @@ function FarmPage() {
           {detail && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                <Field label="牛场编码"><span className="font-mono">{detail.id}</span></Field>
                 <Field label="牛场名称">{detail.name}</Field>
+                <Field label="所在地区">{detail.province} / {detail.city} / {detail.district}</Field>
                 <div className="col-span-2">
-                  <Field label="牛场地点">{detail.address}</Field>
+                  <Field label="详细地址">{fullAddress(detail)}</Field>
                 </div>
                 <Field label="关联 ERP 帐套">
                   {detail.erpBook || <span className="text-text-tertiary">未绑定</span>}
