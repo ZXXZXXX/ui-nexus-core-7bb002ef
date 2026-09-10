@@ -270,6 +270,7 @@ function IntegrationPage() {
                               <div className="text-caption text-text-tertiary mt-1 truncate">{s.remark}</div>
                             )}
                           </div>
+                          </div>
                           <div className="flex items-center gap-3 shrink-0">
                             <Button variant="outline" size="sm" onClick={() => openEdit(s)}>编辑/配置</Button>
                           </div>
