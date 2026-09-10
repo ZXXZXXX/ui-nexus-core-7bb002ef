@@ -181,14 +181,16 @@ function IntegrationPage() {
                     <div className="text-caption text-text-tertiary">{meta.desc} · {meta.limit}</div>
                   </div>
                 </div>
-                <Button
-                  size="sm"
-                  disabled={!canAdd}
-                  onClick={() => openCreate(kind)}
-                  className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-                >
-                  <Plus className="h-3.5 w-3.5" /> 接入系统
-                </Button>
+                {kind === "external" && (
+                  <Button
+                    size="sm"
+                    disabled={!canAdd}
+                    onClick={() => openCreate(kind)}
+                    className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> 接入系统
+                  </Button>
+                )}
               </div>
 
               {rows.length === 0 ? (
