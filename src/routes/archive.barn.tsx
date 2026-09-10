@@ -176,11 +176,11 @@ function BarnPage() {
           {mode === "view" && current && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <Field label="牛舍编号"><span className="font-mono">{current.id}</span></Field>
                 <Field label="牛舍名称">{current.name}</Field>
                 <Field label="所属牧场">{current.farm}</Field>
                 <Field label="牛舍类型"><span className={typeTone(current.type)}>{current.type}</span></Field>
                 <Field label="存栏只数"><span className="tabular-nums">{current.stock}</span></Field>
-                <Field label="更新时间"><span className="tabular-nums">{current.updatedAt}</span></Field>
                 <div className="col-span-2">
                   <Field label="牛舍描述">{current.desc || <span className="text-text-tertiary">暂无描述</span>}</Field>
                 </div>
