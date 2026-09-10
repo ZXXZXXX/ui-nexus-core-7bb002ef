@@ -40,7 +40,6 @@ import { Route as ProductionGeneralRouteImport } from './routes/production.gener
 import { Route as ProductionDryingRouteImport } from './routes/production.drying'
 import { Route as ProductionDiseaseRouteImport } from './routes/production.disease'
 import { Route as ProductionDewormRouteImport } from './routes/production.deworm'
-import { Route as OrganizationTenantRouteImport } from './routes/organization.tenant'
 import { Route as OrganizationTeamRouteImport } from './routes/organization.team'
 import { Route as OrganizationRoleRouteImport } from './routes/organization.role'
 import { Route as OrganizationIntegrationRouteImport } from './routes/organization.integration'
@@ -246,11 +245,6 @@ const ProductionDewormRoute = ProductionDewormRouteImport.update({
   id: '/deworm',
   path: '/deworm',
   getParentRoute: () => ProductionRoute,
-} as any)
-const OrganizationTenantRoute = OrganizationTenantRouteImport.update({
-  id: '/tenant',
-  path: '/tenant',
-  getParentRoute: () => OrganizationRoute,
 } as any)
 const OrganizationTeamRoute = OrganizationTeamRouteImport.update({
   id: '/team',
@@ -551,7 +545,6 @@ export interface FileRoutesByFullPath {
   '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
-  '/organization/tenant': typeof OrganizationTenantRoute
   '/production/deworm': typeof ProductionDewormRoute
   '/production/disease': typeof ProductionDiseaseRoute
   '/production/drying': typeof ProductionDryingRoute
@@ -630,7 +623,6 @@ export interface FileRoutesByTo {
   '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
-  '/organization/tenant': typeof OrganizationTenantRoute
   '/production/deworm': typeof ProductionDewormRoute
   '/production/disease': typeof ProductionDiseaseRoute
   '/production/drying': typeof ProductionDryingRoute
@@ -715,7 +707,6 @@ export interface FileRoutesById {
   '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
-  '/organization/tenant': typeof OrganizationTenantRoute
   '/production/deworm': typeof ProductionDewormRoute
   '/production/disease': typeof ProductionDiseaseRoute
   '/production/drying': typeof ProductionDryingRoute
@@ -801,7 +792,6 @@ export interface FileRouteTypes {
     | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
-    | '/organization/tenant'
     | '/production/deworm'
     | '/production/disease'
     | '/production/drying'
@@ -880,7 +870,6 @@ export interface FileRouteTypes {
     | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
-    | '/organization/tenant'
     | '/production/deworm'
     | '/production/disease'
     | '/production/drying'
@@ -964,7 +953,6 @@ export interface FileRouteTypes {
     | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
-    | '/organization/tenant'
     | '/production/deworm'
     | '/production/disease'
     | '/production/drying'
@@ -1237,13 +1225,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/production/deworm'
       preLoaderRoute: typeof ProductionDewormRouteImport
       parentRoute: typeof ProductionRoute
-    }
-    '/organization/tenant': {
-      id: '/organization/tenant'
-      path: '/tenant'
-      fullPath: '/organization/tenant'
-      preLoaderRoute: typeof OrganizationTenantRouteImport
-      parentRoute: typeof OrganizationRoute
     }
     '/organization/team': {
       id: '/organization/team'
@@ -1734,7 +1715,6 @@ interface OrganizationRouteChildren {
   OrganizationIntegrationRoute: typeof OrganizationIntegrationRoute
   OrganizationRoleRoute: typeof OrganizationRoleRoute
   OrganizationTeamRoute: typeof OrganizationTeamRoute
-  OrganizationTenantRoute: typeof OrganizationTenantRoute
   OrganizationIndexRoute: typeof OrganizationIndexRoute
 }
 
@@ -1743,7 +1723,6 @@ const OrganizationRouteChildren: OrganizationRouteChildren = {
   OrganizationIntegrationRoute: OrganizationIntegrationRoute,
   OrganizationRoleRoute: OrganizationRoleRoute,
   OrganizationTeamRoute: OrganizationTeamRoute,
-  OrganizationTenantRoute: OrganizationTenantRoute,
   OrganizationIndexRoute: OrganizationIndexRoute,
 }
 
