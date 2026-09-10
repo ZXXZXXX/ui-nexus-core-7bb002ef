@@ -54,6 +54,7 @@ import {
   Users,
   Power,
   Info,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePcRole, isSuperAdmin } from "@/lib/pc-role";
@@ -408,6 +409,13 @@ function RolePage() {
   >(null);
 
   const [draftRoleKey, setDraftRoleKey] = useState<string | null>(null);
+
+  /** 权限树展开状态：一级默认展开，二级默认收起 */
+  const [treeOpen, setTreeOpen] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(navSpec.map((g) => [g.key, true])),
+  );
+  const toggleNode = (k: string) => setTreeOpen((m) => ({ ...m, [k]: !m[k] }));
+  const isOpen = (k: string) => !!treeOpen[k];
 
   const startCreate = () => {
     if (!canManage) return;
@@ -899,155 +907,217 @@ function RolePage() {
                   </div>
 
                   {cur.pc.allowLogin ? (
-                    <div className="space-y-3">
+                    <div className="rounded-md border border-border bg-card overflow-hidden">
                       {navSpec.map((g) => {
                         const gp = cur.pc.nav[g.key];
                         if (!gp) return null;
                         const locked = !!g.required;
+                        const open = isOpen(g.key);
+                        const hasChildren =
+                          !!g.children?.length || !!g.actions?.length || g.kind === "home";
+
+                        // 一级节点的勾选态（含二级与操作）
+                        const flags: boolean[] = [
+                          ...Object.values(gp.actions),
+                          ...Object.values(gp.leaves).flatMap((lp) => [
+                            lp.view,
+                            ...Object.values(lp.actions),
+                          ]),
+                        ];
+                        const allOn = gp.view && flags.every(Boolean);
+                        const someOn = gp.view || flags.some(Boolean);
+                        const groupState: boolean | "indeterminate" = locked
+                          ? true
+                          : allOn
+                            ? true
+                            : someOn
+                              ? "indeterminate"
+                              : false;
+
                         return (
-                          <div key={g.key} className="rounded-md border border-border overflow-hidden">
-                            {/* 一级菜单 */}
-                            <div className="flex items-start gap-3 px-4 py-3 bg-surface-subtle">
+                          <div key={g.key} className="border-b border-border last:border-b-0">
+                            {/* 一级节点 */}
+                            <div className="flex items-center gap-2 px-3 py-2.5 bg-surface-subtle">
+                              {hasChildren ? (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleNode(g.key)}
+                                  aria-label={open ? "收起" : "展开"}
+                                  className="h-5 w-5 shrink-0 inline-flex items-center justify-center rounded text-text-tertiary hover:bg-border/60 hover:text-foreground transition-colors"
+                                >
+                                  <ChevronRight
+                                    className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-90" : ""}`}
+                                    strokeWidth={2}
+                                  />
+                                </button>
+                              ) : (
+                                <span className="h-5 w-5 shrink-0" />
+                              )}
                               <Checkbox
-                                checked={locked ? true : gp.view}
+                                checked={groupState}
                                 disabled={!editable || locked}
                                 onCheckedChange={(v) => !locked && setGroupView(g.key, !!v)}
-                                className="mt-0.5"
+                                className="h-[16px] w-[16px]"
                               />
-                              <div className="min-w-0 flex-1">
-                                <div className="text-body-sm font-medium text-foreground inline-flex items-center gap-1.5">
-                                  {g.name}
-                                  {locked && (
-                                    <span className="text-caption text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0 leading-5">
-                                      不可关闭
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="text-caption text-text-tertiary mt-0.5">{g.desc}</div>
-                              </div>
+                              <span className="text-body-sm font-medium text-foreground">
+                                {g.name}
+                              </span>
+                              {locked && (
+                                <span className="text-caption text-primary bg-primary/10 border border-primary/20 rounded px-1.5 leading-5">
+                                  不可关闭
+                                </span>
+                              )}
+                              <span className="text-caption text-text-tertiary truncate hidden md:inline">
+                                {g.desc}
+                              </span>
                             </div>
 
-                            {/* 首页：4 类视角平铺 */}
-                            {g.kind === "home" && (
-                              <div className="p-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                {workbenchViews.map((v) => {
-                                  const active = cur.pc.workbenchView === v.key;
-                                  return (
-                                    <button
-                                      key={v.key}
-                                      type="button"
-                                      disabled={!editable}
-                                      onClick={() => setWorkbenchView(v.key)}
-                                      className={`flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
-                                        active
-                                          ? "border-primary/40 bg-brand-subtle"
-                                          : "border-border bg-card hover:border-primary/30"
-                                      } ${editable ? "cursor-pointer" : "cursor-default"}`}
-                                    >
-                                      <span
-                                        className={`mt-1 h-3 w-3 shrink-0 rounded-full border ${
-                                          active
-                                            ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
-                                            : "border-border bg-card"
-                                        }`}
-                                      />
-                                      <span className="min-w-0">
-                                        <span
-                                          className={`block text-body-sm ${
-                                            active ? "text-primary font-medium" : "text-foreground"
+                            {open && (
+                              <div className="pl-[26px]">
+                                <div className="border-l border-border">
+                                  {/* 首页：4 类视角平铺（单选） */}
+                                  {g.kind === "home" &&
+                                    workbenchViews.map((v) => {
+                                      const active = cur.pc.workbenchView === v.key;
+                                      return (
+                                        <button
+                                          key={v.key}
+                                          type="button"
+                                          disabled={!editable}
+                                          onClick={() => setWorkbenchView(v.key)}
+                                          className={`flex w-full items-center gap-2 pl-3 pr-3 py-2 text-left transition-colors ${
+                                            editable ? "hover:bg-surface-subtle" : "cursor-default"
                                           }`}
                                         >
-                                          {v.name}
-                                        </span>
-                                        <span className="block text-caption text-text-tertiary mt-0.5">
-                                          {v.desc}
-                                        </span>
-                                      </span>
-                                    </button>
-                                  );
-                                })}
-                              </div>
-                            )}
+                                          <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
+                                          <span
+                                            className={`h-[14px] w-[14px] shrink-0 rounded-full border ${
+                                              active
+                                                ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
+                                                : "border-border bg-card"
+                                            }`}
+                                          />
+                                          <span
+                                            className={`text-body-sm ${
+                                              active ? "text-primary font-medium" : "text-foreground"
+                                            }`}
+                                          >
+                                            {v.name}
+                                          </span>
+                                          <span className="text-caption text-text-tertiary truncate hidden md:inline">
+                                            {v.desc}
+                                          </span>
+                                        </button>
+                                      );
+                                    })}
 
-                            {/* 一级菜单自身的操作能力 */}
-                            {!!g.actions?.length && (
-                              <div className="px-4 py-3 flex flex-wrap gap-x-5 gap-y-2">
-                                {g.actions.map((act) => (
-                                  <label
-                                    key={act.key}
-                                    className={`inline-flex items-center gap-2 ${
-                                      editable ? "cursor-pointer" : "cursor-default"
-                                    }`}
-                                  >
-                                    <Checkbox
-                                      checked={gp.actions[act.key]}
-                                      disabled={!editable || !gp.view}
-                                      onCheckedChange={(v) => setGroupAction(g.key, act.key, !!v)}
-                                      className="h-[16px] w-[16px]"
-                                    />
-                                    <span className="text-caption text-text-secondary">{act.name}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* 二级菜单 */}
-                            {!!g.children?.length && (
-                              <div>
-                                {g.children.map((leaf) => {
-                                  const lp = gp.leaves[leaf.key];
-                                  if (!lp) return null;
-                                  return (
-                                    <div
-                                      key={leaf.key}
-                                      className="border-t border-border px-4 py-2.5"
+                                  {/* 一级菜单自身的操作能力 */}
+                                  {g.actions?.map((act) => (
+                                    <label
+                                      key={act.key}
+                                      className={`flex items-center gap-2 pl-3 pr-3 py-2 ${
+                                        editable ? "cursor-pointer hover:bg-surface-subtle" : "cursor-default"
+                                      }`}
                                     >
-                                      <label
-                                        className={`inline-flex items-center gap-2 ${
-                                          editable ? "cursor-pointer" : "cursor-default"
-                                        }`}
-                                      >
-                                        <Checkbox
-                                          checked={lp.view}
-                                          disabled={!editable || !gp.view}
-                                          onCheckedChange={(v) => setLeafView(g.key, leaf.key, !!v)}
-                                          className="h-[16px] w-[16px]"
-                                        />
-                                        <span className="text-body-sm text-foreground">
-                                          {leaf.name}
-                                        </span>
-                                        <span className="text-caption text-text-tertiary">
-                                          可查看
-                                        </span>
-                                      </label>
+                                      <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
+                                      <Checkbox
+                                        checked={gp.actions[act.key]}
+                                        disabled={!editable || !gp.view}
+                                        onCheckedChange={(v) => setGroupAction(g.key, act.key, !!v)}
+                                        className="h-[16px] w-[16px]"
+                                      />
+                                      <span className="text-body-sm text-text-secondary">
+                                        {act.name}
+                                      </span>
+                                    </label>
+                                  ))}
 
-                                      {!!leaf.actions?.length && (
-                                        <div className="mt-2 ml-6 flex flex-wrap gap-x-5 gap-y-2">
-                                          {leaf.actions.map((act) => (
-                                            <label
-                                              key={act.key}
-                                              className={`inline-flex items-center gap-2 ${
-                                                editable ? "cursor-pointer" : "cursor-default"
-                                              }`}
+                                  {/* 二级节点 */}
+                                  {g.children?.map((leaf) => {
+                                    const lp = gp.leaves[leaf.key];
+                                    if (!lp) return null;
+                                    const lKey = `${g.key}:${leaf.key}`;
+                                    const lOpen = isOpen(lKey);
+                                    const acts = leaf.actions ?? [];
+                                    const lFlags = Object.values(lp.actions);
+                                    const lState: boolean | "indeterminate" =
+                                      lp.view && lFlags.every(Boolean)
+                                        ? true
+                                        : lp.view || lFlags.some(Boolean)
+                                          ? acts.length
+                                            ? "indeterminate"
+                                            : true
+                                          : false;
+                                    return (
+                                      <div key={leaf.key}>
+                                        <div className="flex items-center gap-2 pl-3 pr-3 py-2">
+                                          <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
+                                          {acts.length ? (
+                                            <button
+                                              type="button"
+                                              onClick={() => toggleNode(lKey)}
+                                              aria-label={lOpen ? "收起" : "展开"}
+                                              className="h-5 w-5 shrink-0 inline-flex items-center justify-center rounded text-text-tertiary hover:bg-surface-subtle hover:text-foreground transition-colors"
                                             >
-                                              <Checkbox
-                                                checked={lp.actions[act.key]}
-                                                disabled={!editable || !lp.view}
-                                                onCheckedChange={(v) =>
-                                                  setLeafAction(g.key, leaf.key, act.key, !!v)
-                                                }
-                                                className="h-[16px] w-[16px]"
+                                              <ChevronRight
+                                                className={`h-3.5 w-3.5 transition-transform ${lOpen ? "rotate-90" : ""}`}
+                                                strokeWidth={2}
                                               />
-                                              <span className="text-caption text-text-secondary">
-                                                {act.name}
-                                              </span>
-                                            </label>
-                                          ))}
+                                            </button>
+                                          ) : (
+                                            <span className="h-5 w-5 shrink-0" />
+                                          )}
+                                          <Checkbox
+                                            checked={lState}
+                                            disabled={!editable || !gp.view}
+                                            onCheckedChange={(v) =>
+                                              setLeafView(g.key, leaf.key, !!v)
+                                            }
+                                            className="h-[16px] w-[16px]"
+                                          />
+                                          <span className="text-body-sm text-foreground">
+                                            {leaf.name}
+                                          </span>
+                                          {!acts.length && (
+                                            <span className="text-caption text-text-tertiary">
+                                              可查看
+                                            </span>
+                                          )}
                                         </div>
-                                      )}
-                                    </div>
-                                  );
-                                })}
+
+                                        {!!acts.length && lOpen && (
+                                          <div className="pl-[26px]">
+                                            <div className="border-l border-border">
+                                              {acts.map((act) => (
+                                                <label
+                                                  key={act.key}
+                                                  className={`flex items-center gap-2 pl-3 pr-3 py-1.5 ${
+                                                    editable
+                                                      ? "cursor-pointer hover:bg-surface-subtle"
+                                                      : "cursor-default"
+                                                  }`}
+                                                >
+                                                  <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
+                                                  <Checkbox
+                                                    checked={lp.actions[act.key]}
+                                                    disabled={!editable || !lp.view}
+                                                    onCheckedChange={(v) =>
+                                                      setLeafAction(g.key, leaf.key, act.key, !!v)
+                                                    }
+                                                    className="h-[16px] w-[16px]"
+                                                  />
+                                                  <span className="text-caption text-text-secondary">
+                                                    {act.name}
+                                                  </span>
+                                                </label>
+                                              ))}
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             )}
                           </div>
