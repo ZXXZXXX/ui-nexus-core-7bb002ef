@@ -345,11 +345,8 @@ function IntegrationPage() {
               <Field label="备注">
                 <Textarea value={form.remark} onChange={(e) => set("remark", e.target.value)} placeholder="用途说明" className="min-h-20 bg-card border-border text-body-sm" />
               </Field>
-              <div className="flex items-center justify-between">
-                <span className="text-body-sm text-foreground">启用该系统</span>
-                <Switch checked={form.enabled} onCheckedChange={(v) => set("enabled", v)} />
-              </div>
             </section>
+
 
             {form.kind === "erp" && (
               <section className="px-6 py-5 space-y-3">
