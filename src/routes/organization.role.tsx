@@ -54,6 +54,7 @@ import {
   Users,
   Power,
   Info,
+  ChevronRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { usePcRole, isSuperAdmin } from "@/lib/pc-role";
