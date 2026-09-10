@@ -55,7 +55,7 @@ const CRUMB_PATH: Record<string, string> = {
   组织管理: "/organization/account",
   账号管理: "/organization/account",
   角色管理: "/organization/role",
-  租户管理: "/organization/tenant",
+  第三方系统管理: "/organization/integration",
   统计分析: "/stats",
   反馈管理: "/feedback",
 };

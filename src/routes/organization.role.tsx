@@ -229,8 +229,8 @@ const navSpec: NavGroupDef[] = [
         ],
       },
       {
-        key: "tenant",
-        name: "租户管理",
+        key: "integration",
+        name: "第三方系统管理",
         actions: [
           { key: "edit", name: "编辑" },
           { key: "toggle", name: "启用 / 停用" },

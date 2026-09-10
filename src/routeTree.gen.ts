@@ -40,9 +40,9 @@ import { Route as ProductionGeneralRouteImport } from './routes/production.gener
 import { Route as ProductionDryingRouteImport } from './routes/production.drying'
 import { Route as ProductionDiseaseRouteImport } from './routes/production.disease'
 import { Route as ProductionDewormRouteImport } from './routes/production.deworm'
-import { Route as OrganizationTenantRouteImport } from './routes/organization.tenant'
 import { Route as OrganizationTeamRouteImport } from './routes/organization.team'
 import { Route as OrganizationRoleRouteImport } from './routes/organization.role'
+import { Route as OrganizationIntegrationRouteImport } from './routes/organization.integration'
 import { Route as OrganizationAccountRouteImport } from './routes/organization.account'
 import { Route as MSearchRouteImport } from './routes/m.search'
 import { Route as MScanRouteImport } from './routes/m.scan'
@@ -246,11 +246,6 @@ const ProductionDewormRoute = ProductionDewormRouteImport.update({
   path: '/deworm',
   getParentRoute: () => ProductionRoute,
 } as any)
-const OrganizationTenantRoute = OrganizationTenantRouteImport.update({
-  id: '/tenant',
-  path: '/tenant',
-  getParentRoute: () => OrganizationRoute,
-} as any)
 const OrganizationTeamRoute = OrganizationTeamRouteImport.update({
   id: '/team',
   path: '/team',
@@ -259,6 +254,11 @@ const OrganizationTeamRoute = OrganizationTeamRouteImport.update({
 const OrganizationRoleRoute = OrganizationRoleRouteImport.update({
   id: '/role',
   path: '/role',
+  getParentRoute: () => OrganizationRoute,
+} as any)
+const OrganizationIntegrationRoute = OrganizationIntegrationRouteImport.update({
+  id: '/integration',
+  path: '/integration',
   getParentRoute: () => OrganizationRoute,
 } as any)
 const OrganizationAccountRoute = OrganizationAccountRouteImport.update({
@@ -542,9 +542,9 @@ export interface FileRoutesByFullPath {
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
   '/organization/account': typeof OrganizationAccountRoute
+  '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
-  '/organization/tenant': typeof OrganizationTenantRoute
   '/production/deworm': typeof ProductionDewormRoute
   '/production/disease': typeof ProductionDiseaseRoute
   '/production/drying': typeof ProductionDryingRoute
@@ -620,9 +620,9 @@ export interface FileRoutesByTo {
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
   '/organization/account': typeof OrganizationAccountRoute
+  '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
-  '/organization/tenant': typeof OrganizationTenantRoute
   '/production/deworm': typeof ProductionDewormRoute
   '/production/disease': typeof ProductionDiseaseRoute
   '/production/drying': typeof ProductionDryingRoute
@@ -704,9 +704,9 @@ export interface FileRoutesById {
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
   '/organization/account': typeof OrganizationAccountRoute
+  '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
-  '/organization/tenant': typeof OrganizationTenantRoute
   '/production/deworm': typeof ProductionDewormRoute
   '/production/disease': typeof ProductionDiseaseRoute
   '/production/drying': typeof ProductionDryingRoute
@@ -789,9 +789,9 @@ export interface FileRouteTypes {
     | '/m/scan'
     | '/m/search'
     | '/organization/account'
+    | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
-    | '/organization/tenant'
     | '/production/deworm'
     | '/production/disease'
     | '/production/drying'
@@ -867,9 +867,9 @@ export interface FileRouteTypes {
     | '/m/scan'
     | '/m/search'
     | '/organization/account'
+    | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
-    | '/organization/tenant'
     | '/production/deworm'
     | '/production/disease'
     | '/production/drying'
@@ -950,9 +950,9 @@ export interface FileRouteTypes {
     | '/m/scan'
     | '/m/search'
     | '/organization/account'
+    | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
-    | '/organization/tenant'
     | '/production/deworm'
     | '/production/disease'
     | '/production/drying'
@@ -1226,13 +1226,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductionDewormRouteImport
       parentRoute: typeof ProductionRoute
     }
-    '/organization/tenant': {
-      id: '/organization/tenant'
-      path: '/tenant'
-      fullPath: '/organization/tenant'
-      preLoaderRoute: typeof OrganizationTenantRouteImport
-      parentRoute: typeof OrganizationRoute
-    }
     '/organization/team': {
       id: '/organization/team'
       path: '/team'
@@ -1245,6 +1238,13 @@ declare module '@tanstack/react-router' {
       path: '/role'
       fullPath: '/organization/role'
       preLoaderRoute: typeof OrganizationRoleRouteImport
+      parentRoute: typeof OrganizationRoute
+    }
+    '/organization/integration': {
+      id: '/organization/integration'
+      path: '/integration'
+      fullPath: '/organization/integration'
+      preLoaderRoute: typeof OrganizationIntegrationRouteImport
       parentRoute: typeof OrganizationRoute
     }
     '/organization/account': {
@@ -1712,17 +1712,17 @@ const MRouteWithChildren = MRoute._addFileChildren(MRouteChildren)
 
 interface OrganizationRouteChildren {
   OrganizationAccountRoute: typeof OrganizationAccountRoute
+  OrganizationIntegrationRoute: typeof OrganizationIntegrationRoute
   OrganizationRoleRoute: typeof OrganizationRoleRoute
   OrganizationTeamRoute: typeof OrganizationTeamRoute
-  OrganizationTenantRoute: typeof OrganizationTenantRoute
   OrganizationIndexRoute: typeof OrganizationIndexRoute
 }
 
 const OrganizationRouteChildren: OrganizationRouteChildren = {
   OrganizationAccountRoute: OrganizationAccountRoute,
+  OrganizationIntegrationRoute: OrganizationIntegrationRoute,
   OrganizationRoleRoute: OrganizationRoleRoute,
   OrganizationTeamRoute: OrganizationTeamRoute,
-  OrganizationTenantRoute: OrganizationTenantRoute,
   OrganizationIndexRoute: OrganizationIndexRoute,
 }
 
