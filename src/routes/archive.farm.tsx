@@ -162,8 +162,10 @@ function FarmPage() {
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                 <div className="col-span-2">
-                  <Field label="牛场地点">{fullAddress(detail)}</Field>
+                  <Field label="牛场名称">{detail.name}</Field>
                 </div>
+                <Field label="所在地区">{[detail.province, detail.city, detail.district].filter(Boolean).join(" / ")}</Field>
+                <Field label="详细地址">{detail.address || <span className="text-text-tertiary">未填写</span>}</Field>
                 <div className="col-span-2">
                   <Field label="关联 ERP 帐套">
                     {detail.erpBook || <span className="text-text-tertiary">未绑定</span>}
