@@ -43,6 +43,7 @@ import { Route as ProductionDewormRouteImport } from './routes/production.deworm
 import { Route as OrganizationTenantRouteImport } from './routes/organization.tenant'
 import { Route as OrganizationTeamRouteImport } from './routes/organization.team'
 import { Route as OrganizationRoleRouteImport } from './routes/organization.role'
+import { Route as OrganizationIntegrationRouteImport } from './routes/organization.integration'
 import { Route as OrganizationAccountRouteImport } from './routes/organization.account'
 import { Route as MSearchRouteImport } from './routes/m.search'
 import { Route as MScanRouteImport } from './routes/m.scan'
@@ -259,6 +260,11 @@ const OrganizationTeamRoute = OrganizationTeamRouteImport.update({
 const OrganizationRoleRoute = OrganizationRoleRouteImport.update({
   id: '/role',
   path: '/role',
+  getParentRoute: () => OrganizationRoute,
+} as any)
+const OrganizationIntegrationRoute = OrganizationIntegrationRouteImport.update({
+  id: '/integration',
+  path: '/integration',
   getParentRoute: () => OrganizationRoute,
 } as any)
 const OrganizationAccountRoute = OrganizationAccountRouteImport.update({
@@ -542,6 +548,7 @@ export interface FileRoutesByFullPath {
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
   '/organization/account': typeof OrganizationAccountRoute
+  '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
   '/organization/tenant': typeof OrganizationTenantRoute
@@ -620,6 +627,7 @@ export interface FileRoutesByTo {
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
   '/organization/account': typeof OrganizationAccountRoute
+  '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
   '/organization/tenant': typeof OrganizationTenantRoute
@@ -704,6 +712,7 @@ export interface FileRoutesById {
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
   '/organization/account': typeof OrganizationAccountRoute
+  '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
   '/organization/team': typeof OrganizationTeamRoute
   '/organization/tenant': typeof OrganizationTenantRoute
@@ -789,6 +798,7 @@ export interface FileRouteTypes {
     | '/m/scan'
     | '/m/search'
     | '/organization/account'
+    | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
     | '/organization/tenant'
@@ -867,6 +877,7 @@ export interface FileRouteTypes {
     | '/m/scan'
     | '/m/search'
     | '/organization/account'
+    | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
     | '/organization/tenant'
@@ -950,6 +961,7 @@ export interface FileRouteTypes {
     | '/m/scan'
     | '/m/search'
     | '/organization/account'
+    | '/organization/integration'
     | '/organization/role'
     | '/organization/team'
     | '/organization/tenant'
@@ -1245,6 +1257,13 @@ declare module '@tanstack/react-router' {
       path: '/role'
       fullPath: '/organization/role'
       preLoaderRoute: typeof OrganizationRoleRouteImport
+      parentRoute: typeof OrganizationRoute
+    }
+    '/organization/integration': {
+      id: '/organization/integration'
+      path: '/integration'
+      fullPath: '/organization/integration'
+      preLoaderRoute: typeof OrganizationIntegrationRouteImport
       parentRoute: typeof OrganizationRoute
     }
     '/organization/account': {
@@ -1712,6 +1731,7 @@ const MRouteWithChildren = MRoute._addFileChildren(MRouteChildren)
 
 interface OrganizationRouteChildren {
   OrganizationAccountRoute: typeof OrganizationAccountRoute
+  OrganizationIntegrationRoute: typeof OrganizationIntegrationRoute
   OrganizationRoleRoute: typeof OrganizationRoleRoute
   OrganizationTeamRoute: typeof OrganizationTeamRoute
   OrganizationTenantRoute: typeof OrganizationTenantRoute
@@ -1720,6 +1740,7 @@ interface OrganizationRouteChildren {
 
 const OrganizationRouteChildren: OrganizationRouteChildren = {
   OrganizationAccountRoute: OrganizationAccountRoute,
+  OrganizationIntegrationRoute: OrganizationIntegrationRoute,
   OrganizationRoleRoute: OrganizationRoleRoute,
   OrganizationTeamRoute: OrganizationTeamRoute,
   OrganizationTenantRoute: OrganizationTenantRoute,

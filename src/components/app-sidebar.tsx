@@ -91,7 +91,7 @@ const groups: NavGroup[] = [
     children: [
       { title: "账号管理", url: "/organization/account" },
       { title: "角色管理", url: "/organization/role" },
-      { title: "租户管理", url: "/organization/tenant" },
+      { title: "第三方系统管理", url: "/organization/integration" },
     ],
   },
   {
