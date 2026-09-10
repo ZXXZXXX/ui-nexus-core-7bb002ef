@@ -281,16 +281,6 @@ function FarmPage() {
                 </div>
                 <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
                 <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
-                <div className="col-span-2 flex items-center justify-between rounded-md border border-border bg-card px-3 py-2.5">
-                  <div>
-                    <div className="text-body-sm text-foreground">牛场状态</div>
-                    <div className="text-caption text-text-tertiary">关闭后该牛场将被冻结</div>
-                  </div>
-                  <Switch
-                    checked={editing.status === "运营中"}
-                    onCheckedChange={(v) => setEditing({ ...editing, status: v ? "运营中" : "已冻结" })}
-                  />
-                </div>
               </div>
             </div>
           )}
