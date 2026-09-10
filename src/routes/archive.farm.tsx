@@ -23,8 +23,8 @@ type Farm = {
 };
 
 const initialFarms: Farm[] = [
-  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "集团总账套（001）", address: "内蒙古自治区呼伦贝尔市海拉尔区牧原路 18 号", withdrawalFactor: 2, owner: "赵永强" },
-  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中", erpBook: "华北区帐套（002）", address: "内蒙古自治区锡林郭勒盟锡林浩特市草原大道 66 号", withdrawalFactor: 2, owner: "孙立" },
+  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "内蒙古晟安畜牧服务有限公司", address: "内蒙古自治区呼伦贝尔市海拉尔区牧原路 18 号", withdrawalFactor: 2, owner: "赵永强" },
+  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中", erpBook: "连云港晟安畜牧服务有限公司", address: "内蒙古自治区锡林郭勒盟锡林浩特市草原大道 66 号", withdrawalFactor: 2, owner: "孙立" },
   { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔市", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "已冻结", erpBook: "", address: "黑龙江省齐齐哈尔市富拉尔基区兴牧街 5 号", withdrawalFactor: 1, owner: "周敏" },
 ];
 
