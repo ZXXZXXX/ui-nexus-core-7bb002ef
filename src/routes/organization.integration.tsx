@@ -86,12 +86,13 @@ const initialSystems: SystemRow[] = [
   {
     id: "S-HERD",
     kind: "herd",
-    name: "一牧云牛群管理系统",
-    apiUrl: "https://api.yimuyun.com/v2/herd",
-    domain: "yimuyun.com",
-    appKey: "herd_ak_8f21c9",
+    name: "UD系统",
+    apiUrl: "https://api.ud-herd.com/openapi",
+    domain: "ud-herd.com",
+    appKey: "ud_ak_8f21c9",
     appSecret: "••••••••••••",
     remark: "牛只基础档案与繁育数据同步",
+
     enabled: true,
   },
   {
