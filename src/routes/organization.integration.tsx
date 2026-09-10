@@ -285,32 +285,8 @@ function IntegrationPage() {
                         </div>
 
                         {s.kind === "erp" && (
-                          <div className="border-t border-border px-5 py-3.5 space-y-2">
-                            <div className="flex items-center gap-1.5 text-caption text-text-tertiary">
-                              <Layers className="h-3 w-3" /> 帐套（{s.books?.length ?? 0}）
-                            </div>
-                            {(s.books ?? []).length === 0 ? (
-                              <div className="text-body-sm text-text-tertiary">暂无帐套</div>
-                            ) : (
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                {(s.books ?? []).map((b) => (
-                                  <div
-                                    key={b.id}
-                                    className="rounded-md border border-border px-3 py-2 space-y-2"
-                                  >
-                                    <div className="flex items-center justify-between gap-2">
-                                      <span className="text-body-sm text-foreground truncate">{b.name}</span>
-                                      <span className="text-caption text-text-tertiary font-mono shrink-0">{b.code}</span>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                                      {BOOK_FIELDS.map((f) => (
-                                        <InfoItem key={f.key} label={f.label} value={b[f.key]} mono />
-                                      ))}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+                          <div className="border-t border-border px-5 py-2.5 flex items-center gap-1.5 text-caption text-text-tertiary">
+                            <Layers className="h-3 w-3" /> 帐套（{s.books?.length ?? 0}）
                           </div>
                         )}
                       </Card>
