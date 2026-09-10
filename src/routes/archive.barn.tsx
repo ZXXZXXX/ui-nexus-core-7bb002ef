@@ -53,7 +53,8 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function BarnPage() {
   const [barns, setBarns] = useState<Barn[]>(initialBarns);
-  const [detail, setDetail] = useState<Barn | null>(null);
+  const [current, setCurrent] = useState<Barn | null>(null);
+  const [mode, setMode] = useState<"view" | "edit">("view");
   const [editing, setEditing] = useState<Barn | null>(null);
 
   const knownTypes = useMemo(
@@ -61,7 +62,21 @@ function BarnPage() {
     [barns],
   );
 
-  const openEdit = (b: Barn) => setEditing({ ...b });
+  const openView = (b: Barn) => {
+    setCurrent(b);
+    setEditing({ ...b });
+    setMode("view");
+  };
+  const openEdit = (b: Barn) => {
+    setCurrent(b);
+    setEditing({ ...b });
+    setMode("edit");
+  };
+  const closeSheet = () => {
+    setCurrent(null);
+    setEditing(null);
+    setMode("view");
+  };
 
   const save = () => {
     if (!editing) return;
@@ -77,7 +92,9 @@ function BarnPage() {
     }
     const next = { ...editing, name, type, desc: editing.desc.trim() };
     setBarns((prev) => prev.map((b) => (b.id === next.id ? next : b)));
-    setEditing(null);
+    setCurrent(next);
+    setEditing({ ...next });
+    setMode("view");
     toast.success("牛舍信息已更新");
   };
 
