@@ -10,6 +10,8 @@ import { Building2, MoreHorizontal, Trash2 } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { toast } from "sonner";
 import { ERP_BOOKS } from "@/data/erp-books";
+import { Switch } from "@/components/ui/switch";
+import { REGIONS, citiesOf, districtsOf } from "@/data/regions";
 
 export const Route = createFileRoute("/archive/farm")({
   head: () => ({ meta: [{ title: "牛场信息 — 奇点智牧" }] }),
@@ -17,15 +19,19 @@ export const Route = createFileRoute("/archive/farm")({
 });
 
 type Farm = {
-  id: string; name: string; region: string; slot: string; type: string; manager: string;
+  id: string; name: string; slot: string; type: string; manager: string;
   stock: number; barns: number; status: string; erpBook: string;
-  address: string; withdrawalFactor: 1 | 2; owner: string;
+  province: string; city: string; district: string; address: string;
+  withdrawalFactor: 1 | 2;
 };
 
+const regionOf = (f: Farm) => `${f.province}${f.city}${f.district}`;
+const fullAddress = (f: Farm) => `${regionOf(f)}${f.address}`;
+
 const initialFarms: Farm[] = [
-  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "内蒙古晟安畜牧服务有限公司", address: "内蒙古自治区呼伦贝尔市海拉尔区牧原路 18 号", withdrawalFactor: 2, owner: "赵永强" },
-  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中", erpBook: "连云港晟安畜牧服务有限公司", address: "内蒙古自治区锡林郭勒盟锡林浩特市草原大道 66 号", withdrawalFactor: 2, owner: "孙立" },
-  { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔市", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "已冻结", erpBook: "", address: "黑龙江省齐齐哈尔市富拉尔基区兴牧街 5 号", withdrawalFactor: 1, owner: "周敏" },
+  { id: "F001", name: "1 号牧场", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "内蒙古晟安畜牧服务有限公司", province: "内蒙古自治区", city: "呼伦贝尔市", district: "海拉尔区", address: "牧原路 18 号", withdrawalFactor: 2 },
+  { id: "F002", name: "2 号牧场", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中", erpBook: "连云港晟安畜牧服务有限公司", province: "内蒙古自治区", city: "锡林郭勒盟", district: "锡林浩特市", address: "草原大道 66 号", withdrawalFactor: 2 },
+  { id: "F003", name: "3 号牧场", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "已冻结", erpBook: "", province: "黑龙江省", city: "齐齐哈尔市", district: "富拉尔基区", address: "兴牧街 5 号", withdrawalFactor: 1 },
 ];
 
 const columns: ListColumn<Farm>[] = [
@@ -39,7 +45,7 @@ const columns: ListColumn<Farm>[] = [
       </span>
     ),
   },
-  { key: "region", label: "所在地区", filter: "select", render: (f) => <span className="text-body-sm text-text-secondary">{f.region}</span> },
+  { key: "region", label: "所在地区", filter: "select", value: (f) => `${f.province}·${f.city}`, render: (f) => <span className="text-body-sm text-text-secondary">{f.province}·{f.city}</span> },
   { key: "slot", label: "仓位号", filter: "select", render: (f) => <span className="font-mono text-body-sm text-text-secondary">{f.slot}</span> },
   {
     key: "type", label: "牛场类型", filter: "select",
@@ -155,10 +161,10 @@ function FarmPage() {
           {detail && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                <Field label="牛场编码"><span className="font-mono">{detail.id}</span></Field>
                 <Field label="牛场名称">{detail.name}</Field>
+                <Field label="所在地区">{detail.province} / {detail.city} / {detail.district}</Field>
                 <div className="col-span-2">
-                  <Field label="牛场地点">{detail.address}</Field>
+                  <Field label="详细地址">{fullAddress(detail)}</Field>
                 </div>
                 <Field label="关联 ERP 帐套">
                   {detail.erpBook || <span className="text-text-tertiary">未绑定</span>}
@@ -173,7 +179,7 @@ function FarmPage() {
                 <Field label="牛场状态">
                   <span className={`tag ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>
                 </Field>
-                <Field label="牛场负责人">{detail.owner}</Field>
+                
               </div>
             </div>
           )}
@@ -192,14 +198,47 @@ function FarmPage() {
           {editing && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                <Field label="牛场编码"><span className="font-mono">{editing.id}</span></Field>
-                <div className="space-y-1.5">
+                <div className="col-span-2 space-y-1.5">
                   <Label className="text-caption text-text-tertiary">牛场名称</Label>
                   <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
                 </div>
                 <div className="col-span-2 space-y-1.5">
-                  <Label className="text-caption text-text-tertiary">牛场地点</Label>
-                  <Input value={editing.address} onChange={(e) => setEditing({ ...editing, address: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                  <Label className="text-caption text-text-tertiary">所在地区</Label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <Select
+                      value={editing.province}
+                      onValueChange={(v) => setEditing({ ...editing, province: v, city: "", district: "" })}
+                    >
+                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="省 / 自治区" /></SelectTrigger>
+                      <SelectContent>
+                        {REGIONS.map((p) => <SelectItem key={p.name} value={p.name}>{p.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={editing.city || undefined}
+                      onValueChange={(v) => setEditing({ ...editing, city: v, district: "" })}
+                      disabled={!editing.province}
+                    >
+                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="市" /></SelectTrigger>
+                      <SelectContent>
+                        {citiesOf(editing.province).map((c) => <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Select
+                      value={editing.district || undefined}
+                      onValueChange={(v) => setEditing({ ...editing, district: v })}
+                      disabled={!editing.city}
+                    >
+                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="区 / 县" /></SelectTrigger>
+                      <SelectContent>
+                        {districtsOf(editing.province, editing.city).map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="col-span-2 space-y-1.5">
+                  <Label className="text-caption text-text-tertiary">详细地址</Label>
+                  <Input value={editing.address} onChange={(e) => setEditing({ ...editing, address: e.target.value })} placeholder="街道、门牌号等详细信息" className="h-9 bg-card border-border text-body-sm" />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-caption text-text-tertiary">关联 ERP 帐套</Label>
@@ -237,24 +276,20 @@ function FarmPage() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-caption text-text-tertiary">牛场状态</Label>
-                  <Select value={editing.status} onValueChange={(v) => setEditing({ ...editing, status: v })}>
-                    <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="运营中">运营中</SelectItem>
-                      <SelectItem value="已冻结">已冻结</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
-                <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
-                <div className="space-y-1.5">
                   <Label className="text-caption text-text-tertiary">负责人</Label>
                   <Input value={editing.manager} onChange={(e) => setEditing({ ...editing, manager: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-caption text-text-tertiary">牛场负责人</Label>
-                  <Input value={editing.owner} onChange={(e) => setEditing({ ...editing, owner: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
+                <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
+                <div className="col-span-2 flex items-center justify-between rounded-md border border-border bg-card px-3 py-2.5">
+                  <div>
+                    <div className="text-body-sm text-foreground">牛场状态</div>
+                    <div className="text-caption text-text-tertiary">关闭后该牛场将被冻结</div>
+                  </div>
+                  <Switch
+                    checked={editing.status === "运营中"}
+                    onCheckedChange={(v) => setEditing({ ...editing, status: v ? "运营中" : "已冻结" })}
+                  />
                 </div>
               </div>
             </div>
