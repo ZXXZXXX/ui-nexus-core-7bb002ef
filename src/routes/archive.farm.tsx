@@ -222,41 +222,14 @@ function FarmPage() {
                   <Label className="text-caption text-text-tertiary">牛场名称</Label>
                   <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
                 </div>
-                <div className="col-span-2 space-y-1.5">
+                <div className="space-y-1.5">
                   <Label className="text-caption text-text-tertiary">所在地区</Label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <Select
-                      value={editing.province}
-                      onValueChange={(v) => setEditing({ ...editing, province: v, city: "", district: "" })}
-                    >
-                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="省 / 自治区" /></SelectTrigger>
-                      <SelectContent>
-                        {REGIONS.map((p) => <SelectItem key={p.name} value={p.name}>{p.name}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                    <Select
-                      value={editing.city || undefined}
-                      onValueChange={(v) => setEditing({ ...editing, city: v, district: "" })}
-                      disabled={!editing.province}
-                    >
-                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="市" /></SelectTrigger>
-                      <SelectContent>
-                        {citiesOf(editing.province).map((c) => <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                    <Select
-                      value={editing.district || undefined}
-                      onValueChange={(v) => setEditing({ ...editing, district: v })}
-                      disabled={!editing.city}
-                    >
-                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="区 / 县" /></SelectTrigger>
-                      <SelectContent>
-                        {districtsOf(editing.province, editing.city).map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <RegionCascader
+                    value={{ province: editing.province, city: editing.city, district: editing.district }}
+                    onChange={(v) => setEditing({ ...editing, ...v })}
+                  />
                 </div>
-                <div className="col-span-2 space-y-1.5">
+                <div className="space-y-1.5">
                   <Label className="text-caption text-text-tertiary">详细地址</Label>
                   <Input value={editing.address} onChange={(e) => setEditing({ ...editing, address: e.target.value })} placeholder="街道、门牌号等详细信息" className="h-9 bg-card border-border text-body-sm" />
                 </div>
