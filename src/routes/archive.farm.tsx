@@ -149,6 +149,16 @@ function FarmPage() {
           </SheetHeader>
           {detail && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="mb-5 grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-surface-subtle px-4 py-3">
+                  <div className="text-caption text-text-tertiary">存栏总数</div>
+                  <div className="text-page-title tabular-nums text-foreground">{detail.stock}</div>
+                </div>
+                <div className="rounded-lg bg-surface-subtle px-4 py-3">
+                  <div className="text-caption text-text-tertiary">牛舍数量</div>
+                  <div className="text-page-title tabular-nums text-foreground">{detail.barns}</div>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                 <Field label="牛场名称">{detail.name}</Field>
                 <Field label="所在地区">{detail.province} / {detail.city} / {detail.district}</Field>
@@ -162,8 +172,6 @@ function FarmPage() {
                   <span className={`tag ${detail.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{detail.type}</span>
                 </Field>
                 <Field label="休药期倍数">{detail.withdrawalFactor} 倍</Field>
-                <Field label="存栏总数"><span className="tabular-nums">{detail.stock}</span></Field>
-                <Field label="牛舍数量"><span className="tabular-nums">{detail.barns}</span></Field>
                 <Field label="负责人">{detail.manager}</Field>
                 <Field label="牛场状态">
                   <span className={`tag ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>
@@ -197,6 +205,16 @@ function FarmPage() {
           </SheetHeader>
           {editing && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div className="mb-5 grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-surface-subtle px-4 py-3">
+                  <div className="text-caption text-text-tertiary">存栏总数</div>
+                  <div className="text-page-title tabular-nums text-foreground">{editing.stock}</div>
+                </div>
+                <div className="rounded-lg bg-surface-subtle px-4 py-3">
+                  <div className="text-caption text-text-tertiary">牛舍数量</div>
+                  <div className="text-page-title tabular-nums text-foreground">{editing.barns}</div>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                 <div className="col-span-2 space-y-1.5">
                   <Label className="text-caption text-text-tertiary">牛场名称</Label>
@@ -279,8 +297,6 @@ function FarmPage() {
                   <Label className="text-caption text-text-tertiary">负责人</Label>
                   <Input value={editing.manager} onChange={(e) => setEditing({ ...editing, manager: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
                 </div>
-                <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
-                <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
               </div>
             </div>
           )}
