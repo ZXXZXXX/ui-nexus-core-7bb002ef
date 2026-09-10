@@ -165,9 +165,11 @@ function FarmPage() {
                 <div className="col-span-2">
                   <Field label="详细地址">{fullAddress(detail)}</Field>
                 </div>
-                <Field label="关联 ERP 帐套">
-                  {detail.erpBook || <span className="text-text-tertiary">未绑定</span>}
-                </Field>
+                <div className="col-span-2">
+                  <Field label="关联 ERP 帐套">
+                    {detail.erpBook || <span className="text-text-tertiary">未绑定</span>}
+                  </Field>
+                </div>
                 <Field label="牛场类型">
                   <span className={`tag ${detail.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{detail.type}</span>
                 </Field>
