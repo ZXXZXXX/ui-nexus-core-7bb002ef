@@ -192,6 +192,7 @@ function BarnPage() {
             <>
               <div className="flex-1 overflow-y-auto px-6 py-5">
                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                  <Field label="牛舍编号"><span className="font-mono">{editing.id}</span></Field>
                   <div className="space-y-1.5">
                     <Label className="text-caption text-text-tertiary">牛舍名称</Label>
                     <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
@@ -199,23 +200,34 @@ function BarnPage() {
                   <Field label="所属牧场">{editing.farm}</Field>
                   <div className="space-y-1.5">
                     <Label className="text-caption text-text-tertiary">牛舍类型</Label>
-                    <Input
-                      list="barn-type-options"
-                      value={editing.type}
-                      onChange={(e) => setEditing({ ...editing, type: e.target.value })}
-                      placeholder="选择已有类型或输入新类型"
-                      className="h-9 bg-card border-border text-body-sm"
-                    />
-                    <datalist id="barn-type-options">
-                      {knownTypes.map((t) => (
-                        <option key={t} value={t} />
-                      ))}
-                    </datalist>
-                    {editing.type.trim() && (
-                      <div className="pt-1 flex items-center gap-2">
-                        <span className="text-caption text-text-tertiary">标签预览</span>
-                        <span className={typeTone(editing.type.trim())}>{editing.type.trim()}</span>
-                      </div>
+                    {customType ? (
+                      <Input
+                        autoFocus
+                        value={editing.type}
+                        onChange={(e) => setEditing({ ...editing, type: e.target.value })}
+                        placeholder="输入新的牛舍类型"
+                        className="h-9 bg-card border-border text-body-sm"
+                      />
+                    ) : (
+                      <Select
+                        value={editing.type}
+                        onValueChange={(v) => {
+                          if (v === "__new__") {
+                            setCustomType(true);
+                            setEditing({ ...editing, type: "" });
+                          } else {
+                            setEditing({ ...editing, type: v });
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="选择牛舍类型" /></SelectTrigger>
+                        <SelectContent>
+                          {knownTypes.map((t) => (
+                            <SelectItem key={t} value={t}>{t}</SelectItem>
+                          ))}
+                          <SelectItem value="__new__">+ 新增类型</SelectItem>
+                        </SelectContent>
+                      </Select>
                     )}
                   </div>
                   <Field label="存栏只数"><span className="tabular-nums">{editing.stock}</span></Field>
