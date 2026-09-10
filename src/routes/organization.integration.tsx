@@ -322,7 +322,12 @@ function IntegrationPage() {
                 <h4 className="text-body font-medium text-foreground inline-flex items-center gap-1.5">
                   <Info className="h-3.5 w-3.5 text-text-secondary" /> 接口信息
                 </h4>
+                <div className="ml-auto flex items-center gap-2">
+                  <span className="text-body-sm text-text-secondary">启用该系统</span>
+                  <Switch checked={form.enabled} onCheckedChange={(v) => set("enabled", v)} />
+                </div>
               </div>
+
               <Field label="系统名称" required>
                 <Input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="如：金蝶云" className="h-9 bg-card border-border text-body-sm" />
               </Field>
