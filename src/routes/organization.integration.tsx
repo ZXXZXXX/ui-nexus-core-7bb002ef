@@ -360,3 +360,12 @@ function Field({ label, required, children }: { label: string; required?: boolea
     </div>
   );
 }
+
+function InfoItem({ label, value, mono }: { label: string; value?: string; mono?: boolean }) {
+  return (
+    <div className="min-w-0">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className={`text-body-sm text-foreground truncate ${mono ? "font-mono" : ""}`}>{value || "—"}</div>
+    </div>
+  );
+}
