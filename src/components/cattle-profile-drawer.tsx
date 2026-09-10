@@ -790,24 +790,45 @@ function TestHistory() {
   );
 }
 
-type MoveRecord = { id: string; date: string; from: string; to: string; orderId: string | null; reason: string; operator: string };
+type MoveRecord = {
+  id: string;
+  date: string;
+  farm: string;
+  from: string;
+  to: string;
+  orderId: string | null;
+  reason: string;
+  operator: string;
+  /** 跨牧场转入 / 转出 */
+  crossFarm?: boolean;
+};
+const CURRENT_FARM = "1 号牧场";
 const ALL_MOVES: MoveRecord[] = [
-  { id: "MV-0518", date: "2026-05-18", from: "1 号牛舍", to: "3 号牛舍", orderId: "WO-2026-0518", reason: "疾病治疗", operator: "李雨晴" },
-  { id: "MV-0410", date: "2026-04-10", from: "隔离舍", to: "1 号牛舍", orderId: "WO-2026-0405", reason: "治愈", operator: "李雨晴" },
-  { id: "MV-0320", date: "2026-03-20", from: "1 号牛舍", to: "隔离舍", orderId: "WO-2026-0318", reason: "继续观察", operator: "李雨晴" },
-  { id: "MV-0301", date: "2026-03-01", from: "犊牛舍", to: "1 号牛舍", orderId: null, reason: "调群", operator: "王场长" },
-  { id: "MV-0101", date: "2026-01-10", from: "产房", to: "犊牛舍", orderId: null, reason: "断奶分群", operator: "周凯" },
+  { id: "MV-0518", date: "2026-05-18", farm: "1 号牧场", from: "1 号牛舍", to: "3 号牛舍", orderId: "WO-2026-0518", reason: "疾病治疗", operator: "李雨晴" },
+  { id: "MV-0410", date: "2026-04-10", farm: "1 号牧场", from: "病牛舍", to: "1 号牛舍", orderId: "WO-2026-0405", reason: "治愈", operator: "李雨晴" },
+  { id: "MV-0320", date: "2026-03-20", farm: "1 号牧场", from: "1 号牛舍", to: "病牛舍", orderId: "WO-2026-0318", reason: "继续观察", operator: "李雨晴" },
+  { id: "MV-0301", date: "2026-03-01", farm: "1 号牧场", from: "2 号牧场 · 2 号牛舍", to: "1 号牧场 · 1 号牛舍", orderId: null, reason: "跨场调群转入", operator: "王场长", crossFarm: true },
+  { id: "MV-0212", date: "2026-02-12", farm: "2 号牧场", from: "犊牛舍", to: "2 号牛舍", orderId: null, reason: "断奶分群", operator: "周凯" },
+  { id: "MV-0101", date: "2026-01-10", farm: "2 号牧场", from: "产房", to: "犊牛舍", orderId: null, reason: "初生转群", operator: "周凯" },
 ];
 
 function MoveHistory() {
+  const crossCount = ALL_MOVES.filter((m) => m.farm !== CURRENT_FARM || m.crossFarm).length;
   return (
     <div className="space-y-2">
-      <div className="text-caption text-text-tertiary mb-1">共 {ALL_MOVES.length} 条</div>
+      <div className="text-caption text-text-tertiary mb-1">
+        共 {ALL_MOVES.length} 条{crossCount > 0 ? ` · 含原牧场记录 ${crossCount} 条` : ""}
+      </div>
       {ALL_MOVES.map((m) => (
         <div key={m.id} className="rounded-xl border border-border bg-card p-3">
-          <div className="flex items-center gap-2 mb-1.5">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <span className="font-mono text-caption text-text-secondary">{m.date}</span>
             <span className="text-caption text-text-tertiary">· 操作人 {m.operator}</span>
+            {m.crossFarm ? (
+              <span className="tag tag-info">跨牧场转入</span>
+            ) : m.farm !== CURRENT_FARM ? (
+              <span className="tag tag-muted">原牧场 · {m.farm}</span>
+            ) : null}
           </div>
           <div className="flex items-center gap-2 text-body-sm text-foreground">
             <span className="flex-1 min-w-0 truncate">{m.from}</span>
