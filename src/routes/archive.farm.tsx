@@ -131,6 +131,7 @@ function FarmPage() {
               <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
                 <span className="truncate">{detail?.name ?? "牛场详情"}</span>
                 {detail && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{detail.id}</span>}
+                {detail && <span className={`tag shrink-0 ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>}
               </SheetTitle>
               <Button
                 variant="outline"
