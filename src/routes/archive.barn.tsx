@@ -136,7 +136,7 @@ function BarnPage() {
         columns={columns}
         searchKeys={["name", "id"]}
         searchPlaceholder="搜索牛舍名称 / 编号"
-        primaryAction={{ label: "新建牛舍" }}
+        
         getRowKey={(b) => b.id}
         rowActions={(b) => (
           <>
