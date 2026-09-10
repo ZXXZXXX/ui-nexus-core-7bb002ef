@@ -239,52 +239,46 @@ function IntegrationPage() {
     <>
       <AppHeader title="第三方系统管理" breadcrumb={["组织管理", "第三方系统管理"]} />
       <main className="flex-1 px-6 py-6">
-        <div className="mx-auto w-full max-w-5xl space-y-8">
-          {(["herd", "erp", "external"] as SysKind[]).map((kind) => {
-            const meta = KIND_META[kind];
-            const rows = of(kind);
-            return (
-              <section key={kind} className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-body-sm text-text-tertiary">{meta.title}</span>
-                  <span className="text-caption text-text-tertiary/70 truncate">{meta.desc}</span>
-                  <span className="text-caption text-text-tertiary/70 ml-auto shrink-0">{meta.limit}</span>
-                </div>
-
-                {rows.length === 0 ? (
-                  <Card className="border-dashed border-border bg-card px-6 py-10 text-center text-body-sm text-text-tertiary">
-                    暂未接入{meta.title}
-                  </Card>
-                ) : (
-                  <div className="space-y-3">
-                    {rows.map((s) => (
-                      <Card key={s.id} className="border-border bg-card overflow-hidden p-0">
-                        <div className="flex items-start justify-between gap-4 px-5 py-4">
-                          <div className="flex items-start gap-3 min-w-0">
-                          <SystemLogo name={s.name} domain={s.domain} />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="text-card-title text-foreground truncate">{s.name}</span>
-                              <span className={`tag shrink-0 ${s.enabled ? "tag-success" : "tag-muted"}`}>
-                                {s.enabled ? "已启用" : "已停用"}
-                              </span>
-                            </div>
-                            {s.remark && (
-                              <div className="text-caption text-text-tertiary mt-1 truncate">{s.remark}</div>
-                            )}
-                          </div>
-                          </div>
-                          <div className="flex items-center gap-3 shrink-0">
-                            <Button variant="outline" size="sm" onClick={() => openEdit(s)}>编辑/配置</Button>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
+        <div className="mx-auto w-full max-w-4xl">
+          <Card className="border-border bg-card p-0 overflow-hidden divide-y divide-border">
+            {(["herd", "erp", "external"] as SysKind[]).map((kind) => {
+              const meta = KIND_META[kind];
+              const rows = of(kind);
+              return (
+                <div key={kind} className="px-5 py-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-caption text-text-tertiary">{meta.title}</span>
+                    <span className="text-caption text-text-tertiary/60 truncate">{meta.desc}</span>
+                    <span className="text-caption text-text-tertiary/60 ml-auto shrink-0">{meta.limit}</span>
                   </div>
-                )}
-              </section>
-            );
-          })}
+
+                  {rows.length === 0 ? (
+                    <div className="text-body-sm text-text-tertiary py-2">暂未接入</div>
+                  ) : (
+                    rows.map((s) => (
+                      <div key={s.id} className="flex items-center gap-3 py-1">
+                        <SystemLogo name={s.name} domain={s.domain} />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-body font-medium text-foreground truncate">{s.name}</span>
+                            <span className={`tag shrink-0 ${s.enabled ? "tag-success" : "tag-muted"}`}>
+                              {s.enabled ? "已启用" : "已停用"}
+                            </span>
+                          </div>
+                          {s.remark && (
+                            <div className="text-caption text-text-tertiary truncate">{s.remark}</div>
+                          )}
+                        </div>
+                        <Button variant="ghost" size="sm" className="shrink-0 text-primary" onClick={() => openEdit(s)}>
+                          编辑/配置
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              );
+            })}
+          </Card>
         </div>
       </main>
 
