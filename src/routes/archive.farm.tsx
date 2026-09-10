@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Building2, MoreHorizontal, Trash2 } from "lucide-react";
@@ -24,12 +25,13 @@ export const Route = createFileRoute("/archive/farm")({
 type Farm = {
   id: string; name: string; region: string; slot: string; type: string; manager: string;
   stock: number; barns: number; status: string; erpBook: string;
+  address: string; withdrawalFactor: number; owner: string;
 };
 
 const initialFarms: Farm[] = [
-  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "集团总账套（001）" },
-  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中", erpBook: "华北区帐套（002）" },
-  { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔市", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "已冻结", erpBook: "" },
+  { id: "F001", name: "1 号牧场", region: "内蒙古·呼伦贝尔市", slot: "C-01", type: "普通牧场", manager: "张磊", stock: 1240, barns: 12, status: "运营中", erpBook: "集团总账套（001）", address: "内蒙古自治区呼伦贝尔市海拉尔区牧原路 18 号", withdrawalFactor: 1.5, owner: "赵永强" },
+  { id: "F002", name: "2 号牧场", region: "内蒙古·锡林郭勒市", slot: "C-02", type: "有机牧场", manager: "李建国", stock: 856, barns: 8, status: "运营中", erpBook: "华北区帐套（002）", address: "内蒙古自治区锡林郭勒盟锡林浩特市草原大道 66 号", withdrawalFactor: 2, owner: "孙立" },
+  { id: "F003", name: "3 号牧场", region: "黑龙江·齐齐哈尔市", slot: "C-03", type: "普通牧场", manager: "王志强", stock: 390, barns: 5, status: "已冻结", erpBook: "", address: "黑龙江省齐齐哈尔市富拉尔基区兴牧街 5 号", withdrawalFactor: 1, owner: "周敏" },
 ];
 
 const columns: ListColumn<Farm>[] = [
@@ -73,9 +75,19 @@ const columns: ListColumn<Farm>[] = [
   },
 ];
 
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className="text-body-sm text-foreground">{children}</div>
+    </div>
+  );
+}
+
 function FarmPage() {
   const [farms, setFarms] = useState<Farm[]>(initialFarms);
   const [editing, setEditing] = useState<Farm | null>(null);
+  const [detail, setDetail] = useState<Farm | null>(null);
   const [book, setBook] = useState("");
 
   const openEdit = (f: Farm) => {
@@ -102,7 +114,7 @@ function FarmPage() {
         getRowKey={(f) => f.id}
         rowActions={(f) => (
           <>
-            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground">查看</Button>
+            <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground" onClick={() => setDetail(f)}>查看</Button>
             <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => openEdit(f)}>编辑</Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -144,6 +156,40 @@ function FarmPage() {
         </DialogContent>
 
       </Dialog>
+
+      <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <SheetContent className="w-[480px] sm:max-w-[480px] overflow-y-auto p-0">
+          <SheetHeader className="px-6 py-4 border-b border-border">
+            <SheetTitle className="text-card-title text-foreground">{detail?.name}</SheetTitle>
+            <SheetDescription className="text-caption text-text-tertiary">牛场详情</SheetDescription>
+          </SheetHeader>
+          {detail && (
+            <div className="px-6 py-5 space-y-5">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <Field label="牛场编码"><span className="font-mono">{detail.id}</span></Field>
+                <Field label="牛场名称">{detail.name}</Field>
+                <div className="col-span-2">
+                  <Field label="牛场地点">{detail.address}</Field>
+                </div>
+                <Field label="关联 ERP 帐套">
+                  {detail.erpBook || <span className="text-text-tertiary">未绑定</span>}
+                </Field>
+                <Field label="牛场类型">
+                  <span className={`tag ${detail.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{detail.type}</span>
+                </Field>
+                <Field label="休药期倍数"><span className="tabular-nums">{detail.withdrawalFactor}×</span></Field>
+                <Field label="存栏总数"><span className="tabular-nums">{detail.stock}</span></Field>
+                <Field label="牛舍数量"><span className="tabular-nums">{detail.barns}</span></Field>
+                <Field label="负责人">{detail.manager}</Field>
+                <Field label="牛场状态">
+                  <span className={`tag ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>
+                </Field>
+                <Field label="牛场负责人">{detail.owner}</Field>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
