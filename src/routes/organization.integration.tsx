@@ -14,7 +14,19 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Beef, Boxes, Layers, Link2, Info } from "lucide-react";
+
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/organization/integration")({
@@ -165,6 +177,8 @@ function IntegrationPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<SystemRow>(emptyForm("external"));
   const [editing, setEditing] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+
 
   const of = (kind: SysKind) => systems.filter((s) => s.kind === kind);
 
@@ -392,17 +406,34 @@ function IntegrationPage() {
 
           <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-background">
             {editing && (
-              <Button
-                variant="ghost"
-                className="text-destructive mr-auto"
-                onClick={() => {
-                  remove(form.id);
-                  setOpen(false);
-                }}
-              >
-                解除接入
-              </Button>
+              <AlertDialog open={confirmRemove} onOpenChange={setConfirmRemove}>
+                <AlertDialogTrigger asChild>
+                  <Button variant="ghost" className="text-destructive mr-auto">解除接入</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>确认解除接入「{form.name || "该系统"}」？</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      解除后将删除该系统的所有配置信息（接口地址、密钥{form.kind === "erp" ? "、全部帐套配置" : ""}等），且不可恢复。
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>取消</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={() => {
+                        remove(form.id);
+                        setConfirmRemove(false);
+                        setOpen(false);
+                      }}
+                    >
+                      确认解除
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
+
             <Button variant="outline" onClick={() => setOpen(false)}>取消</Button>
             <Button onClick={submit} className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground">
               {editing ? "保存配置" : "确认接入"}
