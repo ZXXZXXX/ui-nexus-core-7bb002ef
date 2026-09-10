@@ -274,24 +274,20 @@ function FarmPage() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-caption text-text-tertiary">牛场状态</Label>
-                  <Select value={editing.status} onValueChange={(v) => setEditing({ ...editing, status: v })}>
-                    <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="运营中">运营中</SelectItem>
-                      <SelectItem value="已冻结">已冻结</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
-                <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
-                <div className="space-y-1.5">
                   <Label className="text-caption text-text-tertiary">负责人</Label>
                   <Input value={editing.manager} onChange={(e) => setEditing({ ...editing, manager: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-caption text-text-tertiary">牛场负责人</Label>
-                  <Input value={editing.owner} onChange={(e) => setEditing({ ...editing, owner: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
+                <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
+                <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
+                <div className="col-span-2 flex items-center justify-between rounded-md border border-border bg-card px-3 py-2.5">
+                  <div>
+                    <div className="text-body-sm text-foreground">牛场状态</div>
+                    <div className="text-caption text-text-tertiary">关闭后该牛场将被冻结</div>
+                  </div>
+                  <Switch
+                    checked={editing.status === "运营中"}
+                    onCheckedChange={(v) => setEditing({ ...editing, status: v ? "运营中" : "已冻结" })}
+                  />
                 </div>
               </div>
             </div>
