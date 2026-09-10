@@ -287,8 +287,6 @@ function FarmPage() {
                   <Label className="text-caption text-text-tertiary">负责人</Label>
                   <Input value={editing.manager} onChange={(e) => setEditing({ ...editing, manager: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
                 </div>
-                <Field label="存栏总数"><span className="tabular-nums">{editing.stock}</span></Field>
-                <Field label="牛舍数量"><span className="tabular-nums">{editing.barns}</span></Field>
               </div>
             </div>
           )}
