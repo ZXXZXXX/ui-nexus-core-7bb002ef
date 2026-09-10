@@ -190,10 +190,21 @@ function FarmPage() {
       <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <SheetContent side="right" className="w-full sm:w-1/2 sm:max-w-none flex flex-col gap-0 p-0 overflow-hidden">
           <SheetHeader className="px-6 pt-6 pb-3 border-b border-border bg-white">
-            <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
-              <span className="truncate">{editing?.name || "编辑牛场"}</span>
-              {editing && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{editing.id}</span>}
-            </SheetTitle>
+            <div className="flex items-center justify-between gap-3">
+              <SheetTitle className="text-section-title flex items-baseline gap-2 min-w-0">
+                <span className="truncate">{editing?.name || "编辑牛场"}</span>
+                {editing && <span className="text-body-sm font-normal text-text-tertiary font-mono shrink-0">{editing.id}</span>}
+              </SheetTitle>
+              {editing && (
+                <div className="flex items-center gap-2 shrink-0 mr-8">
+                  <span className="text-body-sm text-text-secondary">{editing.status === "运营中" ? "运营中" : "已冻结"}</span>
+                  <Switch
+                    checked={editing.status === "运营中"}
+                    onCheckedChange={(v) => setPendingStatus(v ? "运营中" : "已冻结")}
+                  />
+                </div>
+              )}
+            </div>
           </SheetHeader>
           {editing && (
             <div className="flex-1 overflow-y-auto px-6 py-5">
