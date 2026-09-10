@@ -341,7 +341,7 @@ function IntegrationPage() {
                       <Layers className="h-3.5 w-3.5 text-text-secondary" /> 帐套配置
                     </h4>
                   </div>
-                  <Button variant="outline" size="sm" onClick={addBook}>新增帐套</Button>
+                  <Button variant="ghost" size="sm" className="text-primary hover:text-primary hover:bg-transparent px-0" onClick={addBook}>+ 新增帐套</Button>
                 </div>
 
                 {(form.books ?? []).length === 0 ? (
