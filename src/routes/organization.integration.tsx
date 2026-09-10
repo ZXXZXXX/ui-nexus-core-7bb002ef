@@ -177,6 +177,8 @@ function IntegrationPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<SystemRow>(emptyForm("external"));
   const [editing, setEditing] = useState(false);
+  const [confirmRemove, setConfirmRemove] = useState(false);
+
 
   const of = (kind: SysKind) => systems.filter((s) => s.kind === kind);
 
