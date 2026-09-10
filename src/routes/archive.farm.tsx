@@ -172,8 +172,6 @@ function FarmPage() {
                   <span className={`tag ${detail.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{detail.type}</span>
                 </Field>
                 <Field label="休药期倍数">{detail.withdrawalFactor} 倍</Field>
-                <Field label="存栏总数"><span className="tabular-nums">{detail.stock}</span></Field>
-                <Field label="牛舍数量"><span className="tabular-nums">{detail.barns}</span></Field>
                 <Field label="负责人">{detail.manager}</Field>
                 <Field label="牛场状态">
                   <span className={`tag ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>
