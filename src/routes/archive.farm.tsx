@@ -155,6 +155,40 @@ function FarmPage() {
         </DialogContent>
 
       </Dialog>
+
+      <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
+        <SheetContent className="w-[480px] sm:max-w-[480px] overflow-y-auto p-0">
+          <SheetHeader className="px-6 py-4 border-b border-border">
+            <SheetTitle className="text-card-title text-foreground">{detail?.name}</SheetTitle>
+            <SheetDescription className="text-caption text-text-tertiary">牛场详情</SheetDescription>
+          </SheetHeader>
+          {detail && (
+            <div className="px-6 py-5 space-y-5">
+              <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                <Field label="牛场编码"><span className="font-mono">{detail.id}</span></Field>
+                <Field label="牛场名称">{detail.name}</Field>
+                <div className="col-span-2">
+                  <Field label="牛场地点">{detail.address}</Field>
+                </div>
+                <Field label="关联 ERP 帐套">
+                  {detail.erpBook || <span className="text-text-tertiary">未绑定</span>}
+                </Field>
+                <Field label="牛场类型">
+                  <span className={`tag ${detail.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{detail.type}</span>
+                </Field>
+                <Field label="休药期倍数"><span className="tabular-nums">{detail.withdrawalFactor}×</span></Field>
+                <Field label="存栏总数"><span className="tabular-nums">{detail.stock}</span></Field>
+                <Field label="牛舍数量"><span className="tabular-nums">{detail.barns}</span></Field>
+                <Field label="负责人">{detail.manager}</Field>
+                <Field label="牛场状态">
+                  <span className={`tag ${detail.status === "运营中" ? "tag-success" : "tag-muted"}`}>{detail.status}</span>
+                </Field>
+                <Field label="牛场负责人">{detail.owner}</Field>
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
