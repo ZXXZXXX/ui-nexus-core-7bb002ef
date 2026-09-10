@@ -67,7 +67,7 @@ const initialSystems: SystemRow[] = [
   {
     id: "S-ERP",
     kind: "erp",
-    name: "用友 U8 Cloud",
+    name: "金蝶云",
     apiUrl: "https://erp.qidian-farm.com/openapi",
     appKey: "erp_ak_2b77de",
     appSecret: "••••••••••••",
@@ -78,6 +78,7 @@ const initialSystems: SystemRow[] = [
       { id: "B2", name: "华北区帐套", code: "002", apiUrl: "https://erp.qidian-farm.com/openapi/002", enabled: true },
     ],
   },
+
   {
     id: "S-EXT-1",
     kind: "external",
