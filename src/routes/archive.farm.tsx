@@ -126,6 +126,10 @@ function FarmPage() {
       toast.error("请填写牛场名称");
       return;
     }
+    if (!editing.province || !editing.city || !editing.district) {
+      toast.error("请选择所在地区");
+      return;
+    }
     const next = { ...editing, name: editing.name.trim(), erpBook: editing.erpBook.trim() };
     setFarms((prev) => prev.map((f) => (f.id === next.id ? next : f)));
     setCurrent(next);
@@ -241,7 +245,7 @@ function FarmPage() {
                     <Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} className="h-9 bg-card border-border text-body-sm" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-caption text-text-tertiary">所在地区</Label>
+                    <Label className="text-caption text-text-tertiary">所在地区 <span className="text-danger">*</span></Label>
                     <RegionCascader
                       value={{ province: editing.province, city: editing.city, district: editing.district }}
                       onChange={(v) => setEditing({ ...editing, ...v })}
