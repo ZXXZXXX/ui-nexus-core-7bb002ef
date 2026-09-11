@@ -1272,7 +1272,7 @@ function ScreeningHistory() {
           <p className="text-body-sm text-text-secondary">是否跳转查看该工单的详情？</p>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setOrderPreview(null)}>
-              暂不跳转
+              取消&nbsp;
             </Button>
             <Button
               onClick={() => {
@@ -1280,7 +1280,7 @@ function ScreeningHistory() {
                 navigate({ to: "/production/disease" });
               }}
             >
-              查看工单详情
+              查看详情
             </Button>
           </div>
         </DialogContent>
