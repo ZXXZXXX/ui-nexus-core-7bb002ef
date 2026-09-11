@@ -96,7 +96,7 @@ function AnimalDetailPage() {
 
   // 异常 / 观察中：若仍处于休药期，按治疗期间休药期最长的药品自末次用药日推算
   const withdrawal = useMemo(() => {
-    if (!(a.health === "异常" || a.health === "观察中")) return null;
+    if (!(a.health === "治疗中" || a.health === "观察中")) return null;
     const { i } = locateCow(id);
     if (i % 2 !== 0) return null; // 部分牛只无休药期
     const maxDays = 5 + (i % 3) * 2; // 休药期最长药品的天数
@@ -245,13 +245,24 @@ function AnimalDetailPage() {
           </section>
         )}
 
-        {/* 异常 / 观察中：休药期提示 */}
-        {withdrawal && (
+        {/* 治疗中 / 观察中：休药期与产奶上市提示 */}
+        {a.health === "治疗中" && (
+          <section className="px-4 mt-3">
+            <div className="rounded-xl bg-[#FFF1F0] px-3 py-2.5 text-body-sm text-[#CF1322] w-full">
+              <span className="inline-flex items-start gap-1.5">
+                <Clock className="h-4 w-4 shrink-0 mt-0.5" />
+                牛只正在使用药物治疗，当前产奶不建议上市
+              </span>
+            </div>
+          </section>
+        )}
+
+        {a.health === "观察中" && withdrawal && (
           <section className="px-4 mt-3">
             <div className="rounded-xl bg-[#FFF7E6] px-3 py-2.5 text-body-sm text-[#B8860B] w-full">
               <span className="inline-flex items-start gap-1.5">
                 <Clock className="h-4 w-4 shrink-0 mt-0.5" />
-                牛只预计休药期至 {withdrawal.until}，余 {withdrawal.remain} 天
+                牛只治疗已结束，预计休药期至 {withdrawal.until}，余 {withdrawal.remain} 天，期间产奶不可上市
               </span>
             </div>
           </section>
@@ -260,7 +271,7 @@ function AnimalDetailPage() {
 
 
         {/* 休药期 */}
-        {a.withdrawalDays > 0 && (
+        {(a.health === "治疗中" || a.health === "观察中") && a.withdrawalDays > 0 && (
           <section className="px-4 mt-3">
             <div className="bg-[#FFF1F0] border border-[#FFA39E] rounded-lg px-3 py-2 inline-flex items-center justify-between w-full">
               <span className="inline-flex items-center gap-1.5 text-body-sm font-medium text-[#CF1322] min-w-0">

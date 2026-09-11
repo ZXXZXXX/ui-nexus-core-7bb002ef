@@ -357,21 +357,26 @@ export function CattleProfileDrawer({
 
         {/* 内容 */}
         <div ref={scrollRef} className="flex-1 overflow-y-auto px-7 py-6 space-y-5">
-          {/* 休药期：置顶状态条 */}
-          <div
-            className={`rounded-xl border px-4 py-3 flex items-center gap-2.5 ${
-              cow.withdrawalDays > 0
-                ? "border-[#FFCCC7] bg-[#FFF1F0]"
-                : "border-[#B7EB8F] bg-[#F6FFED]"
-            }`}
-          >
-            <Clock className={`h-4 w-4 shrink-0 ${cow.withdrawalDays > 0 ? "text-[#CF1322]" : "text-[#389E0D]"}`} />
-            <span className={`text-body-sm ${cow.withdrawalDays > 0 ? "text-[#CF1322]" : "text-[#389E0D]"}`}>
-              {cow.withdrawalDays > 0
-                ? `该牛只处于休药期，至 ${cow.withdrawalUntil} 结束（剩 ${cow.withdrawalDays} 天），期间产奶不可上市。`
-                : "该牛只未处于休药期，当前产奶可正常上市。"}
-            </span>
-          </div>
+          {/* 休药期 / 产奶上市：仅治疗中、观察中展示 */}
+          {(health === "治疗中" || health === "观察中") && (
+            <div
+              className={`rounded-xl border px-4 py-3 flex items-center gap-2.5 ${
+                health === "治疗中"
+                  ? "border-[#FFCCC7] bg-[#FFF1F0]"
+                  : "border-[#FFE58F] bg-[#FFFBE6]"
+              }`}
+            >
+              <Clock className={`h-4 w-4 shrink-0 ${health === "治疗中" ? "text-[#CF1322]" : "text-[#B8860B]"}`} />
+              <span className={`text-body-sm ${health === "治疗中" ? "text-[#CF1322]" : "text-[#B8860B]"}`}>
+                {health === "治疗中"
+                  ? "该牛只正在使用药物治疗，当前产奶不建议上市。"
+                  : cow.withdrawalDays > 0
+                    ? `该牛只治疗已结束，处于休药期，至 ${cow.withdrawalUntil} 结束（剩 ${cow.withdrawalDays} 天），期间产奶不可上市。`
+                    : "该牛只治疗已结束，处于休药期观察，期间产奶不可上市。"}
+              </span>
+            </div>
+          )}
+
 
 
           {/* 繁育与血统档案 */}
