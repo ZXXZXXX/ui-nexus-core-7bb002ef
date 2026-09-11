@@ -677,11 +677,11 @@ function GranularityTabs({ value, onChange }: { value: Granularity; onChange: (g
 const NOW = new Date(2026, 8, 11);
 /** 每个维度可回溯的最大周期数（拖动到底后不再向前） */
 const MAX_BACK: Record<Granularity, number> = { day: 90, month: 36, year: 24 };
-const WINDOW: Record<Granularity, number> = { day: 15, month: 12, year: 12 };
+const WINDOW: Record<Granularity, number> = { day: 15, month: 12, year: 6 };
 
 /**
  * 按时间维度生成横轴标签与波动因子。
- * offset 为向前回溯的周期数（0 = 最新窗口）：日度 15 天 / 月度 12 个月 / 年度 12 年。
+ * offset 为向前回溯的周期数（0 = 最新窗口）：日度 15 天 / 月度 12 个月 / 年度 6 年。
  */
 export function axisFor(g: Granularity = "month", offset = 0) {
   const n = WINDOW[g];
