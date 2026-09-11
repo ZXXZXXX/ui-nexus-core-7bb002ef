@@ -177,8 +177,9 @@ export function ListPage<T>({
 
   const data = useMemo(() => {
     const kw = q.trim().toLowerCase();
-    const start = dateRangeMode ? (from ? parseDate(from) : null) : rangeStart(range);
-    const end = dateRangeMode && to ? parseDate(to) : null;
+    const custom = dateRangeMode || range === "custom";
+    const start = custom ? (from ? parseDate(from) : null) : rangeStart(range);
+    const end = custom && to ? parseDate(to) : null;
     const dateCol = columns.find((c) => c.key === dateKey);
 
     return rows.filter((row) => {
