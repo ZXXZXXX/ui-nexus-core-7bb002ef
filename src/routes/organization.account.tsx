@@ -546,7 +546,9 @@ function AccountPage() {
                 aria-label="全选"
               />
             </div>
+            <div>账号编号</div>
             <div>用户</div>
+            <div>工号</div>
             <div>来源</div>
             <div>人员类型</div>
             <div>手机号</div>
