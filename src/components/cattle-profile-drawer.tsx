@@ -1165,6 +1165,11 @@ const ALL_SCREENINGS: ScreeningRecord[] = [
 ];
 
 function ScreeningHistory() {
+  const navigate = useNavigate();
+  const [orderPreview, setOrderPreview] = useState<
+    (ScreeningRecord["order"] & { date: string; source: string; operator: string }) | null
+  >(null);
+
   return (
     <div>
       <div className="text-caption text-text-tertiary mb-1">共 {ALL_SCREENINGS.length} 条</div>
@@ -1191,12 +1196,19 @@ function ScreeningHistory() {
             {s.note ? <div className="mt-1 text-caption text-text-secondary">说明：{s.note}</div> : null}
 
             {s.order ? (
-              <div className="mt-2 flex items-center gap-2 rounded-lg bg-muted/50 px-2.5 py-1.5">
+              <button
+                type="button"
+                onClick={() =>
+                  setOrderPreview({ ...s.order!, date: s.date, source: s.source, operator: s.operator })
+                }
+                className="mt-2 flex w-full items-center gap-2 rounded-lg bg-muted/50 px-2.5 py-1.5 text-left transition-colors hover:bg-muted"
+              >
                 <FilePlus2 className="h-3.5 w-3.5 shrink-0 text-primary" />
                 <span className="font-mono text-caption text-text-secondary">{s.order.no}</span>
                 <span className="text-caption text-text-secondary">{s.order.type}</span>
                 <span className="ml-auto text-caption text-text-tertiary">{s.order.status}</span>
-              </div>
+                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
+              </button>
             ) : null}
 
             {s.photos > 0 ? (
@@ -1217,6 +1229,49 @@ function ScreeningHistory() {
           </div>
         ))}
       </div>
+
+      <Dialog open={!!orderPreview} onOpenChange={(o) => !o && setOrderPreview(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>关联工单</DialogTitle>
+          </DialogHeader>
+          {orderPreview ? (
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-mono text-body-sm text-foreground">{orderPreview.no}</span>
+                <span className="rounded-md bg-muted px-1.5 py-0.5 text-caption text-text-secondary">
+                  {orderPreview.status}
+                </span>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-y-2 text-caption">
+                <span className="text-text-tertiary">工单类型</span>
+                <span className="text-text-secondary">{orderPreview.type}</span>
+                <span className="text-text-tertiary">发起时间</span>
+                <span className="text-text-secondary">{orderPreview.date}</span>
+                <span className="text-text-tertiary">来源</span>
+                <span className="text-text-secondary">{orderPreview.source}</span>
+                <span className="text-text-tertiary">排查人</span>
+                <span className="text-text-secondary">{orderPreview.operator}</span>
+              </div>
+            </div>
+          ) : null}
+          <p className="text-body-sm text-text-secondary">是否跳转查看该工单的详情？</p>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={() => setOrderPreview(null)}>
+              暂不跳转
+            </Button>
+            <Button
+              onClick={() => {
+                setOrderPreview(null);
+                navigate({ to: "/production/disease" });
+              }}
+            >
+              查看工单详情
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
