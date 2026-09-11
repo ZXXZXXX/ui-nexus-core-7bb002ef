@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { maxDaysFor, drugDayLimit } from "@/data/drug-days";
 import { StatScopeCard, prescriptionStats } from "@/components/stat-scope-card";
 import { PRESCRIPTION_SEED, RX_DRUG_CATALOG } from "@/lib/prescription-kb";
 
@@ -958,7 +959,12 @@ function DrugDetailRow({
           </div>
           <div className="w-28">
             <Field label="用药天数" required>
-              <NumberInput value={value.days} onChange={(days) => onChange({ days })} suffix="天" />
+              <NumberInput
+                value={value.days}
+                onChange={(days) => onChange({ days })}
+                suffix="天"
+                max={maxDaysFor(value.drugs.map((d) => d.name))}
+              />
             </Field>
           </div>
           <div className="w-48">
@@ -1115,7 +1121,12 @@ function AltDrugEditor({
         </div>
         <div className="w-28">
           <Field label="用药天数" required>
-            <NumberInput value={days} onChange={(v) => onChange({ days: v })} suffix="天" />
+            <NumberInput
+              value={days}
+              onChange={(v) => onChange({ days: v })}
+              suffix="天"
+              max={drugDayLimit(drug.name).maxDays}
+            />
           </Field>
         </div>
         <div className="w-48">
@@ -1379,10 +1390,15 @@ function NumberInput({
   value,
   onChange,
   suffix,
+  max,
+  maxMessage,
 }: {
   value: number;
   onChange: (v: number) => void;
   suffix?: string;
+  /** 上限，超出后自动拦截为上限值 */
+  max?: number;
+  maxMessage?: string;
 }) {
   return (
     <div className="relative">
@@ -1391,7 +1407,12 @@ function NumberInput({
         inputMode="numeric"
         onChange={(e) => {
           const s = sanitizePositive(e.target.value);
-          onChange(s ? Number(s) : 0);
+          let n = s ? Number(s) : 0;
+          if (max != null && n > max) {
+            n = max;
+            toast.warning(maxMessage ?? `用药天数不可超过药品档案设定的最大用药天数 ${max} 天`);
+          }
+          onChange(n);
         }}
         className={cn("h-9 text-body", suffix && "pr-8")}
       />

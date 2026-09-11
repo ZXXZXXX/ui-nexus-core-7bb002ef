@@ -68,7 +68,8 @@ type Drug = {
   withdraw: string; // 休药期
   doseUnit: string; // 默认用药单位
   freqRule?: string; // 用药频次规则
-  daysRange?: string; // 用药天数范围
+  minDays?: number; // 最少用药天数
+  maxDays?: number; // 最大用药天数
   variableDose: boolean; // 是否按变量计算
   variable?: string; // 默认计算变量
   defaultDose: string; // 默认具体剂量
@@ -107,7 +108,8 @@ const initialDrugs: Drug[] = [
     withdraw: "7天",
     doseUnit: "ml",
     freqRule: "",
-    daysRange: "3-5天",
+    minDays: 3,
+    maxDays: 5,
     variableDose: true,
     variable: "体重区间",
     defaultDose: "600-800kg → 30ml/次；400-600kg → 20ml/次",
@@ -138,7 +140,6 @@ const initialDrugs: Drug[] = [
     withdraw: "21天",
     doseUnit: "ml",
     freqRule: "",
-    daysRange: "",
     variableDose: false,
     defaultDose: "2ml/次",
     pcDoseMax: "",
@@ -167,7 +168,6 @@ const initialDrugs: Drug[] = [
     withdraw: "14天",
     doseUnit: "ml",
     freqRule: "每3天1次",
-    daysRange: "",
     variableDose: true,
     variable: "体重区间",
     defaultDose: "1ml/50kg",
@@ -197,7 +197,8 @@ const initialDrugs: Drug[] = [
     withdraw: "0天",
     doseUnit: "g",
     freqRule: "",
-    daysRange: "5-7天",
+    minDays: 5,
+    maxDays: 7,
     variableDose: false,
     defaultDose: "30g/次",
     pcDoseMax: "",
@@ -226,7 +227,6 @@ const initialDrugs: Drug[] = [
     withdraw: "0天",
     doseUnit: "ml",
     freqRule: "",
-    daysRange: "",
     variableDose: false,
     defaultDose: "按环境用量",
     pcDoseMax: "",
@@ -301,7 +301,7 @@ function DrugArchivePage() {
     { key: "reg", label: "批准文号", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.reg || "—"}</span> },
     { key: "shelfLife", label: "保质期", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary">{d.shelfLife || "—"}</span> },
     { key: "defaultDose", label: "默认剂量", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.defaultDose || "—"}</span> },
-    { key: "daysRange", label: "疗程范围", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary">{d.daysRange || "—"}</span> },
+    { key: "daysRange", label: "疗程范围", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary">{d.minDays || d.maxDays ? `${d.minDays ?? "—"}~${d.maxDays ?? "—"} 天` : "—"}</span> },
     { key: "remark", label: "备注", defaultHidden: true, render: (d) => <span className="text-body-sm text-text-secondary truncate">{d.remark || "—"}</span> },
   ];
 
@@ -513,11 +513,24 @@ function DrugForm({
             onChange={(v: string) => patch({ freqRule: v })}
           />
           <F
-            label="用药天数范围"
-            value={d.daysRange ?? ""}
+            label="最少用药天数"
+            value={d.minDays != null ? String(d.minDays) : ""}
             readOnly={readOnly}
-            onChange={(v) => patch({ daysRange: v })}
-            placeholder="如：3-5天"
+            onChange={(v) => {
+              const n = Number(v.replace(/[^\d]/g, ""));
+              patch({ minDays: v.trim() === "" ? undefined : n });
+            }}
+            placeholder="如：3"
+          />
+          <F
+            label="最大用药天数"
+            value={d.maxDays != null ? String(d.maxDays) : ""}
+            readOnly={readOnly}
+            onChange={(v) => {
+              const n = Number(v.replace(/[^\d]/g, ""));
+              patch({ maxDays: v.trim() === "" ? undefined : n });
+            }}
+            placeholder="如：5"
           />
           <FBool
             label="是否按变量计算"
