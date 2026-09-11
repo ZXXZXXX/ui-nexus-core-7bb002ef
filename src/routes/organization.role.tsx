@@ -659,6 +659,7 @@ function RolePage() {
       },
     }));
   };
+  const [batchNoticeOpen, setBatchNoticeOpen] = useState(false);
   const mutateMini = (fn: (m: MiniPerms) => MiniPerms) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
