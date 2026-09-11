@@ -445,7 +445,7 @@ function HomePage() {
   const formatMetricLabel = (c: MetricCard) => {
     // 时点/存量指标与最近完成类指标不随时间维度切换改变口径
     if (c.label.includes("至今日") || c.label.includes("最近一次")) return c.label;
-    return c.label.replace(/（(今日|至昨日|本月|本季度|本年)）/, timePrefix[timeScope]);
+    return c.label.replace(/（(今日|至昨日|本月|本季度|本年|近 30 天|近 12 个月|近 12 年)）/, timePrefix[timeScope]);
   };
 
   const applyTimeScope = (c: MetricCard) => ({
