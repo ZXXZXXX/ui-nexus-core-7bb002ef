@@ -1218,6 +1218,34 @@ function AccountDrawerInner({
           </Button>
         </SheetFooter>
       )}
+      <AlertDialog open={pendingUserType !== null} onOpenChange={(o) => !o && setPendingUserType(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              确认更改为{pendingUserType === "外部" ? "外部" : "内部"}账号？
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingUserType === "外部"
+                ? "外部账号将无法查看工单信息、药品信息等业务数据，请确认是否更改为外部账号"
+                : "内部账号可以查看工单信息、药品信息等业务数据，请确认是否更改为内部账号"}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingUserType) {
+                  setUserType(pendingUserType);
+                  setFarmRoles((cur) => cur.map((fr) => ({ ...fr, roles: [] })));
+                }
+                setPendingUserType(null);
+              }}
+            >
+              确认更改
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
