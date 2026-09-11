@@ -181,12 +181,12 @@ function AnimalDetailPage() {
                     a.health === "死淘"
                       ? "bg-[#F0F2F4] text-[#64748B]"
                       : a.health === "异常"
-                      ? "bg-[#FFE4E1] text-[#D9534F]"
+                      ? "bg-[#FFEDEE] text-[#F15454]"
                       : a.health === "观察中"
-                      ? "bg-[#FFF7E6] text-[#B8860B]"
+                      ? "bg-[#FFF5DF] text-[#F9B855]"
                       : a.health === "治疗中"
-                      ? "bg-[#FFE8CC] text-[#C9621F]"
-                      : "bg-[#E8F5E9] text-[#2E7D32]"
+                      ? "bg-[#E6F7FE] text-[#22ACEB]"
+                      : "bg-[#E8F7EE] text-[#23A969]"
                   }`}
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />

@@ -294,33 +294,33 @@ export function CattleProfileDrawer({
     health === "死淘"
       ? "bg-[#F0F2F4] text-[#64748B]"
       : health === "异常"
-      ? "bg-[#FFE4E1] text-[#D9534F]"
+      ? "bg-[#FFEDEE] text-[#F15454]"
       : health === "观察中"
-        ? "bg-[#FFF7E6] text-[#B8860B]"
+        ? "bg-[#FFF5DF] text-[#F9B855]"
         : health === "治疗中"
-          ? "bg-[#FFE8CC] text-[#C9621F]"
-          : "bg-[#E8F5E9] text-[#2E7D32]";
+          ? "bg-[#E6F7FE] text-[#22ACEB]"
+          : "bg-[#E8F7EE] text-[#23A969]";
 
   // 头部渐变与状态标签色系联动
   const headerTint =
     health === "死淘"
       ? "#F0F2F4"
       : health === "异常"
-      ? "#FFE4E1"
+      ? "#FFEDEE"
       : health === "观察中"
-        ? "#FFF7E6"
+        ? "#FFF5DF"
         : health === "治疗中"
-          ? "#FFE8CC"
+          ? "#E6F7FE"
           : "#EFFBF1";
   const iconTone =
     health === "死淘"
       ? "text-[#64748B]"
       : health === "异常"
-      ? "text-[#D9534F]"
+      ? "text-[#F15454]"
       : health === "观察中"
-        ? "text-[#B8860B]"
+        ? "text-[#F9B855]"
         : health === "治疗中"
-          ? "text-[#C9621F]"
+          ? "text-[#22ACEB]"
           : "text-primary";
 
 
