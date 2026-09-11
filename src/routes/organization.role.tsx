@@ -122,11 +122,11 @@ const navSpec: NavGroupDef[] = [
   {
     key: "archive",
     name: "基础档案",
-    desc: "仅区分能否查看二级菜单界面，无其他操作能力",
+    desc: "可配置二级菜单的查看与导出能力",
     children: [
-      { key: "farm", name: "牛场信息" },
-      { key: "barn", name: "牛舍信息" },
-      { key: "cattle", name: "牛只信息" },
+      { key: "farm", name: "牛场信息", actions: [{ key: "export", name: "导出" }] },
+      { key: "barn", name: "牛舍信息", actions: [{ key: "export", name: "导出" }] },
+      { key: "cattle", name: "牛只信息", actions: [{ key: "export", name: "导出" }] },
     ],
   },
   {
