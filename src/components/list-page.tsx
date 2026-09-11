@@ -215,12 +215,24 @@ export function ListPage<T>({
       data.map((row) => shown.filter((c) => c.key !== "action").map((c) => raw(c, row))),
     );
 
-  const gridStyle = {
-    gridTemplateColumns:
-      shown.length === 0
-        ? "minmax(0, 1fr)"
-        : shown.map((c) => c.width ?? "minmax(0, 1fr)").join(" "),
+  /* 冻结首列 / 尾列，中间横向滚动 */
+  const DEFAULT_COL_PX = 128;
+  const parseW = (w?: string): number => {
+    if (!w) return DEFAULT_COL_PX;
+    const m = /^([\d.]+)\s*(em|rem|px)?$/.exec(w.trim());
+    if (!m) return DEFAULT_COL_PX;
+    const n = parseFloat(m[1]);
+    return m[2] === "px" ? n : n * 14;
   };
+  const colStyle = (c: ListColumn<T>, frozen: boolean) =>
+    frozen || c.width
+      ? { flex: `0 0 ${parseW(c.width)}px`, width: parseW(c.width) }
+      : { flex: "1 1 0", minWidth: DEFAULT_COL_PX };
+  const minTableWidth =
+    shown.reduce((s, c) => s + parseW(c.width), 0) +
+    (rowActions ? actionsWidth : 0) +
+    64;
+
 
   return (
     <>
