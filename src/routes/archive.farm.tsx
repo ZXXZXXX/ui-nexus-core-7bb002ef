@@ -36,7 +36,7 @@ const initialFarms: Farm[] = [
 const columns: ListColumn<Farm>[] = [
   { key: "id", label: "牛场编号", required: true, render: (f) => <span className="font-mono text-body text-foreground">{f.id}</span> },
   {
-    key: "name", label: "牛场名称", required: true,
+    key: "name", label: "牛场名称", required: true, width: "9.5em",
     render: (f) => (
       <span className="flex items-center gap-2 text-body text-foreground truncate">
         <Building2 className="h-3.5 w-3.5 text-primary shrink-0" />
