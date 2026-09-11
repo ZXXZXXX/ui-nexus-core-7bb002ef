@@ -937,7 +937,7 @@ function RolePage() {
                         return (
                           <div key={g.key} className="border-b border-border last:border-b-0">
                             {/* 一级节点 */}
-                            <div className="flex items-center gap-2 px-3 py-2.5 bg-surface-subtle">
+                            <div className="flex items-center gap-2 px-3 py-2.5 bg-card">
                               {hasChildren ? (
                                 <button
                                   type="button"
