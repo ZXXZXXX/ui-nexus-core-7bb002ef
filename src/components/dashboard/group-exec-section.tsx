@@ -475,7 +475,7 @@ function DrugComboChart({
 }
 
 function DrugTrendSection({ scopeRegion, granularity: initialG = "month" }: { scopeRegion?: string | null; granularity?: Granularity }) {
-  const [granularity, setGranularity] = useState<Granularity>(initialG);
+  const { labels: months, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   // 区域视角：总药费按该区域药费占比折算，单头药费按区域实际水平折算
   const { feeRatio, headRatio } = useMemo(() => {
     if (!scopeRegion) return { feeRatio: 1, headRatio: 1 };
@@ -483,15 +483,14 @@ function DrugTrendSection({ scopeRegion, granularity: initialG = "month" }: { sc
     const rg = agg(scopeRegion, "", GROUP_FARMS.filter((f) => f.region === scopeRegion));
     return { feeRatio: rg.drugFee / all.drugFee, headRatio: rg.perHead / all.perHead };
   }, [scopeRegion]);
-  const { labels: months, factors } = useMemo(() => axisFor(granularity), [granularity]);
   const scale = granularity === "day" ? 1 / 15 : granularity === "year" ? 12 : 1;
   const totalFee = useMemo(
-    () => factors.map((k, i) => Number((ALL_TOTAL_FEE[i % ALL_TOTAL_FEE.length] * k * scale * feeRatio).toFixed(1))),
-    [factors, scale, feeRatio],
+    () => factors.map((k, i) => Number((ALL_TOTAL_FEE[(i + offset) % ALL_TOTAL_FEE.length] * k * scale * feeRatio).toFixed(1))),
+    [factors, scale, feeRatio, offset],
   );
   const perHead = useMemo(
-    () => factors.map((k, i) => Number((ALL_PER_HEAD[i % ALL_PER_HEAD.length] * k * headRatio).toFixed(1))),
-    [factors, headRatio],
+    () => factors.map((k, i) => Number((ALL_PER_HEAD[(i + offset) % ALL_PER_HEAD.length] * k * headRatio).toFixed(1))),
+    [factors, headRatio, offset],
   );
 
   return (
@@ -504,7 +503,10 @@ function DrugTrendSection({ scopeRegion, granularity: initialG = "month" }: { sc
         <GranularityTabs value={granularity} onChange={setGranularity} />
       }
     >
-      <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
+      </PannableChart>
+
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
