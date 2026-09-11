@@ -134,44 +134,44 @@ const DEFAULT_ROLES = [...INTERNAL_ROLES, ...EXTERNAL_ROLES];
 type RolePermPreview = { pc: string[]; mini: string[] };
 const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
   场长: {
-    pc: ["工作台", "牛只基础档案", "工单管理", "药品管理", "知识库管理"],
-    mini: ["疾病治疗（上报/领取/回填）", "修蹄、干奶、疫苗、产后护理、驱虫、普修（全部）", "损耗/领用（全部）"],
+    pc: ["首页", "基础档案", "工单管理", "药品管理", "诊疗管理", "统计分析"],
+    mini: ["首页", "现场上报", "备药", "任务处理", "工单管理", "知识查询", "牛只档案", "消息中心", "个人中心"],
   },
   兽医: {
-    pc: ["工作台", "牛只基础档案", "工单管理", "药品管理", "知识库管理"],
-    mini: ["疾病、疫苗、产后护理、驱虫、普修（上报/领取/回填）", "损耗/领用（全部）"],
+    pc: ["首页", "基础档案", "工单管理", "药品管理", "诊疗管理"],
+    mini: ["首页", "现场上报", "备药", "任务处理", "工单管理", "知识查询", "牛只档案", "消息中心", "个人中心"],
   },
   兽医助理: {
     pc: [],
-    mini: ["疾病、疫苗、修蹄、干奶、驱虫、普修（领取/回填）", "损耗（上报）"],
+    mini: ["首页", "现场上报", "备药", "任务处理", "知识查询", "牛只档案", "消息中心", "个人中心"],
   },
   技术员: {
-    pc: ["工作台", "牛只基础档案"],
-    mini: ["疾病、疫苗（上报）"],
+    pc: ["首页", "基础档案"],
+    mini: ["首页", "现场上报", "任务处理", "牛只档案", "消息中心", "个人中心"],
   },
   仓管员: {
-    pc: ["工作台", "牛只基础档案", "药品管理"],
-    mini: ["损耗/领用（全部）"],
+    pc: ["首页", "基础档案", "药品管理"],
+    mini: ["首页", "现场上报", "备药", "消息中心", "个人中心"],
   },
   修蹄工: {
     pc: [],
-    mini: ["修蹄（领取/回填）"],
+    mini: ["首页", "任务处理", "消息中心", "个人中心"],
   },
   普修工: {
     pc: [],
-    mini: ["普修（领取/回填）"],
+    mini: ["首页", "任务处理", "消息中心", "个人中心"],
   },
   干奶工: {
     pc: [],
-    mini: ["干奶（领取/回填）"],
+    mini: ["首页", "任务处理", "消息中心", "个人中心"],
   },
   驱虫工: {
     pc: [],
-    mini: ["驱虫（领取/回填）"],
+    mini: ["首页", "任务处理", "消息中心", "个人中心"],
   },
   超级管理员: {
-    pc: ["工作台", "牛只基础档案", "工单管理", "药品管理", "组织管理", "知识库管理"],
-    mini: ["全部小程序权限"],
+    pc: ["首页", "基础档案", "工单管理", "药品管理", "诊疗管理", "组织管理", "统计分析", "反馈管理"],
+    mini: ["首页", "现场上报", "备药", "任务处理", "工单管理", "知识查询", "牛只档案", "消息中心", "个人中心"],
   },
 };
 
@@ -1318,23 +1318,27 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <div className="text-caption text-text-tertiary mb-1.5">PC 端模块</div>
+                      <div className="text-caption text-text-tertiary mb-1.5">PC 端菜单</div>
                       {perms.pc.length === 0 ? (
                         <div className="text-body-sm text-text-tertiary">—</div>
                       ) : (
-                        <ul className="text-body-sm text-text-secondary space-y-1 list-disc pl-4">
-                          {perms.pc.map((p) => <li key={p}>{p}</li>)}
-                        </ul>
+                        <div className="flex flex-wrap gap-1.5">
+                          {perms.pc.map((p) => (
+                            <span key={p} className="tag tag-info whitespace-nowrap">{p}</span>
+                          ))}
+                        </div>
                       )}
                     </div>
                     <div>
-                      <div className="text-caption text-text-tertiary mb-1.5">小程序事项</div>
+                      <div className="text-caption text-text-tertiary mb-1.5">小程序模块</div>
                       {perms.mini.length === 0 ? (
                         <div className="text-body-sm text-text-tertiary">—</div>
                       ) : (
-                        <ul className="text-body-sm text-text-secondary space-y-1 list-disc pl-4">
-                          {perms.mini.map((p) => <li key={p}>{p}</li>)}
-                        </ul>
+                        <div className="flex flex-wrap gap-1.5">
+                          {perms.mini.map((p) => (
+                            <span key={p} className="tag tag-muted whitespace-nowrap">{p}</span>
+                          ))}
+                        </div>
                       )}
                     </div>
                   </div>
