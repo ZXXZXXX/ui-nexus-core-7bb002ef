@@ -85,7 +85,7 @@ export function CalvingSection() {
       desc={
         <div className="flex items-center gap-3 flex-wrap">
           {view === VIEW_CALF && drill ? (
-            <PeriodTabs value={tab} onChange={setTab} options={[TAB_PARITY, TAB_SEX, TAB_WEIGHT]} />
+            <PeriodTabs value={tab} onChange={setTab} options={[TAB_PARITY, TAB_ORDER, TAB_SEX, TAB_WEIGHT]} />
           ) : (
             <PeriodTabs
               value={view}
