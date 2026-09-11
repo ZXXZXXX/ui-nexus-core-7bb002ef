@@ -51,7 +51,7 @@ export type ListColumn<T> = {
   className?: string;
 };
 
-export type QuickRange = "all" | "today" | "7d" | "30d";
+export type QuickRange = "all" | "today" | "7d" | "30d" | "custom";
 
 export type ListPageProps<T> = {
   title: string;
