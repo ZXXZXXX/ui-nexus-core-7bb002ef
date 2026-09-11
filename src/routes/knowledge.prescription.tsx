@@ -1379,10 +1379,15 @@ function NumberInput({
   value,
   onChange,
   suffix,
+  max,
+  maxMessage,
 }: {
   value: number;
   onChange: (v: number) => void;
   suffix?: string;
+  /** 上限，超出后自动拦截为上限值 */
+  max?: number;
+  maxMessage?: string;
 }) {
   return (
     <div className="relative">
@@ -1391,7 +1396,12 @@ function NumberInput({
         inputMode="numeric"
         onChange={(e) => {
           const s = sanitizePositive(e.target.value);
-          onChange(s ? Number(s) : 0);
+          let n = s ? Number(s) : 0;
+          if (max != null && n > max) {
+            n = max;
+            toast.warning(maxMessage ?? `用药天数不可超过药品档案设定的最大用药天数 ${max} 天`);
+          }
+          onChange(n);
         }}
         className={cn("h-9 text-body", suffix && "pr-8")}
       />
