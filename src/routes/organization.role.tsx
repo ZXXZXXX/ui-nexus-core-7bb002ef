@@ -269,7 +269,8 @@ type MiniFuncDef = { key: string; name: string; scope?: MiniScope };
 type MiniModuleDef = { key: string; name: string; funcs: MiniFuncDef[] };
 
 const scopeOptions = (s: MiniScope) => (s === "wo" ? WO_TYPES : EVENT_TYPES);
-const scopeLabel = (s: MiniScope) => (s === "wo" ? "可选工单类型" : "可选基础事件类型");
+const scopeLabel = (s: MiniScope) =>
+  s === "wo" ? "选择对该角色开放的工单类型" : "选择对该角色开放的基础事件类型";
 
 const miniSpec: MiniModuleDef[] = [
   {
@@ -1316,7 +1317,7 @@ function RolePage() {
                           <div className="text-caption text-text-tertiary mb-2">
                             {scopeLabel(kind)}
                             <span className="ml-1">
-                              （已选 {sel.length}/{opts.length}，对上述所有相关功能通用）
+                              （已选 {sel.length}/{opts.length}）
                             </span>
                           </div>
                           <div className="flex flex-wrap gap-1.5">
