@@ -374,7 +374,7 @@ type LeafPerm = { view: boolean; actions: Record<string, boolean> };
 type GroupPerm = { view: boolean; leaves: Record<string, LeafPerm>; actions: Record<string, boolean> };
 type NavPerms = Record<string, GroupPerm>;
 type PcPerms = { allowLogin: boolean; nav: NavPerms; workbenchView: WorkbenchView };
-type MiniFuncPerm = { on: boolean; scope: string[] };
+type MiniFuncPerm = { on: boolean; scope: string[]; view?: string };
 type MiniPerms = Record<string, Record<string, MiniFuncPerm>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
