@@ -1230,7 +1230,7 @@ function RolePage() {
                   </div>
                   <p className="text-caption text-text-tertiary flex items-start gap-1.5 -mt-1">
                     <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                    请按模块配置功能权限；涉及工单 / 基础事件的功能可进一步限定可选范围。
+                    请按模块配置功能权限；涉及工单的功能可进一步限定可选范围。
                   </p>
 
                   <div className="rounded-md border border-border bg-card overflow-hidden flex">
@@ -1341,7 +1341,7 @@ function RolePage() {
                                 </div>
                               ) : m.key === "task" ? (
                                 <div className="mt-auto whitespace-nowrap pt-4 text-right text-caption text-text-tertiary">
-                                  可查看、操作的任务范围仅限于：开放的工单类型、基础事件类型
+                                  可查看、操作的任务范围仅限于：开放的工单类型
                                 </div>
                               ) : null}
 
@@ -1354,8 +1354,8 @@ function RolePage() {
                   </div>
 
                   {/* 通用范围：工单类型 / 基础事件类型，全局仅需选择一次 */}
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                    {(["wo", "event"] as MiniScope[]).map((kind) => {
+                  <div className="grid grid-cols-1 gap-3">
+                    {(["wo"] as MiniScope[]).map((kind) => {
                       const opts = scopeOptions(kind);
                       const sel = globalScope(kind);
                       return (
