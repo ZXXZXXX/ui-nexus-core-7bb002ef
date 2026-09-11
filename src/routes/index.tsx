@@ -420,38 +420,19 @@ function HomePage() {
   };
   const { factor, level, levels } = useDataLevel();
 
-  /** 根据时间维度调整绝对数量指标的数值；存量/比率指标保持不变
-   *  日度：最近 30 天；月度：最近 12 个月；年度：最近 12 年 */
-  const timeFactor = timeScope === "month" ? 12 : timeScope === "year" ? 144 : 1;
-  const timePrefix: Record<typeof timeScope, string> = {
-    day: "（近 30 天）",
-    month: "（近 12 个月）",
-    year: "（近 12 年）",
-  };
-
-  const scaleCardValue = (c: MetricCard) =>
-    c.absolute
+  /** 指标卡数值按数据量级缩放（不受数据看板的时间维度影响） */
+  const applyDataLevel = (c: MetricCard) => ({
+    ...c,
+    value: c.absolute
       ? c.value
           .split("/")
           .map((part) => {
             const raw = Number(part.trim().replace(/,/g, ""));
-            // 存栏类为存量，不随时间维度缩放；其余绝对量按时间维度缩放
             const isStock = c.topic.includes("存栏") || c.label.includes("存栏");
-            return scaleValue(isStock ? raw : raw * timeFactor, isStock ? 1 : factor).toLocaleString();
+            return scaleValue(raw, isStock ? 1 : factor).toLocaleString();
           })
           .join(" / ")
-      : c.value;
-
-  const formatMetricLabel = (c: MetricCard) => {
-    // 时点/存量指标与最近完成类指标不随时间维度切换改变口径
-    if (c.label.includes("至今日") || c.label.includes("最近一次")) return c.label;
-    return c.label.replace(/（(今日|至昨日|本月|本季度|本年|近 30 天|近 12 个月|近 12 年)）/, timePrefix[timeScope]);
-  };
-
-  const applyTimeScope = (c: MetricCard) => ({
-    ...c,
-    label: formatMetricLabel(c),
-    value: String(scaleCardValue(c)),
+      : c.value,
   });
 
   const baseCards = metricCards
@@ -464,7 +445,7 @@ function HomePage() {
             ? { ...c, ...farmOutCardOverride[c.anchor] }
             : c,
     )
-    .map(applyTimeScope)
+    .map(applyDataLevel)
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
       (a, b) =>
@@ -479,11 +460,11 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? groupBizCards.map(applyTimeScope)
+              ? groupBizCards.map(applyDataLevel)
 
               : scope === "region"
-                ? [applyTimeScope(regionLeadCard), map.get("治愈数"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
-                : farmOutBizCards.map(applyTimeScope);
+                ? [applyDataLevel(regionLeadCard), map.get("治愈数"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyDataLevel(regionTailCard)]
+                : farmOutBizCards.map(applyDataLevel);
 
           return execOrder.filter(Boolean) as MetricCard[];
         })()
@@ -871,7 +852,7 @@ function HomePage() {
             const showAlert = topicOrder.includes("alert");
             return (
               <div className="space-y-6">
-                <Frame title="数据概览" extra={timeTabs}>{cardsGrid}</Frame>
+                <Frame title="数据概览">{cardsGrid}</Frame>
                 <Frame title="数据看板">{topicGrid}</Frame>
                 {showAlert && (
                   <div id="topic-alert" className="scroll-mt-24">
@@ -892,11 +873,11 @@ function HomePage() {
 
           return (
             <div className="space-y-6">
-              <Frame title="数据概览" extra={timeTabs}>
+              <Frame title="数据概览">
                 {cardsGrid}
               </Frame>
-              <Frame title="数据看板">
-                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" />
+              <Frame title="数据看板" extra={timeTabs}>
+                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" granularity={timeScope} />
               </Frame>
               <Frame title="排名情况">
                 <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="rank" />
