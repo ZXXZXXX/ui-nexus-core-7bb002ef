@@ -562,22 +562,16 @@ function breedingFields(cow: CattleProfile): { label: string; value: string }[] 
   const lactating = female && cow.lactationDays > 0;
   const bred = female && cow.pregnancyDays > 0;
   const farmNo = cow.ear.slice(0, 2);
+  void farmNo;
+  void pick;
   return [
     { label: "泌乳天数", value: lactating ? `${cow.lactationDays} 天` : "—" },
     { label: "怀孕天数", value: bred ? `${cow.pregnancyDays} 天` : "—" },
     { label: "胎次", value: `${cow.parity} 胎` },
-    { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
-    { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
-    { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
-    { label: "入群来源", value: pick(5, 3) === 0 ? "本场出生" : pick(5, 3) === 1 ? "外购引进" : "牧场调入" },
-    { label: "产后天数", value: lactating ? `${cow.lactationDays} 天` : "—" },
-    { label: "配后天数", value: bred ? `${cow.pregnancyDays} 天` : "—" },
+    { label: "干奶日期", value: cow.parity > 0 ? dateAgo((cow.lactationDays || 200) + 60) : "—" },
     { label: "配次", value: female ? `${1 + pick(6, 4)} 次` : "—" },
-    { label: "流产天数", value: female && pick(7, 4) === 0 ? `${pick(8, 90, 10)} 天` : "—" },
-    { label: "产犊日期", value: cow.parity > 0 ? dateAgo(cow.lactationDays || 200) : "—" },
     { label: "最近配种日期", value: bred ? dateAgo(cow.pregnancyDays) : "—" },
     { label: "最近围产日期", value: cow.parity > 0 ? dateAgo((cow.lactationDays || 200) + 21) : "—" },
-    { label: "干奶日期", value: cow.parity > 0 ? dateAgo((cow.lactationDays || 200) + 60) : "—" },
     { label: "最近流产日期", value: female && pick(7, 4) === 0 ? dateAgo(pick(9, 300, 60)) : "—" },
   ];
 }
