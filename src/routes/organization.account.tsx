@@ -203,6 +203,47 @@ const farmsOf = (a: Pick<Account, "farmRoles">) => a.farmRoles.map((x) => x.farm
 const rolesOf = (a: Pick<Account, "farmRoles">) =>
   Array.from(new Set(a.farmRoles.flatMap((x) => x.roles)));
 
+type AccountColumn = {
+  key: string;
+  label: string;
+  width: string;
+  filter?: "text" | "select" | "none";
+  options?: string[];
+  defaultHidden?: boolean;
+  required?: boolean;
+};
+
+const ACCOUNT_COLUMNS: AccountColumn[] = [
+  { key: "id", label: "账号编号", width: "0.9fr", required: true },
+  { key: "name", label: "用户", width: "1.2fr", required: true },
+  { key: "employeeNo", label: "工号", width: "1fr" },
+  { key: "source", label: "来源", width: "0.9fr", filter: "select", options: ["人事系统", "兽医系统"] },
+  { key: "userType", label: "人员类型", width: "0.8fr", filter: "select", options: ["内部", "外部"] },
+  { key: "phone", label: "手机号", width: "1.1fr" },
+  { key: "role", label: "角色", width: "1.3fr", filter: "select" },
+  { key: "farms", label: "关联牧场", width: "1.8fr", filter: "select", options: FARM_OPTIONS },
+  { key: "wecomId", label: "企微 ID", width: "140px" },
+  { key: "status", label: "状态", width: "0.7fr", filter: "select", options: ["启用", "禁用"] },
+  { key: "createdAt", label: "创建时间", width: "1fr", defaultHidden: true },
+];
+
+const cellValue = (a: Account, key: string): string => {
+  switch (key) {
+    case "id": return a.id;
+    case "name": return a.name;
+    case "employeeNo": return a.employeeNo;
+    case "source": return a.source;
+    case "userType": return a.userType;
+    case "phone": return a.phone;
+    case "role": return rolesOf(a).join("、");
+    case "farms": return farmsOf(a).join("、");
+    case "wecomId": return a.wecomId ?? "";
+    case "status": return a.status;
+    case "createdAt": return a.createdAt;
+    default: return "";
+  }
+};
+
 function AccountPage() {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<Account[]>(initialAccounts);
