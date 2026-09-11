@@ -1088,10 +1088,7 @@ function AccountDrawerInner({
                     value={userType}
                     onValueChange={(v) => {
                       const next = v as UserType;
-                      if (next !== userType) {
-                        setUserType(next);
-                        setFarmRoles((cur) => cur.map((fr) => ({ ...fr, roles: [] })));
-                      }
+                      if (next !== userType) setPendingUserType(next);
                     }}
                   >
                     <SelectTrigger className="h-9 text-body-sm bg-card border-border"><SelectValue /></SelectTrigger>
