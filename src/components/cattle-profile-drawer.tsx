@@ -641,10 +641,11 @@ function PedigreeDialog({
                     className="flex items-center gap-3 rounded-md border border-border/60 bg-background px-3 py-2"
                   >
                     <span className="text-caption text-text-tertiary shrink-0">第 {i + 1} 只</span>
-                    <span className="text-body-sm text-foreground font-medium tabular-nums truncate flex-1">
+                    <span className="text-body-sm text-foreground font-medium tabular-nums truncate">
                       {c.no}
                     </span>
-                    <span className="text-caption text-text-secondary shrink-0">{c.sex}</span>
+                    <span className="text-body-sm text-text-secondary shrink-0">{c.sex}</span>
+                    <span className="flex-1" />
                     <span
                       className={`shrink-0 rounded px-1.5 py-0.5 text-caption ${
                         c.status === "留养" ? "bg-primary/10 text-primary" : "bg-muted text-text-tertiary"
