@@ -51,7 +51,7 @@ const columns: ListColumn<Farm>[] = [
     render: (f) => <span className={`tag ${f.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{f.type}</span>,
   },
   {
-    key: "erpBook", label: "ERP 帐套", filter: "select",
+    key: "erpBook", label: "ERP 帐套", filter: "select", width: "13em",
     value: (f) => f.erpBook || "未绑定",
     render: (f) => (
       <span className="text-body-sm text-text-secondary truncate">{f.erpBook || <span className="text-text-tertiary">未绑定</span>}</span>
