@@ -402,7 +402,6 @@ function HomePage() {
   const [activeRequest, setActiveRequest] = useState<PendingRequest | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [attendanceOpen, setAttendanceOpen] = useState(false);
-  const [timeScope, setTimeScope] = useState<"day" | "month" | "year">("day");
   const alertsRef = useRef<HTMLDivElement | null>(null);
 
   const { scope, config } = useDashboardView();
@@ -722,24 +721,6 @@ function HomePage() {
               {children}
             </section>
           );
-          const timeTabs = (
-            <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
-              {([["day", "日度"], ["month", "月度"], ["year", "年度"]] as const).map(([v, l]) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setTimeScope(v)}
-                  className={`rounded-md px-3 py-1 text-caption transition-colors ${
-                    timeScope === v
-                      ? "bg-[var(--brand-subtle)] text-[var(--brand)] font-medium"
-                      : "text-text-tertiary hover:text-text-primary"
-                  }`}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
-          );
           const cardsGrid = (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
 
@@ -877,7 +858,7 @@ function HomePage() {
                 {cardsGrid}
               </Frame>
               <Frame title="数据看板">
-                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" granularity={timeScope} />
+                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" granularity="day" />
               </Frame>
               <Frame title="排名情况">
                 <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="rank" />
