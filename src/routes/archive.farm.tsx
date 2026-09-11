@@ -36,7 +36,7 @@ const initialFarms: Farm[] = [
 const columns: ListColumn<Farm>[] = [
   { key: "id", label: "牛场编号", required: true, render: (f) => <span className="font-mono text-body text-foreground">{f.id}</span> },
   {
-    key: "name", label: "牛场名称", required: true,
+    key: "name", label: "牛场名称", required: true, width: "9.5em",
     render: (f) => (
       <span className="flex items-center gap-2 text-body text-foreground truncate">
         <Building2 className="h-3.5 w-3.5 text-primary shrink-0" />
@@ -44,14 +44,14 @@ const columns: ListColumn<Farm>[] = [
       </span>
     ),
   },
-  { key: "region", label: "所在地区", filter: "select", value: (f) => `${f.province}·${f.city}`, render: (f) => <span className="text-body-sm text-text-secondary">{f.province}·{f.city}</span> },
+  { key: "region", label: "所在地区", filter: "select", width: "11em", value: (f) => `${f.province}·${f.city}`, render: (f) => <span className="text-body-sm text-text-secondary truncate">{f.province}·{f.city}</span> },
   { key: "slot", label: "仓位号", filter: "select", render: (f) => <span className="font-mono text-body-sm text-text-secondary">{f.slot}</span> },
   {
     key: "type", label: "牛场类型", filter: "select",
     render: (f) => <span className={`tag ${f.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{f.type}</span>,
   },
   {
-    key: "erpBook", label: "ERP 帐套", filter: "select",
+    key: "erpBook", label: "ERP 帐套", filter: "select", width: "13em",
     value: (f) => f.erpBook || "未绑定",
     render: (f) => (
       <span className="text-body-sm text-text-secondary truncate">{f.erpBook || <span className="text-text-tertiary">未绑定</span>}</span>

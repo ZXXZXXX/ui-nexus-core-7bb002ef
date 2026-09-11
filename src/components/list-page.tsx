@@ -40,6 +40,8 @@ export type ListColumn<T> = {
   options?: string[];
   /** horizontal alignment of header + cell. default: left */
   align?: "left" | "right";
+  /** grid track size, e.g. "7em"; default minmax(0, 1fr) */
+  width?: string;
   /** hidden by default in column settings */
   defaultHidden?: boolean;
   /** cannot be hidden */
@@ -214,7 +216,10 @@ export function ListPage<T>({
     );
 
   const gridStyle = {
-    gridTemplateColumns: `repeat(${Math.max(shown.length, 1)}, minmax(0, 1fr))`,
+    gridTemplateColumns:
+      shown.length === 0
+        ? "minmax(0, 1fr)"
+        : shown.map((c) => c.width ?? "minmax(0, 1fr)").join(" "),
   };
 
   return (
