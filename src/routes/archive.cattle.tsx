@@ -53,6 +53,12 @@ function ageLabelOf(birth: string) {
   return `${days} 日龄`;
 }
 
+// 月龄：出生至今的整月数
+function monthAgeOf(birth: string) {
+  const days = Math.max(1, Math.round((Date.now() - new Date(birth).getTime()) / 86400000));
+  return `${Math.floor(days / 30)} 月龄`;
+}
+
 
 const healthToProfile: Record<Health, CattleProfile["health"]> = {
   健康: "健康",
