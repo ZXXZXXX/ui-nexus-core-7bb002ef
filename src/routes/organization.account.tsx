@@ -1449,6 +1449,7 @@ function CreateDialog({
     onCreate(
       {
         name: name.trim(),
+        employeeNo: "—",
         phone: phone.trim(),
         userType,
         source: "兽医系统",
