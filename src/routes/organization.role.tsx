@@ -1260,7 +1260,7 @@ function RolePage() {
                   </div>
                   <p className="text-caption text-text-tertiary flex items-start gap-1.5 -mt-1">
                     <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                    请按模块配置功能权限；涉及工单的功能可进一步限定可选范围。
+                    请按模块配置功能权限；涉及工单任务的功能可进一步限定可选范围。
                   </p>
 
                   <div className="rounded-md border border-border bg-card overflow-hidden flex">
