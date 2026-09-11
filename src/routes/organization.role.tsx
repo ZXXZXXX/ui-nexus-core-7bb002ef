@@ -656,59 +656,43 @@ function RolePage() {
       },
     }));
   };
-  const setMini = (e: MiniEventKey, a: MiniActionKey, v: boolean) => {
+  const mutateMini = (fn: (m: MiniPerms) => MiniPerms) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
       ...prev,
-      [drawerRole]: {
-        ...prev[drawerRole],
-        mini: {
-          ...prev[drawerRole].mini,
-          [e]: { ...prev[drawerRole].mini[e], [a]: v },
-        },
-      },
+      [drawerRole]: { ...prev[drawerRole], mini: fn(prev[drawerRole].mini) },
     }));
   };
-  const setMiniRow = (e: MiniEventKey, v: boolean) => {
-    if (!drawerRole || !editable) return;
-    const ev = findEvent(e);
-    setPerms((prev) => ({
-      ...prev,
-      [drawerRole]: {
-        ...prev[drawerRole],
-        mini: {
-          ...prev[drawerRole].mini,
-          [e]: {
-            report: hasAction(ev, "report") ? v : false,
-            execute: hasAction(ev, "execute") ? v : false,
-          },
-        },
-      },
+  /** 单个功能开关 */
+  const setMiniFunc = (mKey: string, fKey: string, v: boolean) =>
+    mutateMini((m) => ({
+      ...m,
+      [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], on: v } },
     }));
-  };
-  const setMiniColumn = (a: MiniActionKey, v: boolean) => {
-    if (!drawerRole || !editable) return;
-    setPerms((prev) => ({
-      ...prev,
-      [drawerRole]: {
-        ...prev[drawerRole],
-        mini: miniEvents.reduce((acc, e) => {
-          acc[e.key] = {
-            ...prev[drawerRole].mini[e.key],
-            [a]: hasAction(e, a) ? v : false,
-          };
-          return acc;
-        }, {} as MiniPerms),
-      },
+  /** 模块整行 */
+  const setMiniModule = (mKey: string, v: boolean) =>
+    mutateMini((m) => ({
+      ...m,
+      [mKey]: Object.fromEntries(
+        Object.entries(m[mKey]).map(([k, p]) => [k, { ...p, on: v }]),
+      ),
     }));
-  };
-  const setMiniAll = (v: boolean) => {
-    if (!drawerRole || !editable) return;
-    setPerms((prev) => ({
-      ...prev,
-      [drawerRole]: { ...prev[drawerRole], mini: fullMini(v) },
-    }));
-  };
+  const setMiniAll = (v: boolean) =>
+    mutateMini((m) =>
+      Object.fromEntries(
+        Object.entries(m).map(([mk, fs]) => [
+          mk,
+          Object.fromEntries(Object.entries(fs).map(([fk, p]) => [fk, { ...p, on: v }])),
+        ]),
+      ),
+    );
+  /** 功能下的可选范围（工单类型 / 基础事件类型） */
+  const toggleMiniScope = (mKey: string, fKey: string, t: string) =>
+    mutateMini((m) => {
+      const p = m[mKey][fKey];
+      const scope = p.scope.includes(t) ? p.scope.filter((x) => x !== t) : [...p.scope, t];
+      return { ...m, [mKey]: { ...m[mKey], [fKey]: { ...p, scope } } };
+    });
 
 
   const handleConfirmToggle = () => {
