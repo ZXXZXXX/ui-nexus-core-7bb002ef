@@ -302,7 +302,7 @@ const miniSpec: MiniModuleDef[] = [
     name: "任务处理",
     funcs: [
       { key: "view", name: "查看任务" },
-      { key: "diagnose", name: "诊断任务", scope: "wo" },
+      { key: "diagnose", name: "诊断工单任务", scope: "wo" },
       { key: "execute-wo", name: "执行工单任务", scope: "wo" },
       { key: "execute-event", name: "执行基础事件任务", scope: "event" },
       { key: "abnormal", name: "处理异常排查任务" },
