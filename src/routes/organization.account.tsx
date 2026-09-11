@@ -84,6 +84,7 @@ export const Route = createFileRoute("/organization/account")({
 
 type Status = "启用" | "禁用";
 type UserType = "内部" | "外部";
+type Source = "人事系统" | "兽医系统";
 type FarmRole = { farm: string; roles: string[] };
 type Account = {
   id: string;
@@ -91,12 +92,16 @@ type Account = {
   initial: string;
   phone: string;
   userType: UserType;
+  source: Source; // 人事系统同步 = 内部；兽医系统创建 = 外部
   farmRoles: FarmRole[]; // 每个关联牧场对应一个角色
   wecomId: string | null;
   wechatId: string | null;
   status: Status;
   createdAt: string;
 };
+
+// 来源决定人员类型标签：人事系统同步默认「内部」，兽医系统创建默认「外部」
+const userTypeOfSource = (s: Source): UserType => (s === "人事系统" ? "内部" : "外部");
 
 // 脱敏：保留前 4 后 3，中间以 **** 替代；过短时仅保留首尾各 1
 const maskId = (id: string) => {
