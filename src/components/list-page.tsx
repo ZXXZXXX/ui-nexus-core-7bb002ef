@@ -215,12 +215,24 @@ export function ListPage<T>({
       data.map((row) => shown.filter((c) => c.key !== "action").map((c) => raw(c, row))),
     );
 
-  const gridStyle = {
-    gridTemplateColumns:
-      shown.length === 0
-        ? "minmax(0, 1fr)"
-        : shown.map((c) => c.width ?? "minmax(0, 1fr)").join(" "),
+  /* 冻结首列 / 尾列，中间横向滚动 */
+  const DEFAULT_COL_PX = 128;
+  const parseW = (w?: string): number => {
+    if (!w) return DEFAULT_COL_PX;
+    const m = /^([\d.]+)\s*(em|rem|px)?$/.exec(w.trim());
+    if (!m) return DEFAULT_COL_PX;
+    const n = parseFloat(m[1]);
+    return m[2] === "px" ? n : n * 14;
   };
+  const colStyle = (c: ListColumn<T>, frozen: boolean) =>
+    frozen || c.width
+      ? { flex: `0 0 ${parseW(c.width)}px`, width: parseW(c.width) }
+      : { flex: "1 1 0", minWidth: DEFAULT_COL_PX };
+  const minTableWidth =
+    shown.reduce((s, c) => s + parseW(c.width), 0) +
+    (rowActions ? actionsWidth : 0) +
+    64;
+
 
   return (
     <>
@@ -415,54 +427,72 @@ export function ListPage<T>({
           </div>
         )}
 
-        {/* table */}
+        {/* table：首列 / 操作列冻结，中间横向滚动 */}
         <Card className="border-border bg-card overflow-hidden">
-          <div className="flex items-center gap-4 px-6 h-12 text-table-header text-text-secondary border-b border-border bg-surface-subtle">
-            <div className="grid gap-4 flex-1 min-w-0" style={gridStyle}>
-              {shown.map((c) => (
-                <div key={c.key} className={`truncate ${c.align === "right" ? "text-right" : ""}`}>
-                  {c.label}
+          <div className="overflow-x-auto">
+            <div style={{ minWidth: minTableWidth }} className="relative w-full">
+              <div className="flex items-center h-12 text-table-header text-text-secondary border-b border-border bg-surface-subtle">
+                {shown.map((c, ci) => (
+                  <div
+                    key={c.key}
+                    style={colStyle(c, ci === 0)}
+                    className={`truncate px-2 ${ci === 0 ? "sticky left-0 z-20 pl-6 border-r border-border bg-surface-subtle" : ""} ${
+                      c.align === "right" ? "text-right" : ""
+                    }`}
+                  >
+                    {c.label}
+                  </div>
+                ))}
+                {rowActions && (
+                  <div
+                    className="sticky right-0 z-20 shrink-0 text-right pl-2 pr-6 border-l border-border bg-surface-subtle"
+                    style={{ width: actionsWidth + 32 }}
+                  >
+                    操作
+                  </div>
+                )}
+              </div>
+
+              {data.length === 0 && (
+                <div className="px-6 py-12 text-center text-body-sm text-text-tertiary">{emptyText}</div>
+              )}
+
+              {data.map((row, i) => (
+                <div
+                  key={getRowKey(row, i)}
+                  onClick={() => onRowClick?.(row)}
+                  className={`group/row flex items-center min-h-12 text-table-cell border-b border-border last:border-0 hover:bg-surface-subtle transition-colors ${
+                    onRowClick ? "cursor-pointer" : ""
+                  }`}
+                >
+                  {shown.map((c, ci) => (
+                    <div
+                      key={c.key}
+                      style={colStyle(c, ci === 0)}
+                      className={`min-w-0 truncate px-2 ${
+                        ci === 0
+                          ? "sticky left-0 z-10 pl-6 border-r border-border bg-card group-hover/row:bg-surface-subtle"
+                          : ""
+                      } ${c.align === "right" ? "text-right" : ""} ${c.className ?? ""}`}
+                    >
+                      {c.render ? c.render(row) : <span className="text-body text-foreground">{raw(c, row)}</span>}
+                    </div>
+                  ))}
+                  {rowActions && (
+                    <div
+                      className="sticky right-0 z-10 shrink-0 flex items-center justify-end gap-0.5 pl-2 pr-6 border-l border-border bg-card group-hover/row:bg-surface-subtle"
+                      style={{ width: actionsWidth + 32 }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {rowActions(row)}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-            {rowActions && (
-              <div className="text-right shrink-0" style={{ width: actionsWidth }}>
-                操作
-              </div>
-            )}
           </div>
-
-          {data.length === 0 && (
-            <div className="px-6 py-12 text-center text-body-sm text-text-tertiary">{emptyText}</div>
-          )}
-
-          {data.map((row, i) => (
-            <div
-              key={getRowKey(row, i)}
-              onClick={() => onRowClick?.(row)}
-              className={`flex items-center gap-4 px-6 min-h-12 text-table-cell border-b border-border last:border-0 hover:bg-surface-subtle transition-colors ${
-                onRowClick ? "cursor-pointer" : ""
-              }`}
-            >
-              <div className="grid gap-4 flex-1 min-w-0" style={gridStyle}>
-                {shown.map((c) => (
-                  <div key={c.key} className={`min-w-0 truncate ${c.align === "right" ? "text-right" : ""} ${c.className ?? ""}`}>
-                    {c.render ? c.render(row) : <span className="text-body text-foreground">{raw(c, row)}</span>}
-                  </div>
-                ))}
-              </div>
-              {rowActions && (
-                <div
-                  className="shrink-0 flex items-center justify-end gap-0.5"
-                  style={{ width: actionsWidth }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {rowActions(row)}
-                </div>
-              )}
-            </div>
-          ))}
         </Card>
+
 
         <div className="text-caption text-text-tertiary">
           共 {data.length} 条{data.length !== rows.length && ` / 全部 ${rows.length} 条`}
