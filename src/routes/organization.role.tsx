@@ -277,7 +277,7 @@ const miniSpec: MiniModuleDef[] = [
     key: "home",
     name: "首页",
     funcs: [
-      { key: "work-status", name: "确认工作状态" },
+      { key: "work-status", name: "签到卡片" },
       { key: "ops", name: "查看运营概览" },
     ],
   },
