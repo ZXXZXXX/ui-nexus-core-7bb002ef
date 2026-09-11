@@ -816,7 +816,7 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity: initialG
 /* ---------------- 牛只死淘变化趋势 ---------------- */
 
 function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const herd = all.herd || 1;
   const deathRate = factors.map((k) => Number(((all.death * k) / herd * 100).toFixed(2)));
@@ -830,16 +830,19 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity: initialG 
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <LineTrend
-        labels={labels}
-        unit="%"
-        height={240}
-        formatValue={(v) => `${v.toFixed(2)}%（${Math.round((v / 100) * herd).toLocaleString()} 头）`}
-        series={[
-          { name: "死亡率", color: "var(--state-danger)", points: deathRate },
-          { name: "淘汰率", color: "var(--state-warning)", points: cullRate, dashed: true },
-        ]}
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <LineTrend
+          labels={labels}
+          unit="%"
+          height={240}
+          formatValue={(v) => `${v.toFixed(2)}%（${Math.round((v / 100) * herd).toLocaleString()} 头）`}
+          series={[
+            { name: "死亡率", color: "var(--state-danger)", points: deathRate },
+            { name: "淘汰率", color: "var(--state-warning)", points: cullRate, dashed: true },
+          ]}
+        />
+      </PannableChart>
+
     </SectionCard>
   );
 }
