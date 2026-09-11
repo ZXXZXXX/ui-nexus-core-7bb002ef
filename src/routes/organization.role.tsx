@@ -1437,6 +1437,23 @@ function RolePage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* 批量执行任务提示 */}
+      <AlertDialog open={batchNoticeOpen} onOpenChange={setBatchNoticeOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>批量执行说明</AlertDialogTitle>
+            <AlertDialogDescription>
+              仅免疫、驱虫类型工单，基础事件任务允许批量执行
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setBatchNoticeOpen(false)}>
+              知道了
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
