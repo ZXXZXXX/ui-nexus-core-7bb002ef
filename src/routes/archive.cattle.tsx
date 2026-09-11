@@ -74,8 +74,9 @@ function toProfile(c: Cow): CattleProfile {
     type: c.type,
     ageDays,
     health: healthToProfile[c.health],
-    withdrawalDays: c.health === "治疗中" ? 3 : 0,
-    withdrawalUntil: "2026-08-13",
+    withdrawalDays: c.health === "治疗中" ? 3 : c.health === "观察中" ? 5 : 0,
+    withdrawalUntil: withdrawalUntilOf(c.health === "治疗中" ? 3 : c.health === "观察中" ? 5 : 0),
+
     lactationDays: c.sex === "♀" ? 168 : 0,
     pregnancyDays: c.health === "健康" && c.sex === "♀" ? 92 : 0,
     parity: c.parity,
