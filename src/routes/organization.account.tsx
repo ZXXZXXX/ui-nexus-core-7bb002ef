@@ -502,126 +502,34 @@ function AccountPage() {
                 className="h-9 w-72 pl-9 text-body-sm"
               />
             </div>
-            <label className="flex items-center gap-2 h-9 px-3 rounded-md border border-border bg-card cursor-pointer select-none">
-              <Switch checked={onlyInternal} onCheckedChange={setOnlyInternal} />
-              <span className="text-body-sm text-text-secondary">仅查看内部</span>
-            </label>
-            <Popover open={advOpen} onOpenChange={setAdvOpen}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9 gap-1.5 text-body-sm font-normal">
-                  <Filter className="h-3.5 w-3.5" /> 精细筛选
-                  {advCount > 0 && (
-                    <span className="ml-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-caption">
-                      {advCount}
-                    </span>
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent align="start" className="w-80 p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-body-sm text-foreground font-medium">精细筛选</div>
-                  <button
-                    type="button"
-                    onClick={resetAdv}
-                    className="inline-flex items-center gap-1 text-caption text-text-tertiary hover:text-foreground"
-                  >
-                    <RotateCcw className="h-3 w-3" /> 重置
-                  </button>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="text-caption text-text-tertiary">角色</div>
-                  <Select value={filterRole} onValueChange={setFilterRole}>
-                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all" className="text-body-sm">全部角色</SelectItem>
-                      {roles.map((r) => (
-                        <SelectItem key={r} value={r} className="text-body-sm">{r}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="text-caption text-text-tertiary">关联牧场</div>
-                  <Popover open={farmFilterOpen} onOpenChange={setFarmFilterOpen}>
-                    <PopoverTrigger asChild>
-                      <button
-                        type="button"
-                        className="flex h-9 w-full items-center justify-between gap-2 rounded-md border border-input bg-card px-3 text-body-sm text-left hover:border-primary/40 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-0"
-                      >
-                        <span className={filterFarms.length === 0 ? "text-text-tertiary" : "text-foreground truncate"}>
-                          {filterFarms.length === 0
-                            ? "全部牧场"
-                            : filterFarms.length === 1
-                              ? filterFarms[0]
-                              : `已选 ${filterFarms.length} 个牧场`}
-                        </span>
-                        <ChevronDown className="h-3.5 w-3.5 text-text-tertiary shrink-0" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-64 p-0" align="start">
-                      <Command>
-                        <CommandInput placeholder="输入牧场名称搜索" className="text-body-sm" />
-                        <CommandList className="max-h-64">
-                          <CommandEmpty className="text-caption text-text-tertiary py-4 text-center">无匹配牧场</CommandEmpty>
-                          <CommandGroup>
-                            {FARM_OPTIONS.map((f) => {
-                              const checked = filterFarms.includes(f);
-                              return (
-                                <CommandItem
-                                  key={f}
-                                  value={f}
-                                  onSelect={() => {
-                                    setFilterFarms((prev) =>
-                                      prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f],
-                                    );
-                                  }}
-                                  className="text-body-sm gap-2"
-                                >
-                                  <Checkbox checked={checked} className="h-4 w-4 pointer-events-none" />
-                                  <span className="flex-1 truncate">{f}</span>
-                                  {checked && <Check className="h-3.5 w-3.5 text-primary" />}
-                                </CommandItem>
-                              );
-                            })}
-                          </CommandGroup>
-                        </CommandList>
-                        {filterFarms.length > 0 && (
-                          <div className="border-t border-border px-2 py-1.5 flex items-center justify-between">
-                            <span className="text-caption text-text-tertiary">已选 {filterFarms.length} 个</span>
-                            <button
-                              type="button"
-                              onClick={() => setFilterFarms([])}
-                              className="text-caption text-text-tertiary hover:text-foreground inline-flex items-center gap-1"
-                            >
-                              <X className="h-3 w-3" /> 清空
-                            </button>
-                          </div>
-                        )}
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-1.5">
-                  <div className="text-caption text-text-tertiary">状态</div>
-                  <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as "all" | Status)}>
-                    <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all" className="text-body-sm">全部状态</SelectItem>
-                      <SelectItem value="启用" className="text-body-sm">启用</SelectItem>
-                      <SelectItem value="禁用" className="text-body-sm">禁用</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </PopoverContent>
-            </Popover>
           </div>
-          <Button
-            size="sm"
-            onClick={() => setCreating(true)}
-            className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
-          >
-            <Plus className="h-3.5 w-3.5" /> 新建账号
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              title="筛选与列设置"
+              aria-label="筛选与列设置"
+              className="relative h-9 w-9 shrink-0"
+              onClick={() => {
+                setDraft(filters);
+                setDraftVisible(visible);
+                setFilterOpen(true);
+              }}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-4 text-center tabular-nums">
+                  {activeFilterCount}
+                </span>
+              )}
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setCreating(true)}
+              className="h-9 gap-1.5 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
+            >
+              <Plus className="h-3.5 w-3.5" /> 新建账号
+            </Button>
         </div>
 
         {selectedIds.size > 0 && (
