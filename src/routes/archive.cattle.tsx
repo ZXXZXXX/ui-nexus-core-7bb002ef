@@ -7,6 +7,8 @@ import { Beef, Search, SlidersHorizontal, Upload } from "lucide-react";
 import { useState } from "react";
 import { CattleProfileDrawer, type CattleProfile } from "@/components/cattle-profile-drawer";
 import { ImportExamResultsDialog } from "@/components/import-exam-results-dialog";
+import { ExportConfirmButton } from "@/components/export-confirm";
+import { exportCsv } from "@/lib/export-csv";
 
 export const Route = createFileRoute("/archive/cattle")({
   head: () => ({ meta: [{ title: "牛只信息 — 奇点智牧" }] }),
