@@ -88,6 +88,7 @@ type Source = "人事系统" | "兽医系统";
 type FarmRole = { farm: string; roles: string[] };
 type Account = {
   id: string;
+  employeeNo: string; // 人事系统工号
   name: string;
   initial: string;
   phone: string;
