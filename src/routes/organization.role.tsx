@@ -517,10 +517,7 @@ function RolePage() {
           nav: buildNav(false),
         },
 
-        mini: miniEvents.reduce(
-          (a, e) => ({ ...a, [e.key]: { report: false, execute: false } }),
-          {} as MiniPerms,
-        ),
+        mini: fullMini(false),
       },
     }));
     setDraftRoleKey(key);
