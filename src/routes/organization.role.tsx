@@ -961,77 +961,77 @@ function RolePage() {
                   </div>
 
                   {cur.pc.allowLogin ? (
-                    <div className="rounded-md border border-border bg-card overflow-hidden">
-                      {navSpec.map((g) => {
-                        const gp = cur.pc.nav[g.key];
-                        if (!gp) return null;
-                        const locked = !!g.required;
-                        const open = isOpen(g.key);
-                        const hasChildren =
-                          !!g.children?.length || !!g.actions?.length || g.kind === "home";
-
-                        // 一级节点的勾选态（含二级与操作）
-                        const flags: boolean[] = [
-                          ...Object.values(gp.actions),
-                          ...Object.values(gp.leaves).flatMap((lp) => [
-                            lp.view,
-                            ...Object.values(lp.actions),
-                          ]),
-                        ];
-                        const allOn = gp.view && flags.every(Boolean);
-                        const someOn = gp.view || flags.some(Boolean);
-                        const groupState: boolean | "indeterminate" = locked
-                          ? true
-                          : allOn
+                    <div className="rounded-md border border-border bg-card overflow-hidden flex">
+                      {/* 左：一级菜单 */}
+                      <div className="w-[200px] shrink-0 border-r border-border bg-surface-subtle/40 py-1">
+                        {navSpec.map((g) => {
+                          const gp = cur.pc.nav[g.key];
+                          if (!gp) return null;
+                          const locked = !!g.required;
+                          const flags: boolean[] = [
+                            ...Object.values(gp.actions),
+                            ...Object.values(gp.leaves).flatMap((lp) => [
+                              lp.view,
+                              ...Object.values(lp.actions),
+                            ]),
+                          ];
+                          const allOn = gp.view && flags.every(Boolean);
+                          const someOn = gp.view || flags.some(Boolean);
+                          const groupState: boolean | "indeterminate" = locked
                             ? true
-                            : someOn
-                              ? "indeterminate"
-                              : false;
-
-                        return (
-                          <div key={g.key} className="border-b border-border last:border-b-0">
-                            {/* 一级节点 */}
-                            <div className="flex items-center gap-2 px-3 py-2.5 bg-card">
-                              {hasChildren ? (
-                                <button
-                                  type="button"
-                                  onClick={() => toggleNode(g.key)}
-                                  aria-label={open ? "收起" : "展开"}
-                                  className="h-5 w-5 shrink-0 inline-flex items-center justify-center rounded text-text-tertiary hover:bg-border/60 hover:text-foreground transition-colors"
-                                >
-                                  <ChevronRight
-                                    className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-90" : ""}`}
-                                    strokeWidth={2}
-                                  />
-                                </button>
-                              ) : (
-                                <span className="h-5 w-5 shrink-0" />
-                              )}
+                            : allOn
+                              ? true
+                              : someOn
+                                ? "indeterminate"
+                                : false;
+                          const active = navActive === g.key;
+                          return (
+                            <div
+                              key={g.key}
+                              onClick={() => setNavActive(g.key)}
+                              className={`flex items-center gap-2 px-3 py-2 cursor-pointer border-l-2 transition-colors ${
+                                active
+                                  ? "border-primary bg-card"
+                                  : "border-transparent hover:bg-card/70"
+                              }`}
+                            >
                               <Checkbox
                                 checked={groupState}
                                 disabled={!editable || locked}
                                 onCheckedChange={(v) => !locked && setGroupView(g.key, !!v)}
+                                onClick={(e) => e.stopPropagation()}
                                 className="h-[16px] w-[16px]"
                               />
-                              <span className="text-body-sm font-medium text-foreground">
+                              <span
+                                className={`text-body-sm truncate ${
+                                  active ? "text-primary font-medium" : "text-foreground"
+                                }`}
+                              >
                                 {g.name}
                               </span>
                               {locked && (
-                                <span className="text-caption text-primary bg-primary/10 border border-primary/20 rounded px-1.5 leading-5">
-                                  不可关闭
-                                </span>
+                                <span className="ml-auto text-caption text-primary">必开</span>
                               )}
-                              <span className="text-caption text-text-tertiary truncate hidden md:inline">
-                                {g.desc}
-                              </span>
                             </div>
+                          );
+                        })}
+                      </div>
 
-                            {open && (
-                              <div className="pl-[26px]">
-                                <div className="border-l border-border">
-                                  {/* 首页：4 类视角平铺（单选） */}
-                                  {g.kind === "home" &&
-                                    workbenchViews.map((v) => {
+                      {/* 右：当前一级菜单的详情 */}
+                      <div className="flex-1 min-w-0 p-3">
+                        {navSpec
+                          .filter((g) => g.key === navActive)
+                          .map((g) => {
+                            const gp = cur.pc.nav[g.key];
+                            if (!gp) return null;
+                            return (
+                              <div key={g.key} className="space-y-3">
+                                <p className="text-caption text-text-tertiary">{g.desc}</p>
+
+                                {/* 首页：4 类视角（单选） */}
+                                {g.kind === "home" && (
+                                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
+                                    {workbenchViews.map((v) => {
                                       const active = cur.pc.workbenchView === v.key;
                                       return (
                                         <button
@@ -1039,126 +1039,114 @@ function RolePage() {
                                           type="button"
                                           disabled={!editable}
                                           onClick={() => setWorkbenchView(v.key)}
-                                          className={`flex w-full items-center gap-2 pl-3 pr-3 py-2 text-left transition-colors ${
-                                            editable ? "hover:bg-surface-subtle" : "cursor-default"
+                                          className={`flex items-start gap-2 rounded-md border px-3 py-2 text-left transition-colors ${
+                                            active
+                                              ? "border-primary bg-primary/5"
+                                              : "border-border bg-card hover:bg-surface-subtle"
                                           }`}
                                         >
-                                          <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
                                           <span
-                                            className={`h-[14px] w-[14px] shrink-0 rounded-full border ${
+                                            className={`mt-0.5 h-[14px] w-[14px] shrink-0 rounded-full border ${
                                               active
                                                 ? "border-primary bg-primary shadow-[inset_0_0_0_2px_var(--card)]"
                                                 : "border-border bg-card"
                                             }`}
                                           />
-                                          <span
-                                            className={`text-body-sm ${
-                                              active ? "text-primary font-medium" : "text-foreground"
-                                            }`}
-                                          >
-                                            {v.name}
-                                          </span>
-                                          <span className="text-caption text-text-tertiary truncate hidden md:inline">
-                                            {v.desc}
+                                          <span className="min-w-0">
+                                            <span
+                                              className={`block text-body-sm ${
+                                                active ? "text-primary font-medium" : "text-foreground"
+                                              }`}
+                                            >
+                                              {v.name}
+                                            </span>
+                                            <span className="block text-caption text-text-tertiary">
+                                              {v.desc}
+                                            </span>
                                           </span>
                                         </button>
                                       );
                                     })}
+                                  </div>
+                                )}
 
-                                  {/* 一级菜单自身的操作能力 */}
-                                  {g.actions?.map((act) => (
-                                    <label
-                                      key={act.key}
-                                      className={`flex items-center gap-2 pl-3 pr-3 py-2 ${
-                                        editable ? "cursor-pointer hover:bg-surface-subtle" : "cursor-default"
-                                      }`}
-                                    >
-                                      <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
-                                      <Checkbox
-                                        checked={gp.actions[act.key]}
-                                        disabled={!editable || !gp.view}
-                                        onCheckedChange={(v) => setGroupAction(g.key, act.key, !!v)}
-                                        className="h-[16px] w-[16px]"
-                                      />
-                                      <span className="text-body-sm text-text-secondary">
-                                        {act.name}
-                                      </span>
-                                    </label>
-                                  ))}
+                                {/* 一级菜单自身的操作能力 */}
+                                {!!g.actions?.length && (
+                                  <div className="flex flex-wrap gap-x-5 gap-y-2">
+                                    {g.actions.map((act) => (
+                                      <label
+                                        key={act.key}
+                                        className={`inline-flex items-center gap-2 ${
+                                          editable ? "cursor-pointer" : "cursor-default"
+                                        }`}
+                                      >
+                                        <Checkbox
+                                          checked={gp.actions[act.key]}
+                                          disabled={!editable || !gp.view}
+                                          onCheckedChange={(v) => setGroupAction(g.key, act.key, !!v)}
+                                          className="h-[16px] w-[16px]"
+                                        />
+                                        <span className="text-body-sm text-text-secondary">
+                                          {act.name}
+                                        </span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                )}
 
-                                  {/* 二级节点 */}
-                                  {g.children?.map((leaf) => {
-                                    const lp = gp.leaves[leaf.key];
-                                    if (!lp) return null;
-                                    const lKey = `${g.key}:${leaf.key}`;
-                                    const lOpen = isOpen(lKey);
-                                    const acts = leaf.actions ?? [];
-                                    const lFlags = Object.values(lp.actions);
-                                    const lState: boolean | "indeterminate" =
-                                      lp.view && lFlags.every(Boolean)
-                                        ? true
-                                        : lp.view || lFlags.some(Boolean)
-                                          ? acts.length
-                                            ? "indeterminate"
-                                            : true
-                                          : false;
-                                    return (
-                                      <div key={leaf.key}>
-                                        <div className="flex items-center gap-2 pl-3 pr-3 py-2">
-                                          <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
-                                          {acts.length ? (
-                                            <button
-                                              type="button"
-                                              onClick={() => toggleNode(lKey)}
-                                              aria-label={lOpen ? "收起" : "展开"}
-                                              className="h-5 w-5 shrink-0 inline-flex items-center justify-center rounded text-text-tertiary hover:bg-surface-subtle hover:text-foreground transition-colors"
-                                            >
-                                              <ChevronRight
-                                                className={`h-3.5 w-3.5 transition-transform ${lOpen ? "rotate-90" : ""}`}
-                                                strokeWidth={2}
-                                              />
-                                            </button>
-                                          ) : (
-                                            <span className="h-5 w-5 shrink-0" />
-                                          )}
-                                          <Checkbox
-                                            checked={lState}
-                                            disabled={!editable || !gp.view}
-                                            onCheckedChange={(v) =>
-                                              setLeafView(g.key, leaf.key, !!v)
-                                            }
-                                            className="h-[16px] w-[16px]"
-                                          />
-                                          <span className="text-body-sm text-foreground">
-                                            {leaf.name}
-                                          </span>
-                                          {!acts.length && (
-                                            <span className="text-caption text-text-tertiary">
-                                              可查看
+                                {/* 二级节点：左右两列排布 */}
+                                {!!g.children?.length && (
+                                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
+                                    {g.children.map((leaf) => {
+                                      const lp = gp.leaves[leaf.key];
+                                      if (!lp) return null;
+                                      const acts = leaf.actions ?? [];
+                                      const lFlags = Object.values(lp.actions);
+                                      const lState: boolean | "indeterminate" =
+                                        lp.view && lFlags.every(Boolean)
+                                          ? true
+                                          : lp.view || lFlags.some(Boolean)
+                                            ? acts.length
+                                              ? "indeterminate"
+                                              : true
+                                            : false;
+                                      return (
+                                        <div
+                                          key={leaf.key}
+                                          className="rounded-md border border-border bg-card px-3 py-2"
+                                        >
+                                          <div className="flex items-center gap-2">
+                                            <Checkbox
+                                              checked={lState}
+                                              disabled={!editable || !gp.view}
+                                              onCheckedChange={(v) => setLeafView(g.key, leaf.key, !!v)}
+                                              className="h-[16px] w-[16px]"
+                                            />
+                                            <span className="text-body-sm text-foreground">
+                                              {leaf.name}
                                             </span>
-                                          )}
-                                        </div>
-
-                                        {!!acts.length && lOpen && (
-                                          <div className="pl-[26px]">
-                                            <div className="border-l border-border">
+                                            {!acts.length && (
+                                              <span className="text-caption text-text-tertiary">
+                                                可查看
+                                              </span>
+                                            )}
+                                          </div>
+                                          {!!acts.length && (
+                                            <div className="mt-2 pl-6 flex flex-wrap gap-x-4 gap-y-1.5">
                                               {acts.map((act) => (
                                                 <label
                                                   key={act.key}
-                                                  className={`flex items-center gap-2 pl-3 pr-3 py-1.5 ${
-                                                    editable
-                                                      ? "cursor-pointer hover:bg-surface-subtle"
-                                                      : "cursor-default"
+                                                  className={`inline-flex items-center gap-1.5 ${
+                                                    editable ? "cursor-pointer" : "cursor-default"
                                                   }`}
                                                 >
-                                                  <span className="h-3.5 w-3.5 shrink-0 border-t border-border" />
                                                   <Checkbox
                                                     checked={lp.actions[act.key]}
                                                     disabled={!editable || !lp.view}
                                                     onCheckedChange={(v) =>
                                                       setLeafAction(g.key, leaf.key, act.key, !!v)
                                                     }
-                                                    className="h-[16px] w-[16px]"
+                                                    className="h-[14px] w-[14px]"
                                                   />
                                                   <span className="text-caption text-text-secondary">
                                                     {act.name}
@@ -1166,17 +1154,16 @@ function RolePage() {
                                                 </label>
                                               ))}
                                             </div>
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
                               </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                            );
+                          })}
+                      </div>
                     </div>
                   ) : (
                     <div className="rounded-md border border-dashed border-border bg-surface-subtle px-4 py-6 text-center text-body-sm text-text-tertiary">
