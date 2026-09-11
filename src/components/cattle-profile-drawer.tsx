@@ -12,6 +12,7 @@ import {
   ListChecks,
   Image as ImageIcon,
   AlertTriangle,
+  Dna,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -272,6 +273,7 @@ export function CattleProfileDrawer({
 
 
   const [activeDevice, setActiveDevice] = useState<Device | null>(null);
+  const [pedigreeOpen, setPedigreeOpen] = useState(false);
 
   if (!cow) return null;
 
@@ -381,7 +383,22 @@ export function CattleProfileDrawer({
 
 
           {/* 繁育与血统档案 */}
-          <Panel title="繁育与档案信息" icon={<ListChecks className="h-4 w-4 text-primary" />} bodyClassName="p-4">
+          <Panel
+            title="繁育与档案信息"
+            icon={<ListChecks className="h-4 w-4 text-primary" />}
+            bodyClassName="p-4"
+            extra={
+              <button
+                type="button"
+                onClick={() => setPedigreeOpen(true)}
+                title="血统与犊牛档案"
+                aria-label="血统与犊牛档案"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-secondary hover:text-primary hover:border-primary/50 transition-colors"
+              >
+                <Dna className="h-4 w-4" />
+              </button>
+            }
+          >
             <div className="grid grid-cols-4 gap-x-6 gap-y-3">
               {breedingFields(cow).map((f) => (
                 <div key={f.label} className="flex items-baseline justify-between gap-3 border-b border-border/60 pb-2">
@@ -391,6 +408,8 @@ export function CattleProfileDrawer({
               ))}
             </div>
           </Panel>
+
+          <PedigreeDialog cow={cow} open={pedigreeOpen} onOpenChange={setPedigreeOpen} />
 
           <div className="grid grid-cols-2 gap-5 items-stretch">
             {/* 左：产奶数据 */}
@@ -543,24 +562,65 @@ function breedingFields(cow: CattleProfile): { label: string; value: string }[] 
   const lactating = female && cow.lactationDays > 0;
   const bred = female && cow.pregnancyDays > 0;
   const farmNo = cow.ear.slice(0, 2);
+  void farmNo;
+  void pick;
   return [
     { label: "泌乳天数", value: lactating ? `${cow.lactationDays} 天` : "—" },
     { label: "怀孕天数", value: bred ? `${cow.pregnancyDays} 天` : "—" },
     { label: "胎次", value: `${cow.parity} 胎` },
-    { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
-    { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
-    { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
-    { label: "入群来源", value: pick(5, 3) === 0 ? "本场出生" : pick(5, 3) === 1 ? "外购引进" : "牧场调入" },
-    { label: "产后天数", value: lactating ? `${cow.lactationDays} 天` : "—" },
-    { label: "配后天数", value: bred ? `${cow.pregnancyDays} 天` : "—" },
+    { label: "干奶日期", value: cow.parity > 0 ? dateAgo((cow.lactationDays || 200) + 60) : "—" },
     { label: "配次", value: female ? `${1 + pick(6, 4)} 次` : "—" },
-    { label: "流产天数", value: female && pick(7, 4) === 0 ? `${pick(8, 90, 10)} 天` : "—" },
-    { label: "产犊日期", value: cow.parity > 0 ? dateAgo(cow.lactationDays || 200) : "—" },
     { label: "最近配种日期", value: bred ? dateAgo(cow.pregnancyDays) : "—" },
     { label: "最近围产日期", value: cow.parity > 0 ? dateAgo((cow.lactationDays || 200) + 21) : "—" },
-    { label: "干奶日期", value: cow.parity > 0 ? dateAgo((cow.lactationDays || 200) + 60) : "—" },
     { label: "最近流产日期", value: female && pick(7, 4) === 0 ? dateAgo(pick(9, 300, 60)) : "—" },
   ];
+}
+
+/** 血统与犊牛档案弹窗 */
+function PedigreeDialog({
+  cow,
+  open,
+  onOpenChange,
+}: {
+  cow: CattleProfile;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const seed = Number(cow.ear.replace(/\D/g, "").slice(-4) || 0);
+  const pick = (n: number, mod: number, base = 0) => base + ((seed + n) % mod);
+  const female = cow.sex === "母" || cow.sex === "♀";
+  const farmNo = cow.ear.slice(0, 2);
+  const hasCalf = female && cow.parity > 0;
+  const calfSex = pick(11, 2) === 0 ? "母" : "公";
+  const rows: { label: string; value: string }[] = [
+    { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
+    { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
+    { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
+    { label: "入群来源", value: pick(5, 3) === 0 ? "本场出生" : pick(5, 3) === 1 ? "外购引进" : "牧场调入" },
+    { label: "生产牛犊编号", value: hasCalf ? `${farmNo}-26-${String(pick(12, 9999)).padStart(4, "0")}` : "—" },
+    { label: "生产牛犊性别", value: hasCalf ? calfSex : "—" },
+    { label: "生产牛犊状态", value: hasCalf ? (calfSex === "母" ? "留养" : pick(13, 2) === 0 ? "留养" : "不留养") : "—" },
+  ];
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[440px]">
+        <DialogHeader>
+          <DialogTitle className="text-card-title">血统与犊牛档案</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-2">
+          {rows.map((r) => (
+            <div
+              key={r.label}
+              className="flex items-baseline justify-between gap-4 border-b border-border/60 pb-2 last:border-0 last:pb-0"
+            >
+              <span className="text-body-sm text-text-tertiary shrink-0">{r.label}</span>
+              <span className="text-body-sm text-foreground font-medium tabular-nums truncate">{r.value}</span>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 
