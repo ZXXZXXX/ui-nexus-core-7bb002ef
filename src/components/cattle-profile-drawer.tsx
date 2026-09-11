@@ -383,7 +383,22 @@ export function CattleProfileDrawer({
 
 
           {/* 繁育与血统档案 */}
-          <Panel title="繁育与档案信息" icon={<ListChecks className="h-4 w-4 text-primary" />} bodyClassName="p-4">
+          <Panel
+            title="繁育与档案信息"
+            icon={<ListChecks className="h-4 w-4 text-primary" />}
+            bodyClassName="p-4"
+            extra={
+              <button
+                type="button"
+                onClick={() => setPedigreeOpen(true)}
+                title="血统与犊牛档案"
+                aria-label="血统与犊牛档案"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border text-text-secondary hover:text-primary hover:border-primary/50 transition-colors"
+              >
+                <Dna className="h-4 w-4" />
+              </button>
+            }
+          >
             <div className="grid grid-cols-4 gap-x-6 gap-y-3">
               {breedingFields(cow).map((f) => (
                 <div key={f.label} className="flex items-baseline justify-between gap-3 border-b border-border/60 pb-2">
@@ -393,6 +408,8 @@ export function CattleProfileDrawer({
               ))}
             </div>
           </Panel>
+
+          <PedigreeDialog cow={cow} open={pedigreeOpen} onOpenChange={setPedigreeOpen} />
 
           <div className="grid grid-cols-2 gap-5 items-stretch">
             {/* 左：产奶数据 */}
