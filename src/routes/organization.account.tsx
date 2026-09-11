@@ -530,6 +530,7 @@ function AccountPage() {
             >
               <Plus className="h-3.5 w-3.5" /> 新建账号
             </Button>
+          </div>
         </div>
 
         {selectedIds.size > 0 && (
