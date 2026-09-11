@@ -1296,6 +1296,46 @@ function RolePage() {
                     </Table>
                   </div>
 
+                  {/* 通用范围：工单类型 / 基础事件类型，全局仅需选择一次 */}
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                    {(["wo", "event"] as MiniScope[]).map((kind) => {
+                      const opts = scopeOptions(kind);
+                      const sel = globalScope(kind);
+                      return (
+                        <div key={kind} className="rounded-md border border-border bg-surface-subtle px-3 py-2.5">
+                          <div className="text-caption text-text-tertiary mb-2">
+                            {scopeLabel(kind)}
+                            <span className="ml-1">
+                              （已选 {sel.length}/{opts.length}，对上述所有相关功能通用）
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {opts.map((t) => {
+                              const on = sel.includes(t);
+                              return (
+                                <button
+                                  key={t}
+                                  type="button"
+                                  disabled={!editable}
+                                  onClick={() => toggleGlobalScope(kind, t)}
+                                  className={`px-2 py-0.5 rounded-md border text-caption transition-colors ${
+                                    on
+                                      ? "border-primary text-primary bg-primary/5"
+                                      : "border-border text-text-tertiary bg-card"
+                                  } ${editable ? "cursor-pointer" : "cursor-default"}`}
+                                >
+                                  {t}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+
+
 
                 </section>
               </>
