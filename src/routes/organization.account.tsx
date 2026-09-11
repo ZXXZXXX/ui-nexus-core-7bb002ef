@@ -1875,7 +1875,7 @@ function BindRow({
   return (
     <div>
       <Label className="text-caption text-text-tertiary">{label}</Label>
-      <div className="mt-1.5 flex items-center justify-between gap-2 rounded-md border border-border bg-surface-subtle px-3 h-9">
+      <div className="mt-1.5 flex items-center justify-between gap-2 rounded-md border border-border bg-card px-3 h-9">
         {value ? (
           <>
             <span className="text-body-sm font-mono text-text-secondary truncate" title="已脱敏显示">{maskId(value)}</span>
