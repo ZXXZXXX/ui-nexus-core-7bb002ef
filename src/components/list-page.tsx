@@ -216,7 +216,10 @@ export function ListPage<T>({
     );
 
   const gridStyle = {
-    gridTemplateColumns: `repeat(${Math.max(shown.length, 1)}, minmax(0, 1fr))`,
+    gridTemplateColumns:
+      shown.length === 0
+        ? "minmax(0, 1fr)"
+        : shown.map((c) => c.width ?? "minmax(0, 1fr)").join(" "),
   };
 
   return (
