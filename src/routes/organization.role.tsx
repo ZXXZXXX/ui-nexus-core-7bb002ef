@@ -688,12 +688,37 @@ function RolePage() {
         ]),
       ),
     );
-  /** 功能下的可选范围（工单类型 / 基础事件类型） */
-  const toggleMiniScope = (mKey: string, fKey: string, t: string) =>
+  /** 全局可选范围（工单类型 / 基础事件类型）——所有功能通用，仅需选择一次 */
+  const globalScope = (kind: MiniScope): string[] => {
+    for (const m of miniSpec) {
+      for (const f of m.funcs) {
+        if (f.scope === kind) return cur.mini[m.key][f.key].scope;
+      }
+    }
+    return [];
+  };
+  const toggleGlobalScope = (kind: MiniScope, t: string) =>
     mutateMini((m) => {
-      const p = m[mKey][fKey];
-      const scope = p.scope.includes(t) ? p.scope.filter((x) => x !== t) : [...p.scope, t];
-      return { ...m, [mKey]: { ...m[mKey], [fKey]: { ...p, scope } } };
+      const curList = (() => {
+        for (const mod of miniSpec) {
+          for (const f of mod.funcs) {
+            if (f.scope === kind) return m[mod.key][f.key].scope;
+          }
+        }
+        return [] as string[];
+      })();
+      const next = curList.includes(t) ? curList.filter((x) => x !== t) : [...curList, t];
+      return Object.fromEntries(
+        miniSpec.map((mod) => [
+          mod.key,
+          Object.fromEntries(
+            mod.funcs.map((f) => [
+              f.key,
+              f.scope === kind ? { ...m[mod.key][f.key], scope: next } : m[mod.key][f.key],
+            ]),
+          ),
+        ]),
+      ) as MiniPerms;
     });
 
 
