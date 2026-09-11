@@ -1303,7 +1303,7 @@ function RolePage() {
                       const opts = scopeOptions(kind);
                       const sel = globalScope(kind);
                       return (
-                        <div key={kind} className="rounded-md border border-border bg-surface-subtle px-3 py-2.5">
+                        <div key={kind} className="rounded-md border border-border bg-card px-3 py-2.5">
                           <div className="text-caption text-text-tertiary mb-2">
                             {scopeLabel(kind)}
                             <span className="ml-1">
