@@ -126,6 +126,10 @@ function FarmPage() {
       toast.error("请填写牛场名称");
       return;
     }
+    if (!editing.province || !editing.city || !editing.district) {
+      toast.error("请选择所在地区");
+      return;
+    }
     const next = { ...editing, name: editing.name.trim(), erpBook: editing.erpBook.trim() };
     setFarms((prev) => prev.map((f) => (f.id === next.id ? next : f)));
     setCurrent(next);
