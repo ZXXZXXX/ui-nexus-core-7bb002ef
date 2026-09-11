@@ -1430,6 +1430,7 @@ function AccountDrawerInner({
   const editable = mode === "edit";
 
   const [phone, setPhone] = useState(account.phone);
+  const [phoneEditing, setPhoneEditing] = useState(false);
   const [userType, setUserType] = useState<UserType>(account.userType);
   const [farmRoles, setFarmRoles] = useState<FarmRole[]>(account.farmRoles);
   const [wecomId, setWecomId] = useState<string | null>(account.wecomId);
@@ -1524,7 +1525,35 @@ function AccountDrawerInner({
               <Label className="text-caption text-text-tertiary">手机号</Label>
               <div className="mt-1.5">
                 {editable ? (
-                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="h-9 bg-card border-border text-body-sm tabular-nums" />
+                  phoneEditing ? (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        autoFocus
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 11))}
+                        placeholder="输入新手机号"
+                        className="h-9 bg-card border-border text-body-sm tabular-nums"
+                      />
+                      <button
+                        type="button"
+                        className="text-body-sm text-text-tertiary hover:text-text-secondary shrink-0"
+                        onClick={() => { setPhone(account.phone); setPhoneEditing(false); }}
+                      >
+                        取消
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex h-9 items-center gap-3">
+                      <span className="text-body text-foreground tabular-nums">{maskPhone(phone)}</span>
+                      <button
+                        type="button"
+                        className="text-body-sm text-primary hover:underline"
+                        onClick={() => { setPhone(""); setPhoneEditing(true); }}
+                      >
+                        变更手机号
+                      </button>
+                    </div>
+                  )
                 ) : (
                   <div className="text-body text-foreground tabular-nums">{maskPhone(account.phone)}</div>
                 )}
