@@ -31,7 +31,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pill, Plus, Lock, Trash2, Pencil } from "lucide-react";
+import { Pill, Plus, Lock, Trash2, Pencil, X } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 
 
@@ -532,46 +532,70 @@ function DrugForm({
             }}
             placeholder="如：5"
           />
-          <FBool
-            label="是否按变量计算"
-            value={d.variableDose}
-            readOnly={readOnly}
-            onChange={(v) =>
-              patch({ variableDose: v, variable: v ? d.variable || "体重区间" : "" })
-            }
-          />
-          {d.variableDose ? (
-            <FSelect
-              label="默认计算变量"
-              required
-              value={d.variable ?? ""}
-              options={VARIABLE_OPTIONS}
-              readOnly={readOnly}
-              onChange={(v) => patch({ variable: v })}
-            />
-          ) : (
-            <div className="grid grid-cols-[1fr_auto] gap-2 items-end">
-              <F
-                label="具体剂量"
-                required
-                value={d.defaultDose}
-                readOnly={readOnly}
-                onChange={(v) => patch({ defaultDose: v })}
-                placeholder="如 20"
-              />
-              <div className="pb-2 text-body-sm text-text-tertiary">{d.doseUnit}/次</div>
+          <div className="col-span-2 rounded-lg border border-border p-4 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-body font-medium text-foreground">按变量计算剂量</span>
+              <div className="flex items-center gap-2">
+                {d.variableDose && (
+                  <>
+                    <span className="text-caption text-text-tertiary">计算变量</span>
+                    <Select
+                      value={d.variable || "体重区间"}
+                      disabled={readOnly}
+                      onValueChange={(v) => patch({ variable: v })}
+                    >
+                      <SelectTrigger className="h-9 w-36 text-body-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {VARIABLE_OPTIONS.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </>
+                )}
+                <Switch
+                  checked={d.variableDose}
+                  disabled={readOnly}
+                  onCheckedChange={(v) =>
+                    patch({ variableDose: v, variable: v ? d.variable || "体重区间" : "" })
+                  }
+                />
+              </div>
             </div>
-          )}
-          {d.variableDose && (
-            <VariableDoseEditor
-              label="默认具体剂量"
-              required
-              value={d.defaultDose}
-              unit={d.doseUnit}
-              readOnly={readOnly}
-              onChange={(v) => patch({ defaultDose: v })}
-            />
-          )}
+
+            {d.variableDose ? (
+              <>
+                <VariableDoseEditor
+                  value={d.defaultDose}
+                  unit={d.doseUnit}
+                  variable={d.variable || "体重区间"}
+                  readOnly={readOnly}
+                  onChange={(v) => patch({ defaultDose: v })}
+                />
+                <div className="text-caption text-text-tertiary">每个变量区间对应一次剂量</div>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="text-body-sm text-text-secondary shrink-0">
+                  具体剂量<span className="ml-0.5 text-[var(--state-danger)]">*</span>
+                </span>
+                <Input
+                  value={d.defaultDose}
+                  readOnly={readOnly}
+                  onChange={(e) => patch({ defaultDose: e.target.value })}
+                  placeholder="如 20"
+                  className="h-9 w-28 text-body-sm"
+                />
+                <span className="h-9 inline-flex items-center px-2 rounded-md text-body-sm text-text-tertiary border border-border">
+                  {d.doseUnit}/次
+                </span>
+              </div>
+            )}
+          </div>
           <F
             label="PC单位用药剂量上限"
             value={d.pcDoseMax ?? ""}
@@ -918,18 +942,16 @@ function FMulti({
 }
 
 function VariableDoseEditor({
-  label,
   value,
   unit,
+  variable,
   readOnly,
-  required,
   onChange,
 }: {
-  label: string;
   value: string;
   unit: string;
+  variable: string;
   readOnly?: boolean;
-  required?: boolean;
   onChange?: (v: string) => void;
 }) {
   const [rows, setRows] = useState(() => parseVariableDose(value, unit));
@@ -938,74 +960,104 @@ function VariableDoseEditor({
     setRows(parseVariableDose(value, unit));
   }, [value, unit]);
 
+  const isWeight = variable === "体重区间";
+  const varUnit = isWeight ? "kg" : "";
+
   const updateRows = (next: Array<{ range: string; dose: string }>) => {
     setRows(next);
     const serialized = serializeVariableDose(next, unit);
     if (serialized !== value) onChange?.(serialized);
   };
-
   const addRow = () => updateRows([...rows, { range: "", dose: "" }]);
   const removeRow = (idx: number) => updateRows(rows.filter((_, i) => i !== idx));
-  const patchRow = (idx: number, patch: Partial<{ range: string; dose: string }>) => {
+  const patchRow = (idx: number, patch: Partial<{ range: string; dose: string }>) =>
     updateRows(rows.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
+
+  const parseRange = (s: string) => {
+    const m = String(s || "").match(/(\d+(?:\.\d+)?)?\s*-\s*(\d+(?:\.\d+)?)?/);
+    return { min: m?.[1] ?? "", max: m?.[2] ?? "" };
   };
+  const buildRange = (min: string, max: string) =>
+    min || max ? `${min}-${max}${varUnit}` : "";
+
+  if (readOnly) {
+    return (
+      <div className="text-body-sm text-foreground whitespace-pre-wrap">
+        {value || <span className="text-text-tertiary">—</span>}
+      </div>
+    );
+  }
 
   return (
-    <div className="col-span-2">
-      {readOnly ? (
-        <div className="flex items-start gap-3 py-1.5">
-          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
-          <span className="text-body-sm text-foreground whitespace-pre-wrap">
-            {value || <span className="text-text-tertiary">—</span>}
-          </span>
-        </div>
-      ) : (
-        <>
-        <Lbl label={label} required={required} />
-        <div className="mt-1 space-y-2">
-          {rows.map((row, i) => (
-            <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+    <div className="flex flex-wrap gap-2">
+      {rows.map((row, i) => {
+        const { min, max } = parseRange(row.range);
+        return (
+          <div key={i} className="group flex items-center gap-2">
+            {isWeight ? (
+              <div className="flex items-center gap-1">
+                <Input
+                  value={min}
+                  inputMode="decimal"
+                  onChange={(e) => patchRow(i, { range: buildRange(e.target.value, max) })}
+                  placeholder="最小"
+                  className="h-9 w-20 text-body-sm"
+                />
+                <span className="text-body-sm text-text-tertiary">-</span>
+                <Input
+                  value={max}
+                  inputMode="decimal"
+                  onChange={(e) => patchRow(i, { range: buildRange(min, e.target.value) })}
+                  placeholder="最大"
+                  className="h-9 w-20 text-body-sm"
+                />
+                <span className="h-9 inline-flex items-center px-2 rounded-md text-body-sm text-text-tertiary border border-border">
+                  kg
+                </span>
+              </div>
+            ) : (
               <Input
                 value={row.range}
                 onChange={(e) => patchRow(i, { range: e.target.value })}
-                placeholder="变量区间，如 600-800kg"
-                className="h-9 text-body-sm"
+                placeholder="变量区间"
+                className="h-9 w-28 text-body-sm"
               />
-              <div className="flex items-center gap-2">
-                <Input
-                  value={row.dose}
-                  onChange={(e) => patchRow(i, { dose: e.target.value })}
-                  placeholder="剂量"
-                  className="h-9 text-body-sm"
-                />
-                <span className="text-body-sm text-text-secondary whitespace-nowrap">
-                  {unit}/次
-                </span>
-              </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-text-secondary hover:text-state-danger"
-                onClick={() => removeRow(i)}
-                disabled={rows.length <= 1}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+            )}
+
+            <span className="text-body-sm text-text-tertiary">→</span>
+
+            <div className="flex items-center">
+              <Input
+                value={row.dose}
+                inputMode="decimal"
+                onChange={(e) => patchRow(i, { dose: e.target.value })}
+                placeholder="剂量"
+                className="h-9 w-24 text-body-sm rounded-r-none"
+              />
+              <span className="h-9 inline-flex items-center px-2 rounded-md rounded-l-none -ml-px text-body-sm text-text-tertiary border border-border">
+                {unit}
+              </span>
             </div>
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="gap-1 text-body-sm font-normal"
-            onClick={addRow}
-          >
-            <Plus className="h-3.5 w-3.5" /> 添加一组
-          </Button>
-        </div>
-        </>
-      )}
+
+            <button
+              type="button"
+              onClick={() => removeRow(i)}
+              disabled={rows.length <= 1}
+              className="text-text-tertiary opacity-0 group-hover:opacity-100 hover:text-[var(--state-danger)] transition-opacity disabled:opacity-0"
+              aria-label="删除该区间"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        );
+      })}
+      <button
+        type="button"
+        onClick={addRow}
+        className="inline-flex items-center h-9 px-2 text-body-sm text-primary hover:underline"
+      >
+        添加区间
+      </button>
     </div>
   );
 }
