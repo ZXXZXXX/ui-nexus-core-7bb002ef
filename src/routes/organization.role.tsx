@@ -262,7 +262,7 @@ const navSpec: NavGroupDef[] = [
 
 /** 小程序模块与功能权限 */
 const WO_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干奶", "驱虫", "普修"];
-const EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场", "异常排查"];
+const EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场"];
 
 type MiniScope = "wo" | "event";
 type MiniFuncDef = { key: string; name: string; scope?: MiniScope };
