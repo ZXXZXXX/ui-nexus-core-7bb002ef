@@ -639,6 +639,7 @@ function RolePage() {
       ...nav,
       [gKey]: {
         ...nav[gKey],
+        view: v ? true : nav[gKey].view,
         leaves: {
           ...nav[gKey].leaves,
           [lKey]: {
@@ -1140,7 +1141,7 @@ function RolePage() {
                                       >
                                         <Checkbox
                                           checked={gp.actions[act.key]}
-                                          disabled={!editable || !gp.view}
+                                          disabled={!editable}
                                           onCheckedChange={(v) => setGroupAction(g.key, act.key, !!v)}
                                           className="h-[16px] w-[16px]"
                                         />
@@ -1176,7 +1177,7 @@ function RolePage() {
                                           <div className="flex items-center gap-2">
                                             <Checkbox
                                               checked={lState}
-                                              disabled={!editable || !gp.view}
+                                              disabled={!editable}
                                               onCheckedChange={(v) => setLeafView(g.key, leaf.key, !!v)}
                                               className="h-[16px] w-[16px]"
                                             />
@@ -1198,7 +1199,7 @@ function RolePage() {
                                               >
                                                 <Checkbox
                                                   checked={lp.view}
-                                                  disabled={!editable || !gp.view}
+                                                  disabled={!editable}
                                                   onCheckedChange={(v) =>
                                                     setLeafView(g.key, leaf.key, !!v)
                                                   }
@@ -1217,7 +1218,7 @@ function RolePage() {
                                                 >
                                                   <Checkbox
                                                     checked={lp.actions[act.key]}
-                                                    disabled={!editable || !lp.view}
+                                                    disabled={!editable}
                                                     onCheckedChange={(v) =>
                                                       setLeafAction(g.key, leaf.key, act.key, !!v)
                                                     }
