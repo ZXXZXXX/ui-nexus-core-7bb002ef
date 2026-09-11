@@ -590,50 +590,73 @@ function PedigreeDialog({
   const pick = (n: number, mod: number, base = 0) => base + ((seed + n) % mod);
   const female = cow.sex === "母" || cow.sex === "♀";
   const farmNo = cow.ear.slice(0, 2);
-  const hasCalf = female && cow.parity > 0;
-  const calfSex = pick(11, 2) === 0 ? "母" : "公";
-  const groups: { title: string; rows: { label: string; value: string }[] }[] = [
-    {
-      title: "血统信息",
-      rows: [
-        { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
-        { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
-        { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
-        { label: "入群来源", value: pick(5, 3) === 0 ? "本场出生" : pick(5, 3) === 1 ? "外购引进" : "牧场调入" },
-      ],
-    },
-    {
-      title: "犊牛信息",
-      rows: [
-        { label: "牛犊编号", value: hasCalf ? `${farmNo}-26-${String(pick(12, 9999)).padStart(4, "0")}` : "—" },
-        { label: "牛犊性别", value: hasCalf ? calfSex : "—" },
-        {
-          label: "牛犊状态",
-          value: hasCalf ? (calfSex === "母" ? "留养" : pick(13, 2) === 0 ? "留养" : "不留养") : "—",
-        },
-      ],
-    },
+  const pedigree = [
+    { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
+    { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
+    { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
+    { label: "入群来源", value: pick(5, 3) === 0 ? "本场出生" : pick(5, 3) === 1 ? "外购引进" : "牧场调入" },
   ];
+  // 犊牛数量 0～5，兼容双胎/多胎与无产犊记录
+  const calfCount = female ? Math.min(5, Math.max(0, cow.parity + (pick(9, 3) === 0 ? 1 : 0))) : 0;
+  const calves = Array.from({ length: calfCount }, (_, i) => {
+    const sex = pick(11 + i * 7, 2) === 0 ? "母" : "公";
+    const keep = sex === "母" ? true : pick(13 + i * 5, 2) === 0;
+    return {
+      no: `${farmNo}-${String(21 + Math.min(i, 4)).padStart(2, "0")}-${String(pick(12 + i * 3, 9999)).padStart(4, "0")}`,
+      sex,
+      status: keep ? "留养" : "不留养",
+    };
+  });
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[460px]">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle className="text-card-title">血统与犊牛档案</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          {groups.map((g) => (
-            <div key={g.title} className="rounded-lg border border-border/70 bg-muted/20 p-3">
-              <div className="mb-2 text-caption text-text-tertiary">{g.title}</div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                {g.rows.map((r) => (
-                  <div key={r.label} className="min-w-0">
-                    <div className="text-caption text-text-tertiary">{r.label}</div>
-                    <div className="text-body-sm text-foreground font-medium tabular-nums truncate">{r.value}</div>
+        <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
+            <div className="mb-2 text-caption text-text-tertiary">血统信息</div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+              {pedigree.map((r) => (
+                <div key={r.label} className="min-w-0">
+                  <div className="text-caption text-text-tertiary">{r.label}</div>
+                  <div className="text-body-sm text-foreground font-medium tabular-nums truncate">{r.value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-border/70 bg-muted/20 p-3">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-caption text-text-tertiary">犊牛信息</span>
+              <span className="text-caption text-text-tertiary">共 {calves.length} 只</span>
+            </div>
+            {calves.length === 0 ? (
+              <div className="py-4 text-center text-body-sm text-text-tertiary">暂无产犊记录</div>
+            ) : (
+              <div className="space-y-2">
+                {calves.map((c, i) => (
+                  <div
+                    key={c.no}
+                    className="flex items-center gap-3 rounded-md border border-border/60 bg-background px-3 py-2"
+                  >
+                    <span className="text-caption text-text-tertiary shrink-0">第 {i + 1} 只</span>
+                    <span className="text-body-sm text-foreground font-medium tabular-nums truncate flex-1">
+                      {c.no}
+                    </span>
+                    <span className="text-caption text-text-secondary shrink-0">{c.sex}</span>
+                    <span
+                      className={`shrink-0 rounded px-1.5 py-0.5 text-caption ${
+                        c.status === "留养" ? "bg-primary/10 text-primary" : "bg-muted text-text-tertiary"
+                      }`}
+                    >
+                      {c.status}
+                    </span>
                   </div>
                 ))}
               </div>
-            </div>
-          ))}
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
