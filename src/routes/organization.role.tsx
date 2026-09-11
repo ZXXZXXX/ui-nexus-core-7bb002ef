@@ -396,35 +396,32 @@ function buildNav(on: boolean, groupKeys?: string[]): NavPerms {
 function fullPc(allow = true, on = true): PcPerms {
   return { allowLogin: allow, workbenchView: "group", nav: buildNav(on) };
 }
-type MiniEventDef = (typeof miniEvents)[number];
-const hasAction = (e: MiniEventDef, a: MiniActionKey) => !!e.actions[a];
-const findEvent = (k: MiniEventKey) => miniEvents.find((x) => x.key === k)!;
+function buildMini(pick?: (mKey: string, fKey: string) => boolean): MiniPerms {
+  return miniSpec.reduce((acc, m) => {
+    acc[m.key] = m.funcs.reduce((a, f) => {
+      a[f.key] = {
+        on: pick ? pick(m.key, f.key) : false,
+        scope: f.scope ? [...scopeOptions(f.scope)] : [],
+      };
+      return a;
+    }, {} as Record<string, MiniFuncPerm>);
+    return acc;
+  }, {} as MiniPerms);
+}
 
 function fullMini(v = true): MiniPerms {
-  return miniEvents.reduce(
-    (acc, e) => ({
-      ...acc,
-      [e.key]: {
-        report: hasAction(e, "report") ? v : false,
-        execute: hasAction(e, "execute") ? v : false,
-      },
-    }),
-    {} as MiniPerms,
-  );
+  return buildMini(() => v);
 }
 function partialPc(keys: string[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
   return { allowLogin: true, workbenchView, nav: buildNav(false, keys) };
 }
 
-function partialMini(map: Partial<Record<MiniEventKey, Partial<Record<MiniActionKey, boolean>>>>): MiniPerms {
-  return miniEvents.reduce((acc, e) => {
-    const m = map[e.key] ?? {};
-    acc[e.key] = {
-      report: hasAction(e, "report") && !!m.report,
-      execute: hasAction(e, "execute") && !!m.execute,
-    };
-    return acc;
-  }, {} as MiniPerms);
+/** map：模块 key -> true（全部功能）或功能 key 数组 */
+function partialMini(map: Record<string, true | string[]>): MiniPerms {
+  return buildMini((mKey, fKey) => {
+    const v = map[mKey];
+    return v === true || (Array.isArray(v) && v.includes(fKey));
+  });
 }
 
 const defaultPerms: RolePerms = {
