@@ -1546,7 +1546,7 @@ function AccountDrawerInner({
 }
 
 function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const totalRoles = useMemo(
     () => Array.from(new Set(farmRoles.flatMap((fr) => fr.roles))).length,
     [farmRoles],
@@ -1571,14 +1571,14 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
       </button>
 
       {open && (
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-4">
           {farmRoles.map((fr) => {
             const perms = unionPermsForRoles(fr.roles);
             const empty = perms.pc.length === 0 && perms.mini.length === 0;
             return (
-              <div key={fr.farm} className="rounded-md border border-border bg-surface-subtle px-4 py-3 space-y-2.5">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="tag tag-muted whitespace-nowrap">{fr.farm}</span>
+              <div key={fr.farm} className="rounded-lg border border-border bg-card overflow-hidden">
+                <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-border">
+                  <span className="text-body-sm font-medium text-foreground whitespace-nowrap">{fr.farm}</span>
                   {fr.roles.length === 0 ? (
                     <span className="tag tag-muted">未分配</span>
                   ) : (
@@ -1586,35 +1586,99 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
                       <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
                     ))
                   )}
+                  {perms.homeView && (
+                    <span className="ml-auto text-caption text-text-tertiary whitespace-nowrap">
+                      首页看板：{perms.homeView}
+                    </span>
+                  )}
                 </div>
+
                 {empty ? (
-                  <p className="text-caption text-text-tertiary">该角色暂无权限，请前往「角色权限」配置。</p>
+                  <p className="px-4 py-3 text-caption text-text-tertiary">该角色暂无权限，请前往「角色权限」配置。</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <div className="text-caption text-text-tertiary mb-1.5">PC 端菜单</div>
+                  <div className="divide-y divide-border">
+                    <PermBlock title="PC 端权限" count={perms.pc.length} unit="个菜单">
                       {perms.pc.length === 0 ? (
-                        <div className="text-body-sm text-text-tertiary">—</div>
+                        <p className="text-caption text-text-tertiary">无 PC 端访问权限</p>
                       ) : (
-                        <div className="flex flex-wrap gap-1.5">
-                          {perms.pc.map((p) => (
-                            <span key={p} className="tag tag-info whitespace-nowrap">{p}</span>
+                        <div className="space-y-2">
+                          {perms.pc.map((m) => (
+                            <div key={m.menu} className="flex items-start gap-3">
+                              <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">{m.menu}</div>
+                              <div className="flex-1 space-y-1">
+                                {m.subs.map((s) => (
+                                  <div key={s.name} className="flex items-baseline gap-2 flex-wrap">
+                                    <span className="text-caption text-text-secondary min-w-[6em]">{s.name}</span>
+                                    <span className="flex flex-wrap gap-1">
+                                      {s.actions.map((a) => (
+                                        <span
+                                          key={a}
+                                          className="inline-flex items-center rounded px-1.5 py-0.5 text-caption bg-[var(--surface-subtle)] text-text-secondary whitespace-nowrap"
+                                        >
+                                          {a}
+                                        </span>
+                                      ))}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           ))}
                         </div>
                       )}
-                    </div>
-                    <div>
-                      <div className="text-caption text-text-tertiary mb-1.5">小程序模块</div>
-                      {perms.mini.length === 0 ? (
-                        <div className="text-body-sm text-text-tertiary">—</div>
-                      ) : (
-                        <div className="flex flex-wrap gap-1.5">
-                          {perms.mini.map((p) => (
-                            <span key={p} className="tag tag-muted whitespace-nowrap">{p}</span>
-                          ))}
+                    </PermBlock>
+
+                    <PermBlock title="小程序权限" count={perms.mini.length} unit="个模块">
+                      <div className="space-y-1.5">
+                        {perms.mini.map((m) => (
+                          <div key={m.module} className="flex items-start gap-3">
+                            <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">{m.module}</div>
+                            <div className="flex flex-wrap gap-1">
+                              {m.features.map((f) => (
+                                <span
+                                  key={f}
+                                  className="inline-flex items-center rounded px-1.5 py-0.5 text-caption bg-[var(--surface-subtle)] text-text-secondary whitespace-nowrap"
+                                >
+                                  {f}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </PermBlock>
+
+                    <PermBlock title="开放范围">
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-3">
+                          <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">工单类型</div>
+                          <div className="flex flex-wrap gap-1">
+                            {perms.workOrderTypes.length === 0 ? (
+                              <span className="text-caption text-text-tertiary">未开放</span>
+                            ) : (
+                              perms.workOrderTypes.map((t) => (
+                                <span key={t} className="tag tag-info whitespace-nowrap">{t}</span>
+                              ))
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">基础事件</div>
+                          <div className="flex flex-wrap gap-1">
+                            {perms.eventTypes.length === 0 ? (
+                              <span className="text-caption text-text-tertiary">未开放</span>
+                            ) : (
+                              perms.eventTypes.map((t) => (
+                                <span key={t} className="tag tag-muted whitespace-nowrap">{t}</span>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-caption text-text-tertiary">
+                          可查看、操作的工单与任务范围仅限于以上开放类型。
+                        </p>
+                      </div>
+                    </PermBlock>
                   </div>
                 )}
               </div>
@@ -1626,6 +1690,32 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
         </div>
       )}
     </section>
+  );
+}
+
+function PermBlock({
+  title,
+  count,
+  unit,
+  children,
+}: {
+  title: string;
+  count?: number;
+  unit?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="px-4 py-3 space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="text-caption font-medium text-text-secondary">{title}</span>
+        {count !== undefined && (
+          <span className="text-caption text-text-tertiary">
+            {count} {unit}
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
   );
 }
 
