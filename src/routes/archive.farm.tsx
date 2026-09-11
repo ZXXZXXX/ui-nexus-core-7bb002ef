@@ -268,13 +268,25 @@ function FarmPage() {
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-caption text-text-tertiary">牛场类型</Label>
-                    <Select value={editing.type} onValueChange={(v) => setEditing({ ...editing, type: v })}>
-                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="普通牧场">普通牧场</SelectItem>
-                        <SelectItem value="有机牧场">有机牧场</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                      {["普通牧场", "有机牧场"].map((t) => {
+                        const active = editing.type === t;
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setEditing({ ...editing, type: t })}
+                            className={`h-8 rounded-full border px-3 text-body-sm transition-colors ${
+                              active
+                                ? "border-primary bg-brand-subtle text-primary font-medium"
+                                : "border-border bg-card text-text-secondary hover:border-primary/50"
+                            }`}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-caption text-text-tertiary">休药期倍数</Label>
