@@ -132,60 +132,269 @@ const EXTERNAL_ROLES = ["修蹄工", "普修工", "干奶工", "驱虫工"];
 const DEFAULT_ROLES = [...INTERNAL_ROLES, ...EXTERNAL_ROLES];
 
 // 角色权限预览（用于账号详情中聚合展示，最终以「角色权限」配置为准）
-type RolePermPreview = { pc: string[]; mini: string[] };
+type PcMenuPerm = { menu: string; subs: { name: string; actions: string[] }[] };
+type MiniModulePerm = { module: string; features: string[] };
+type RolePermPreview = {
+  pc: PcMenuPerm[];
+  mini: MiniModulePerm[];
+  workOrderTypes: string[];
+  eventTypes: string[];
+  homeView?: string;
+};
+
+const VIEW_ONLY = ["查看"];
+
 const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
   场长: {
-    pc: ["首页", "基础档案", "工单管理", "药品管理", "诊疗管理", "统计分析"],
-    mini: ["首页", "现场上报", "备药", "任务处理", "工单管理", "知识查询", "牛只档案", "消息中心", "个人中心"],
+    homeView: "牧场内部管理看板",
+    pc: [
+      { menu: "首页", subs: [{ name: "牧场内部管理看板", actions: VIEW_ONLY }] },
+      {
+        menu: "基础档案",
+        subs: [
+          { name: "牛场信息", actions: ["查看", "导出"] },
+          { name: "牛舍信息", actions: ["查看", "导出"] },
+          { name: "牛只信息", actions: ["查看", "导出"] },
+        ],
+      },
+      {
+        menu: "工单管理",
+        subs: [
+          { name: "工单列表", actions: ["查看", "新建", "指派", "关闭", "导出"] },
+          { name: "工单模板", actions: ["查看", "编辑"] },
+        ],
+      },
+      {
+        menu: "药品管理",
+        subs: [
+          { name: "药品库存", actions: ["查看", "导出"] },
+          { name: "领用记录", actions: ["查看", "审批"] },
+        ],
+      },
+      {
+        menu: "诊疗管理",
+        subs: [
+          { name: "处方管理", actions: ["查看", "审核"] },
+          { name: "疾病知识库", actions: VIEW_ONLY },
+        ],
+      },
+      { menu: "统计分析", subs: [{ name: "统计模板", actions: ["查看", "导出"] }] },
+    ],
+    mini: [
+      { module: "首页", features: ["待办概览", "牧场概览"] },
+      { module: "现场上报", features: ["异常上报", "拍照上传"] },
+      { module: "备药", features: ["备药清单", "领用登记"] },
+      { module: "任务处理", features: ["工单任务 - 诊断", "工单任务 - 执行", "工单任务 - 复查", "异常排查任务", "基础事件任务", "批量执行任务"] },
+      { module: "工单管理", features: ["查看工单", "创建工单", "指派工单"] },
+      { module: "知识查询", features: ["疾病查询", "药品查询"] },
+      { module: "牛只档案", features: ["档案查询", "健康详情"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息", "切换牧场"] },
+    ],
+    workOrderTypes: ["诊断", "治疗", "免疫", "驱虫", "修蹄", "干奶", "保健"],
+    eventTypes: ["转群", "称重", "配种", "干奶", "分娩"],
   },
   兽医: {
-    pc: ["首页", "基础档案", "工单管理", "药品管理", "诊疗管理"],
-    mini: ["首页", "现场上报", "备药", "任务处理", "工单管理", "知识查询", "牛只档案", "消息中心", "个人中心"],
+    homeView: "牧场内部管理看板",
+    pc: [
+      { menu: "首页", subs: [{ name: "牧场内部管理看板", actions: VIEW_ONLY }] },
+      { menu: "基础档案", subs: [{ name: "牛只信息", actions: ["查看", "导出"] }] },
+      { menu: "工单管理", subs: [{ name: "工单列表", actions: ["查看", "新建", "指派"] }] },
+      { menu: "药品管理", subs: [{ name: "药品库存", actions: VIEW_ONLY }, { name: "领用记录", actions: ["查看", "新建"] }] },
+      { menu: "诊疗管理", subs: [{ name: "处方管理", actions: ["查看", "新建", "编辑"] }, { name: "疾病知识库", actions: VIEW_ONLY }] },
+    ],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "现场上报", features: ["异常上报", "拍照上传"] },
+      { module: "备药", features: ["备药清单", "领用登记"] },
+      { module: "任务处理", features: ["工单任务 - 诊断", "工单任务 - 执行", "工单任务 - 复查", "异常排查任务", "基础事件任务"] },
+      { module: "工单管理", features: ["查看工单", "创建工单"] },
+      { module: "知识查询", features: ["疾病查询", "药品查询"] },
+      { module: "牛只档案", features: ["档案查询", "健康详情"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息", "切换牧场"] },
+    ],
+    workOrderTypes: ["诊断", "治疗", "免疫", "驱虫", "保健"],
+    eventTypes: ["转群", "配种", "干奶", "分娩"],
   },
   兽医助理: {
     pc: [],
-    mini: ["首页", "现场上报", "备药", "任务处理", "知识查询", "牛只档案", "消息中心", "个人中心"],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "现场上报", features: ["异常上报"] },
+      { module: "备药", features: ["备药清单"] },
+      { module: "任务处理", features: ["工单任务 - 执行", "异常排查任务", "基础事件任务"] },
+      { module: "知识查询", features: ["疾病查询"] },
+      { module: "牛只档案", features: ["档案查询"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息"] },
+    ],
+    workOrderTypes: ["治疗", "免疫", "驱虫"],
+    eventTypes: ["转群", "称重"],
   },
   技术员: {
-    pc: ["首页", "基础档案"],
-    mini: ["首页", "现场上报", "任务处理", "牛只档案", "消息中心", "个人中心"],
+    homeView: "牧场内部管理看板",
+    pc: [
+      { menu: "首页", subs: [{ name: "牧场内部管理看板", actions: VIEW_ONLY }] },
+      { menu: "基础档案", subs: [{ name: "牛只信息", actions: VIEW_ONLY }, { name: "牛舍信息", actions: VIEW_ONLY }] },
+    ],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "现场上报", features: ["异常上报"] },
+      { module: "任务处理", features: ["工单任务 - 执行", "基础事件任务", "批量执行任务"] },
+      { module: "牛只档案", features: ["档案查询"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息"] },
+    ],
+    workOrderTypes: ["免疫", "驱虫", "保健"],
+    eventTypes: ["转群", "称重", "配种"],
   },
   仓管员: {
-    pc: ["首页", "基础档案", "药品管理"],
-    mini: ["首页", "现场上报", "备药", "消息中心", "个人中心"],
+    homeView: "牧场内部管理看板",
+    pc: [
+      { menu: "首页", subs: [{ name: "牧场内部管理看板", actions: VIEW_ONLY }] },
+      { menu: "基础档案", subs: [{ name: "牛场信息", actions: VIEW_ONLY }] },
+      {
+        menu: "药品管理",
+        subs: [
+          { name: "药品档案", actions: ["查看", "编辑"] },
+          { name: "药品库存", actions: ["查看", "入库", "调拨", "损耗", "导出"] },
+          { name: "领用记录", actions: ["查看", "发放"] },
+        ],
+      },
+    ],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "现场上报", features: ["异常上报"] },
+      { module: "备药", features: ["备药清单", "领用登记", "退回登记"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息"] },
+    ],
+    workOrderTypes: [],
+    eventTypes: [],
   },
   修蹄工: {
     pc: [],
-    mini: ["首页", "任务处理", "消息中心", "个人中心"],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "任务处理", features: ["工单任务 - 执行"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息"] },
+    ],
+    workOrderTypes: ["修蹄"],
+    eventTypes: [],
   },
   普修工: {
     pc: [],
-    mini: ["首页", "任务处理", "消息中心", "个人中心"],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "任务处理", features: ["工单任务 - 执行"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息"] },
+    ],
+    workOrderTypes: ["修蹄", "保健"],
+    eventTypes: [],
   },
   干奶工: {
     pc: [],
-    mini: ["首页", "任务处理", "消息中心", "个人中心"],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "任务处理", features: ["工单任务 - 执行", "基础事件任务", "批量执行任务"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息"] },
+    ],
+    workOrderTypes: ["干奶"],
+    eventTypes: ["干奶"],
   },
   驱虫工: {
     pc: [],
-    mini: ["首页", "任务处理", "消息中心", "个人中心"],
+    mini: [
+      { module: "首页", features: ["待办概览"] },
+      { module: "任务处理", features: ["工单任务 - 执行", "批量执行任务"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息"] },
+    ],
+    workOrderTypes: ["驱虫", "免疫"],
+    eventTypes: [],
   },
   超级管理员: {
-    pc: ["首页", "基础档案", "工单管理", "药品管理", "诊疗管理", "组织管理", "统计分析", "反馈管理"],
-    mini: ["首页", "现场上报", "备药", "任务处理", "工单管理", "知识查询", "牛只档案", "消息中心", "个人中心"],
+    homeView: "集团级别运营看板",
+    pc: [
+      { menu: "首页", subs: [{ name: "集团级别运营看板", actions: VIEW_ONLY }] },
+      {
+        menu: "基础档案",
+        subs: [
+          { name: "牛场信息", actions: ["查看", "编辑", "导出"] },
+          { name: "牛舍信息", actions: ["查看", "编辑", "导出"] },
+          { name: "牛只信息", actions: ["查看", "编辑", "导出"] },
+        ],
+      },
+      { menu: "工单管理", subs: [{ name: "工单列表", actions: ["查看", "新建", "指派", "关闭", "导出"] }, { name: "工单模板", actions: ["查看", "编辑"] }] },
+      { menu: "药品管理", subs: [{ name: "药品档案", actions: ["查看", "编辑"] }, { name: "药品库存", actions: ["查看", "入库", "调拨", "损耗", "导出"] }] },
+      { menu: "诊疗管理", subs: [{ name: "处方管理", actions: ["查看", "新建", "编辑", "审核"] }, { name: "疾病知识库", actions: ["查看", "编辑"] }] },
+      { menu: "组织管理", subs: [{ name: "账号管理", actions: ["查看", "新建", "编辑"] }, { name: "角色权限", actions: ["查看", "编辑"] }, { name: "第三方系统", actions: ["查看", "编辑"] }] },
+      { menu: "统计分析", subs: [{ name: "统计模板", actions: ["查看", "编辑", "导出"] }] },
+      { menu: "反馈管理", subs: [{ name: "反馈列表", actions: ["查看", "处理"] }] },
+    ],
+    mini: [
+      { module: "首页", features: ["待办概览", "牧场概览"] },
+      { module: "现场上报", features: ["异常上报", "拍照上传"] },
+      { module: "备药", features: ["备药清单", "领用登记", "退回登记"] },
+      { module: "任务处理", features: ["工单任务 - 诊断", "工单任务 - 执行", "工单任务 - 复查", "异常排查任务", "基础事件任务", "批量执行任务"] },
+      { module: "工单管理", features: ["查看工单", "创建工单", "指派工单"] },
+      { module: "知识查询", features: ["疾病查询", "药品查询"] },
+      { module: "牛只档案", features: ["档案查询", "健康详情"] },
+      { module: "消息中心", features: ["消息查看"] },
+      { module: "个人中心", features: ["个人信息", "切换牧场"] },
+    ],
+    workOrderTypes: ["诊断", "治疗", "免疫", "驱虫", "修蹄", "干奶", "保健"],
+    eventTypes: ["转群", "称重", "配种", "干奶", "分娩"],
   },
 };
 
+const PC_MENU_ORDER = ["首页", "基础档案", "工单管理", "药品管理", "诊疗管理", "组织管理", "统计分析", "反馈管理"];
+const MINI_MODULE_ORDER = ["首页", "现场上报", "备药", "任务处理", "工单管理", "知识查询", "牛只档案", "消息中心", "个人中心"];
+
 function unionPermsForRoles(rs: string[]): RolePermPreview {
-  const pc = new Set<string>();
-  const mini = new Set<string>();
+  const pcMap = new Map<string, Map<string, Set<string>>>();
+  const miniMap = new Map<string, Set<string>>();
+  const wo = new Set<string>();
+  const ev = new Set<string>();
+  let homeView: string | undefined;
+
   rs.forEach((r) => {
     const p = ROLE_PERMISSIONS[r];
     if (!p) return;
-    p.pc.forEach((x) => pc.add(x));
-    p.mini.forEach((x) => mini.add(x));
+    if (!homeView && p.homeView) homeView = p.homeView;
+    p.pc.forEach((m) => {
+      const subs = pcMap.get(m.menu) ?? new Map<string, Set<string>>();
+      m.subs.forEach((s) => {
+        const acts = subs.get(s.name) ?? new Set<string>();
+        s.actions.forEach((a) => acts.add(a));
+        subs.set(s.name, acts);
+      });
+      pcMap.set(m.menu, subs);
+    });
+    p.mini.forEach((m) => {
+      const fs = miniMap.get(m.module) ?? new Set<string>();
+      m.features.forEach((f) => fs.add(f));
+      miniMap.set(m.module, fs);
+    });
+    p.workOrderTypes.forEach((x) => wo.add(x));
+    p.eventTypes.forEach((x) => ev.add(x));
   });
-  return { pc: [...pc], mini: [...mini] };
+
+  const pc: PcMenuPerm[] = [...pcMap.entries()]
+    .sort((a, b) => PC_MENU_ORDER.indexOf(a[0]) - PC_MENU_ORDER.indexOf(b[0]))
+    .map(([menu, subs]) => ({
+      menu,
+      subs: [...subs.entries()].map(([name, acts]) => ({ name, actions: [...acts] })),
+    }));
+  const mini: MiniModulePerm[] = [...miniMap.entries()]
+    .sort((a, b) => MINI_MODULE_ORDER.indexOf(a[0]) - MINI_MODULE_ORDER.indexOf(b[0]))
+    .map(([module, fs]) => ({ module, features: [...fs] }));
+
+  return { pc, mini, workOrderTypes: [...wo], eventTypes: [...ev], homeView };
 }
 
 const initialAccounts: Account[] = [
@@ -1337,7 +1546,7 @@ function AccountDrawerInner({
 }
 
 function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const totalRoles = useMemo(
     () => Array.from(new Set(farmRoles.flatMap((fr) => fr.roles))).length,
     [farmRoles],
@@ -1362,14 +1571,14 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
       </button>
 
       {open && (
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 space-y-4">
           {farmRoles.map((fr) => {
             const perms = unionPermsForRoles(fr.roles);
             const empty = perms.pc.length === 0 && perms.mini.length === 0;
             return (
-              <div key={fr.farm} className="rounded-md border border-border bg-surface-subtle px-4 py-3 space-y-2.5">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="tag tag-muted whitespace-nowrap">{fr.farm}</span>
+              <div key={fr.farm} className="rounded-lg border border-border bg-card overflow-hidden">
+                <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-border">
+                  <span className="text-body-sm font-medium text-foreground whitespace-nowrap">{fr.farm}</span>
                   {fr.roles.length === 0 ? (
                     <span className="tag tag-muted">未分配</span>
                   ) : (
@@ -1377,35 +1586,99 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
                       <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
                     ))
                   )}
+                  {perms.homeView && (
+                    <span className="ml-auto text-caption text-text-tertiary whitespace-nowrap">
+                      首页看板：{perms.homeView}
+                    </span>
+                  )}
                 </div>
+
                 {empty ? (
-                  <p className="text-caption text-text-tertiary">该角色暂无权限，请前往「角色权限」配置。</p>
+                  <p className="px-4 py-3 text-caption text-text-tertiary">该角色暂无权限，请前往「角色权限」配置。</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <div className="text-caption text-text-tertiary mb-1.5">PC 端菜单</div>
+                  <div className="divide-y divide-border">
+                    <PermBlock title="PC 端权限" count={perms.pc.length} unit="个菜单">
                       {perms.pc.length === 0 ? (
-                        <div className="text-body-sm text-text-tertiary">—</div>
+                        <p className="text-caption text-text-tertiary">无 PC 端访问权限</p>
                       ) : (
-                        <div className="flex flex-wrap gap-1.5">
-                          {perms.pc.map((p) => (
-                            <span key={p} className="tag tag-info whitespace-nowrap">{p}</span>
+                        <div className="space-y-2">
+                          {perms.pc.map((m) => (
+                            <div key={m.menu} className="flex items-start gap-3">
+                              <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">{m.menu}</div>
+                              <div className="flex-1 space-y-1">
+                                {m.subs.map((s) => (
+                                  <div key={s.name} className="flex items-baseline gap-2 flex-wrap">
+                                    <span className="text-caption text-text-secondary min-w-[6em]">{s.name}</span>
+                                    <span className="flex flex-wrap gap-1">
+                                      {s.actions.map((a) => (
+                                        <span
+                                          key={a}
+                                          className="inline-flex items-center rounded px-1.5 py-0.5 text-caption bg-[var(--surface-subtle)] text-text-secondary whitespace-nowrap"
+                                        >
+                                          {a}
+                                        </span>
+                                      ))}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
                           ))}
                         </div>
                       )}
-                    </div>
-                    <div>
-                      <div className="text-caption text-text-tertiary mb-1.5">小程序模块</div>
-                      {perms.mini.length === 0 ? (
-                        <div className="text-body-sm text-text-tertiary">—</div>
-                      ) : (
-                        <div className="flex flex-wrap gap-1.5">
-                          {perms.mini.map((p) => (
-                            <span key={p} className="tag tag-muted whitespace-nowrap">{p}</span>
-                          ))}
+                    </PermBlock>
+
+                    <PermBlock title="小程序权限" count={perms.mini.length} unit="个模块">
+                      <div className="space-y-1.5">
+                        {perms.mini.map((m) => (
+                          <div key={m.module} className="flex items-start gap-3">
+                            <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">{m.module}</div>
+                            <div className="flex flex-wrap gap-1">
+                              {m.features.map((f) => (
+                                <span
+                                  key={f}
+                                  className="inline-flex items-center rounded px-1.5 py-0.5 text-caption bg-[var(--surface-subtle)] text-text-secondary whitespace-nowrap"
+                                >
+                                  {f}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </PermBlock>
+
+                    <PermBlock title="开放范围">
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-3">
+                          <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">工单类型</div>
+                          <div className="flex flex-wrap gap-1">
+                            {perms.workOrderTypes.length === 0 ? (
+                              <span className="text-caption text-text-tertiary">未开放</span>
+                            ) : (
+                              perms.workOrderTypes.map((t) => (
+                                <span key={t} className="tag tag-info whitespace-nowrap">{t}</span>
+                              ))
+                            )}
+                          </div>
                         </div>
-                      )}
-                    </div>
+                        <div className="flex items-start gap-3">
+                          <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">基础事件</div>
+                          <div className="flex flex-wrap gap-1">
+                            {perms.eventTypes.length === 0 ? (
+                              <span className="text-caption text-text-tertiary">未开放</span>
+                            ) : (
+                              perms.eventTypes.map((t) => (
+                                <span key={t} className="tag tag-muted whitespace-nowrap">{t}</span>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-caption text-text-tertiary">
+                          可查看、操作的工单与任务范围仅限于以上开放类型。
+                        </p>
+                      </div>
+                    </PermBlock>
                   </div>
                 )}
               </div>
@@ -1417,6 +1690,32 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
         </div>
       )}
     </section>
+  );
+}
+
+function PermBlock({
+  title,
+  count,
+  unit,
+  children,
+}: {
+  title: string;
+  count?: number;
+  unit?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="px-4 py-3 space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="text-caption font-medium text-text-secondary">{title}</span>
+        {count !== undefined && (
+          <span className="text-caption text-text-tertiary">
+            {count} {unit}
+          </span>
+        )}
+      </div>
+      {children}
+    </div>
   );
 }
 
