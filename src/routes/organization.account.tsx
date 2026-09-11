@@ -571,6 +571,7 @@ function AccountPage() {
                 <div className="text-body text-foreground truncate">{a.name}</div>
                 <div className="text-caption text-text-tertiary font-mono">{a.id}</div>
               </div>
+              <div className="text-body-sm text-text-secondary truncate">{a.source}</div>
               <div><span className={`tag ${userTypeTagClass(a.userType)}`}>{a.userType}</span></div>
               <div className="text-body-sm text-text-secondary tabular-nums">{a.phone}</div>
               <div className="flex items-center gap-1 min-w-0 overflow-hidden">
