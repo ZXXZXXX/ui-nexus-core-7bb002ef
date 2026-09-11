@@ -1294,9 +1294,15 @@ function RolePage() {
                                   <span className="text-body-sm text-text-secondary">{f.name}</span>
                                 </label>
                               ))}
+                              {m.key === "workorder" ? (
+                                <div className="xl:col-span-2 pt-2 text-caption text-text-tertiary">
+                                  可查看、操作的工单范围仅限于开放的工单类型
+                                </div>
+                              ) : null}
                             </div>
                           );
                         })}
+
                     </div>
                   </div>
 
