@@ -402,7 +402,7 @@ function HomePage() {
   const [activeRequest, setActiveRequest] = useState<PendingRequest | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [attendanceOpen, setAttendanceOpen] = useState(false);
-  const [timeScope, setTimeScope] = useState<"yesterday" | "month" | "year">("month");
+  const [timeScope, setTimeScope] = useState<"day" | "month" | "year">("day");
   const alertsRef = useRef<HTMLDivElement | null>(null);
 
   const { scope, config } = useDashboardView();
@@ -420,12 +420,13 @@ function HomePage() {
   };
   const { factor, level, levels } = useDataLevel();
 
-  /** 根据时间维度调整绝对数量指标的数值；存量/比率指标保持不变 */
-  const timeFactor = timeScope === "yesterday" ? 1 / 30 : timeScope === "year" ? 12 : 1;
+  /** 根据时间维度调整绝对数量指标的数值；存量/比率指标保持不变
+   *  日度：最近 30 天；月度：最近 12 个月；年度：最近 12 年 */
+  const timeFactor = timeScope === "month" ? 12 : timeScope === "year" ? 144 : 1;
   const timePrefix: Record<typeof timeScope, string> = {
-    yesterday: "（至昨日）",
-    month: "（本月）",
-    year: "（本年）",
+    day: "（近 30 天）",
+    month: "（近 12 个月）",
+    year: "（近 12 年）",
   };
 
   const scaleCardValue = (c: MetricCard) =>
