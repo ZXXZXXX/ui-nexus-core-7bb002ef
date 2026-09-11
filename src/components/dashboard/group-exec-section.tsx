@@ -777,7 +777,7 @@ type TrendProps = {
 /* ---------------- 产后淘汰率趋势 ---------------- */
 
 function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const s30 = factors.map((k) => Number((all.pp30 * k).toFixed(2)));
   const s60 = factors.map((k, i) => Number(Math.max(all.pp60 * k - s30[i], 0).toFixed(2)));
@@ -791,16 +791,19 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity: initialG
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <StackedColumns
-        labels={labels}
-        unit="%"
-        decimals={2}
-        series={[
-          { name: "0-30 天", color: BUCKETS[0].color, points: s30 },
-          { name: "31-60 天", color: BUCKETS[1].color, points: s60 },
-          { name: "61-90 天", color: BUCKETS[2].color, points: s90 },
-        ]}
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <StackedColumns
+          labels={labels}
+          unit="%"
+          decimals={2}
+          series={[
+            { name: "0-30 天", color: BUCKETS[0].color, points: s30 },
+            { name: "31-60 天", color: BUCKETS[1].color, points: s60 },
+            { name: "61-90 天", color: BUCKETS[2].color, points: s90 },
+          ]}
+        />
+      </PannableChart>
+
       <ChartLegend items={[
         { name: "0-30 天", color: BUCKETS[0].color },
         { name: "31-60 天", color: BUCKETS[1].color },
