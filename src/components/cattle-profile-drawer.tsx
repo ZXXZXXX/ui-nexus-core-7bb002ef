@@ -384,7 +384,7 @@ export function CattleProfileDrawer({
 
           {/* 繁育与血统档案 */}
           <Panel
-            title="繁育与档案信息"
+            title="基础信息"
             icon={<ListChecks className="h-4 w-4 text-primary" />}
             bodyClassName="p-4"
             extra={
