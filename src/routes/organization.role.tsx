@@ -489,6 +489,7 @@ function RolePage() {
   const isOpen = (k: string) => !!treeOpen[k];
   /** 权限树左右布局：当前选中的一级菜单 */
   const [navActive, setNavActive] = useState<string>(navSpec[0]!.key);
+  const [miniActive, setMiniActive] = useState<string>(miniSpec[0]!.key);
 
   const startCreate = () => {
     if (!canManage) return;
@@ -1213,87 +1214,87 @@ function RolePage() {
                     所有账号均可自由登录小程序，请按模块配置功能权限；涉及工单 / 基础事件的功能可进一步限定可选范围。
                   </p>
 
-                  <div className="rounded-md border border-border overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-surface-subtle hover:bg-surface-subtle">
-                          <TableHead className="w-[160px] text-text-secondary align-middle">
-                            <div className="flex items-center gap-2">
-                              {editable ? (
-                                <Checkbox
-                                  checked={
-                                    miniSpec.every((m) =>
-                                      m.funcs.every((f) => cur.mini[m.key][f.key].on),
-                                    )
-                                      ? true
-                                      : miniSpec.some((m) =>
-                                          m.funcs.some((f) => cur.mini[m.key][f.key].on),
-                                        )
-                                      ? "indeterminate"
-                                      : false
-                                  }
-                                  onCheckedChange={(v) => setMiniAll(!!v)}
-                                  className="h-[18px] w-[18px] border data-[state=unchecked]:border-[var(--text-tertiary)]"
-                                  aria-label="全选"
-                                />
-                              ) : null}
-                              <span>小程序模块</span>
-                            </div>
-                          </TableHead>
-                          <TableHead className="text-text-secondary">功能权限</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {miniSpec.map((m) => {
+                  <div className="rounded-md border border-border bg-card overflow-hidden flex">
+                    {/* 左：模块 */}
+                    <div className="w-[200px] shrink-0 border-r border-border bg-surface-subtle/40 py-1">
+                      {editable ? (
+                        <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
+                          <Checkbox
+                            checked={
+                              miniSpec.every((m) => m.funcs.every((f) => cur.mini[m.key][f.key].on))
+                                ? true
+                                : miniSpec.some((m) => m.funcs.some((f) => cur.mini[m.key][f.key].on))
+                                  ? "indeterminate"
+                                  : false
+                            }
+                            onCheckedChange={(v) => setMiniAll(!!v)}
+                            className="h-[16px] w-[16px]"
+                            aria-label="全选"
+                          />
+                          <span className="text-caption text-text-tertiary">全选模块</span>
+                        </div>
+                      ) : null}
+                      {miniSpec.map((m) => {
+                        const fs = cur.mini[m.key];
+                        const rowAll = m.funcs.every((f) => fs[f.key].on);
+                        const rowAny = m.funcs.some((f) => fs[f.key].on);
+                        const active = miniActive === m.key;
+                        return (
+                          <div
+                            key={m.key}
+                            onClick={() => setMiniActive(m.key)}
+                            className={`flex items-center gap-2 px-3 py-2 cursor-pointer border-l-2 transition-colors ${
+                              active ? "border-primary bg-card" : "border-transparent hover:bg-card/70"
+                            }`}
+                          >
+                            <Checkbox
+                              checked={rowAll ? true : rowAny ? "indeterminate" : false}
+                              disabled={!editable}
+                              onCheckedChange={(v) => setMiniModule(m.key, !!v)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-[16px] w-[16px]"
+                              aria-label={`整行：${m.name}`}
+                            />
+                            <span
+                              className={`text-body-sm truncate ${
+                                active ? "text-primary font-medium" : "text-foreground"
+                              }`}
+                            >
+                              {m.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* 右：功能权限 */}
+                    <div className="flex-1 min-w-0 p-3">
+                      {miniSpec
+                        .filter((m) => m.key === miniActive)
+                        .map((m) => {
                           const fs = cur.mini[m.key];
-                          const rowAll = m.funcs.every((f) => fs[f.key].on);
-                          const rowAny = m.funcs.some((f) => fs[f.key].on);
                           return (
-                            <TableRow key={m.key} className="hover:bg-transparent align-top">
-                              <TableCell className="w-[160px] py-3">
-                                <div className="flex items-center gap-2">
-                                  {editable ? (
-                                    <Checkbox
-                                      checked={rowAll ? true : rowAny ? "indeterminate" : false}
-                                      onCheckedChange={(v) => setMiniModule(m.key, !!v)}
-                                      className="h-[18px] w-[18px] border data-[state=unchecked]:border-[var(--text-tertiary)]"
-                                      aria-label={`整行：${m.name}`}
-                                    />
-                                  ) : null}
-                                  <span className="text-body-sm font-medium text-foreground">
-                                    {m.name}
-                                  </span>
-                                </div>
-                              </TableCell>
-                              <TableCell className="py-3">
-                                <div className="space-y-2.5">
-                                  <div className="flex flex-wrap gap-x-5 gap-y-2">
-                                    {m.funcs.map((f) => (
-                                      <label
-                                        key={f.key}
-                                        className={`inline-flex items-center gap-2 ${
-                                          editable ? "cursor-pointer" : ""
-                                        }`}
-                                      >
-                                        <Checkbox
-                                          checked={fs[f.key].on}
-                                          disabled={!editable}
-                                          onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
-                                          className="h-[18px] w-[18px] rounded-full border data-[state=unchecked]:border-[var(--border-strong)] data-[state=checked]:border-primary data-[state=checked]:border-2 data-[state=checked]:bg-primary data-[state=checked]:text-white"
-                                        />
-                                        <span className="text-body-sm text-text-secondary">
-                                          {f.name}
-                                        </span>
-                                      </label>
-                                    ))}
-                                  </div>
-                                </div>
-                              </TableCell>
-                            </TableRow>
+                            <div key={m.key} className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2">
+                              {m.funcs.map((f) => (
+                                <label
+                                  key={f.key}
+                                  className={`inline-flex items-center gap-2 ${
+                                    editable ? "cursor-pointer" : ""
+                                  }`}
+                                >
+                                  <Checkbox
+                                    checked={fs[f.key].on}
+                                    disabled={!editable}
+                                    onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
+                                    className="h-[16px] w-[16px]"
+                                  />
+                                  <span className="text-body-sm text-text-secondary">{f.name}</span>
+                                </label>
+                              ))}
+                            </div>
                           );
                         })}
-                      </TableBody>
-                    </Table>
+                    </div>
                   </div>
 
                   {/* 通用范围：工单类型 / 基础事件类型，全局仅需选择一次 */}
