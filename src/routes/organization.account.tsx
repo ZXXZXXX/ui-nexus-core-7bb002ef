@@ -707,6 +707,106 @@ function AccountPage() {
         </p>
       </main>
 
+      {/* 筛选与列设置 */}
+      <Sheet open={filterOpen} onOpenChange={setFilterOpen}>
+        <SheetContent side="right" className="w-[380px] sm:max-w-[380px] flex flex-col p-0">
+          <SheetHeader className="px-5 py-4 border-b border-border">
+            <SheetTitle className="text-section">筛选与列设置</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+            <div>
+              <div className="text-caption text-text-tertiary mb-2">显示列（筛选仅作用于展示中的列）</div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                {ACCOUNT_COLUMNS.map((c) => (
+                  <label
+                    key={c.key}
+                    className={`flex items-center gap-2 text-body-sm ${
+                      c.required ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+                    }`}
+                  >
+                    <Checkbox
+                      checked={draftVisible.includes(c.key)}
+                      disabled={c.required}
+                      onCheckedChange={(v) =>
+                        setDraftVisible((prev) =>
+                          v
+                            ? ACCOUNT_COLUMNS.filter(
+                                (x) => prev.includes(x.key) || x.key === c.key,
+                              ).map((x) => x.key)
+                            : prev.filter((k) => k !== c.key),
+                        )
+                      }
+                    />
+                    <span>{c.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3 border-t border-border pt-4">
+              {ACCOUNT_COLUMNS.filter(
+                (c) => (c.filter ?? "text") !== "none" && draftVisible.includes(c.key),
+              ).map((c) => (
+                <div key={c.key}>
+                  <div className="text-caption text-text-tertiary mb-1.5">{c.label}</div>
+                  {(c.filter ?? "text") === "select" ? (
+                    <Select
+                      value={draft[c.key] || "__all"}
+                      onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}
+                    >
+                      <SelectTrigger className="h-9 text-body-sm">
+                        <SelectValue placeholder="全部" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="__all" className="text-body-sm">全部</SelectItem>
+                        {optionsFor(c.key, c.options).map((o) => (
+                          <SelectItem key={o} value={o} className="text-body-sm">{o}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      value={draft[c.key] ?? ""}
+                      onChange={(e) => setDraft((p) => ({ ...p, [c.key]: e.target.value }))}
+                      placeholder="包含…"
+                      className="h-9 text-body-sm"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <SheetFooter className="px-5 py-4 border-t border-border flex-row gap-2">
+            <Button
+              variant="outline"
+              className="flex-1 h-9 text-body-sm font-normal"
+              onClick={() => {
+                setDraft({});
+                setDraftVisible(ACCOUNT_COLUMNS.filter((c) => !c.defaultHidden).map((c) => c.key));
+              }}
+            >
+              重置
+            </Button>
+            <Button
+              className="flex-1 h-9 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
+              onClick={() => {
+                const next: Record<string, string> = {};
+                for (const [k, v] of Object.entries(draft)) {
+                  if (draftVisible.includes(k)) next[k] = v;
+                }
+                setFilters(next);
+                setVisible(draftVisible);
+                setFilterOpen(false);
+              }}
+            >
+              应用
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+
+
       {/* 查看 / 编辑 抽屉 */}
       <AccountDrawer
         account={drawerAccount}
