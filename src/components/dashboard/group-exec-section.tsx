@@ -483,7 +483,7 @@ function DrugTrendSection({ scopeRegion, granularity = "month" }: { scopeRegion?
     return { feeRatio: rg.drugFee / all.drugFee, headRatio: rg.perHead / all.perHead };
   }, [scopeRegion]);
   const { labels: months, factors } = useMemo(() => axisFor(granularity), [granularity]);
-  const scale = granularity === "day" ? 1 / 30 : granularity === "year" ? 12 : 1;
+  const scale = granularity === "day" ? 1 / 15 : granularity === "year" ? 12 : 1;
   const totalFee = useMemo(
     () => factors.map((k, i) => Number((ALL_TOTAL_FEE[i % ALL_TOTAL_FEE.length] * k * scale * feeRatio).toFixed(1))),
     [factors, scale, feeRatio],
@@ -501,7 +501,7 @@ function DrugTrendSection({ scopeRegion, granularity = "month" }: { scopeRegion?
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
         <span className="text-caption text-text-tertiary">
-          {granularity === "day" ? "近 30 天" : granularity === "year" ? "近 12 年" : "近 12 个月"}
+          {granularity === "day" ? "近 15 天" : granularity === "year" ? "近 12 年" : "近 12 个月"}
         </span>
       }
     >
@@ -659,13 +659,13 @@ function useScopeRatio(scopeRegion?: string | null) {
 
 export type Granularity = "day" | "month" | "year";
 
-/** 按时间维度生成横轴标签与波动因子：日度近 30 天 / 月度近 12 个月 / 年度近 12 年 */
+/** 按时间维度生成横轴标签与波动因子：日度近 15 天 / 月度近 12 个月 / 年度近 12 年 */
 export function axisFor(g: Granularity = "month") {
   if (g === "day") {
     const now = new Date(2026, 8, 11);
     const labels: string[] = [];
     const factors: number[] = [];
-    for (let i = 29; i >= 0; i--) {
+    for (let i = 14; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 86400000);
       labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
       factors.push(Number((0.86 + 0.28 * ((Math.sin(i * 1.7) + 1) / 2)).toFixed(3)));
