@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { BarChart3, Layers, Download, ChevronLeft, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { SectionCard, PeriodTabs, TimeTabs, LineTrend, SmoothAreaTrend } from "./charts";
@@ -475,7 +475,7 @@ function DrugComboChart({
 }
 
 function DrugTrendSection({ scopeRegion, granularity: initialG = "month" }: { scopeRegion?: string | null; granularity?: Granularity }) {
-  const [granularity, setGranularity] = useState<Granularity>(initialG);
+  const { labels: months, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   // 区域视角：总药费按该区域药费占比折算，单头药费按区域实际水平折算
   const { feeRatio, headRatio } = useMemo(() => {
     if (!scopeRegion) return { feeRatio: 1, headRatio: 1 };
@@ -483,15 +483,14 @@ function DrugTrendSection({ scopeRegion, granularity: initialG = "month" }: { sc
     const rg = agg(scopeRegion, "", GROUP_FARMS.filter((f) => f.region === scopeRegion));
     return { feeRatio: rg.drugFee / all.drugFee, headRatio: rg.perHead / all.perHead };
   }, [scopeRegion]);
-  const { labels: months, factors } = useMemo(() => axisFor(granularity), [granularity]);
   const scale = granularity === "day" ? 1 / 15 : granularity === "year" ? 12 : 1;
   const totalFee = useMemo(
-    () => factors.map((k, i) => Number((ALL_TOTAL_FEE[i % ALL_TOTAL_FEE.length] * k * scale * feeRatio).toFixed(1))),
-    [factors, scale, feeRatio],
+    () => factors.map((k, i) => Number((ALL_TOTAL_FEE[(i + offset) % ALL_TOTAL_FEE.length] * k * scale * feeRatio).toFixed(1))),
+    [factors, scale, feeRatio, offset],
   );
   const perHead = useMemo(
-    () => factors.map((k, i) => Number((ALL_PER_HEAD[i % ALL_PER_HEAD.length] * k * headRatio).toFixed(1))),
-    [factors, headRatio],
+    () => factors.map((k, i) => Number((ALL_PER_HEAD[(i + offset) % ALL_PER_HEAD.length] * k * headRatio).toFixed(1))),
+    [factors, headRatio, offset],
   );
 
   return (
@@ -504,7 +503,10 @@ function DrugTrendSection({ scopeRegion, granularity: initialG = "month" }: { sc
         <GranularityTabs value={granularity} onChange={setGranularity} />
       }
     >
-      <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
+      </PannableChart>
+
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--brand)" }} />
@@ -672,34 +674,100 @@ function GranularityTabs({ value, onChange }: { value: Granularity; onChange: (g
   );
 }
 
-/** 按时间维度生成横轴标签与波动因子：日度近 15 天 / 月度近 12 个月 / 年度近 12 年 */
-export function axisFor(g: Granularity = "month") {
-  if (g === "day") {
-    const now = new Date(2026, 8, 11);
-    const labels: string[] = [];
-    const factors: number[] = [];
-    for (let i = 14; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * 86400000);
+const NOW = new Date(2026, 8, 11);
+/** 每个维度可回溯的最大周期数（拖动到底后不再向前） */
+const MAX_BACK: Record<Granularity, number> = { day: 90, month: 36, year: 24 };
+const WINDOW: Record<Granularity, number> = { day: 15, month: 12, year: 12 };
+
+/**
+ * 按时间维度生成横轴标签与波动因子。
+ * offset 为向前回溯的周期数（0 = 最新窗口）：日度 15 天 / 月度 12 个月 / 年度 12 年。
+ */
+export function axisFor(g: Granularity = "month", offset = 0) {
+  const n = WINDOW[g];
+  const labels: string[] = [];
+  const factors: number[] = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const back = i + offset;
+    if (g === "day") {
+      const d = new Date(NOW.getTime() - back * 86400000);
       labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
-      factors.push(Number((0.86 + 0.28 * ((Math.sin(i * 1.7) + 1) / 2)).toFixed(3)));
+      factors.push(Number((0.86 + 0.28 * ((Math.sin(back * 1.7) + 1) / 2)).toFixed(3)));
+    } else if (g === "year") {
+      labels.push(`${NOW.getFullYear() - back}年`);
+      factors.push(Number((0.88 + 0.24 * ((Math.sin(back * 0.9) + 1) / 2)).toFixed(3)));
+    } else {
+      const d = new Date(NOW.getFullYear(), NOW.getMonth() - back, 1);
+      labels.push(`${d.getMonth() + 1}月`);
+      factors.push(MONTH_FACTORS[((d.getMonth() % 12) + 12) % 12]);
     }
-    return { labels, factors };
   }
-  if (g === "year") {
-    const labels: number[] = [];
-    for (let i = 11; i >= 0; i--) labels.push(2026 - i);
-    return {
-      labels: labels.map((y) => `${y}年`),
-      factors: labels.map((_, i) => Number((0.88 + 0.24 * ((Math.sin(i * 0.9) + 1) / 2)).toFixed(3))),
-    };
-  }
-  return { labels: ALL_MONTHS, factors: MONTH_FACTORS };
+  return { labels, factors };
+}
+
+/** 趋势图左右拖动：向右拖看更早的数据，向左拖回到最新 */
+function PannableChart({
+  granularity,
+  offset,
+  onOffsetChange,
+  children,
+}: {
+  granularity: Granularity;
+  offset: number;
+  onOffsetChange: (v: number) => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; base: number } | null>(null);
+  const max = MAX_BACK[granularity];
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    drag.current = { x: e.clientX, base: offset };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || !ref.current) return;
+    const step = ref.current.clientWidth / WINDOW[granularity];
+    const next = Math.max(0, Math.min(max, d.base + Math.round((e.clientX - d.x) / step)));
+    if (next !== offset) onOffsetChange(next);
+  };
+  const endDrag = (e: React.PointerEvent) => {
+    drag.current = null;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch { /* ignore */ }
+  };
+
+  return (
+    <div
+      ref={ref}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      className="cursor-grab active:cursor-grabbing select-none"
+      style={{ touchAction: "pan-y" }}
+    >
+      {children}
+    </div>
+  );
 }
 
 function usePeriod(initial: Granularity = "month") {
-  const [granularity, setGranularity] = useState<Granularity>(initial);
-  const { labels, factors } = useMemo(() => axisFor(granularity), [granularity]);
-  return { labels, factors, granularity, setGranularity };
+  const [granularity, setG] = useState<Granularity>(initial);
+  const [offset, setOffset] = useState(0);
+  const setGranularity = (g: Granularity) => {
+    setG(g);
+    setOffset(0);
+  };
+  const { labels, factors } = useMemo(() => axisFor(granularity, offset), [granularity, offset]);
+  // 预加载相邻窗口的数据，拖动时无需等待计算
+  useMemo(() => {
+    axisFor(granularity, Math.min(MAX_BACK[granularity], offset + WINDOW[granularity]));
+    axisFor(granularity, Math.max(0, offset - WINDOW[granularity]));
+  }, [granularity, offset]);
+  return { labels, factors, granularity, setGranularity, offset, setOffset };
 }
 
 type TrendProps = {
@@ -711,7 +779,7 @@ type TrendProps = {
 /* ---------------- 产后淘汰率趋势 ---------------- */
 
 function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const s30 = factors.map((k) => Number((all.pp30 * k).toFixed(2)));
   const s60 = factors.map((k, i) => Number(Math.max(all.pp60 * k - s30[i], 0).toFixed(2)));
@@ -725,16 +793,19 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity: initialG
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <StackedColumns
-        labels={labels}
-        unit="%"
-        decimals={2}
-        series={[
-          { name: "0-30 天", color: BUCKETS[0].color, points: s30 },
-          { name: "31-60 天", color: BUCKETS[1].color, points: s60 },
-          { name: "61-90 天", color: BUCKETS[2].color, points: s90 },
-        ]}
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <StackedColumns
+          labels={labels}
+          unit="%"
+          decimals={2}
+          series={[
+            { name: "0-30 天", color: BUCKETS[0].color, points: s30 },
+            { name: "31-60 天", color: BUCKETS[1].color, points: s60 },
+            { name: "61-90 天", color: BUCKETS[2].color, points: s90 },
+          ]}
+        />
+      </PannableChart>
+
       <ChartLegend items={[
         { name: "0-30 天", color: BUCKETS[0].color },
         { name: "31-60 天", color: BUCKETS[1].color },
@@ -747,7 +818,7 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity: initialG
 /* ---------------- 牛只死淘变化趋势 ---------------- */
 
 function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const herd = all.herd || 1;
   const deathRate = factors.map((k) => Number(((all.death * k) / herd * 100).toFixed(2)));
@@ -761,16 +832,19 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity: initialG 
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <LineTrend
-        labels={labels}
-        unit="%"
-        height={240}
-        formatValue={(v) => `${v.toFixed(2)}%（${Math.round((v / 100) * herd).toLocaleString()} 头）`}
-        series={[
-          { name: "死亡率", color: "var(--state-danger)", points: deathRate },
-          { name: "淘汰率", color: "var(--state-warning)", points: cullRate, dashed: true },
-        ]}
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <LineTrend
+          labels={labels}
+          unit="%"
+          height={240}
+          formatValue={(v) => `${v.toFixed(2)}%（${Math.round((v / 100) * herd).toLocaleString()} 头）`}
+          series={[
+            { name: "死亡率", color: "var(--state-danger)", points: deathRate },
+            { name: "淘汰率", color: "var(--state-warning)", points: cullRate, dashed: true },
+          ]}
+        />
+      </PannableChart>
+
     </SectionCard>
   );
 }
@@ -778,7 +852,7 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity: initialG 
 /* ---------------- 早产率变化趋势 ---------------- */
 
 function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const base = ((all.pp30 || 2) * 1.6) / 2 + 3.2;
   const points = factors.map((k) => Number((base * k).toFixed(2)));
@@ -792,16 +866,19 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity: initi
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <SmoothAreaTrend
-        labels={labels}
-        points={points}
-        unit="%"
-        name="早产率"
-        color="var(--chart-blue, #3B82F6)"
-        formatValue={(v, i) =>
-          `${v.toFixed(2)}%（${Math.round((v / 100) * calvings[i]).toLocaleString()} / ${calvings[i].toLocaleString()} 产犊）`
-        }
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <SmoothAreaTrend
+          labels={labels}
+          points={points}
+          unit="%"
+          name="早产率"
+          color="var(--chart-blue, #3B82F6)"
+          formatValue={(v, i) =>
+            `${v.toFixed(2)}%（${Math.round((v / 100) * calvings[i]).toLocaleString()} / ${calvings[i].toLocaleString()} 产犊）`
+          }
+        />
+      </PannableChart>
+
     </SectionCard>
   );
 }
@@ -809,7 +886,7 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity: initi
 /* ---------------- 发病率 / 治愈率 / 平均诊疗天数趋势 ---------------- */
 
 function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
   const sickCount = factors.map((k) => Math.round(all.sick * (0.94 + (k - 1) * 0.5) * 62));
@@ -823,19 +900,22 @@ function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity: initi
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <DrugComboChart
-        months={labels}
-        totalFee={sickCount}
-        perHead={cureRate}
-        barUnit="头次"
-        lineUnit="%"
-        barLabel="发病数"
-        lineLabel="治愈率"
-        barHeadroom={1}
-        barColor="var(--state-warning)"
-        lineColor="var(--brand)"
-        extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <DrugComboChart
+          months={labels}
+          totalFee={sickCount}
+          perHead={cureRate}
+          barUnit="头次"
+          lineUnit="%"
+          barLabel="发病数"
+          lineLabel="治愈率"
+          barHeadroom={1}
+          barColor="var(--state-warning)"
+          lineColor="var(--brand)"
+          extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
+        />
+      </PannableChart>
+
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--state-warning)" }} />
