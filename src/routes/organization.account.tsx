@@ -387,10 +387,16 @@ function AccountPage() {
     const kw = keyword.trim().toLowerCase();
     return accounts
       .filter((a) => {
-        if (onlyInternal && a.userType !== "内部") return false;
-        if (filterRole !== "all" && !rolesOf(a).includes(filterRole)) return false;
-        if (filterFarms.length > 0 && !filterFarms.some((f) => farmsOf(a).includes(f))) return false;
-        if (filterStatus !== "all" && a.status !== filterStatus) return false;
+        for (const [key, val] of Object.entries(filters)) {
+          if (!val || val === "__all") continue;
+          if (key === "role") {
+            if (!rolesOf(a).includes(val)) return false;
+          } else if (key === "farms") {
+            if (!farmsOf(a).includes(val)) return false;
+          } else if (!cellValue(a, key).toLowerCase().includes(val.toLowerCase())) {
+            return false;
+          }
+        }
         if (kw) {
           const hay = `${a.name} ${a.phone} ${a.wecomId ?? ""}`.toLowerCase();
           if (!hay.includes(kw)) return false;
@@ -401,10 +407,72 @@ function AccountPage() {
         if (a.status !== b.status) return a.status === "启用" ? -1 : 1;
         return b.createdAt.localeCompare(a.createdAt);
       });
-  }, [accounts, keyword, onlyInternal, filterRole, filterFarms, filterStatus]);
+  }, [accounts, keyword, filters]);
 
-  // 列宽：勾选 用户 来源 类型 手机号 角色 关联牧场 企微ID 状态 管理
-  const cols = "40px 0.9fr 1.2fr 1fr 0.9fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 0.7fr 0.5fr";
+  // 列宽：勾选 + 展示中的列 + 管理
+  const cols = `40px ${shownCols.map((c) => c.width).join(" ")} 0.5fr`;
+
+  const renderCell = (a: Account, key: string) => {
+    switch (key) {
+      case "id":
+        return <span className="block text-body-sm text-text-secondary font-mono truncate">{a.id}</span>;
+      case "name":
+        return <span className="block text-body text-foreground truncate">{a.name}</span>;
+      case "employeeNo":
+        return <span className="block text-body-sm text-text-secondary font-mono truncate">{a.employeeNo}</span>;
+      case "source":
+        return <span className="block text-body-sm text-text-secondary truncate">{a.source}</span>;
+      case "userType":
+        return <span className={`tag ${userTypeTagClass(a.userType)}`}>{a.userType}</span>;
+      case "phone":
+        return <span className="text-body-sm text-text-secondary tabular-nums">{maskPhone(a.phone)}</span>;
+      case "role": {
+        const rs = rolesOf(a);
+        if (rs.length === 0) return <span className="tag tag-muted">未分配</span>;
+        return (
+          <div className="flex items-center gap-1 min-w-0 overflow-hidden">
+            <span className="tag tag-brand whitespace-nowrap" title={rs[0]}>{ellipsize(rs[0], 3)}</span>
+            {rs.length > 1 && (
+              <span className="tag tag-brand whitespace-nowrap" title={rs.slice(1).join("、")}>
+                +{rs.length - 1}
+              </span>
+            )}
+          </div>
+        );
+      }
+      case "farms": {
+        const fs = farmsOf(a);
+        if (fs.length === 0) return <span className="tag tag-muted">未关联</span>;
+        return (
+          <div className="flex items-center gap-1 min-w-0 overflow-hidden">
+            <span className="tag tag-muted whitespace-nowrap" title={fs[0]}>{ellipsize(fs[0], 4)}</span>
+            {fs.length > 1 && (
+              <span
+                className="tag tag-muted whitespace-nowrap"
+                title={a.farmRoles.slice(1).map((x) => `${x.farm}（${x.roles.join("、") || "未分配"}）`).join("\n")}
+              >
+                +{fs.length - 1}
+              </span>
+            )}
+          </div>
+        );
+      }
+      case "wecomId":
+        return a.wecomId ? (
+          <span className="block truncate text-body-sm text-text-secondary font-mono tabular-nums" title="已脱敏显示">
+            {maskId(a.wecomId)}
+          </span>
+        ) : (
+          <span className="tag tag-muted">未绑定</span>
+        );
+      case "status":
+        return <span className={`tag ${a.status === "启用" ? "tag-success" : "tag-muted"}`}>{a.status}</span>;
+      case "createdAt":
+        return <span className="text-body-sm text-text-secondary tabular-nums">{a.createdAt}</span>;
+      default:
+        return null;
+    }
+  };
 
   const visibleIds = filteredAccounts.map((a) => a.id);
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
