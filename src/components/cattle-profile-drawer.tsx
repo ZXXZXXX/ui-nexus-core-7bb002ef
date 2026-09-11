@@ -7,26 +7,16 @@ import {
   Radio,
   Activity,
   ChevronRight,
-  ChevronDown,
   ArrowRight,
   FilePlus2,
-  MessageSquareWarning,
   ListChecks,
   Image as ImageIcon,
   AlertTriangle,
 } from "lucide-react";
-import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { markAlertHandled } from "@/lib/alert-store";
 
 /**
  * PC「牛只信息」档案详情抽屉。
@@ -281,13 +271,11 @@ export function CattleProfileDrawer({
   const scrollRef = useRef<HTMLDivElement>(null);
 
 
-  const [observed, setObserved] = useState(false);
   const [activeDevice, setActiveDevice] = useState<Device | null>(null);
 
   if (!cow) return null;
 
-  const health = observed ? "观察中" : cow.health;
-  const abnormal = cow.health === "异常" || cow.health === "观察中" || observed;
+  const health = cow.health;
 
 
   const healthCls =
@@ -347,28 +335,6 @@ export function CattleProfileDrawer({
                     <span className="h-1.5 w-1.5 rounded-full bg-current" />
                     {health}
                   </span>
-                  {abnormal && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-6 px-2 rounded-full text-caption font-normal gap-1 bg-card">
-                          <MessageSquareWarning className="h-3.5 w-3.5" />
-                          异常反馈
-                          <ChevronDown className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-36">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setObserved(true);
-                            markAlertHandled(cow.ear);
-                            toast.success("已转为观察中，次日 00:00 自动解除");
-                          }}
-                        >
-                          继续观察
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
                 </div>
                 <div className="mt-2 flex items-center gap-x-3 gap-y-1 flex-wrap text-body-sm text-text-secondary">
                   <span className="inline-flex items-center gap-1.5">

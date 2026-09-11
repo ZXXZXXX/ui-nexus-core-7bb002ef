@@ -3,9 +3,7 @@ import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Beef, Search, SlidersHorizontal, MoreHorizontal, FilePlus2, Baby, Stethoscope, ArrowRightLeft, LogOut, Upload } from "lucide-react";
-import { toast } from "sonner";
+import { Beef, Search, SlidersHorizontal, Upload } from "lucide-react";
 import { useState } from "react";
 import { CattleProfileDrawer, type CattleProfile } from "@/components/cattle-profile-drawer";
 import { ImportExamResultsDialog } from "@/components/import-exam-results-dialog";
@@ -137,35 +135,6 @@ function CattlePage() {
               </div>
               <div className="w-[170px] shrink-0 flex items-center justify-end gap-0.5">
                 <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground" onClick={() => openProfile(c)}>查看</Button>
-                
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-text-secondary hover:bg-surface-subtle hover:text-foreground" aria-label="更多">
-                      <MoreHorizontal className="h-3.5 w-3.5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuSub>
-                      <DropdownMenuSubTrigger>
-                        <FilePlus2 className="h-3.5 w-3.5 mr-2" /> 记录事件
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuSubContent className="w-36">
-                        <DropdownMenuItem onClick={() => toast.info(`#${c.ear} 产犊记录`)}>
-                          <Baby className="h-3.5 w-3.5 mr-2" /> 产犊记录
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info(`#${c.ear} 基础检查`)}>
-                          <Stethoscope className="h-3.5 w-3.5 mr-2" /> 基础检查
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info(`#${c.ear} 转栏/转群`)}>
-                          <ArrowRightLeft className="h-3.5 w-3.5 mr-2" /> 转栏/转群
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info(`#${c.ear} 离场记录`)}>
-                          <LogOut className="h-3.5 w-3.5 mr-2" /> 离场记录
-                        </DropdownMenuItem>
-                      </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
             </div>
           ))}
