@@ -40,6 +40,8 @@ export type ListColumn<T> = {
   options?: string[];
   /** horizontal alignment of header + cell. default: left */
   align?: "left" | "right";
+  /** grid track size, e.g. "7em"; default minmax(0, 1fr) */
+  width?: string;
   /** hidden by default in column settings */
   defaultHidden?: boolean;
   /** cannot be hidden */
