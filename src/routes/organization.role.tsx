@@ -688,12 +688,37 @@ function RolePage() {
         ]),
       ),
     );
-  /** 功能下的可选范围（工单类型 / 基础事件类型） */
-  const toggleMiniScope = (mKey: string, fKey: string, t: string) =>
+  /** 全局可选范围（工单类型 / 基础事件类型）——所有功能通用，仅需选择一次 */
+  const globalScope = (kind: MiniScope): string[] => {
+    for (const m of miniSpec) {
+      for (const f of m.funcs) {
+        if (f.scope === kind) return cur?.mini[m.key][f.key].scope ?? [];
+      }
+    }
+    return [];
+  };
+  const toggleGlobalScope = (kind: MiniScope, t: string) =>
     mutateMini((m) => {
-      const p = m[mKey][fKey];
-      const scope = p.scope.includes(t) ? p.scope.filter((x) => x !== t) : [...p.scope, t];
-      return { ...m, [mKey]: { ...m[mKey], [fKey]: { ...p, scope } } };
+      const curList = (() => {
+        for (const mod of miniSpec) {
+          for (const f of mod.funcs) {
+            if (f.scope === kind) return m[mod.key][f.key].scope;
+          }
+        }
+        return [] as string[];
+      })();
+      const next = curList.includes(t) ? curList.filter((x) => x !== t) : [...curList, t];
+      return Object.fromEntries(
+        miniSpec.map((mod) => [
+          mod.key,
+          Object.fromEntries(
+            mod.funcs.map((f) => [
+              f.key,
+              f.scope === kind ? { ...m[mod.key][f.key], scope: next } : m[mod.key][f.key],
+            ]),
+          ),
+        ]),
+      ) as MiniPerms;
     });
 
 
@@ -1262,43 +1287,6 @@ function RolePage() {
                                       </label>
                                     ))}
                                   </div>
-
-                                  {m.funcs
-                                    .filter((f) => f.scope && fs[f.key].on)
-                                    .map((f) => (
-                                      <div
-                                        key={`${f.key}-scope`}
-                                        className="rounded-md bg-surface-subtle px-3 py-2"
-                                      >
-                                        <div className="text-caption text-text-tertiary mb-1.5">
-                                          {f.name} · {scopeLabel(f.scope!)}
-                                          <span className="ml-1">
-                                            （已选 {fs[f.key].scope.length}/
-                                            {scopeOptions(f.scope!).length}）
-                                          </span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-1.5">
-                                          {scopeOptions(f.scope!).map((t) => {
-                                            const on = fs[f.key].scope.includes(t);
-                                            return (
-                                              <button
-                                                key={t}
-                                                type="button"
-                                                disabled={!editable}
-                                                onClick={() => toggleMiniScope(m.key, f.key, t)}
-                                                className={`px-2 py-0.5 rounded-md border text-caption transition-colors ${
-                                                  on
-                                                    ? "border-primary text-primary bg-primary/5"
-                                                    : "border-border text-text-tertiary bg-card"
-                                                } ${editable ? "cursor-pointer" : "cursor-default"}`}
-                                              >
-                                                {t}
-                                              </button>
-                                            );
-                                          })}
-                                        </div>
-                                      </div>
-                                    ))}
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -1307,6 +1295,46 @@ function RolePage() {
                       </TableBody>
                     </Table>
                   </div>
+
+                  {/* 通用范围：工单类型 / 基础事件类型，全局仅需选择一次 */}
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                    {(["wo", "event"] as MiniScope[]).map((kind) => {
+                      const opts = scopeOptions(kind);
+                      const sel = globalScope(kind);
+                      return (
+                        <div key={kind} className="rounded-md border border-border bg-surface-subtle px-3 py-2.5">
+                          <div className="text-caption text-text-tertiary mb-2">
+                            {scopeLabel(kind)}
+                            <span className="ml-1">
+                              （已选 {sel.length}/{opts.length}，对上述所有相关功能通用）
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {opts.map((t) => {
+                              const on = sel.includes(t);
+                              return (
+                                <button
+                                  key={t}
+                                  type="button"
+                                  disabled={!editable}
+                                  onClick={() => toggleGlobalScope(kind, t)}
+                                  className={`px-2 py-0.5 rounded-md border text-caption transition-colors ${
+                                    on
+                                      ? "border-primary text-primary bg-primary/5"
+                                      : "border-border text-text-tertiary bg-card"
+                                  } ${editable ? "cursor-pointer" : "cursor-default"}`}
+                                >
+                                  {t}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+
 
 
                 </section>
