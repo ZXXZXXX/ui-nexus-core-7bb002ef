@@ -265,7 +265,8 @@ const WO_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干
 const EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场"];
 
 type MiniScope = "wo" | "event";
-type MiniFuncDef = { key: string; name: string; scope?: MiniScope };
+type MiniViewDef = { key: string; name: string };
+type MiniFuncDef = { key: string; name: string; scope?: MiniScope; views?: MiniViewDef[] };
 type MiniModuleDef = { key: string; name: string; funcs: MiniFuncDef[] };
 
 const scopeOptions = (s: MiniScope) => (s === "wo" ? WO_TYPES : EVENT_TYPES);
@@ -278,7 +279,14 @@ const miniSpec: MiniModuleDef[] = [
     name: "首页",
     funcs: [
       { key: "work-status", name: "签到卡片" },
-      { key: "ops", name: "查看运营概览" },
+      {
+        key: "ops",
+        name: "查看运营概览",
+        views: [
+          { key: "ops", name: "运营概览" },
+          { key: "work", name: "工作概览" },
+        ],
+      },
     ],
   },
   {
