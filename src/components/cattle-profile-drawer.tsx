@@ -331,10 +331,14 @@ export function CattleProfileDrawer({
       >
         {/* 头部：品牌化身份区 */}
         <header className="shrink-0 border-b border-border bg-card">
-          <div className="px-7 pt-6 pb-5 bg-[linear-gradient(180deg,var(--brand-subtle,#EFFBF1)_0%,transparent_100%)]">
+          <div
+            className="px-7 pt-6 pb-5 transition-colors"
+            style={{ backgroundImage: `linear-gradient(180deg, ${headerTint} 0%, transparent 100%)` }}
+          >
             <div className="flex items-start gap-4">
-              <span className="h-12 w-12 rounded-xl bg-card border border-border text-primary inline-flex items-center justify-center shrink-0 shadow-sm">
+              <span className={`h-12 w-12 rounded-xl bg-card border border-border inline-flex items-center justify-center shrink-0 shadow-sm ${iconTone}`}>
                 <Beef className="h-5 w-5" />
+              </span>
               </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
