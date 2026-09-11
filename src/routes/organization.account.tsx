@@ -278,25 +278,29 @@ function AccountPage() {
     setBatchOpen(false);
   };
 
-  // 筛选状态
+  // 筛选状态（与通用列表一致：搜索 + 筛选/列设置抽屉）
   const [keyword, setKeyword] = useState("");
-  const [onlyInternal, setOnlyInternal] = useState(false);
-  const [filterRole, setFilterRole] = useState<string>("all");
-  const [filterFarms, setFilterFarms] = useState<string[]>([]);
-  const [filterStatus, setFilterStatus] = useState<"all" | Status>("all");
-  const [advOpen, setAdvOpen] = useState(false);
-  const [farmFilterOpen, setFarmFilterOpen] = useState(false);
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [draft, setDraft] = useState<Record<string, string>>({});
+  const [visible, setVisible] = useState<string[]>(
+    ACCOUNT_COLUMNS.filter((c) => !c.defaultHidden).map((c) => c.key),
+  );
+  const [draftVisible, setDraftVisible] = useState<string[]>(visible);
+  const [filterOpen, setFilterOpen] = useState(false);
 
-  const resetAdv = () => {
-    setFilterRole("all");
-    setFilterFarms([]);
-    setFilterStatus("all");
-  };
+  const activeFilterCount = Object.values(filters).filter((v) => v && v !== "__all").length;
+  const shownCols = ACCOUNT_COLUMNS.filter((c) => visible.includes(c.key));
+  const isShown = (key: string) => visible.includes(key);
+  const optionsFor = (key: string, opts?: string[]) =>
+    opts ??
+    Array.from(
+      new Set(
+        accounts.flatMap((a) =>
+          key === "role" ? rolesOf(a) : key === "farms" ? farmsOf(a) : [cellValue(a, key)],
+        ),
+      ),
+    ).filter(Boolean);
 
-  const advCount =
-    (filterRole !== "all" ? 1 : 0) +
-    (filterFarms.length > 0 ? 1 : 0) +
-    (filterStatus !== "all" ? 1 : 0);
 
   const toggleStatus = (id: string) => {
     setAccounts((list) =>
