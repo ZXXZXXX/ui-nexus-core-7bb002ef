@@ -1280,7 +1280,7 @@ function ScreeningHistory() {
                 navigate({ to: "/production/disease" });
               }}
             >
-              查看详情
+              查看
             </Button>
           </div>
         </DialogContent>
