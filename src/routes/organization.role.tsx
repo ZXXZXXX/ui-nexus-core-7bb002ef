@@ -1296,20 +1296,43 @@ function RolePage() {
                             <div key={m.key} className="flex flex-col flex-1 min-h-0">
                               <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2">
                                 {m.funcs.map((f) => (
-                                  <label
-                                    key={f.key}
-                                    className={`inline-flex items-center gap-2 ${
-                                      editable ? "cursor-pointer" : ""
-                                    }`}
-                                  >
-                                    <Checkbox
-                                      checked={fs[f.key].on}
-                                      disabled={!editable}
-                                      onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
-                                      className="h-[16px] w-[16px]"
-                                    />
-                                    <span className="text-body-sm text-text-secondary">{f.name}</span>
-                                  </label>
+                                  <div key={f.key} className="flex flex-col gap-1.5">
+                                    <label
+                                      className={`inline-flex items-center gap-2 ${
+                                        editable ? "cursor-pointer" : ""
+                                      }`}
+                                    >
+                                      <Checkbox
+                                        checked={fs[f.key].on}
+                                        disabled={!editable}
+                                        onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
+                                        className="h-[16px] w-[16px]"
+                                      />
+                                      <span className="text-body-sm text-text-secondary">{f.name}</span>
+                                    </label>
+                                    {f.views && fs[f.key].on ? (
+                                      <div className="ml-6 flex items-center gap-4">
+                                        {f.views.map((v) => (
+                                          <label
+                                            key={v.key}
+                                            className={`inline-flex items-center gap-1.5 ${
+                                              editable ? "cursor-pointer" : ""
+                                            }`}
+                                          >
+                                            <input
+                                              type="radio"
+                                              name={`mini-view-${m.key}-${f.key}`}
+                                              className="h-[14px] w-[14px] accent-primary"
+                                              disabled={!editable}
+                                              checked={(fs[f.key].view ?? f.views![0]!.key) === v.key}
+                                              onChange={() => setMiniView(m.key, f.key, v.key)}
+                                            />
+                                            <span className="text-caption text-text-tertiary">{v.name}</span>
+                                          </label>
+                                        ))}
+                                      </div>
+                                    ) : null}
+                                  </div>
                                 ))}
                               </div>
                               {m.key === "workorder" ? (
