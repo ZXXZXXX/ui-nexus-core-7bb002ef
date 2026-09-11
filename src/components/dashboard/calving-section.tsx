@@ -21,6 +21,12 @@ const sexRatio = [
   { name: "公犊", value: 79, color: "var(--effect-ai-cyan)" },
 ];
 
+// 母牛胎次：头胎 / 经产
+const parityOrderDist = [
+  { name: "头胎", value: 62, color: "var(--effect-ai-cyan)" },
+  { name: "经产", value: 108, color: "var(--brand)" },
+];
+
 const birthWeight = [
   { name: "< 30 kg", value: 12, color: "var(--state-warning)" },
   { name: "30 - 35 kg", value: 40, color: "var(--effect-ai-cyan)" },
