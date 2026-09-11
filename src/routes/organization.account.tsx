@@ -1662,21 +1662,10 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
                             )}
                           </div>
                         </div>
-                        <div className="flex items-start gap-3">
-                          <div className="w-20 shrink-0 pt-0.5 text-body-sm text-foreground">基础事件</div>
-                          <div className="flex flex-wrap gap-1">
-                            {perms.eventTypes.length === 0 ? (
-                              <span className="text-caption text-text-tertiary">未开放</span>
-                            ) : (
-                              perms.eventTypes.map((t) => (
-                                <span key={t} className="tag tag-muted whitespace-nowrap">{t}</span>
-                              ))
-                            )}
-                          </div>
-                        </div>
                         <p className="text-caption text-text-tertiary">
                           可查看、操作的工单与任务范围仅限于以上开放类型。
                         </p>
+
                       </div>
                     </PermBlock>
                   </div>
