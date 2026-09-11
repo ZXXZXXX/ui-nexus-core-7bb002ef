@@ -260,29 +260,95 @@ const navSpec: NavGroupDef[] = [
 
 
 
-type MiniEventKey =
-  | "disease"
-  | "hoof"
-  | "drying"
-  | "vaccine"
-  | "postpartum"
-  | "deworm"
-  | "general";
+/** 小程序模块与功能权限 */
+const WO_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干奶", "驱虫", "普修"];
+const EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场", "异常排查"];
 
-type MiniActionKey = "report" | "execute";
+type MiniScope = "wo" | "event";
+type MiniFuncDef = { key: string; name: string; scope?: MiniScope };
+type MiniModuleDef = { key: string; name: string; funcs: MiniFuncDef[] };
 
-const miniEvents: {
-  key: MiniEventKey;
-  name: string;
-  actions: Record<MiniActionKey, string>;
-}[] = [
-  { key: "disease", name: "疾病治疗", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "hoof", name: "修蹄", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "drying", name: "干奶", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "vaccine", name: "疫苗", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "postpartum", name: "产后护理", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "deworm", name: "驱虫", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "general", name: "普修", actions: { report: "可上报", execute: "可响应 / 执行" } },
+const scopeOptions = (s: MiniScope) => (s === "wo" ? WO_TYPES : EVENT_TYPES);
+const scopeLabel = (s: MiniScope) => (s === "wo" ? "可选工单类型" : "可选基础事件类型");
+
+const miniSpec: MiniModuleDef[] = [
+  {
+    key: "home",
+    name: "首页",
+    funcs: [
+      { key: "work-status", name: "确认工作状态" },
+      { key: "ops", name: "查看运营概览" },
+    ],
+  },
+  {
+    key: "report",
+    name: "现场上报",
+    funcs: [
+      { key: "health", name: "健康上报" },
+      { key: "loss", name: "药品损耗上报" },
+      { key: "return", name: "药品退料上报" },
+    ],
+  },
+  {
+    key: "prep",
+    name: "备药",
+    funcs: [
+      { key: "prep-done", name: "完成备药" },
+      { key: "level3", name: "查询三级库" },
+    ],
+  },
+  {
+    key: "task",
+    name: "任务处理",
+    funcs: [
+      { key: "view", name: "查看任务" },
+      { key: "diagnose", name: "诊断任务", scope: "wo" },
+      { key: "execute-wo", name: "执行工单任务", scope: "wo" },
+      { key: "execute-event", name: "执行基础事件任务", scope: "event" },
+      { key: "abnormal", name: "处理异常排查任务" },
+      { key: "review", name: "完成复查" },
+      { key: "assign", name: "指定任务责任人" },
+      { key: "batch", name: "批量执行任务" },
+    ],
+  },
+  {
+    key: "workorder",
+    name: "工单管理",
+    funcs: [
+      { key: "view", name: "查看工单", scope: "wo" },
+      { key: "abort", name: "终止工单", scope: "wo" },
+    ],
+  },
+  {
+    key: "kb",
+    name: "知识查询",
+    funcs: [
+      { key: "symptom", name: "查询症状" },
+      { key: "disease", name: "查询疾病" },
+      { key: "drug", name: "查询药品" },
+    ],
+  },
+  {
+    key: "cattle",
+    name: "牛只档案",
+    funcs: [
+      { key: "view", name: "查看牛只档案" },
+      { key: "alert", name: "处理异常预警" },
+      { key: "calving", name: "记录产犊" },
+      { key: "exam", name: "记录基础检查" },
+      { key: "transfer", name: "记录转栏 / 转群" },
+      { key: "leave", name: "记录离场" },
+    ],
+  },
+  { key: "message", name: "消息中心", funcs: [{ key: "view", name: "查看消息" }] },
+  {
+    key: "me",
+    name: "个人中心",
+    funcs: [
+      { key: "drafts", name: "管理健康上报草稿" },
+      { key: "feedback", name: "提交帮助与反馈" },
+    ],
+  },
 ];
 
 /** 工作台可选的 4 套定制化看板视图 */
