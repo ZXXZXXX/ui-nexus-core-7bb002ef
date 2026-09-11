@@ -1040,7 +1040,7 @@ function RolePage() {
                                 {g.name}
                               </span>
                               {locked && (
-                                <span className="ml-auto text-caption text-primary">必开</span>
+                                <span className="ml-auto text-caption text-primary">必选</span>
                               )}
                             </div>
                           );
