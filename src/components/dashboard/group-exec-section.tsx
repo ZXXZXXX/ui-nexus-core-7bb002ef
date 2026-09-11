@@ -672,34 +672,100 @@ function GranularityTabs({ value, onChange }: { value: Granularity; onChange: (g
   );
 }
 
-/** 按时间维度生成横轴标签与波动因子：日度近 15 天 / 月度近 12 个月 / 年度近 12 年 */
-export function axisFor(g: Granularity = "month") {
-  if (g === "day") {
-    const now = new Date(2026, 8, 11);
-    const labels: string[] = [];
-    const factors: number[] = [];
-    for (let i = 14; i >= 0; i--) {
-      const d = new Date(now.getTime() - i * 86400000);
+const NOW = new Date(2026, 8, 11);
+/** 每个维度可回溯的最大周期数（拖动到底后不再向前） */
+const MAX_BACK: Record<Granularity, number> = { day: 90, month: 36, year: 24 };
+const WINDOW: Record<Granularity, number> = { day: 15, month: 12, year: 12 };
+
+/**
+ * 按时间维度生成横轴标签与波动因子。
+ * offset 为向前回溯的周期数（0 = 最新窗口）：日度 15 天 / 月度 12 个月 / 年度 12 年。
+ */
+export function axisFor(g: Granularity = "month", offset = 0) {
+  const n = WINDOW[g];
+  const labels: string[] = [];
+  const factors: number[] = [];
+  for (let i = n - 1; i >= 0; i--) {
+    const back = i + offset;
+    if (g === "day") {
+      const d = new Date(NOW.getTime() - back * 86400000);
       labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
-      factors.push(Number((0.86 + 0.28 * ((Math.sin(i * 1.7) + 1) / 2)).toFixed(3)));
+      factors.push(Number((0.86 + 0.28 * ((Math.sin(back * 1.7) + 1) / 2)).toFixed(3)));
+    } else if (g === "year") {
+      labels.push(`${NOW.getFullYear() - back}年`);
+      factors.push(Number((0.88 + 0.24 * ((Math.sin(back * 0.9) + 1) / 2)).toFixed(3)));
+    } else {
+      const d = new Date(NOW.getFullYear(), NOW.getMonth() - back, 1);
+      labels.push(`${d.getMonth() + 1}月`);
+      factors.push(MONTH_FACTORS[((d.getMonth() % 12) + 12) % 12]);
     }
-    return { labels, factors };
   }
-  if (g === "year") {
-    const labels: number[] = [];
-    for (let i = 11; i >= 0; i--) labels.push(2026 - i);
-    return {
-      labels: labels.map((y) => `${y}年`),
-      factors: labels.map((_, i) => Number((0.88 + 0.24 * ((Math.sin(i * 0.9) + 1) / 2)).toFixed(3))),
-    };
-  }
-  return { labels: ALL_MONTHS, factors: MONTH_FACTORS };
+  return { labels, factors };
+}
+
+/** 趋势图左右拖动：向右拖看更早的数据，向左拖回到最新 */
+function PannableChart({
+  granularity,
+  offset,
+  onOffsetChange,
+  children,
+}: {
+  granularity: Granularity;
+  offset: number;
+  onOffsetChange: (v: number) => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; base: number } | null>(null);
+  const max = MAX_BACK[granularity];
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    drag.current = { x: e.clientX, base: offset };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || !ref.current) return;
+    const step = ref.current.clientWidth / WINDOW[granularity];
+    const next = Math.max(0, Math.min(max, d.base + Math.round((e.clientX - d.x) / step)));
+    if (next !== offset) onOffsetChange(next);
+  };
+  const endDrag = (e: React.PointerEvent) => {
+    drag.current = null;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch { /* ignore */ }
+  };
+
+  return (
+    <div
+      ref={ref}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      className="cursor-grab active:cursor-grabbing select-none"
+      style={{ touchAction: "pan-y" }}
+    >
+      {children}
+    </div>
+  );
 }
 
 function usePeriod(initial: Granularity = "month") {
-  const [granularity, setGranularity] = useState<Granularity>(initial);
-  const { labels, factors } = useMemo(() => axisFor(granularity), [granularity]);
-  return { labels, factors, granularity, setGranularity };
+  const [granularity, setG] = useState<Granularity>(initial);
+  const [offset, setOffset] = useState(0);
+  const setGranularity = (g: Granularity) => {
+    setG(g);
+    setOffset(0);
+  };
+  const { labels, factors } = useMemo(() => axisFor(granularity, offset), [granularity, offset]);
+  // 预加载相邻窗口的数据，拖动时无需等待计算
+  useMemo(() => {
+    axisFor(granularity, Math.min(MAX_BACK[granularity], offset + WINDOW[granularity]));
+    axisFor(granularity, Math.max(0, offset - WINDOW[granularity]));
+  }, [granularity, offset]);
+  return { labels, factors, granularity, setGranularity, offset, setOffset };
 }
 
 type TrendProps = {
