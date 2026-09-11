@@ -1406,6 +1406,7 @@ function CreateDialog({
         name: name.trim(),
         phone: phone.trim(),
         userType,
+        source: "兽医系统",
         farmRoles: effectiveFarmRoles,
         wecomId: null,
         wechatId: null,
