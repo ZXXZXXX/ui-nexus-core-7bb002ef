@@ -63,7 +63,15 @@ const healthToProfile: Record<Health, CattleProfile["health"]> = {
   死淘: "死淘",
 };
 
+function withdrawalUntilOf(days: number) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + days);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function toProfile(c: Cow): CattleProfile {
+
   const ageDays = Math.max(1, Math.round((Date.now() - new Date(c.birth).getTime()) / 86400000));
   return {
     ear: c.ear,
@@ -74,8 +82,9 @@ function toProfile(c: Cow): CattleProfile {
     type: c.type,
     ageDays,
     health: healthToProfile[c.health],
-    withdrawalDays: c.health === "治疗中" ? 3 : 0,
-    withdrawalUntil: "2026-08-13",
+    withdrawalDays: c.health === "治疗中" ? 3 : c.health === "观察中" ? 5 : 0,
+    withdrawalUntil: withdrawalUntilOf(c.health === "治疗中" ? 3 : c.health === "观察中" ? 5 : 0),
+
     lactationDays: c.sex === "♀" ? 168 : 0,
     pregnancyDays: c.health === "健康" && c.sex === "♀" ? 92 : 0,
     parity: c.parity,
