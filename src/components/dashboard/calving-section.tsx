@@ -21,6 +21,12 @@ const sexRatio = [
   { name: "公犊", value: 79, color: "var(--effect-ai-cyan)" },
 ];
 
+// 母牛胎次：头胎 / 经产
+const parityOrderDist = [
+  { name: "头胎", value: 62, color: "var(--effect-ai-cyan)" },
+  { name: "经产", value: 108, color: "var(--brand)" },
+];
+
 const birthWeight = [
   { name: "< 30 kg", value: 12, color: "var(--state-warning)" },
   { name: "30 - 35 kg", value: 40, color: "var(--effect-ai-cyan)" },
@@ -39,6 +45,7 @@ const difficulty = [
 const TAB_PARITY = "胎型分布";
 const TAB_SEX = "性别比例";
 const TAB_WEIGHT = "体重分布";
+const TAB_ORDER = "胎次分布";
 
 const VIEW_CALF = "犊牛情况";
 const VIEW_COW = "母牛情况";
@@ -60,7 +67,16 @@ export function CalvingSection() {
   const survivalData = scaleList(survival, factor);
   const difficultyData = scaleList(difficulty, factor);
   const total = alive + scaleValue(deadTotal, factor);
-  const detail = scaleList(tab === TAB_PARITY ? parityDist : tab === TAB_SEX ? sexRatio : birthWeight, factor);
+  const detail = scaleList(
+    tab === TAB_PARITY
+      ? parityDist
+      : tab === TAB_SEX
+        ? sexRatio
+        : tab === TAB_ORDER
+          ? parityOrderDist
+          : birthWeight,
+    factor,
+  );
 
   return (
     <SectionCard
@@ -69,7 +85,7 @@ export function CalvingSection() {
       desc={
         <div className="flex items-center gap-3 flex-wrap">
           {view === VIEW_CALF && drill ? (
-            <PeriodTabs value={tab} onChange={setTab} options={[TAB_PARITY, TAB_SEX, TAB_WEIGHT]} />
+            <PeriodTabs value={tab} onChange={setTab} options={[TAB_PARITY, TAB_ORDER, TAB_SEX, TAB_WEIGHT]} />
           ) : (
             <PeriodTabs
               value={view}
