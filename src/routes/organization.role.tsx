@@ -685,6 +685,12 @@ function RolePage() {
       [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], on: v } },
     }));
   };
+  /** 功能视角单选 */
+  const setMiniView = (mKey: string, fKey: string, view: string) =>
+    mutateMini((m) => ({
+      ...m,
+      [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], view } },
+    }));
   /** 模块整行 */
   const setMiniModule = (mKey: string, v: boolean) =>
     mutateMini((m) => ({
