@@ -446,7 +446,7 @@ export function ListPage<T>({
                 {rowActions && (
                   <div
                     className="sticky right-0 z-20 shrink-0 text-right pl-2 pr-6 border-l border-border bg-surface-subtle"
-                    style={{ width: actionsWidth }}
+                    style={{ width: actionsWidth + 32 }}
                   >
                     操作
                   </div>
@@ -481,7 +481,7 @@ export function ListPage<T>({
                   {rowActions && (
                     <div
                       className="sticky right-0 z-10 shrink-0 flex items-center justify-end gap-0.5 pl-2 pr-6 border-l border-border bg-card group-hover/row:bg-surface-subtle"
-                      style={{ width: actionsWidth }}
+                      style={{ width: actionsWidth + 32 }}
                       onClick={(e) => e.stopPropagation()}
                     >
                       {rowActions(row)}
