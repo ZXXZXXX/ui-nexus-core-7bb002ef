@@ -1282,7 +1282,6 @@ function FarmRolePicker({
             <>
               <div className="px-4 pt-3 pb-2 flex items-center gap-3">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="tag tag-brand whitespace-nowrap">{activeRole}</span>
                   <span className="text-caption text-text-tertiary whitespace-nowrap">
                     已分配 {activeFarmsSet.size} 个牧场
                   </span>
