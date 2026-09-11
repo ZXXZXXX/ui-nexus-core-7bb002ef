@@ -100,9 +100,6 @@ type Account = {
   createdAt: string;
 };
 
-// 来源决定人员类型标签：人事系统同步默认「内部」，兽医系统创建默认「外部」
-const userTypeOfSource = (s: Source): UserType => (s === "人事系统" ? "内部" : "外部");
-
 // 脱敏：保留前 4 后 3，中间以 **** 替代；过短时仅保留首尾各 1
 const maskId = (id: string) => {
   if (id.length <= 7) {
