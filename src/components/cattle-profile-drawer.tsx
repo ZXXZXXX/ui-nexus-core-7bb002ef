@@ -12,6 +12,7 @@ import {
   ListChecks,
   Image as ImageIcon,
   AlertTriangle,
+  Dna,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
