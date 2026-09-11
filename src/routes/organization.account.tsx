@@ -570,10 +570,9 @@ function AccountPage() {
                   aria-label={`选择 ${a.name}`}
                 />
               </div>
-              <div className="leading-tight min-w-0">
-                <div className="text-body text-foreground truncate">{a.name}</div>
-                <div className="text-caption text-text-tertiary font-mono">{a.id}</div>
-              </div>
+              <div className="text-body-sm text-text-secondary font-mono truncate">{a.id}</div>
+              <div className="text-body text-foreground truncate">{a.name}</div>
+              <div className="text-body-sm text-text-secondary font-mono truncate">{a.employeeNo}</div>
               <div className="text-body-sm text-text-secondary truncate">{a.source}</div>
               <div><span className={`tag ${userTypeTagClass(a.userType)}`}>{a.userType}</span></div>
               <div className="text-body-sm text-text-secondary tabular-nums">{maskPhone(a.phone)}</div>
