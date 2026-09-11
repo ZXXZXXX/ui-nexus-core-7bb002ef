@@ -474,7 +474,8 @@ function DrugComboChart({
   );
 }
 
-function DrugTrendSection({ scopeRegion, granularity = "month" }: { scopeRegion?: string | null; granularity?: Granularity }) {
+function DrugTrendSection({ scopeRegion, granularity: initialG = "month" }: { scopeRegion?: string | null; granularity?: Granularity }) {
+  const [granularity, setGranularity] = useState<Granularity>(initialG);
   // 区域视角：总药费按该区域药费占比折算，单头药费按区域实际水平折算
   const { feeRatio, headRatio } = useMemo(() => {
     if (!scopeRegion) return { feeRatio: 1, headRatio: 1 };
@@ -500,9 +501,7 @@ function DrugTrendSection({ scopeRegion, granularity = "month" }: { scopeRegion?
       desc={<span className="tag tag-muted">{scopeRegion ?? "全部牧场"}</span>}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <span className="text-caption text-text-tertiary">
-          {granularity === "day" ? "近 15 天" : granularity === "year" ? "近 12 年" : "近 12 个月"}
-        </span>
+        <GranularityTabs value={granularity} onChange={setGranularity} />
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
@@ -659,6 +658,20 @@ function useScopeRatio(scopeRegion?: string | null) {
 
 export type Granularity = "day" | "month" | "year";
 
+const G_LABEL: Record<Granularity, string> = { day: "日度", month: "月度", year: "年度" };
+const G_VALUE: Record<string, Granularity> = { "日度": "day", "月度": "month", "年度": "year" };
+
+/** 单个趋势图卡片内的时间维度选择器 */
+function GranularityTabs({ value, onChange }: { value: Granularity; onChange: (g: Granularity) => void }) {
+  return (
+    <TimeTabs
+      value={G_LABEL[value]}
+      onChange={(v) => onChange(G_VALUE[v] ?? "month")}
+      options={["日度", "月度", "年度"]}
+    />
+  );
+}
+
 /** 按时间维度生成横轴标签与波动因子：日度近 15 天 / 月度近 12 个月 / 年度近 12 年 */
 export function axisFor(g: Granularity = "month") {
   if (g === "day") {
@@ -683,9 +696,10 @@ export function axisFor(g: Granularity = "month") {
   return { labels: ALL_MONTHS, factors: MONTH_FACTORS };
 }
 
-function usePeriod(granularity: Granularity = "month") {
+function usePeriod(initial: Granularity = "month") {
+  const [granularity, setGranularity] = useState<Granularity>(initial);
   const { labels, factors } = useMemo(() => axisFor(granularity), [granularity]);
-  return { labels, factors };
+  return { labels, factors, granularity, setGranularity };
 }
 
 type TrendProps = {
@@ -696,8 +710,8 @@ type TrendProps = {
 
 /* ---------------- 产后淘汰率趋势 ---------------- */
 
-function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
-  const { labels, factors } = usePeriod(granularity);
+function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
+  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const s30 = factors.map((k) => Number((all.pp30 * k).toFixed(2)));
   const s60 = factors.map((k, i) => Number(Math.max(all.pp60 * k - s30[i], 0).toFixed(2)));
@@ -709,6 +723,7 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity }: TrendP
       title="产后淘汰率趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
       <StackedColumns
         labels={labels}
@@ -731,8 +746,8 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity }: TrendP
 
 /* ---------------- 牛只死淘变化趋势 ---------------- */
 
-function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
-  const { labels, factors } = usePeriod(granularity);
+function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
+  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const herd = all.herd || 1;
   const deathRate = factors.map((k) => Number(((all.death * k) / herd * 100).toFixed(2)));
@@ -744,6 +759,7 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity }: TrendPr
       title="牛只死淘变化趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
       <LineTrend
         labels={labels}
@@ -761,8 +777,8 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity }: TrendPr
 
 /* ---------------- 早产率变化趋势 ---------------- */
 
-function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
-  const { labels, factors } = usePeriod(granularity);
+function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
+  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const base = ((all.pp30 || 2) * 1.6) / 2 + 3.2;
   const points = factors.map((k) => Number((base * k).toFixed(2)));
@@ -774,6 +790,7 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity }: Tre
       title="早产率变化趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
       <SmoothAreaTrend
         labels={labels}
@@ -791,8 +808,8 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity }: Tre
 
 /* ---------------- 发病率 / 治愈率 / 平均诊疗天数趋势 ---------------- */
 
-function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
-  const { labels, factors } = usePeriod(granularity);
+function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
+  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
   const sickCount = factors.map((k) => Math.round(all.sick * (0.94 + (k - 1) * 0.5) * 62));
@@ -804,6 +821,7 @@ function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity }: Tre
       title="发病治愈趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
+      extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
       <DrugComboChart
         months={labels}

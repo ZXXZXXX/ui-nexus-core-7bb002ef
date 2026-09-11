@@ -876,7 +876,7 @@ function HomePage() {
               <Frame title="数据概览">
                 {cardsGrid}
               </Frame>
-              <Frame title="数据看板" extra={timeTabs}>
+              <Frame title="数据看板">
                 <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" granularity={timeScope} />
               </Frame>
               <Frame title="排名情况">
