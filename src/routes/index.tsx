@@ -464,7 +464,6 @@ function HomePage() {
             ? { ...c, ...farmOutCardOverride[c.anchor] }
             : c,
     )
-    .map(applyTimeScope)
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
       (a, b) =>
@@ -871,7 +870,7 @@ function HomePage() {
             const showAlert = topicOrder.includes("alert");
             return (
               <div className="space-y-6">
-                <Frame title="数据概览" extra={timeTabs}>{cardsGrid}</Frame>
+                <Frame title="数据概览">{cardsGrid}</Frame>
                 <Frame title="数据看板">{topicGrid}</Frame>
                 {showAlert && (
                   <div id="topic-alert" className="scroll-mt-24">
@@ -892,11 +891,11 @@ function HomePage() {
 
           return (
             <div className="space-y-6">
-              <Frame title="数据概览" extra={timeTabs}>
+              <Frame title="数据概览">
                 {cardsGrid}
               </Frame>
-              <Frame title="数据看板">
-                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" />
+              <Frame title="数据看板" extra={timeTabs}>
+                <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="charts" granularity={timeScope} />
               </Frame>
               <Frame title="排名情况">
                 <GroupExecSection scopeRegion={region} scopeFarm={farmScope} part="rank" />
