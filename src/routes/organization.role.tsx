@@ -1298,11 +1298,11 @@ function RolePage() {
                                 ))}
                               </div>
                               {m.key === "workorder" ? (
-                                <div className="mt-auto pt-4 text-caption text-text-tertiary">
+                                <div className="mt-auto whitespace-nowrap pt-4 text-right text-caption text-text-tertiary">
                                   可查看、操作的工单范围仅限于：开放的工单类型
                                 </div>
                               ) : m.key === "task" ? (
-                                <div className="mt-auto pt-4 text-caption text-text-tertiary">
+                                <div className="mt-auto whitespace-nowrap pt-4 text-right text-caption text-text-tertiary">
                                   可查看、操作的任务范围仅限于：开放的工单类型、基础事件类型
                                 </div>
                               ) : null}
