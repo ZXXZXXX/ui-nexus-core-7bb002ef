@@ -86,6 +86,7 @@ const RANGES: { key: QuickRange; label: string }[] = [
   { key: "today", label: "今日" },
   { key: "7d", label: "最近 7 天" },
   { key: "30d", label: "最近 30 天" },
+  { key: "custom", label: "自定义" },
 ];
 
 function raw<T>(col: ListColumn<T>, row: T): string {
