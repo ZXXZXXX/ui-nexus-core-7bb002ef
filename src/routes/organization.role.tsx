@@ -1118,6 +1118,19 @@ function RolePage() {
                                 {/* 一级菜单自身的操作能力 */}
                                 {!!g.actions?.length && (
                                   <div className="flex flex-wrap gap-x-5 gap-y-2">
+                                    <label
+                                      className={`inline-flex items-center gap-2 ${
+                                        editable ? "cursor-pointer" : "cursor-default"
+                                      }`}
+                                    >
+                                      <Checkbox
+                                        checked={gp.view}
+                                        disabled={!editable}
+                                        onCheckedChange={(v) => setGroupView(g.key, !!v)}
+                                        className="h-[16px] w-[16px]"
+                                      />
+                                      <span className="text-body-sm text-text-secondary">查看</span>
+                                    </label>
                                     {g.actions.map((act) => (
                                       <label
                                         key={act.key}
