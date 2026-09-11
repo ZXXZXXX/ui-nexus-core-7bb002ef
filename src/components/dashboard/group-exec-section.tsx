@@ -884,7 +884,7 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity: initi
 /* ---------------- 发病率 / 治愈率 / 平均诊疗天数趋势 ---------------- */
 
 function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
   const sickCount = factors.map((k) => Math.round(all.sick * (0.94 + (k - 1) * 0.5) * 62));
@@ -898,19 +898,22 @@ function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity: initi
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <DrugComboChart
-        months={labels}
-        totalFee={sickCount}
-        perHead={cureRate}
-        barUnit="头次"
-        lineUnit="%"
-        barLabel="发病数"
-        lineLabel="治愈率"
-        barHeadroom={1}
-        barColor="var(--state-warning)"
-        lineColor="var(--brand)"
-        extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <DrugComboChart
+          months={labels}
+          totalFee={sickCount}
+          perHead={cureRate}
+          barUnit="头次"
+          lineUnit="%"
+          barLabel="发病数"
+          lineLabel="治愈率"
+          barHeadroom={1}
+          barColor="var(--state-warning)"
+          lineColor="var(--brand)"
+          extraRows={(i) => [{ label: "平均诊疗天数", value: `${days[i]} 天` }]}
+        />
+      </PannableChart>
+
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-2">
         <span className="inline-flex items-center gap-1.5 text-body-sm text-text-secondary">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: "var(--state-warning)" }} />
