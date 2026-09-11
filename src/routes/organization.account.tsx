@@ -65,6 +65,7 @@ import {
   Plus,
   Search,
   Filter,
+  SlidersHorizontal,
   MoreHorizontal,
   Eye,
   Pencil,
