@@ -1287,43 +1287,6 @@ function RolePage() {
                                       </label>
                                     ))}
                                   </div>
-
-                                  {m.funcs
-                                    .filter((f) => f.scope && fs[f.key].on)
-                                    .map((f) => (
-                                      <div
-                                        key={`${f.key}-scope`}
-                                        className="rounded-md bg-surface-subtle px-3 py-2"
-                                      >
-                                        <div className="text-caption text-text-tertiary mb-1.5">
-                                          {f.name} · {scopeLabel(f.scope!)}
-                                          <span className="ml-1">
-                                            （已选 {fs[f.key].scope.length}/
-                                            {scopeOptions(f.scope!).length}）
-                                          </span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-1.5">
-                                          {scopeOptions(f.scope!).map((t) => {
-                                            const on = fs[f.key].scope.includes(t);
-                                            return (
-                                              <button
-                                                key={t}
-                                                type="button"
-                                                disabled={!editable}
-                                                onClick={() => toggleMiniScope(m.key, f.key, t)}
-                                                className={`px-2 py-0.5 rounded-md border text-caption transition-colors ${
-                                                  on
-                                                    ? "border-primary text-primary bg-primary/5"
-                                                    : "border-border text-text-tertiary bg-card"
-                                                } ${editable ? "cursor-pointer" : "cursor-default"}`}
-                                              >
-                                                {t}
-                                              </button>
-                                            );
-                                          })}
-                                        </div>
-                                      </div>
-                                    ))}
                                 </div>
                               </TableCell>
                             </TableRow>
