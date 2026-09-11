@@ -260,29 +260,95 @@ const navSpec: NavGroupDef[] = [
 
 
 
-type MiniEventKey =
-  | "disease"
-  | "hoof"
-  | "drying"
-  | "vaccine"
-  | "postpartum"
-  | "deworm"
-  | "general";
+/** 小程序模块与功能权限 */
+const WO_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干奶", "驱虫", "普修"];
+const EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场", "异常排查"];
 
-type MiniActionKey = "report" | "execute";
+type MiniScope = "wo" | "event";
+type MiniFuncDef = { key: string; name: string; scope?: MiniScope };
+type MiniModuleDef = { key: string; name: string; funcs: MiniFuncDef[] };
 
-const miniEvents: {
-  key: MiniEventKey;
-  name: string;
-  actions: Record<MiniActionKey, string>;
-}[] = [
-  { key: "disease", name: "疾病治疗", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "hoof", name: "修蹄", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "drying", name: "干奶", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "vaccine", name: "疫苗", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "postpartum", name: "产后护理", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "deworm", name: "驱虫", actions: { report: "可上报", execute: "可响应 / 执行" } },
-  { key: "general", name: "普修", actions: { report: "可上报", execute: "可响应 / 执行" } },
+const scopeOptions = (s: MiniScope) => (s === "wo" ? WO_TYPES : EVENT_TYPES);
+const scopeLabel = (s: MiniScope) => (s === "wo" ? "可选工单类型" : "可选基础事件类型");
+
+const miniSpec: MiniModuleDef[] = [
+  {
+    key: "home",
+    name: "首页",
+    funcs: [
+      { key: "work-status", name: "确认工作状态" },
+      { key: "ops", name: "查看运营概览" },
+    ],
+  },
+  {
+    key: "report",
+    name: "现场上报",
+    funcs: [
+      { key: "health", name: "健康上报" },
+      { key: "loss", name: "药品损耗上报" },
+      { key: "return", name: "药品退料上报" },
+    ],
+  },
+  {
+    key: "prep",
+    name: "备药",
+    funcs: [
+      { key: "prep-done", name: "完成备药" },
+      { key: "level3", name: "查询三级库" },
+    ],
+  },
+  {
+    key: "task",
+    name: "任务处理",
+    funcs: [
+      { key: "view", name: "查看任务" },
+      { key: "diagnose", name: "诊断任务", scope: "wo" },
+      { key: "execute-wo", name: "执行工单任务", scope: "wo" },
+      { key: "execute-event", name: "执行基础事件任务", scope: "event" },
+      { key: "abnormal", name: "处理异常排查任务" },
+      { key: "review", name: "完成复查" },
+      { key: "assign", name: "指定任务责任人" },
+      { key: "batch", name: "批量执行任务" },
+    ],
+  },
+  {
+    key: "workorder",
+    name: "工单管理",
+    funcs: [
+      { key: "view", name: "查看工单", scope: "wo" },
+      { key: "abort", name: "终止工单", scope: "wo" },
+    ],
+  },
+  {
+    key: "kb",
+    name: "知识查询",
+    funcs: [
+      { key: "symptom", name: "查询症状" },
+      { key: "disease", name: "查询疾病" },
+      { key: "drug", name: "查询药品" },
+    ],
+  },
+  {
+    key: "cattle",
+    name: "牛只档案",
+    funcs: [
+      { key: "view", name: "查看牛只档案" },
+      { key: "alert", name: "处理异常预警" },
+      { key: "calving", name: "记录产犊" },
+      { key: "exam", name: "记录基础检查" },
+      { key: "transfer", name: "记录转栏 / 转群" },
+      { key: "leave", name: "记录离场" },
+    ],
+  },
+  { key: "message", name: "消息中心", funcs: [{ key: "view", name: "查看消息" }] },
+  {
+    key: "me",
+    name: "个人中心",
+    funcs: [
+      { key: "drafts", name: "管理健康上报草稿" },
+      { key: "feedback", name: "提交帮助与反馈" },
+    ],
+  },
 ];
 
 /** 工作台可选的 4 套定制化看板视图 */
@@ -299,7 +365,8 @@ type LeafPerm = { view: boolean; actions: Record<string, boolean> };
 type GroupPerm = { view: boolean; leaves: Record<string, LeafPerm>; actions: Record<string, boolean> };
 type NavPerms = Record<string, GroupPerm>;
 type PcPerms = { allowLogin: boolean; nav: NavPerms; workbenchView: WorkbenchView };
-type MiniPerms = Record<MiniEventKey, Record<MiniActionKey, boolean>>;
+type MiniFuncPerm = { on: boolean; scope: string[] };
+type MiniPerms = Record<string, Record<string, MiniFuncPerm>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
 function buildNav(on: boolean, groupKeys?: string[]): NavPerms {
@@ -329,35 +396,32 @@ function buildNav(on: boolean, groupKeys?: string[]): NavPerms {
 function fullPc(allow = true, on = true): PcPerms {
   return { allowLogin: allow, workbenchView: "group", nav: buildNav(on) };
 }
-type MiniEventDef = (typeof miniEvents)[number];
-const hasAction = (e: MiniEventDef, a: MiniActionKey) => !!e.actions[a];
-const findEvent = (k: MiniEventKey) => miniEvents.find((x) => x.key === k)!;
+function buildMini(pick?: (mKey: string, fKey: string) => boolean): MiniPerms {
+  return miniSpec.reduce((acc, m) => {
+    acc[m.key] = m.funcs.reduce((a, f) => {
+      a[f.key] = {
+        on: pick ? pick(m.key, f.key) : false,
+        scope: f.scope ? [...scopeOptions(f.scope)] : [],
+      };
+      return a;
+    }, {} as Record<string, MiniFuncPerm>);
+    return acc;
+  }, {} as MiniPerms);
+}
 
 function fullMini(v = true): MiniPerms {
-  return miniEvents.reduce(
-    (acc, e) => ({
-      ...acc,
-      [e.key]: {
-        report: hasAction(e, "report") ? v : false,
-        execute: hasAction(e, "execute") ? v : false,
-      },
-    }),
-    {} as MiniPerms,
-  );
+  return buildMini(() => v);
 }
 function partialPc(keys: string[], workbenchView: WorkbenchView = "farm-internal"): PcPerms {
   return { allowLogin: true, workbenchView, nav: buildNav(false, keys) };
 }
 
-function partialMini(map: Partial<Record<MiniEventKey, Partial<Record<MiniActionKey, boolean>>>>): MiniPerms {
-  return miniEvents.reduce((acc, e) => {
-    const m = map[e.key] ?? {};
-    acc[e.key] = {
-      report: hasAction(e, "report") && !!m.report,
-      execute: hasAction(e, "execute") && !!m.execute,
-    };
-    return acc;
-  }, {} as MiniPerms);
+/** map：模块 key -> true（全部功能）或功能 key 数组 */
+function partialMini(map: Record<string, true | string[]>): MiniPerms {
+  return buildMini((mKey, fKey) => {
+    const v = map[mKey];
+    return v === true || (Array.isArray(v) && v.includes(fKey));
+  });
 }
 
 const defaultPerms: RolePerms = {
@@ -369,22 +433,29 @@ const defaultPerms: RolePerms = {
   vet: {
     pc: partialPc(["workorder", "drug", "diagnosis", "archive"]),
     mini: partialMini({
-      disease: { report: true, execute: true },
-      vaccine: { report: true, execute: true },
-      postpartum: { report: true, execute: true },
-      deworm: { report: true, execute: true },
-      general: { report: true, execute: true },
+      home: true,
+      report: true,
+      prep: true,
+      task: true,
+      workorder: true,
+      kb: true,
+      cattle: true,
+      message: true,
+      me: true,
     }),
   },
   assistant: {
     pc: { allowLogin: false, workbenchView: "farm-internal", nav: buildNav(false) },
     mini: partialMini({
-      disease: { execute: true },
-      vaccine: { execute: true },
-      hoof: { execute: true },
-      drying: { execute: true },
-      deworm: { execute: true },
-      general: { execute: true },
+      home: ["work-status"],
+      report: ["health", "loss", "return"],
+      prep: true,
+      task: ["view", "execute-wo", "execute-event", "batch"],
+      workorder: ["view"],
+      kb: true,
+      cattle: ["view", "exam", "transfer"],
+      message: true,
+      me: true,
     }),
   },
 };
@@ -446,10 +517,7 @@ function RolePage() {
           nav: buildNav(false),
         },
 
-        mini: miniEvents.reduce(
-          (a, e) => ({ ...a, [e.key]: { report: false, execute: false } }),
-          {} as MiniPerms,
-        ),
+        mini: fullMini(false),
       },
     }));
     setDraftRoleKey(key);
@@ -588,59 +656,43 @@ function RolePage() {
       },
     }));
   };
-  const setMini = (e: MiniEventKey, a: MiniActionKey, v: boolean) => {
+  const mutateMini = (fn: (m: MiniPerms) => MiniPerms) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
       ...prev,
-      [drawerRole]: {
-        ...prev[drawerRole],
-        mini: {
-          ...prev[drawerRole].mini,
-          [e]: { ...prev[drawerRole].mini[e], [a]: v },
-        },
-      },
+      [drawerRole]: { ...prev[drawerRole], mini: fn(prev[drawerRole].mini) },
     }));
   };
-  const setMiniRow = (e: MiniEventKey, v: boolean) => {
-    if (!drawerRole || !editable) return;
-    const ev = findEvent(e);
-    setPerms((prev) => ({
-      ...prev,
-      [drawerRole]: {
-        ...prev[drawerRole],
-        mini: {
-          ...prev[drawerRole].mini,
-          [e]: {
-            report: hasAction(ev, "report") ? v : false,
-            execute: hasAction(ev, "execute") ? v : false,
-          },
-        },
-      },
+  /** 单个功能开关 */
+  const setMiniFunc = (mKey: string, fKey: string, v: boolean) =>
+    mutateMini((m) => ({
+      ...m,
+      [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], on: v } },
     }));
-  };
-  const setMiniColumn = (a: MiniActionKey, v: boolean) => {
-    if (!drawerRole || !editable) return;
-    setPerms((prev) => ({
-      ...prev,
-      [drawerRole]: {
-        ...prev[drawerRole],
-        mini: miniEvents.reduce((acc, e) => {
-          acc[e.key] = {
-            ...prev[drawerRole].mini[e.key],
-            [a]: hasAction(e, a) ? v : false,
-          };
-          return acc;
-        }, {} as MiniPerms),
-      },
+  /** 模块整行 */
+  const setMiniModule = (mKey: string, v: boolean) =>
+    mutateMini((m) => ({
+      ...m,
+      [mKey]: Object.fromEntries(
+        Object.entries(m[mKey]).map(([k, p]) => [k, { ...p, on: v }]),
+      ),
     }));
-  };
-  const setMiniAll = (v: boolean) => {
-    if (!drawerRole || !editable) return;
-    setPerms((prev) => ({
-      ...prev,
-      [drawerRole]: { ...prev[drawerRole], mini: fullMini(v) },
-    }));
-  };
+  const setMiniAll = (v: boolean) =>
+    mutateMini((m) =>
+      Object.fromEntries(
+        Object.entries(m).map(([mk, fs]) => [
+          mk,
+          Object.fromEntries(Object.entries(fs).map(([fk, p]) => [fk, { ...p, on: v }])),
+        ]),
+      ),
+    );
+  /** 功能下的可选范围（工单类型 / 基础事件类型） */
+  const toggleMiniScope = (mKey: string, fKey: string, t: string) =>
+    mutateMini((m) => {
+      const p = m[mKey][fKey];
+      const scope = p.scope.includes(t) ? p.scope.filter((x) => x !== t) : [...p.scope, t];
+      return { ...m, [mKey]: { ...m[mKey], [fKey]: { ...p, scope } } };
+    });
 
 
   const handleConfirmToggle = () => {
@@ -1144,126 +1196,129 @@ function RolePage() {
                   </div>
                   <p className="text-caption text-text-tertiary flex items-start gap-1.5 -mt-1">
                     <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                    所有账号均可自由登录小程序，请在此配置不同角色的事项权限范围。
+                    所有账号均可自由登录小程序，请按模块配置功能权限；涉及工单 / 基础事件的功能可进一步限定可选范围。
                   </p>
 
                   <div className="rounded-md border border-border overflow-hidden">
-                    {(() => {
-                      const actions: MiniActionKey[] = ["report", "execute"];
-                      const actionLabels = ["上报", "响应 / 执行"];
-                      const evsFor = (a: MiniActionKey) =>
-                        miniEvents.filter((e) => hasAction(e, a));
-                      const colChecked = (a: MiniActionKey) =>
-                        evsFor(a).every((e) => cur.mini[e.key][a]);
-                      const colIndeterminate = (a: MiniActionKey) =>
-                        !colChecked(a) && evsFor(a).some((e) => cur.mini[e.key][a]);
-                      const allChecked = miniEvents.every((e) =>
-                        actions.filter((a) => hasAction(e, a)).every((a) => cur.mini[e.key][a]),
-                      );
-                      const anyChecked = miniEvents.some((e) =>
-                        actions.filter((a) => hasAction(e, a)).some((a) => cur.mini[e.key][a]),
-                      );
-                      const allIndeterminate = anyChecked && !allChecked;
-                      return (
-                        <Table>
-                          <TableHeader>
-                            <TableRow className="bg-surface-subtle hover:bg-surface-subtle">
-                              <TableHead className="w-[220px] text-text-secondary">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-surface-subtle hover:bg-surface-subtle">
+                          <TableHead className="w-[160px] text-text-secondary align-middle">
+                            <div className="flex items-center gap-2">
+                              {editable ? (
+                                <Checkbox
+                                  checked={
+                                    miniSpec.every((m) =>
+                                      m.funcs.every((f) => cur.mini[m.key][f.key].on),
+                                    )
+                                      ? true
+                                      : miniSpec.some((m) =>
+                                          m.funcs.some((f) => cur.mini[m.key][f.key].on),
+                                        )
+                                      ? "indeterminate"
+                                      : false
+                                  }
+                                  onCheckedChange={(v) => setMiniAll(!!v)}
+                                  className="h-[18px] w-[18px] border data-[state=unchecked]:border-[var(--text-tertiary)]"
+                                  aria-label="全选"
+                                />
+                              ) : null}
+                              <span>小程序模块</span>
+                            </div>
+                          </TableHead>
+                          <TableHead className="text-text-secondary">功能权限</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {miniSpec.map((m) => {
+                          const fs = cur.mini[m.key];
+                          const rowAll = m.funcs.every((f) => fs[f.key].on);
+                          const rowAny = m.funcs.some((f) => fs[f.key].on);
+                          return (
+                            <TableRow key={m.key} className="hover:bg-transparent align-top">
+                              <TableCell className="w-[160px] py-3">
                                 <div className="flex items-center gap-2">
                                   {editable ? (
                                     <Checkbox
-                                      checked={allIndeterminate ? "indeterminate" : allChecked}
-                                      onCheckedChange={(v) => setMiniAll(!!v)}
+                                      checked={rowAll ? true : rowAny ? "indeterminate" : false}
+                                      onCheckedChange={(v) => setMiniModule(m.key, !!v)}
                                       className="h-[18px] w-[18px] border data-[state=unchecked]:border-[var(--text-tertiary)]"
-                                      aria-label="全选"
+                                      aria-label={`整行：${m.name}`}
                                     />
                                   ) : null}
-                                  <span>事项类型</span>
+                                  <span className="text-body-sm font-medium text-foreground">
+                                    {m.name}
+                                  </span>
                                 </div>
-                              </TableHead>
-                              {actions.map((a, i) => {
-                                const checked = colChecked(a);
-                                const indet = colIndeterminate(a);
-                                return (
-                                  <TableHead
-                                    key={a}
-                                    className="text-center text-text-secondary"
-                                  >
-                                    <div className="flex items-center justify-center gap-2">
-                                      {editable ? (
+                              </TableCell>
+                              <TableCell className="py-3">
+                                <div className="space-y-2.5">
+                                  <div className="flex flex-wrap gap-x-5 gap-y-2">
+                                    {m.funcs.map((f) => (
+                                      <label
+                                        key={f.key}
+                                        className={`inline-flex items-center gap-2 ${
+                                          editable ? "cursor-pointer" : ""
+                                        }`}
+                                      >
                                         <Checkbox
-                                          checked={indet ? "indeterminate" : checked}
-                                          onCheckedChange={(v) => setMiniColumn(a, !!v)}
-                                          className="h-[18px] w-[18px] border data-[state=unchecked]:border-[var(--text-tertiary)]"
-                                          aria-label={`整列：${actionLabels[i]}`}
+                                          checked={fs[f.key].on}
+                                          disabled={!editable}
+                                          onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
+                                          className="h-[18px] w-[18px] rounded-full border data-[state=unchecked]:border-[var(--border-strong)] data-[state=checked]:border-primary data-[state=checked]:border-2 data-[state=checked]:bg-primary data-[state=checked]:text-white"
                                         />
-                                      ) : null}
-                                      <span>{actionLabels[i]}</span>
-                                    </div>
-                                  </TableHead>
-                                );
-                              })}
+                                        <span className="text-body-sm text-text-secondary">
+                                          {f.name}
+                                        </span>
+                                      </label>
+                                    ))}
+                                  </div>
 
-
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {miniEvents.map((e) => {
-                              const p = cur.mini[e.key];
-                              const evActions = actions.filter((a) => hasAction(e, a));
-                              const rowAll = evActions.every((a) => p[a]);
-                              const rowAny = evActions.some((a) => p[a]);
-                              const rowIndeterminate = rowAny && !rowAll;
-                              return (
-                                <TableRow key={e.key} className="hover:bg-surface-subtle">
-                                  <TableCell className="w-[220px]">
-                                    <div className="flex items-center gap-2">
-                                      {editable ? (
-                                        <Checkbox
-                                          checked={rowIndeterminate ? "indeterminate" : rowAll}
-                                          onCheckedChange={(v) => setMiniRow(e.key, !!v)}
-                                          className="h-[18px] w-[18px] border data-[state=unchecked]:border-[var(--text-tertiary)]"
-                                          aria-label={`整行：${e.name}`}
-                                        />
-                                      ) : null}
-                                      <span className="text-body-sm font-medium text-foreground">
-                                        {e.name}
-                                      </span>
-                                    </div>
-                                  </TableCell>
-
-
-                                  {actions.map((a) => (
-                                    <TableCell key={a} className="text-center">
-                                      {hasAction(e, a) ? (
-                                        <label
-                                          className={`inline-flex items-center justify-center gap-2 ${
-                                            editable ? "cursor-pointer" : ""
-                                          }`}
-                                        >
-                                          <Checkbox
-                                            checked={p[a]}
-                                            disabled={!editable}
-                                            onCheckedChange={(v) => setMini(e.key, a, !!v)}
-                                            className="h-[18px] w-[18px] rounded-full border data-[state=unchecked]:border-[var(--border-strong)] data-[state=checked]:border-primary data-[state=checked]:border-2 data-[state=checked]:bg-primary data-[state=checked]:text-white"
-                                          />
-                                          <span className="text-body-sm text-text-secondary">
-                                            {e.actions[a]}
+                                  {m.funcs
+                                    .filter((f) => f.scope && fs[f.key].on)
+                                    .map((f) => (
+                                      <div
+                                        key={`${f.key}-scope`}
+                                        className="rounded-md bg-surface-subtle px-3 py-2"
+                                      >
+                                        <div className="text-caption text-text-tertiary mb-1.5">
+                                          {f.name} · {scopeLabel(f.scope!)}
+                                          <span className="ml-1">
+                                            （已选 {fs[f.key].scope.length}/
+                                            {scopeOptions(f.scope!).length}）
                                           </span>
-                                        </label>
-                                      ) : (
-                                        <span className="text-body-sm text-text-tertiary">—</span>
-                                      )}
-                                    </TableCell>
-                                  ))}
-                                </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      );
-                    })()}
+                                        </div>
+                                        <div className="flex flex-wrap gap-1.5">
+                                          {scopeOptions(f.scope!).map((t) => {
+                                            const on = fs[f.key].scope.includes(t);
+                                            return (
+                                              <button
+                                                key={t}
+                                                type="button"
+                                                disabled={!editable}
+                                                onClick={() => toggleMiniScope(m.key, f.key, t)}
+                                                className={`px-2 py-0.5 rounded-md border text-caption transition-colors ${
+                                                  on
+                                                    ? "border-primary text-primary bg-primary/5"
+                                                    : "border-border text-text-tertiary bg-card"
+                                                } ${editable ? "cursor-pointer" : "cursor-default"}`}
+                                              >
+                                                {t}
+                                              </button>
+                                            );
+                                          })}
+                                        </div>
+                                      </div>
+                                    ))}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
                   </div>
+
 
                 </section>
               </>
