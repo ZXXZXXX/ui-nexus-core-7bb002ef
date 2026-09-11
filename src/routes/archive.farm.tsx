@@ -269,10 +269,17 @@ function FarmPage() {
                   <div className="space-y-1.5">
                     <Label className="text-caption text-text-tertiary">牛场类型</Label>
                     <Select value={editing.type} onValueChange={(v) => setEditing({ ...editing, type: v })}>
-                      <SelectTrigger className="h-9 bg-card border-border text-body-sm"><SelectValue placeholder="选择牛场类型" /></SelectTrigger>
+                      <SelectTrigger className="h-9 bg-card border-border text-body-sm">
+                        <SelectValue placeholder="选择牛场类型">
+                          <span className={`tag whitespace-nowrap ${editing.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{editing.type}</span>
+                        </SelectValue>
+                      </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="普通牧场">普通牧场</SelectItem>
-                        <SelectItem value="有机牧场">有机牧场</SelectItem>
+                        {["普通牧场", "有机牧场"].map((t) => (
+                          <SelectItem key={t} value={t}>
+                            <span className={`tag whitespace-nowrap ${t === "有机牧场" ? "tag-info" : "tag-warning"}`}>{t}</span>
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
