@@ -411,6 +411,7 @@ function buildMini(pick?: (mKey: string, fKey: string) => boolean): MiniPerms {
       a[f.key] = {
         on: pick ? pick(m.key, f.key) : false,
         scope: f.scope ? [...scopeOptions(f.scope)] : [],
+        ...(f.views ? { view: f.views[0]!.key } : {}),
       };
       return a;
     }, {} as Record<string, MiniFuncPerm>);
