@@ -1118,6 +1118,19 @@ function RolePage() {
                                 {/* 一级菜单自身的操作能力 */}
                                 {!!g.actions?.length && (
                                   <div className="flex flex-wrap gap-x-5 gap-y-2">
+                                    <label
+                                      className={`inline-flex items-center gap-2 ${
+                                        editable ? "cursor-pointer" : "cursor-default"
+                                      }`}
+                                    >
+                                      <Checkbox
+                                        checked={gp.view}
+                                        disabled={!editable}
+                                        onCheckedChange={(v) => setGroupView(g.key, !!v)}
+                                        className="h-[16px] w-[16px]"
+                                      />
+                                      <span className="text-body-sm text-text-secondary">查看</span>
+                                    </label>
                                     {g.actions.map((act) => (
                                       <label
                                         key={act.key}
@@ -1178,6 +1191,23 @@ function RolePage() {
                                           </div>
                                           {!!acts.length && (
                                             <div className="mt-2 pl-6 flex flex-wrap gap-x-4 gap-y-1.5">
+                                              <label
+                                                className={`inline-flex items-center gap-1.5 ${
+                                                  editable ? "cursor-pointer" : "cursor-default"
+                                                }`}
+                                              >
+                                                <Checkbox
+                                                  checked={lp.view}
+                                                  disabled={!editable || !gp.view}
+                                                  onCheckedChange={(v) =>
+                                                    setLeafView(g.key, leaf.key, !!v)
+                                                  }
+                                                  className="h-[14px] w-[14px]"
+                                                />
+                                                <span className="text-caption text-text-secondary">
+                                                  查看
+                                                </span>
+                                              </label>
                                               {acts.map((act) => (
                                                 <label
                                                   key={act.key}
