@@ -489,6 +489,7 @@ function RolePage() {
   const isOpen = (k: string) => !!treeOpen[k];
   /** 权限树左右布局：当前选中的一级菜单 */
   const [navActive, setNavActive] = useState<string>(navSpec[0]!.key);
+  const [miniActive, setMiniActive] = useState<string>(miniSpec[0]!.key);
 
   const startCreate = () => {
     if (!canManage) return;
