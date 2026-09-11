@@ -639,6 +639,7 @@ function RolePage() {
       ...nav,
       [gKey]: {
         ...nav[gKey],
+        view: v ? true : nav[gKey].view,
         leaves: {
           ...nav[gKey].leaves,
           [lKey]: {
