@@ -248,7 +248,7 @@ function AnimalDetailPage() {
         {/* 治疗中 / 观察中：休药期与产奶上市提示 */}
         {a.health === "治疗中" && (
           <section className="px-4 mt-3">
-            <div className="rounded-xl bg-[#FFF1F0] px-3 py-2.5 text-body-sm text-[#CF1322] w-full">
+            <div className="rounded-xl bg-[#E6F7FE] px-3 py-2.5 text-body-sm text-[#0DA5E9] w-full">
               <span className="inline-flex items-start gap-1.5">
                 <Clock className="h-4 w-4 shrink-0 mt-0.5" />
                 牛只正在使用药物治疗，当前产奶不建议上市

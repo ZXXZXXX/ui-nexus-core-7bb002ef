@@ -362,12 +362,13 @@ export function CattleProfileDrawer({
             <div
               className={`rounded-xl border px-4 py-3 flex items-center gap-2.5 ${
                 health === "治疗中"
-                  ? "border-[#FFCCC7] bg-[#FFF1F0]"
+                  ? "border-[#B7E4FB] bg-[#E6F7FE]"
                   : "border-[#FFE58F] bg-[#FFFBE6]"
               }`}
             >
-              <Clock className={`h-4 w-4 shrink-0 ${health === "治疗中" ? "text-[#CF1322]" : "text-[#B8860B]"}`} />
-              <span className={`text-body-sm ${health === "治疗中" ? "text-[#CF1322]" : "text-[#B8860B]"}`}>
+              <Clock className={`h-4 w-4 shrink-0 ${health === "治疗中" ? "text-[#0DA5E9]" : "text-[#B8860B]"}`} />
+              <span className={`text-body-sm ${health === "治疗中" ? "text-[#0DA5E9]" : "text-[#B8860B]"}`}>
+
                 {health === "治疗中"
                   ? "该牛只正在使用药物治疗，当前产奶不建议上市。"
                   : cow.withdrawalDays > 0
