@@ -659,6 +659,7 @@ function RolePage() {
       },
     }));
   };
+  const [batchNoticeOpen, setBatchNoticeOpen] = useState(false);
   const mutateMini = (fn: (m: MiniPerms) => MiniPerms) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
@@ -667,11 +668,13 @@ function RolePage() {
     }));
   };
   /** 单个功能开关 */
-  const setMiniFunc = (mKey: string, fKey: string, v: boolean) =>
+  const setMiniFunc = (mKey: string, fKey: string, v: boolean) => {
+    if (v && mKey === "task" && fKey === "batch") setBatchNoticeOpen(true);
     mutateMini((m) => ({
       ...m,
       [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], on: v } },
     }));
+  };
   /** 模块整行 */
   const setMiniModule = (mKey: string, v: boolean) =>
     mutateMini((m) => ({
@@ -1430,6 +1433,23 @@ function RolePage() {
               className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
             >
               删除
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 批量执行任务提示 */}
+      <AlertDialog open={batchNoticeOpen} onOpenChange={setBatchNoticeOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>批量执行说明</AlertDialogTitle>
+            <AlertDialogDescription>
+              仅免疫、驱虫类型工单，基础事件任务允许批量执行
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setBatchNoticeOpen(false)}>
+              知道了
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
