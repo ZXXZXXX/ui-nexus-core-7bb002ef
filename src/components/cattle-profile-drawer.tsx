@@ -1197,20 +1197,21 @@ function ScreeningHistory() {
             {s.note ? <div className="mt-1 text-caption text-text-secondary">说明：{s.note}</div> : null}
 
             {s.order ? (
-              <button
-                type="button"
-                onClick={() =>
-                  setOrderPreview({ ...s.order!, date: s.date, source: s.source, operator: s.operator })
-                }
-                className="mt-2 flex w-full items-center gap-2 rounded-lg bg-muted/50 px-2.5 py-1.5 text-left transition-colors hover:bg-muted"
-              >
+              <div className="mt-2 flex items-center gap-2">
                 <FilePlus2 className="h-3.5 w-3.5 shrink-0 text-primary" />
-                <span className="font-mono text-caption text-text-secondary">{s.order.no}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setOrderPreview({ ...s.order!, date: s.date, source: s.source, operator: s.operator })
+                  }
+                  className="font-mono text-caption text-primary hover:underline"
+                >
+                  {s.order.no}
+                </button>
                 <span className="text-caption text-text-secondary">{s.order.type}</span>
-                <span className="ml-auto text-caption text-text-tertiary">{s.order.status}</span>
-                <ChevronRight className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
-              </button>
+              </div>
             ) : null}
+
 
             {s.photos > 0 ? (
               <div className="mt-2 flex items-center gap-1.5">
