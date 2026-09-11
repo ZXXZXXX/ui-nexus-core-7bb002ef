@@ -1272,31 +1272,33 @@ function RolePage() {
                     </div>
 
                     {/* 右：功能权限 */}
-                    <div className="flex-1 min-w-0 p-3">
+                    <div className="flex-1 min-w-0 p-3 flex flex-col">
                       {miniSpec
                         .filter((m) => m.key === miniActive)
                         .map((m) => {
                           const fs = cur.mini[m.key];
                           return (
-                            <div key={m.key} className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2">
-                              {m.funcs.map((f) => (
-                                <label
-                                  key={f.key}
-                                  className={`inline-flex items-center gap-2 ${
-                                    editable ? "cursor-pointer" : ""
-                                  }`}
-                                >
-                                  <Checkbox
-                                    checked={fs[f.key].on}
-                                    disabled={!editable}
-                                    onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
-                                    className="h-[16px] w-[16px]"
-                                  />
-                                  <span className="text-body-sm text-text-secondary">{f.name}</span>
-                                </label>
-                              ))}
+                            <div key={m.key} className="flex flex-col flex-1 min-h-0">
+                              <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2">
+                                {m.funcs.map((f) => (
+                                  <label
+                                    key={f.key}
+                                    className={`inline-flex items-center gap-2 ${
+                                      editable ? "cursor-pointer" : ""
+                                    }`}
+                                  >
+                                    <Checkbox
+                                      checked={fs[f.key].on}
+                                      disabled={!editable}
+                                      onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
+                                      className="h-[16px] w-[16px]"
+                                    />
+                                    <span className="text-body-sm text-text-secondary">{f.name}</span>
+                                  </label>
+                                ))}
+                              </div>
                               {m.key === "workorder" ? (
-                                <div className="xl:col-span-2 pt-2 text-caption text-text-tertiary">
+                                <div className="mt-auto pt-4 text-caption text-text-tertiary">
                                   可查看、操作的工单范围仅限于开放的工单类型
                                 </div>
                               ) : null}
@@ -1305,6 +1307,7 @@ function RolePage() {
                         })}
 
                     </div>
+
                   </div>
 
                   {/* 通用范围：工单类型 / 基础事件类型，全局仅需选择一次 */}
