@@ -743,7 +743,7 @@ function HomePage() {
           );
           const timeTabs = (
             <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
-              {([["yesterday", "至昨日"], ["month", "本月"], ["year", "本年"]] as const).map(([v, l]) => (
+              {([["day", "日度"], ["month", "月度"], ["year", "年度"]] as const).map(([v, l]) => (
                 <button
                   key={v}
                   type="button"
