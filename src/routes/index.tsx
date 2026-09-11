@@ -478,11 +478,11 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? groupBizCards.map(applyTimeScope)
+              ? groupBizCards
 
               : scope === "region"
-                ? [applyTimeScope(regionLeadCard), map.get("治愈数"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyTimeScope(regionTailCard)]
-                : farmOutBizCards.map(applyTimeScope);
+                ? [regionLeadCard, map.get("治愈数"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), regionTailCard]
+                : farmOutBizCards;
 
           return execOrder.filter(Boolean) as MetricCard[];
         })()
