@@ -45,6 +45,7 @@ const difficulty = [
 const TAB_PARITY = "胎型分布";
 const TAB_SEX = "性别比例";
 const TAB_WEIGHT = "体重分布";
+const TAB_ORDER = "胎次分布";
 
 const VIEW_CALF = "犊牛情况";
 const VIEW_COW = "母牛情况";
@@ -66,7 +67,16 @@ export function CalvingSection() {
   const survivalData = scaleList(survival, factor);
   const difficultyData = scaleList(difficulty, factor);
   const total = alive + scaleValue(deadTotal, factor);
-  const detail = scaleList(tab === TAB_PARITY ? parityDist : tab === TAB_SEX ? sexRatio : birthWeight, factor);
+  const detail = scaleList(
+    tab === TAB_PARITY
+      ? parityDist
+      : tab === TAB_SEX
+        ? sexRatio
+        : tab === TAB_ORDER
+          ? parityOrderDist
+          : birthWeight,
+    factor,
+  );
 
   return (
     <SectionCard
