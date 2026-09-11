@@ -12,6 +12,7 @@ import { ERP_BOOKS } from "@/data/erp-books";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { RegionCascader } from "@/components/region-cascader";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/archive/farm")({
   head: () => ({ meta: [{ title: "牛场信息 — 奇点智牧" }] }),
@@ -44,7 +45,20 @@ const columns: ListColumn<Farm>[] = [
       </span>
     ),
   },
-  { key: "region", label: "所在地区", filter: "select", width: "11em", value: (f) => `${f.province}·${f.city}`, render: (f) => <span className="text-body-sm text-text-secondary truncate">{f.province}·{f.city}</span> },
+  {
+    key: "region", label: "所在地区", filter: "select", width: "12em",
+    value: (f) => `${f.province}·${f.city}`,
+    render: (f) => (
+      <TooltipProvider delayDuration={200}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="block max-w-[12em] truncate text-body-sm text-text-secondary">{f.province}·{f.city}</span>
+          </TooltipTrigger>
+          <TooltipContent>{f.province}·{f.city}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    ),
+  },
   { key: "slot", label: "仓位号", filter: "select", render: (f) => <span className="font-mono text-body-sm text-text-secondary">{f.slot}</span> },
   {
     key: "type", label: "牛场类型", filter: "select", width: "6.5em",
