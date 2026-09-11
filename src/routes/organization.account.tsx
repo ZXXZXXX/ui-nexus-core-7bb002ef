@@ -357,8 +357,8 @@ function AccountPage() {
       });
   }, [accounts, keyword, onlyInternal, filterRole, filterFarms, filterStatus]);
 
-  // 列宽：勾选 用户 类型 手机号 角色 关联牧场 企微ID 状态 管理
-  const cols = "40px 1.5fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 0.7fr 0.5fr";
+  // 列宽：勾选 用户 来源 类型 手机号 角色 关联牧场 企微ID 状态 管理
+  const cols = "40px 1.5fr 0.9fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 0.7fr 0.5fr";
 
   const visibleIds = filteredAccounts.map((a) => a.id);
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
