@@ -111,6 +111,9 @@ const maskId = (id: string) => {
   return `${id.slice(0, 4)}****${id.slice(-3)}`;
 };
 
+// 列表脱敏：固定 4 位 *，仅显示末 4 位字符
+const maskIdShort = (id: string) => `****${id.slice(-4)}`;
+
 // 手机号脱敏：中间四位隐藏
 const maskPhone = (p: string) => (p.length >= 7 ? `${p.slice(0, 3)}****${p.slice(-4)}` : p);
 
@@ -743,7 +746,7 @@ function AccountPage() {
       case "wecomId":
         return a.wecomId ? (
           <span className="block truncate text-body-sm text-text-secondary font-mono tabular-nums" title="已脱敏显示">
-            {maskId(a.wecomId)}
+            {maskIdShort(a.wecomId)}
           </span>
         ) : (
           <span className="tag tag-muted">未绑定</span>
