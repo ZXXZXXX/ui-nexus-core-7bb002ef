@@ -109,6 +109,9 @@ const maskId = (id: string) => {
   return `${id.slice(0, 4)}****${id.slice(-3)}`;
 };
 
+// 手机号脱敏：中间四位隐藏
+const maskPhone = (p: string) => (p.length >= 7 ? `${p.slice(0, 3)}****${p.slice(-4)}` : p);
+
 // 文本省略
 const ellipsize = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)}…` : s);
 
@@ -184,13 +187,13 @@ function unionPermsForRoles(rs: string[]): RolePermPreview {
 }
 
 const initialAccounts: Account[] = [
-  { id: "U001", name: "张磊", initial: "ZL", phone: "138****6201", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["场长"] }], wecomId: "wm_zhanglei_8821", wechatId: "wx_zhanglei_6688", status: "启用", createdAt: "2024-03-08" },
-  { id: "U002", name: "李雨晴", initial: "LY", phone: "139****3018", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["兽医", "技术员"] }, { farm: "2 号牧场", roles: ["兽医助理"] }], wecomId: "wm_liyuqing_3210", wechatId: "wx_liyuqing_4521", status: "启用", createdAt: "2024-06-21" },
-  { id: "U003", name: "陈晓东", initial: "CX", phone: "137****8520", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["技术员"] }], wecomId: null, wechatId: "wx_chenxd_7702", status: "启用", createdAt: "2025-09-12" },
-  { id: "U004", name: "王仓管", initial: "WC", phone: "136****4302", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["仓管员"] }, { farm: "2 号牧场", roles: ["仓管员"] }, { farm: "3 号牧场", roles: ["技术员", "仓管员"] }], wecomId: "wm_wangck_5601", wechatId: null, status: "启用", createdAt: "2026-02-04" },
-  { id: "U005", name: "孙库管", initial: "SK", phone: "135****9012", userType: "内部", source: "人事系统", farmRoles: [{ farm: "2 号牧场", roles: ["仓管员"] }], wecomId: null, wechatId: null, status: "禁用", createdAt: "2026-04-30" },
-  { id: "U006", name: "赵修蹄", initial: "ZX", phone: "134****7788", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "1 号牧场", roles: ["修蹄工"] }, { farm: "3 号牧场", roles: ["修蹄工", "普修工"] }, { farm: "金辉牧场", roles: ["普修工"] }], wecomId: "wm_zhaoxt_9912", wechatId: "wx_zhaoxt_3344", status: "启用", createdAt: "2025-11-18" },
-  { id: "U007", name: "刘技师", initial: "LJ", phone: "133****5566", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "2 号牧场", roles: ["干奶工"] }], wecomId: null, wechatId: "wx_liujs_1209", status: "启用", createdAt: "2026-05-09" },
+  { id: "U001", name: "张磊", initial: "ZL", phone: "13856216201", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["场长"] }], wecomId: "wm_zhanglei_8821", wechatId: "wx_zhanglei_6688", status: "启用", createdAt: "2024-03-08" },
+  { id: "U002", name: "李雨晴", initial: "LY", phone: "13930183018", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["兽医", "技术员"] }, { farm: "2 号牧场", roles: ["兽医助理"] }], wecomId: "wm_liyuqing_3210", wechatId: "wx_liyuqing_4521", status: "启用", createdAt: "2024-06-21" },
+  { id: "U003", name: "陈晓东", initial: "CX", phone: "13785208520", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["技术员"] }], wecomId: null, wechatId: "wx_chenxd_7702", status: "启用", createdAt: "2025-09-12" },
+  { id: "U004", name: "王仓管", initial: "WC", phone: "13643024302", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["仓管员"] }, { farm: "2 号牧场", roles: ["仓管员"] }, { farm: "3 号牧场", roles: ["技术员", "仓管员"] }], wecomId: "wm_wangck_5601", wechatId: null, status: "启用", createdAt: "2026-02-04" },
+  { id: "U005", name: "孙库管", initial: "SK", phone: "13590129012", userType: "内部", source: "人事系统", farmRoles: [{ farm: "2 号牧场", roles: ["仓管员"] }], wecomId: null, wechatId: null, status: "禁用", createdAt: "2026-04-30" },
+  { id: "U006", name: "赵修蹄", initial: "ZX", phone: "13477887788", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "1 号牧场", roles: ["修蹄工"] }, { farm: "3 号牧场", roles: ["修蹄工", "普修工"] }, { farm: "金辉牧场", roles: ["普修工"] }], wecomId: "wm_zhaoxt_9912", wechatId: "wx_zhaoxt_3344", status: "启用", createdAt: "2025-11-18" },
+  { id: "U007", name: "刘技师", initial: "LJ", phone: "13355665566", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "2 号牧场", roles: ["干奶工"] }], wecomId: null, wechatId: "wx_liujs_1209", status: "启用", createdAt: "2026-05-09" },
 
 ];
 
@@ -570,7 +573,7 @@ function AccountPage() {
               </div>
               <div className="text-body-sm text-text-secondary truncate">{a.source}</div>
               <div><span className={`tag ${userTypeTagClass(a.userType)}`}>{a.userType}</span></div>
-              <div className="text-body-sm text-text-secondary tabular-nums">{a.phone}</div>
+              <div className="text-body-sm text-text-secondary tabular-nums">{maskPhone(a.phone)}</div>
               <div className="flex items-center gap-1 min-w-0 overflow-hidden">
                 {(() => {
                   const rs = rolesOf(a);
@@ -1109,7 +1112,7 @@ function AccountDrawerInner({
                 {editable ? (
                   <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="h-9 bg-card border-border text-body-sm tabular-nums" />
                 ) : (
-                  <div className="text-body text-foreground tabular-nums">{account.phone}</div>
+                  <div className="text-body text-foreground tabular-nums">{maskPhone(account.phone)}</div>
                 )}
               </div>
             </div>
