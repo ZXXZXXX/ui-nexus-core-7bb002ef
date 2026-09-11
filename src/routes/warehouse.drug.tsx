@@ -68,7 +68,8 @@ type Drug = {
   withdraw: string; // 休药期
   doseUnit: string; // 默认用药单位
   freqRule?: string; // 用药频次规则
-  daysRange?: string; // 用药天数范围
+  minDays?: number; // 最少用药天数
+  maxDays?: number; // 最大用药天数
   variableDose: boolean; // 是否按变量计算
   variable?: string; // 默认计算变量
   defaultDose: string; // 默认具体剂量
