@@ -474,8 +474,7 @@ function DrugComboChart({
   );
 }
 
-function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
-  const [period, setPeriod] = useState("近 6 个月");
+function DrugTrendSection({ scopeRegion, granularity = "month" }: { scopeRegion?: string | null; granularity?: Granularity }) {
   // 区域视角：总药费按该区域药费占比折算，单头药费按区域实际水平折算
   const { feeRatio, headRatio } = useMemo(() => {
     if (!scopeRegion) return { feeRatio: 1, headRatio: 1 };
@@ -483,14 +482,15 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
     const rg = agg(scopeRegion, "", GROUP_FARMS.filter((f) => f.region === scopeRegion));
     return { feeRatio: rg.drugFee / all.drugFee, headRatio: rg.perHead / all.perHead };
   }, [scopeRegion]);
-  const months = useMemo(() => (period === "近 6 个月" ? ALL_MONTHS.slice(-6) : ALL_MONTHS), [period]);
+  const { labels: months, factors } = useMemo(() => axisFor(granularity), [granularity]);
+  const scale = granularity === "day" ? 1 / 30 : granularity === "year" ? 12 : 1;
   const totalFee = useMemo(
-    () => (period === "近 6 个月" ? ALL_TOTAL_FEE.slice(-6) : ALL_TOTAL_FEE).map((v) => Number((v * feeRatio).toFixed(1))),
-    [period, feeRatio],
+    () => factors.map((k, i) => Number((ALL_TOTAL_FEE[i % ALL_TOTAL_FEE.length] * k * scale * feeRatio).toFixed(1))),
+    [factors, scale, feeRatio],
   );
   const perHead = useMemo(
-    () => (period === "近 6 个月" ? ALL_PER_HEAD.slice(-6) : ALL_PER_HEAD).map((v) => Number((v * headRatio).toFixed(1))),
-    [period, headRatio],
+    () => factors.map((k, i) => Number((ALL_PER_HEAD[i % ALL_PER_HEAD.length] * k * headRatio).toFixed(1))),
+    [factors, headRatio],
   );
 
   return (
@@ -500,11 +500,9 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
       desc={<span className="tag tag-muted">{scopeRegion ?? "全部牧场"}</span>}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <TimeTabs
-          value={period}
-          onChange={setPeriod}
-          options={["近 6 个月", "近 1 年"]}
-        />
+        <span className="text-caption text-text-tertiary">
+          {granularity === "day" ? "近 30 天" : granularity === "year" ? "近 12 年" : "近 12 个月"}
+        </span>
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
@@ -690,10 +688,16 @@ function usePeriod(granularity: Granularity = "month") {
   return { labels, factors };
 }
 
+type TrendProps = {
+  scopeRegion?: string | null;
+  scopeLabel?: string | null;
+  granularity?: Granularity;
+};
+
 /* ---------------- 产后淘汰率趋势 ---------------- */
 
-function PostpartumTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
-  const { period, setPeriod, labels, factors } = usePeriod();
+function PostpartumTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
+  const { labels, factors } = usePeriod(granularity);
   const { all } = useScopeRatio(scopeRegion);
   const s30 = factors.map((k) => Number((all.pp30 * k).toFixed(2)));
   const s60 = factors.map((k, i) => Number(Math.max(all.pp60 * k - s30[i], 0).toFixed(2)));
@@ -705,7 +709,6 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: str
       title="产后淘汰率趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <StackedColumns
         labels={labels}
@@ -728,8 +731,8 @@ function PostpartumTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: str
 
 /* ---------------- 牛只死淘变化趋势 ---------------- */
 
-function DeathCullTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
-  const { period, setPeriod, labels, factors } = usePeriod();
+function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
+  const { labels, factors } = usePeriod(granularity);
   const { all } = useScopeRatio(scopeRegion);
   const herd = all.herd || 1;
   const deathRate = factors.map((k) => Number(((all.death * k) / herd * 100).toFixed(2)));
@@ -741,7 +744,6 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: stri
       title="牛只死淘变化趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <LineTrend
         labels={labels}
@@ -759,8 +761,8 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: stri
 
 /* ---------------- 早产率变化趋势 ---------------- */
 
-function PrematureRateTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
-  const { period, setPeriod, labels, factors } = usePeriod();
+function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
+  const { labels, factors } = usePeriod(granularity);
   const { all } = useScopeRatio(scopeRegion);
   const base = ((all.pp30 || 2) * 1.6) / 2 + 3.2;
   const points = factors.map((k) => Number((base * k).toFixed(2)));
@@ -772,7 +774,6 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: 
       title="早产率变化趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <SmoothAreaTrend
         labels={labels}
@@ -790,8 +791,8 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: 
 
 /* ---------------- 发病率 / 治愈率 / 平均诊疗天数趋势 ---------------- */
 
-function TreatmentDaysTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: string | null; scopeLabel?: string | null }) {
-  const { period, setPeriod, labels, factors } = usePeriod();
+function TreatmentDaysTrendSection({ scopeRegion, scopeLabel, granularity }: TrendProps) {
+  const { labels, factors } = usePeriod(granularity);
   const { all } = useScopeRatio(scopeRegion);
   const days = factors.map((k) => Number((all.treatmentDays * (0.92 + (k - 1) * 0.6)).toFixed(1)));
   const sickCount = factors.map((k) => Math.round(all.sick * (0.94 + (k - 1) * 0.5) * 62));
@@ -803,7 +804,6 @@ function TreatmentDaysTrendSection({ scopeRegion, scopeLabel }: { scopeRegion?: 
       title="发病治愈趋势"
       desc={scopeLabel ?? scopeRegion ?? "全部牧场"}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
-      extra={<TimeTabs value={period} onChange={setPeriod} options={["近 6 个月", "近 1 年"]} />}
     >
       <DrugComboChart
         months={labels}
@@ -1072,10 +1072,12 @@ export function GroupExecSection({
   scopeRegion,
   scopeFarm,
   part = "all",
+  granularity = "month",
 }: {
   scopeRegion?: string | null;
   scopeFarm?: { farm: string; region: string } | null;
   part?: "all" | "charts" | "rank";
+  granularity?: Granularity;
 } = {}) {
   const showCharts = part === "all" || part === "charts";
   const showRank = part === "all" || part === "rank";
@@ -1083,19 +1085,19 @@ export function GroupExecSection({
     <div className="space-y-6">
       {showCharts && (scopeFarm ? (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-          <DeathCullTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
-          <PostpartumTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
-          <TreatmentDaysTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
-          <PrematureRateTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} />
+          <DeathCullTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} granularity={granularity} />
+          <PostpartumTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} granularity={granularity} />
+          <TreatmentDaysTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} granularity={granularity} />
+          <PrematureRateTrendSection scopeRegion={scopeRegion} scopeLabel={scopeFarm.farm} granularity={granularity} />
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-stretch">
-          <DeathCullTrendSection scopeRegion={scopeRegion} />
-          <PostpartumTrendSection scopeRegion={scopeRegion} />
-          <DrugTrendSection scopeRegion={scopeRegion} />
-          <TreatmentDaysTrendSection scopeRegion={scopeRegion} />
+          <DeathCullTrendSection scopeRegion={scopeRegion} granularity={granularity} />
+          <PostpartumTrendSection scopeRegion={scopeRegion} granularity={granularity} />
+          <DrugTrendSection scopeRegion={scopeRegion} granularity={granularity} />
+          <TreatmentDaysTrendSection scopeRegion={scopeRegion} granularity={granularity} />
           <div className="xl:col-span-2">
-            <PrematureRateTrendSection scopeRegion={scopeRegion} />
+            <PrematureRateTrendSection scopeRegion={scopeRegion} granularity={granularity} />
           </div>
         </div>
       ))}
