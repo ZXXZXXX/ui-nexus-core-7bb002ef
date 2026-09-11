@@ -339,7 +339,6 @@ export function CattleProfileDrawer({
               <span className={`h-12 w-12 rounded-xl bg-card border border-border inline-flex items-center justify-center shrink-0 shadow-sm ${iconTone}`}>
                 <Beef className="h-5 w-5" />
               </span>
-              </span>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <h2 className="text-page-title text-foreground font-mono leading-none">#{cow.ear}</h2>
