@@ -592,29 +592,46 @@ function PedigreeDialog({
   const farmNo = cow.ear.slice(0, 2);
   const hasCalf = female && cow.parity > 0;
   const calfSex = pick(11, 2) === 0 ? "母" : "公";
-  const rows: { label: string; value: string }[] = [
-    { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
-    { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
-    { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
-    { label: "入群来源", value: pick(5, 3) === 0 ? "本场出生" : pick(5, 3) === 1 ? "外购引进" : "牧场调入" },
-    { label: "生产牛犊编号", value: hasCalf ? `${farmNo}-26-${String(pick(12, 9999)).padStart(4, "0")}` : "—" },
-    { label: "生产牛犊性别", value: hasCalf ? calfSex : "—" },
-    { label: "生产牛犊状态", value: hasCalf ? (calfSex === "母" ? "留养" : pick(13, 2) === 0 ? "留养" : "不留养") : "—" },
+  const groups: { title: string; rows: { label: string; value: string }[] }[] = [
+    {
+      title: "血统信息",
+      rows: [
+        { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
+        { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
+        { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
+        { label: "入群来源", value: pick(5, 3) === 0 ? "本场出生" : pick(5, 3) === 1 ? "外购引进" : "牧场调入" },
+      ],
+    },
+    {
+      title: "犊牛信息",
+      rows: [
+        { label: "牛犊编号", value: hasCalf ? `${farmNo}-26-${String(pick(12, 9999)).padStart(4, "0")}` : "—" },
+        { label: "牛犊性别", value: hasCalf ? calfSex : "—" },
+        {
+          label: "牛犊状态",
+          value: hasCalf ? (calfSex === "母" ? "留养" : pick(13, 2) === 0 ? "留养" : "不留养") : "—",
+        },
+      ],
+    },
   ];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[440px]">
+      <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
           <DialogTitle className="text-card-title">血统与犊牛档案</DialogTitle>
         </DialogHeader>
-        <div className="space-y-2">
-          {rows.map((r) => (
-            <div
-              key={r.label}
-              className="flex items-baseline justify-between gap-4 border-b border-border/60 pb-2 last:border-0 last:pb-0"
-            >
-              <span className="text-body-sm text-text-tertiary shrink-0">{r.label}</span>
-              <span className="text-body-sm text-foreground font-medium tabular-nums truncate">{r.value}</span>
+        <div className="space-y-4">
+          {groups.map((g) => (
+            <div key={g.title} className="rounded-lg border border-border/70 bg-muted/20 p-3">
+              <div className="mb-2 text-caption text-text-tertiary">{g.title}</div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                {g.rows.map((r) => (
+                  <div key={r.label} className="min-w-0">
+                    <div className="text-caption text-text-tertiary">{r.label}</div>
+                    <div className="text-body-sm text-foreground font-medium tabular-nums truncate">{r.value}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
