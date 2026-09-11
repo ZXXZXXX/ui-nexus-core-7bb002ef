@@ -347,28 +347,6 @@ export function CattleProfileDrawer({
                     <span className="h-1.5 w-1.5 rounded-full bg-current" />
                     {health}
                   </span>
-                  {abnormal && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-6 px-2 rounded-full text-caption font-normal gap-1 bg-card">
-                          <MessageSquareWarning className="h-3.5 w-3.5" />
-                          异常反馈
-                          <ChevronDown className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="start" className="w-36">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setObserved(true);
-                            markAlertHandled(cow.ear);
-                            toast.success("已转为观察中，次日 00:00 自动解除");
-                          }}
-                        >
-                          继续观察
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
                 </div>
                 <div className="mt-2 flex items-center gap-x-3 gap-y-1 flex-wrap text-body-sm text-text-secondary">
                   <span className="inline-flex items-center gap-1.5">
