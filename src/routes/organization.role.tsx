@@ -265,7 +265,8 @@ const WO_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干
 const EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场"];
 
 type MiniScope = "wo" | "event";
-type MiniFuncDef = { key: string; name: string; scope?: MiniScope };
+type MiniViewDef = { key: string; name: string };
+type MiniFuncDef = { key: string; name: string; scope?: MiniScope; views?: MiniViewDef[] };
 type MiniModuleDef = { key: string; name: string; funcs: MiniFuncDef[] };
 
 const scopeOptions = (s: MiniScope) => (s === "wo" ? WO_TYPES : EVENT_TYPES);
@@ -278,7 +279,14 @@ const miniSpec: MiniModuleDef[] = [
     name: "首页",
     funcs: [
       { key: "work-status", name: "签到卡片" },
-      { key: "ops", name: "查看运营概览" },
+      {
+        key: "ops",
+        name: "查看运营概览",
+        views: [
+          { key: "ops", name: "运营概览" },
+          { key: "work", name: "工作概览" },
+        ],
+      },
     ],
   },
   {
@@ -366,7 +374,7 @@ type LeafPerm = { view: boolean; actions: Record<string, boolean> };
 type GroupPerm = { view: boolean; leaves: Record<string, LeafPerm>; actions: Record<string, boolean> };
 type NavPerms = Record<string, GroupPerm>;
 type PcPerms = { allowLogin: boolean; nav: NavPerms; workbenchView: WorkbenchView };
-type MiniFuncPerm = { on: boolean; scope: string[] };
+type MiniFuncPerm = { on: boolean; scope: string[]; view?: string };
 type MiniPerms = Record<string, Record<string, MiniFuncPerm>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
@@ -403,6 +411,7 @@ function buildMini(pick?: (mKey: string, fKey: string) => boolean): MiniPerms {
       a[f.key] = {
         on: pick ? pick(m.key, f.key) : false,
         scope: f.scope ? [...scopeOptions(f.scope)] : [],
+        ...(f.views ? { view: f.views[0]!.key } : {}),
       };
       return a;
     }, {} as Record<string, MiniFuncPerm>);
@@ -676,6 +685,12 @@ function RolePage() {
       [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], on: v } },
     }));
   };
+  /** 功能视角单选 */
+  const setMiniView = (mKey: string, fKey: string, view: string) =>
+    mutateMini((m) => ({
+      ...m,
+      [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], view } },
+    }));
   /** 模块整行 */
   const setMiniModule = (mKey: string, v: boolean) =>
     mutateMini((m) => ({
@@ -1281,20 +1296,43 @@ function RolePage() {
                             <div key={m.key} className="flex flex-col flex-1 min-h-0">
                               <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2">
                                 {m.funcs.map((f) => (
-                                  <label
-                                    key={f.key}
-                                    className={`inline-flex items-center gap-2 ${
-                                      editable ? "cursor-pointer" : ""
-                                    }`}
-                                  >
-                                    <Checkbox
-                                      checked={fs[f.key].on}
-                                      disabled={!editable}
-                                      onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
-                                      className="h-[16px] w-[16px]"
-                                    />
-                                    <span className="text-body-sm text-text-secondary">{f.name}</span>
-                                  </label>
+                                  <div key={f.key} className="flex flex-col gap-1.5">
+                                    <label
+                                      className={`inline-flex items-center gap-2 ${
+                                        editable ? "cursor-pointer" : ""
+                                      }`}
+                                    >
+                                      <Checkbox
+                                        checked={fs[f.key].on}
+                                        disabled={!editable}
+                                        onCheckedChange={(v) => setMiniFunc(m.key, f.key, !!v)}
+                                        className="h-[16px] w-[16px]"
+                                      />
+                                      <span className="text-body-sm text-text-secondary">{f.name}</span>
+                                    </label>
+                                    {f.views && fs[f.key].on ? (
+                                      <div className="ml-6 flex items-center gap-4">
+                                        {f.views.map((v) => (
+                                          <label
+                                            key={v.key}
+                                            className={`inline-flex items-center gap-1.5 ${
+                                              editable ? "cursor-pointer" : ""
+                                            }`}
+                                          >
+                                            <input
+                                              type="radio"
+                                              name={`mini-view-${m.key}-${f.key}`}
+                                              className="h-[14px] w-[14px] accent-primary"
+                                              disabled={!editable}
+                                              checked={(fs[f.key].view ?? f.views![0]!.key) === v.key}
+                                              onChange={() => setMiniView(m.key, f.key, v.key)}
+                                            />
+                                            <span className="text-caption text-text-tertiary">{v.name}</span>
+                                          </label>
+                                        ))}
+                                      </div>
+                                    ) : null}
+                                  </div>
                                 ))}
                               </div>
                               {m.key === "workorder" ? (
