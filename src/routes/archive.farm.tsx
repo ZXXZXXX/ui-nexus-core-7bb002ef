@@ -276,11 +276,9 @@ function FarmPage() {
                             key={t}
                             type="button"
                             onClick={() => setEditing({ ...editing, type: t })}
-                            className={`h-8 rounded-full border px-3 text-body-sm transition-colors ${
-                              active
-                                ? "border-primary bg-brand-subtle text-primary font-medium"
-                                : "border-border bg-card text-text-secondary hover:border-primary/50"
-                            }`}
+                            className={`tag whitespace-nowrap transition-opacity ${
+                              t === "有机牧场" ? "tag-info" : "tag-warning"
+                            } ${active ? "ring-1 ring-current" : "opacity-40 hover:opacity-70"}`}
                           >
                             {t}
                           </button>
