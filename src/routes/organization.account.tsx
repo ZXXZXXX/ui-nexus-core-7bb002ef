@@ -188,7 +188,7 @@ function unionPermsForRoles(rs: string[]): RolePermPreview {
 
 const initialAccounts: Account[] = [
   { id: "U001", name: "张磊", initial: "ZL", phone: "13856216201", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["场长"] }], wecomId: "wm_zhanglei_8821", wechatId: "wx_zhanglei_6688", status: "启用", createdAt: "2024-03-08" },
-  { id: "U002", name: "李雨晴", initial: "LY", phone: "13930183018", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["兽医", "技术员"] }, { farm: "2 号牧场", roles: ["兽医助理"] }], wecomId: "wm_liyuqing_3210", wechatId: "wx_liyuqing_4521", status: "启用", createdAt: "2024-06-21" },
+  { id: "U002", name: "李雨晴", initial: "LY", phone: "13930183018", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["兽医", "技术员"] }, { farm: "2 号牧场", roles: ["技术员"] }], wecomId: "wm_liyuqing_3210", wechatId: "wx_liyuqing_4521", status: "启用", createdAt: "2024-06-21" },
   { id: "U003", name: "陈晓东", initial: "CX", phone: "13785208520", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["技术员"] }], wecomId: null, wechatId: "wx_chenxd_7702", status: "启用", createdAt: "2025-09-12" },
   { id: "U004", name: "王仓管", initial: "WC", phone: "13643024302", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["仓管员"] }, { farm: "2 号牧场", roles: ["仓管员"] }, { farm: "3 号牧场", roles: ["技术员", "仓管员"] }], wecomId: "wm_wangck_5601", wechatId: null, status: "启用", createdAt: "2026-02-04" },
   { id: "U005", name: "孙库管", initial: "SK", phone: "13590129012", userType: "内部", source: "人事系统", farmRoles: [{ farm: "2 号牧场", roles: ["仓管员"] }], wecomId: null, wechatId: null, status: "禁用", createdAt: "2026-04-30" },
@@ -720,6 +720,13 @@ function FarmRolePicker({
     value.filter((v) => v.roles.includes(role)).map((v) => v.farm);
   const isRoleUsed = (role: string) => farmsForRole(role).length > 0;
 
+  const usedRoles = useMemo(
+    () => Array.from(new Set(value.flatMap((v) => v.roles))),
+    [value],
+  );
+  const MAX_ROLES = 2;
+  const roleLimitReached = usedRoles.length >= MAX_ROLES;
+
   const [roleKw, setRoleKw] = useState("");
   const [farmKw, setFarmKw] = useState("");
   const initialActive =
@@ -749,6 +756,11 @@ function FarmRolePicker({
   const toggleFarmForActiveRole = (farm: string) => {
     if (!activeRole) return;
     const existing = value.find((v) => v.farm === farm);
+    const adding = !existing || !existing.roles.includes(activeRole);
+    if (adding && !usedRoles.includes(activeRole) && roleLimitReached) {
+      toast.error(`一个帐号最多配置 ${MAX_ROLES} 个角色`);
+      return;
+    }
     if (!existing) {
       onChange([...value, { farm, roles: [activeRole] }]);
       return;
@@ -809,6 +821,9 @@ function FarmRolePicker({
               className="h-8 pl-8 text-body-sm"
             />
           </div>
+          <div className="px-3 py-1.5 text-caption text-text-tertiary border-b border-border">
+            已选 {usedRoles.length}/{MAX_ROLES} 个角色
+          </div>
           <div className="flex-1 overflow-y-auto py-1 max-h-[340px]">
             {filteredRoles.length === 0 ? (
               <div className="text-caption text-text-tertiary text-center py-6">
@@ -831,6 +846,7 @@ function FarmRolePicker({
                   >
                     <Checkbox
                       checked={used}
+                      disabled={!used && roleLimitReached}
                       onClick={(e) => e.stopPropagation()}
                       onCheckedChange={(v) => {
                         if (!v) clearRole(r);
