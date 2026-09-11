@@ -667,11 +667,13 @@ function RolePage() {
     }));
   };
   /** 单个功能开关 */
-  const setMiniFunc = (mKey: string, fKey: string, v: boolean) =>
+  const setMiniFunc = (mKey: string, fKey: string, v: boolean) => {
+    if (v && mKey === "task" && fKey === "batch") setBatchNoticeOpen(true);
     mutateMini((m) => ({
       ...m,
       [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], on: v } },
     }));
+  };
   /** 模块整行 */
   const setMiniModule = (mKey: string, v: boolean) =>
     mutateMini((m) => ({
