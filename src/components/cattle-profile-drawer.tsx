@@ -1241,7 +1241,19 @@ function ScreeningHistory() {
             <div className="rounded-xl border border-border bg-card p-4">
               <div className="flex items-center justify-between gap-3">
                 <span className="font-mono text-body-sm text-foreground">{orderPreview.no}</span>
-                <span className="rounded-md bg-muted px-1.5 py-0.5 text-caption text-text-secondary">
+                <span
+                  className={
+                    orderPreview.status === "已完成"
+                      ? "tag tag-success"
+                      : orderPreview.status === "执行中"
+                        ? "tag tag-info"
+                        : orderPreview.status === "待诊断"
+                          ? "tag tag-warning"
+                          : orderPreview.status === "已终止"
+                            ? "tag tag-danger"
+                            : "tag tag-muted"
+                  }
+                >
                   {orderPreview.status}
                 </span>
               </div>
