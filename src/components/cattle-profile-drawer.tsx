@@ -300,6 +300,29 @@ export function CattleProfileDrawer({
           ? "bg-[#FFE8CC] text-[#C9621F]"
           : "bg-[#E8F5E9] text-[#2E7D32]";
 
+  // 头部渐变与状态标签色系联动
+  const headerTint =
+    health === "死淘"
+      ? "#F0F2F4"
+      : health === "异常"
+      ? "#FFE4E1"
+      : health === "观察中"
+        ? "#FFF7E6"
+        : health === "治疗中"
+          ? "#FFE8CC"
+          : "#EFFBF1";
+  const iconTone =
+    health === "死淘"
+      ? "text-[#64748B]"
+      : health === "异常"
+      ? "text-[#D9534F]"
+      : health === "观察中"
+        ? "text-[#B8860B]"
+        : health === "治疗中"
+          ? "text-[#C9621F]"
+          : "text-primary";
+
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
@@ -308,9 +331,12 @@ export function CattleProfileDrawer({
       >
         {/* 头部：品牌化身份区 */}
         <header className="shrink-0 border-b border-border bg-card">
-          <div className="px-7 pt-6 pb-5 bg-[linear-gradient(180deg,var(--brand-subtle,#EFFBF1)_0%,transparent_100%)]">
+          <div
+            className="px-7 pt-6 pb-5 transition-colors"
+            style={{ backgroundImage: `linear-gradient(180deg, ${headerTint} 0%, transparent 100%)` }}
+          >
             <div className="flex items-start gap-4">
-              <span className="h-12 w-12 rounded-xl bg-card border border-border text-primary inline-flex items-center justify-center shrink-0 shadow-sm">
+              <span className={`h-12 w-12 rounded-xl bg-card border border-border inline-flex items-center justify-center shrink-0 shadow-sm ${iconTone}`}>
                 <Beef className="h-5 w-5" />
               </span>
               <div className="min-w-0 flex-1">
