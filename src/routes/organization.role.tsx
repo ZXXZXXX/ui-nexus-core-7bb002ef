@@ -487,6 +487,8 @@ function RolePage() {
   );
   const toggleNode = (k: string) => setTreeOpen((m) => ({ ...m, [k]: !m[k] }));
   const isOpen = (k: string) => !!treeOpen[k];
+  /** 权限树左右布局：当前选中的一级菜单 */
+  const [navActive, setNavActive] = useState<string>(navSpec[0]!.key);
 
   const startCreate = () => {
     if (!canManage) return;
