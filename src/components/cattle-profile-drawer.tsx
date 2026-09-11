@@ -7,26 +7,16 @@ import {
   Radio,
   Activity,
   ChevronRight,
-  ChevronDown,
   ArrowRight,
   FilePlus2,
-  MessageSquareWarning,
   ListChecks,
   Image as ImageIcon,
   AlertTriangle,
 } from "lucide-react";
-import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { markAlertHandled } from "@/lib/alert-store";
 
 /**
  * PC「牛只信息」档案详情抽屉。
