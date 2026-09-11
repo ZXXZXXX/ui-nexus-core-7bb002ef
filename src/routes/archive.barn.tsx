@@ -122,7 +122,7 @@ function BarnPage() {
       render: (b) => <span className="tabular-nums text-body text-foreground">{b.stock}</span>,
     },
     {
-      key: "updatedAt", label: "更新时间", date: true, filter: "date", defaultHidden: true,
+      key: "updatedAt", label: "更新时间", filter: "none", defaultHidden: true,
       render: (b) => <span className="text-body-sm text-text-secondary tabular-nums">{b.updatedAt}</span>,
     },
   ];
