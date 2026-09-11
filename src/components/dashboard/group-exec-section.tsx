@@ -850,7 +850,7 @@ function DeathCullTrendSection({ scopeRegion, scopeLabel, granularity: initialG 
 /* ---------------- 早产率变化趋势 ---------------- */
 
 function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity: initialG }: TrendProps) {
-  const { labels, factors, granularity, setGranularity } = usePeriod(initialG);
+  const { labels, factors, granularity, setGranularity, offset, setOffset } = usePeriod(initialG);
   const { all } = useScopeRatio(scopeRegion);
   const base = ((all.pp30 || 2) * 1.6) / 2 + 3.2;
   const points = factors.map((k) => Number((base * k).toFixed(2)));
@@ -864,16 +864,19 @@ function PrematureRateTrendSection({ scopeRegion, scopeLabel, granularity: initi
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={<GranularityTabs value={granularity} onChange={setGranularity} />}
     >
-      <SmoothAreaTrend
-        labels={labels}
-        points={points}
-        unit="%"
-        name="早产率"
-        color="var(--chart-blue, #3B82F6)"
-        formatValue={(v, i) =>
-          `${v.toFixed(2)}%（${Math.round((v / 100) * calvings[i]).toLocaleString()} / ${calvings[i].toLocaleString()} 产犊）`
-        }
-      />
+      <PannableChart granularity={granularity} offset={offset} onOffsetChange={setOffset}>
+        <SmoothAreaTrend
+          labels={labels}
+          points={points}
+          unit="%"
+          name="早产率"
+          color="var(--chart-blue, #3B82F6)"
+          formatValue={(v, i) =>
+            `${v.toFixed(2)}%（${Math.round((v / 100) * calvings[i]).toLocaleString()} / ${calvings[i].toLocaleString()} 产犊）`
+          }
+        />
+      </PannableChart>
+
     </SectionCard>
   );
 }
