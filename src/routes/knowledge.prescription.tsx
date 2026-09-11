@@ -47,6 +47,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { maxDaysFor, drugDayLimit } from "@/data/drug-days";
 import { StatScopeCard, prescriptionStats } from "@/components/stat-scope-card";
 import { PRESCRIPTION_SEED, RX_DRUG_CATALOG } from "@/lib/prescription-kb";
 
@@ -958,7 +959,12 @@ function DrugDetailRow({
           </div>
           <div className="w-28">
             <Field label="用药天数" required>
-              <NumberInput value={value.days} onChange={(days) => onChange({ days })} suffix="天" />
+              <NumberInput
+                value={value.days}
+                onChange={(days) => onChange({ days })}
+                suffix="天"
+                max={maxDaysFor(value.drugs.map((d) => d.name))}
+              />
             </Field>
           </div>
           <div className="w-48">
@@ -1115,7 +1121,12 @@ function AltDrugEditor({
         </div>
         <div className="w-28">
           <Field label="用药天数" required>
-            <NumberInput value={days} onChange={(v) => onChange({ days: v })} suffix="天" />
+            <NumberInput
+              value={days}
+              onChange={(v) => onChange({ days: v })}
+              suffix="天"
+              max={drugDayLimit(drug.name).maxDays}
+            />
           </Field>
         </div>
         <div className="w-48">
