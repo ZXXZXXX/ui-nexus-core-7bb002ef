@@ -47,8 +47,8 @@ const columns: ListColumn<Farm>[] = [
   { key: "region", label: "所在地区", filter: "select", width: "11em", value: (f) => `${f.province}·${f.city}`, render: (f) => <span className="text-body-sm text-text-secondary truncate">{f.province}·{f.city}</span> },
   { key: "slot", label: "仓位号", filter: "select", render: (f) => <span className="font-mono text-body-sm text-text-secondary">{f.slot}</span> },
   {
-    key: "type", label: "牛场类型", filter: "select",
-    render: (f) => <span className={`tag ${f.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{f.type}</span>,
+    key: "type", label: "牛场类型", filter: "select", width: "6.5em",
+    render: (f) => <span className={`tag whitespace-nowrap ${f.type === "有机牧场" ? "tag-info" : "tag-warning"}`}>{f.type}</span>,
   },
   {
     key: "erpBook", label: "ERP 帐套", filter: "select", width: "13em",
