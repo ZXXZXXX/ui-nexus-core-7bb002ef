@@ -141,7 +141,7 @@ function CattlePage() {
       ),
     },
     { key: "breed", label: "品种", filter: "select", value: (c) => c.breed },
-    { key: "age", label: "年龄", filter: "none", value: (c) => ageLabelOf(c.birth) },
+    { key: "age", label: "月龄", filter: "none", value: (c) => monthAgeOf(c.birth) },
     { key: "type", label: "类型", filter: "select", value: (c) => c.type },
     { key: "parity", label: "胎次", filter: "number", value: (c) => c.parity, render: (c) => (c.parity > 0 ? `${c.parity} 胎` : "-") },
     { key: "barn", label: "所在牛舍", filter: "select", value: (c) => c.barn },
