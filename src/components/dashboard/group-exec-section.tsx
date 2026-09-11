@@ -659,12 +659,35 @@ function useScopeRatio(scopeRegion?: string | null) {
   }, [scopeRegion]);
 }
 
-function usePeriod() {
-  const [period, setPeriod] = useState("近 6 个月");
-  const n = period === "近 6 个月" ? 6 : 12;
-  const labels = ALL_MONTHS.slice(-n);
-  const factors = MONTH_FACTORS.slice(-n);
-  return { period, setPeriod, labels, factors };
+export type Granularity = "day" | "month" | "year";
+
+/** 按时间维度生成横轴标签与波动因子：日度近 30 天 / 月度近 12 个月 / 年度近 12 年 */
+export function axisFor(g: Granularity = "month") {
+  if (g === "day") {
+    const now = new Date(2026, 8, 11);
+    const labels: string[] = [];
+    const factors: number[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * 86400000);
+      labels.push(`${d.getMonth() + 1}/${d.getDate()}`);
+      factors.push(Number((0.86 + 0.28 * ((Math.sin(i * 1.7) + 1) / 2)).toFixed(3)));
+    }
+    return { labels, factors };
+  }
+  if (g === "year") {
+    const labels: number[] = [];
+    for (let i = 11; i >= 0; i--) labels.push(2026 - i);
+    return {
+      labels: labels.map((y) => `${y}年`),
+      factors: labels.map((_, i) => Number((0.88 + 0.24 * ((Math.sin(i * 0.9) + 1) / 2)).toFixed(3))),
+    };
+  }
+  return { labels: ALL_MONTHS, factors: MONTH_FACTORS };
+}
+
+function usePeriod(granularity: Granularity = "month") {
+  const { labels, factors } = useMemo(() => axisFor(granularity), [granularity]);
+  return { labels, factors };
 }
 
 /* ---------------- 产后淘汰率趋势 ---------------- */
