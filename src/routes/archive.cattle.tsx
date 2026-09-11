@@ -44,7 +44,9 @@ function healthTag(h: Health) {
       ? "tag tag-warning"
       : h === "死淘"
         ? "tag tag-muted"
-        : "tag tag-danger";
+        : h === "治疗中"
+          ? "tag tag-info"
+          : "tag tag-danger";
 }
 
 
