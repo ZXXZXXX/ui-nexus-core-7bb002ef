@@ -88,6 +88,7 @@ type Source = "人事系统" | "兽医系统";
 type FarmRole = { farm: string; roles: string[] };
 type Account = {
   id: string;
+  employeeNo: string; // 人事系统工号
   name: string;
   initial: string;
   phone: string;
@@ -187,13 +188,13 @@ function unionPermsForRoles(rs: string[]): RolePermPreview {
 }
 
 const initialAccounts: Account[] = [
-  { id: "U001", name: "张磊", initial: "ZL", phone: "13856216201", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["场长"] }], wecomId: "wm_zhanglei_8821", wechatId: "wx_zhanglei_6688", status: "启用", createdAt: "2024-03-08" },
-  { id: "U002", name: "李雨晴", initial: "LY", phone: "13930183018", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["兽医", "技术员"] }, { farm: "2 号牧场", roles: ["技术员"] }], wecomId: "wm_liyuqing_3210", wechatId: "wx_liyuqing_4521", status: "启用", createdAt: "2024-06-21" },
-  { id: "U003", name: "陈晓东", initial: "CX", phone: "13785208520", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["技术员"] }], wecomId: null, wechatId: "wx_chenxd_7702", status: "启用", createdAt: "2025-09-12" },
-  { id: "U004", name: "王仓管", initial: "WC", phone: "13643024302", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["仓管员"] }, { farm: "2 号牧场", roles: ["仓管员"] }, { farm: "3 号牧场", roles: ["技术员", "仓管员"] }], wecomId: "wm_wangck_5601", wechatId: null, status: "启用", createdAt: "2026-02-04" },
-  { id: "U005", name: "孙库管", initial: "SK", phone: "13590129012", userType: "内部", source: "人事系统", farmRoles: [{ farm: "2 号牧场", roles: ["仓管员"] }], wecomId: null, wechatId: null, status: "禁用", createdAt: "2026-04-30" },
-  { id: "U006", name: "赵修蹄", initial: "ZX", phone: "13477887788", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "1 号牧场", roles: ["修蹄工"] }, { farm: "3 号牧场", roles: ["修蹄工", "普修工"] }, { farm: "金辉牧场", roles: ["普修工"] }], wecomId: "wm_zhaoxt_9912", wechatId: "wx_zhaoxt_3344", status: "启用", createdAt: "2025-11-18" },
-  { id: "U007", name: "刘技师", initial: "LJ", phone: "13355665566", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "2 号牧场", roles: ["干奶工"] }], wecomId: null, wechatId: "wx_liujs_1209", status: "启用", createdAt: "2026-05-09" },
+  { id: "U001", employeeNo: "HR100231", name: "张磊", initial: "ZL", phone: "13856216201", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["场长"] }], wecomId: "wm_zhanglei_8821", wechatId: "wx_zhanglei_6688", status: "启用", createdAt: "2024-03-08" },
+  { id: "U002", employeeNo: "HR100288", name: "李雨晴", initial: "LY", phone: "13930183018", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["兽医", "技术员"] }, { farm: "2 号牧场", roles: ["技术员"] }], wecomId: "wm_liyuqing_3210", wechatId: "wx_liyuqing_4521", status: "启用", createdAt: "2024-06-21" },
+  { id: "U003", employeeNo: "HR100312", name: "陈晓东", initial: "CX", phone: "13785208520", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["技术员"] }], wecomId: null, wechatId: "wx_chenxd_7702", status: "启用", createdAt: "2025-09-12" },
+  { id: "U004", employeeNo: "HR100455", name: "王仓管", initial: "WC", phone: "13643024302", userType: "内部", source: "人事系统", farmRoles: [{ farm: "1 号牧场", roles: ["仓管员"] }, { farm: "2 号牧场", roles: ["仓管员"] }, { farm: "3 号牧场", roles: ["技术员", "仓管员"] }], wecomId: "wm_wangck_5601", wechatId: null, status: "启用", createdAt: "2026-02-04" },
+  { id: "U005", employeeNo: "HR100479", name: "孙库管", initial: "SK", phone: "13590129012", userType: "内部", source: "人事系统", farmRoles: [{ farm: "2 号牧场", roles: ["仓管员"] }], wecomId: null, wechatId: null, status: "禁用", createdAt: "2026-04-30" },
+  { id: "U006", employeeNo: "—", name: "赵修蹄", initial: "ZX", phone: "13477887788", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "1 号牧场", roles: ["修蹄工"] }, { farm: "3 号牧场", roles: ["修蹄工", "普修工"] }, { farm: "金辉牧场", roles: ["普修工"] }], wecomId: "wm_zhaoxt_9912", wechatId: "wx_zhaoxt_3344", status: "启用", createdAt: "2025-11-18" },
+  { id: "U007", employeeNo: "—", name: "刘技师", initial: "LJ", phone: "13355665566", userType: "外部", source: "兽医系统", farmRoles: [{ farm: "2 号牧场", roles: ["干奶工"] }], wecomId: null, wechatId: "wx_liujs_1209", status: "启用", createdAt: "2026-05-09" },
 
 ];
 
@@ -358,7 +359,7 @@ function AccountPage() {
   }, [accounts, keyword, onlyInternal, filterRole, filterFarms, filterStatus]);
 
   // 列宽：勾选 用户 来源 类型 手机号 角色 关联牧场 企微ID 状态 管理
-  const cols = "40px 1.5fr 0.9fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 0.7fr 0.5fr";
+  const cols = "40px 0.9fr 1.2fr 1fr 0.9fr 0.8fr 1.1fr 1.3fr 1.8fr 140px 0.7fr 0.5fr";
 
   const visibleIds = filteredAccounts.map((a) => a.id);
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedIds.has(id));
@@ -545,7 +546,9 @@ function AccountPage() {
                 aria-label="全选"
               />
             </div>
+            <div>账号编号</div>
             <div>用户</div>
+            <div>工号</div>
             <div>来源</div>
             <div>人员类型</div>
             <div>手机号</div>
@@ -567,10 +570,9 @@ function AccountPage() {
                   aria-label={`选择 ${a.name}`}
                 />
               </div>
-              <div className="leading-tight min-w-0">
-                <div className="text-body text-foreground truncate">{a.name}</div>
-                <div className="text-caption text-text-tertiary font-mono">{a.id}</div>
-              </div>
+              <div className="text-body-sm text-text-secondary font-mono truncate">{a.id}</div>
+              <div className="text-body text-foreground truncate">{a.name}</div>
+              <div className="text-body-sm text-text-secondary font-mono truncate">{a.employeeNo}</div>
               <div className="text-body-sm text-text-secondary truncate">{a.source}</div>
               <div><span className={`tag ${userTypeTagClass(a.userType)}`}>{a.userType}</span></div>
               <div className="text-body-sm text-text-secondary tabular-nums">{maskPhone(a.phone)}</div>
@@ -1448,6 +1450,7 @@ function CreateDialog({
     onCreate(
       {
         name: name.trim(),
+        employeeNo: "—",
         phone: phone.trim(),
         userType,
         source: "兽医系统",
