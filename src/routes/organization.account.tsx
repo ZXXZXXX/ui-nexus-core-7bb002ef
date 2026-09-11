@@ -591,19 +591,10 @@ function AccountPage() {
                 aria-label="全选"
               />
             </div>
-            <div>账号编号</div>
-            <div>用户</div>
-            <div>工号</div>
-            <div>来源</div>
-            <div>人员类型</div>
-            <div>手机号</div>
-            <div>角色</div>
-            <div>关联牧场</div>
-            <div>企微 ID</div>
-            
-            <div>状态</div>
+            {shownCols.map((c) => (
+              <div key={c.key}>{c.label}</div>
+            ))}
             <div className="text-right">管理</div>
-
           </div>
           {filteredAccounts.map((a) => (
             <div key={a.id} className={`grid gap-3 px-6 h-12 items-center text-table-cell border-b border-border last:border-0 hover:bg-surface-subtle ${selectedIds.has(a.id) ? "bg-brand-subtle/40" : ""}`}
@@ -615,60 +606,11 @@ function AccountPage() {
                   aria-label={`选择 ${a.name}`}
                 />
               </div>
-              <div className="text-body-sm text-text-secondary font-mono truncate">{a.id}</div>
-              <div className="text-body text-foreground truncate">{a.name}</div>
-              <div className="text-body-sm text-text-secondary font-mono truncate">{a.employeeNo}</div>
-              <div className="text-body-sm text-text-secondary truncate">{a.source}</div>
-              <div><span className={`tag ${userTypeTagClass(a.userType)}`}>{a.userType}</span></div>
-              <div className="text-body-sm text-text-secondary tabular-nums">{maskPhone(a.phone)}</div>
-              <div className="flex items-center gap-1 min-w-0 overflow-hidden">
-                {(() => {
-                  const rs = rolesOf(a);
-                  if (rs.length === 0) return <span className="tag tag-muted">未分配</span>;
-                  return (
-                    <>
-                      <span className="tag tag-brand whitespace-nowrap" title={rs[0]}>{ellipsize(rs[0], 3)}</span>
-                      {rs.length > 1 && (
-                        <span
-                          className="tag tag-brand whitespace-nowrap"
-                          title={rs.slice(1).join("、")}
-                        >
-                          +{rs.length - 1}
-                        </span>
-                      )}
-                    </>
-                  );
-                })()}
-              </div>
-              <div className="flex items-center gap-1 min-w-0 overflow-hidden">
-                {(() => {
-                  const fs = farmsOf(a);
-                  if (fs.length === 0) return <span className="tag tag-muted">未关联</span>;
-                  return (
-                    <>
-                      <span className="tag tag-muted whitespace-nowrap" title={fs[0]}>{ellipsize(fs[0], 4)}</span>
-                      {fs.length > 1 && (
-                        <span
-                          className="tag tag-muted whitespace-nowrap"
-                          title={a.farmRoles.slice(1).map((x) => `${x.farm}（${x.roles.join("、") || "未分配"}）`).join("\n")}
-                        >
-                          +{fs.length - 1}
-                        </span>
-                      )}
-                    </>
-                  );
-                })()}
-              </div>
-              <div className="text-body-sm tabular-nums min-w-0 overflow-hidden">
-                {a.wecomId ? (
-                  <span className="block truncate text-text-secondary font-mono" title="已脱敏显示">{maskId(a.wecomId)}</span>
-                ) : (
-                  <span className="tag tag-muted">未绑定</span>
-                )}
-              </div>
-
-
-              <div><span className={`tag ${a.status === "启用" ? "tag-success" : "tag-muted"}`}>{a.status}</span></div>
+              {shownCols.map((c) => (
+                <div key={c.key} className="min-w-0 overflow-hidden">
+                  {renderCell(a, c.key)}
+                </div>
+              ))}
               <div className="flex justify-end">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
