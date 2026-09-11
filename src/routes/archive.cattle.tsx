@@ -101,6 +101,12 @@ function CattlePage() {
     setCurrent(toProfile(c));
     setOpen(true);
   };
+  const exportCurrent = () =>
+    exportCsv(
+      "牛只信息",
+      ["耳号", "品种", "年龄", "类型", "胎次", "所在牛舍", "当前状态"],
+      cattle.map((c) => [c.ear, c.breed, ageLabelOf(c.birth), c.type, c.parity || "-", c.barn, c.health]),
+    );
   return (
     <>
       <AppHeader title="牛只信息" breadcrumb={["基础档案", "牛只信息"]} />
