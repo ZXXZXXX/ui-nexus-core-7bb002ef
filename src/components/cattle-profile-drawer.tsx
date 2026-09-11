@@ -281,13 +281,11 @@ export function CattleProfileDrawer({
   const scrollRef = useRef<HTMLDivElement>(null);
 
 
-  const [observed, setObserved] = useState(false);
   const [activeDevice, setActiveDevice] = useState<Device | null>(null);
 
   if (!cow) return null;
 
-  const health = observed ? "观察中" : cow.health;
-  const abnormal = cow.health === "异常" || cow.health === "观察中" || observed;
+  const health = cow.health;
 
 
   const healthCls =
