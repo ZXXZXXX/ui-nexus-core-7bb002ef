@@ -692,7 +692,7 @@ function RolePage() {
   const globalScope = (kind: MiniScope): string[] => {
     for (const m of miniSpec) {
       for (const f of m.funcs) {
-        if (f.scope === kind) return cur.mini[m.key][f.key].scope;
+        if (f.scope === kind) return cur?.mini[m.key][f.key].scope ?? [];
       }
     }
     return [];
