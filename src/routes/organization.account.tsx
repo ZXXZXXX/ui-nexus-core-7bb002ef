@@ -1156,28 +1156,54 @@ function FarmRolePicker({
     [value, activeRole],
   );
 
+  const allFarmsSelected =
+    !!activeRole && filteredFarms.length > 0 && filteredFarms.every((f) => activeFarmsSet.has(f));
+
+  const setFarmsForActiveRole = (farms: string[]) => {
+    if (!activeRole) return;
+    const target = new Set(farms);
+    const next = value
+      .map((v) => ({
+        ...v,
+        roles: target.has(v.farm)
+          ? Array.from(new Set([...v.roles, activeRole]))
+          : v.roles.filter((r) => r !== activeRole),
+      }))
+      .filter((v) => v.roles.length > 0);
+    const existing = new Set(next.map((v) => v.farm));
+    farms.forEach((f) => {
+      if (!existing.has(f)) next.push({ farm: f, roles: [activeRole] });
+    });
+    onChange(next);
+  };
+
   return (
-    <div className="rounded-md border border-border bg-surface-subtle overflow-hidden">
-      <div className="grid grid-cols-[minmax(0,220px)_1fr] min-h-[320px]">
+    <div className="rounded-lg border border-border bg-card overflow-hidden">
+      <div className="grid grid-cols-[minmax(0,236px)_1fr] min-h-[340px]">
         {/* 左：角色 */}
-        <div className="border-r border-border flex flex-col bg-card">
-          <div className="relative p-2 border-b border-border">
-            <Search className="absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
-            <Input
-              value={roleKw}
-              onChange={(e) => setRoleKw(e.target.value)}
-              placeholder="搜索角色"
-              className="h-8 pl-8 text-body-sm"
-            />
+        <div className="border-r border-border flex flex-col">
+          <div className="px-3 pt-3 pb-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
+              <Input
+                value={roleKw}
+                onChange={(e) => setRoleKw(e.target.value)}
+                placeholder="搜索角色"
+                className="h-8 pl-8 text-body-sm rounded-md"
+              />
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-caption text-text-tertiary">角色</span>
+              <span
+                className={`text-caption ${roleLimitReached ? "text-warning" : "text-text-tertiary"}`}
+              >
+                {usedRoles.length}/{MAX_ROLES}
+              </span>
+            </div>
           </div>
-          <div className="px-3 py-1.5 text-caption text-text-tertiary border-b border-border">
-            已选 {usedRoles.length}/{MAX_ROLES} 个角色
-          </div>
-          <div className="flex-1 overflow-y-auto py-1 max-h-[340px]">
+          <div className="flex-1 overflow-y-auto pb-1 max-h-[300px]">
             {filteredRoles.length === 0 ? (
-              <div className="text-caption text-text-tertiary text-center py-6">
-                无匹配角色
-              </div>
+              <div className="text-caption text-text-tertiary text-center py-8">无匹配角色</div>
             ) : (
               filteredRoles.map((r) => {
                 const used = isRoleUsed(r);
@@ -1187,12 +1213,15 @@ function FarmRolePicker({
                   <div
                     key={r}
                     onClick={() => setActiveRole(r)}
-                    className={`flex items-center gap-2 px-3 py-1.5 cursor-pointer text-body-sm border-l-2 ${
+                    className={`relative flex items-center gap-2.5 pl-4 pr-3 h-10 cursor-pointer text-body-sm transition-colors ${
                       isActive
-                        ? "bg-sidebar-hover border-primary text-foreground"
-                        : "border-transparent hover:bg-surface-subtle text-text-secondary"
+                        ? "bg-brand-subtle text-foreground font-medium"
+                        : "hover:bg-surface-subtle text-text-secondary"
                     }`}
                   >
+                    {isActive && (
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full bg-primary" />
+                    )}
                     <Checkbox
                       checked={used}
                       disabled={!used && roleLimitReached}
@@ -1203,14 +1232,13 @@ function FarmRolePicker({
                       }}
                     />
                     <span className="flex-1 truncate">{r}</span>
-                    {INTERNAL_ROLES.includes(r) ? (
-                      <span className="text-caption text-text-tertiary shrink-0">内部</span>
-                    ) : EXTERNAL_ROLES.includes(r) ? (
-                      <span className="text-caption text-text-tertiary shrink-0">外部</span>
-                    ) : null}
-                    {used && (
-                      <span className="text-caption text-text-tertiary shrink-0">
+                    {used ? (
+                      <span className="shrink-0 h-5 min-w-5 px-1.5 rounded-full bg-primary/10 text-primary text-caption inline-flex items-center justify-center">
                         {farmCount}
+                      </span>
+                    ) : (
+                      <span className="text-caption text-text-tertiary shrink-0">
+                        {INTERNAL_ROLES.includes(r) ? "内部" : EXTERNAL_ROLES.includes(r) ? "外部" : ""}
                       </span>
                     )}
                   </div>
@@ -1234,10 +1262,10 @@ function FarmRolePicker({
             <Button
               type="button"
               size="sm"
-              variant="outline"
+              variant="ghost"
               onClick={handleCreateRole}
               disabled={!newRole.trim()}
-              className="h-8 gap-1 text-body-sm shrink-0"
+              className="h-8 gap-1 px-2 text-body-sm shrink-0 text-primary hover:text-primary hover:bg-brand-subtle"
             >
               <Plus className="h-3.5 w-3.5" /> 新建
             </Button>
@@ -1252,57 +1280,78 @@ function FarmRolePicker({
             </div>
           ) : (
             <>
-              <div className="px-4 py-2.5 border-b border-border flex items-center justify-between gap-2">
-                <div className="text-body-sm text-foreground font-medium truncate">
-                  {activeRole}
-                  <span className="ml-2 text-caption text-text-tertiary font-normal">
+              <div className="px-4 pt-3 pb-2 flex items-center gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="tag tag-brand whitespace-nowrap">{activeRole}</span>
+                  <span className="text-caption text-text-tertiary whitespace-nowrap">
                     已分配 {activeFarmsSet.size} 个牧场
                   </span>
                 </div>
-                {activeFarmsSet.size > 0 && (
+                <div className="ml-auto flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => clearRole(activeRole)}
-                    className="inline-flex items-center gap-1 text-caption text-text-tertiary hover:text-destructive"
+                    onClick={() =>
+                      allFarmsSelected
+                        ? setFarmsForActiveRole([])
+                        : setFarmsForActiveRole(
+                            Array.from(new Set([...activeFarmsSet, ...filteredFarms])),
+                          )
+                    }
+                    className="text-caption text-primary hover:opacity-80 whitespace-nowrap"
                   >
-                    <Unlink className="h-3 w-3" /> 清除该角色全部分配
+                    {allFarmsSelected ? "取消全选" : "全选"}
                   </button>
-                )}
+                  {activeFarmsSet.size > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => clearRole(activeRole)}
+                      className="inline-flex items-center gap-1 text-caption text-text-tertiary hover:text-destructive whitespace-nowrap"
+                    >
+                      <Unlink className="h-3 w-3" /> 清除分配
+                    </button>
+                  )}
+                </div>
               </div>
-              <div className="p-2 border-b border-border relative">
-                <Search className="absolute left-4 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
-                <Input
-                  value={farmKw}
-                  onChange={(e) => setFarmKw(e.target.value)}
-                  placeholder="搜索牧场"
-                  className="h-8 pl-8 text-body-sm"
-                />
+              <div className="px-4 pb-2">
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-text-tertiary" />
+                  <Input
+                    value={farmKw}
+                    onChange={(e) => setFarmKw(e.target.value)}
+                    placeholder="搜索牧场"
+                    className="h-8 pl-8 text-body-sm rounded-md"
+                  />
+                </div>
               </div>
-              <div className="flex-1 overflow-y-auto p-3 space-y-0.5 max-h-[220px]">
+              <div className="flex-1 overflow-y-auto px-4 pb-3 max-h-[240px]">
                 {filteredFarms.length === 0 ? (
-                  <div className="text-caption text-text-tertiary text-center py-6">
-                    无匹配牧场
-                  </div>
+                  <div className="text-caption text-text-tertiary text-center py-8">无匹配牧场</div>
                 ) : (
-                  filteredFarms.map((f) => {
-                    const checked = activeFarmsSet.has(f);
-                    return (
-                      <label
-                        key={f}
-                        className="flex items-center gap-2 cursor-pointer text-body-sm px-2 py-1.5 rounded hover:bg-surface-subtle"
-                      >
-                        <Checkbox
-                          checked={checked}
-                          onCheckedChange={() => toggleFarmForActiveRole(f)}
-                        />
-                        <span className="flex-1 text-foreground truncate">{f}</span>
-                      </label>
-                    );
-                  })
+                  <div className="grid grid-cols-2 gap-2">
+                    {filteredFarms.map((f) => {
+                      const checked = activeFarmsSet.has(f);
+                      return (
+                        <label
+                          key={f}
+                          className={`flex items-center gap-2 cursor-pointer text-body-sm h-9 px-2.5 rounded-md border transition-colors ${
+                            checked
+                              ? "border-primary/40 bg-brand-subtle text-foreground"
+                              : "border-border hover:border-primary/30 text-text-secondary"
+                          }`}
+                        >
+                          <Checkbox
+                            checked={checked}
+                            onCheckedChange={() => toggleFarmForActiveRole(f)}
+                          />
+                          <span className="flex-1 truncate">{f}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
-              <div className="px-4 py-2 border-t border-border text-caption text-text-tertiary leading-relaxed bg-surface-subtle">
-                提示：同一牧场可同时分配多个角色，功能权限与数据权限均取所有角色的并集。共关联 {distinctFarmsCount} 个牧场。
+              <div className="px-4 py-2 border-t border-border text-caption text-text-tertiary bg-surface-subtle">
+                同一牧场可分配多个角色，权限取并集 · 共关联 {distinctFarmsCount} 个牧场
               </div>
             </>
           )}
