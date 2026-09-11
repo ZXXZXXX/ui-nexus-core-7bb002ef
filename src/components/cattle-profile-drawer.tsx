@@ -300,6 +300,29 @@ export function CattleProfileDrawer({
           ? "bg-[#FFE8CC] text-[#C9621F]"
           : "bg-[#E8F5E9] text-[#2E7D32]";
 
+  // 头部渐变与状态标签色系联动
+  const headerTint =
+    health === "死淘"
+      ? "#F0F2F4"
+      : health === "异常"
+      ? "#FFE4E1"
+      : health === "观察中"
+        ? "#FFF7E6"
+        : health === "治疗中"
+          ? "#FFE8CC"
+          : "#EFFBF1";
+  const iconTone =
+    health === "死淘"
+      ? "text-[#64748B]"
+      : health === "异常"
+      ? "text-[#D9534F]"
+      : health === "观察中"
+        ? "text-[#B8860B]"
+        : health === "治疗中"
+          ? "text-[#C9621F]"
+          : "text-primary";
+
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
