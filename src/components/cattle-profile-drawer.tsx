@@ -273,6 +273,7 @@ export function CattleProfileDrawer({
 
 
   const [activeDevice, setActiveDevice] = useState<Device | null>(null);
+  const [pedigreeOpen, setPedigreeOpen] = useState(false);
 
   if (!cow) return null;
 
