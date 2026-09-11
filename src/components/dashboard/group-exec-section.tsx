@@ -500,14 +500,11 @@ function DrugTrendSection({ scopeRegion }: { scopeRegion?: string | null }) {
       desc={<span className="tag tag-muted">{scopeRegion ?? "全部牧场"}</span>}
       icon={<BarChart3 className="h-4 w-4 text-primary" strokeWidth={1.75} />}
       extra={
-        <div className="flex items-center gap-2">
-          <span className="tag tag-muted">{period}</span>
-          <TimeTabs
-            value={period}
-            onChange={setPeriod}
-            options={["近 6 个月", "近 1 年"]}
-          />
-        </div>
+        <TimeTabs
+          value={period}
+          onChange={setPeriod}
+          options={["近 6 个月", "近 1 年"]}
+        />
       }
     >
       <DrugComboChart months={months} totalFee={totalFee} perHead={perHead} barHeadroom={1} />
