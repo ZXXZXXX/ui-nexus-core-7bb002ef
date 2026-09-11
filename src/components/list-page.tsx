@@ -353,6 +353,40 @@ export function ListPage<T>({
                     ))}
                   </div>
                 )}
+                {!dateRangeMode && range === "custom" && (
+                  <div className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-card pl-2.5 pr-2">
+                    <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
+                    <input
+                      type="date"
+                      value={from}
+                      max={to || undefined}
+                      onChange={(e) => setFrom(e.target.value)}
+                      aria-label="开始日期"
+                      className="h-7 w-[112px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none hover:bg-surface-subtle"
+                    />
+                    <span className="h-px w-2 shrink-0 bg-border" />
+                    <input
+                      type="date"
+                      value={to}
+                      min={from || undefined}
+                      onChange={(e) => setTo(e.target.value)}
+                      aria-label="结束日期"
+                      className="h-7 w-[112px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none hover:bg-surface-subtle"
+                    />
+                    {(from || to) && (
+                      <button
+                        onClick={() => {
+                          setFrom("");
+                          setTo("");
+                        }}
+                        aria-label="重置时间范围"
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-tertiary hover:bg-surface-subtle hover:text-foreground"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
