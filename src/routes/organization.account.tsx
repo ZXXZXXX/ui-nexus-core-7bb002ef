@@ -1018,6 +1018,7 @@ function AccountDrawerInner({
   const [wecomId, setWecomId] = useState<string | null>(account.wecomId);
   const [wechatId, setWechatId] = useState<string | null>(account.wechatId);
   const [status, setStatus] = useState<Status>(account.status);
+  const [pendingUserType, setPendingUserType] = useState<UserType | null>(null);
 
   const baseRoles = userType === "内部" ? internalRoles : externalRoles;
   const availableRoles = useMemo(() => {
