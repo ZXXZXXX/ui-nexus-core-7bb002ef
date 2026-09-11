@@ -51,7 +51,7 @@ export type ListColumn<T> = {
   className?: string;
 };
 
-export type QuickRange = "all" | "today" | "7d" | "30d";
+export type QuickRange = "all" | "today" | "7d" | "30d" | "custom";
 
 export type ListPageProps<T> = {
   title: string;
@@ -86,6 +86,7 @@ const RANGES: { key: QuickRange; label: string }[] = [
   { key: "today", label: "今日" },
   { key: "7d", label: "最近 7 天" },
   { key: "30d", label: "最近 30 天" },
+  { key: "custom", label: "自定义" },
 ];
 
 function raw<T>(col: ListColumn<T>, row: T): string {
@@ -176,8 +177,9 @@ export function ListPage<T>({
 
   const data = useMemo(() => {
     const kw = q.trim().toLowerCase();
-    const start = dateRangeMode ? (from ? parseDate(from) : null) : rangeStart(range);
-    const end = dateRangeMode && to ? parseDate(to) : null;
+    const custom = dateRangeMode || range === "custom";
+    const start = custom ? (from ? parseDate(from) : null) : rangeStart(range);
+    const end = custom && to ? parseDate(to) : null;
     const dateCol = columns.find((c) => c.key === dateKey);
 
     return rows.filter((row) => {
@@ -350,6 +352,40 @@ export function ListPage<T>({
                         {r.label}
                       </button>
                     ))}
+                  </div>
+                )}
+                {!dateRangeMode && range === "custom" && (
+                  <div className="inline-flex h-9 items-center gap-1.5 rounded-md border border-border bg-card pl-2.5 pr-2">
+                    <CalendarDays className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
+                    <input
+                      type="date"
+                      value={from}
+                      max={to || undefined}
+                      onChange={(e) => setFrom(e.target.value)}
+                      aria-label="开始日期"
+                      className="h-7 w-[112px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none hover:bg-surface-subtle"
+                    />
+                    <span className="h-px w-2 shrink-0 bg-border" />
+                    <input
+                      type="date"
+                      value={to}
+                      min={from || undefined}
+                      onChange={(e) => setTo(e.target.value)}
+                      aria-label="结束日期"
+                      className="h-7 w-[112px] cursor-pointer rounded bg-transparent px-1 text-body-sm tabular-nums text-foreground outline-none hover:bg-surface-subtle"
+                    />
+                    {(from || to) && (
+                      <button
+                        onClick={() => {
+                          setFrom("");
+                          setTo("");
+                        }}
+                        aria-label="重置时间范围"
+                        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-text-tertiary hover:bg-surface-subtle hover:text-foreground"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
