@@ -445,6 +445,7 @@ function HomePage() {
             ? { ...c, ...farmOutCardOverride[c.anchor] }
             : c,
     )
+    .map(applyDataLevel)
     .filter((c) => vis[cardTopicByAnchor[c.anchor]] !== false)
     .sort(
       (a, b) =>
@@ -459,11 +460,11 @@ function HomePage() {
           const map = new Map(baseCards.map((c) => [c.topic, c]));
           const execOrder =
             scope === "group"
-              ? groupBizCards
+              ? groupBizCards.map(applyDataLevel)
 
               : scope === "region"
-                ? [regionLeadCard, map.get("治愈数"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), regionTailCard]
-                : farmOutBizCards;
+                ? [applyDataLevel(regionLeadCard), map.get("治愈数"), map.get("死淘总数"), map.get("早产率"), map.get("总药费支出"), applyDataLevel(regionTailCard)]
+                : farmOutBizCards.map(applyDataLevel);
 
           return execOrder.filter(Boolean) as MetricCard[];
         })()
