@@ -1118,7 +1118,7 @@ function FarmRolePicker({
   const initialActive =
     [...roles].find((r) => isRoleUsed(r)) ?? roles[0] ?? null;
   const [activeRole, setActiveRole] = useState<string | null>(initialActive);
-  const [newRole, setNewRole] = useState("");
+  
 
   const filteredRoles = useMemo(() => {
     const kw = roleKw.trim().toLowerCase();
@@ -1175,17 +1175,6 @@ function FarmRolePicker({
     onChange(next);
   };
 
-  const handleCreateRole = () => {
-    const kw = newRole.trim();
-    if (!kw) return;
-    if (kw.length > 6) {
-      toast.error("角色名称不超过 6 个字");
-      return;
-    }
-    if (!roles.includes(kw)) onCreateRole(kw);
-    setActiveRole(kw);
-    setNewRole("");
-  };
 
   const activeFarmsSet = useMemo(
     () => new Set(activeRole ? farmsForRole(activeRole) : []),
@@ -1282,30 +1271,6 @@ function FarmRolePicker({
                 );
               })
             )}
-          </div>
-          <div className="border-t border-border p-2 flex items-center gap-2">
-            <Input
-              value={newRole}
-              onChange={(e) => setNewRole(e.target.value.slice(0, 6))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleCreateRole();
-                }
-              }}
-              placeholder="新角色（≤6 字）"
-              className="h-8 text-body-sm"
-            />
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={handleCreateRole}
-              disabled={!newRole.trim()}
-              className="h-8 gap-1 px-2 text-body-sm shrink-0 text-primary hover:text-primary hover:bg-brand-subtle"
-            >
-              <Plus className="h-3.5 w-3.5" /> 新建
-            </Button>
           </div>
         </div>
 
@@ -2144,7 +2109,7 @@ function CreateDialog({
               onCreateRole={(r) => onCreateRole(userType, r)}
             />
             <p className="text-caption text-text-tertiary">
-              勾选牧场后请为每个牧场至少指定一个角色；未选角色的牧场切走时会自动取消关联。当前为「{userType}」人员，可在右上方输入新角色名创建。
+              勾选牧场后请为每个牧场至少指定一个角色；未选角色的牧场切走时会自动取消关联。当前为「{userType}」人员。
             </p>
             {incomplete && (
               <p className="text-caption text-warning">当前牧场未选择角色，提交时将自动取消该牧场关联</p>
