@@ -1710,7 +1710,25 @@ function AccountDrawerInner({
           <Button variant="outline" onClick={onClose} className="h-9 text-body-sm font-normal">取消</Button>
           <Button
             disabled={!canSave}
-            onClick={() => onSave({ ...account, phone, userType, farmRoles: effectiveFarmRoles, wecomId, wechatId, status })}    
+            onClick={() => {
+              const changed = phone !== account.phone;
+              if (changed) {
+                if (!/^1\d{10}$/.test(phone)) {
+                  toast.error("请输入正确的手机号");
+                  return;
+                }
+                if (phoneRemain <= 0) {
+                  toast.error("今日该账号手机号变更次数已用完");
+                  return;
+                }
+                const used = bumpPhoneChange(account.id);
+                setPhoneUsed(used);
+                toast.success(
+                  `手机号已换绑，今日还可为该账号变更 ${Math.max(0, PHONE_CHANGE_LIMIT - used)} 次`,
+                );
+              }
+              onSave({ ...account, phone, userType, farmRoles: effectiveFarmRoles, wecomId, wechatId, status });
+            }}
             className="h-9 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
           >
             保存
