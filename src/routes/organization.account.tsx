@@ -1746,25 +1746,19 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
       {open && (
         <div className="mt-4 space-y-4">
           {groups.map((g) => {
-            const perms = unionPermsForRoles(g.roles);
+            const perms = unionPermsForRoles([g.role]);
             const empty = perms.pc.length === 0 && perms.mini.length === 0;
             return (
               <div key={g.key} className="rounded-lg border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-border">
-                  {g.farms.map((f) => (
-                    <span key={f} className="text-body-sm font-medium text-foreground whitespace-nowrap">{f}</span>
-                  ))}
+                  <span className="tag tag-brand whitespace-nowrap">{g.role}</span>
                   <span className="ml-auto flex items-center gap-2 flex-wrap justify-end">
-                    {g.roles.length === 0 ? (
-                      <span className="tag tag-muted">未分配</span>
-                    ) : (
-                      g.roles.map((r) => (
-                        <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
-                      ))
-                    )}
+                    {g.farms.map((f) => (
+                      <span key={f} className="text-caption text-text-secondary whitespace-nowrap">{f}</span>
+                    ))}
                   </span>
-
                 </div>
+
 
                 {empty ? (
                   <p className="px-4 py-3 text-caption text-text-tertiary">该角色暂无权限，请前往「角色权限」配置。</p>
