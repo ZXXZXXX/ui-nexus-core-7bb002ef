@@ -1744,20 +1744,23 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
 
       {open && (
         <div className="mt-4 space-y-4">
-          {farmRoles.map((fr) => {
-            const perms = unionPermsForRoles(fr.roles);
+          {groups.map((g) => {
+            const perms = unionPermsForRoles(g.roles);
             const empty = perms.pc.length === 0 && perms.mini.length === 0;
             return (
-              <div key={fr.farm} className="rounded-lg border border-border bg-card overflow-hidden">
+              <div key={g.key} className="rounded-lg border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-border">
-                  <span className="text-body-sm font-medium text-foreground whitespace-nowrap">{fr.farm}</span>
-                  {fr.roles.length === 0 ? (
+                  {g.farms.map((f) => (
+                    <span key={f} className="text-body-sm font-medium text-foreground whitespace-nowrap">{f}</span>
+                  ))}
+                  {g.roles.length === 0 ? (
                     <span className="tag tag-muted">未分配</span>
                   ) : (
-                    fr.roles.map((r) => (
+                    g.roles.map((r) => (
                       <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
                     ))
                   )}
+
                   {perms.homeView && (
                     <span className="ml-auto text-caption text-text-tertiary whitespace-nowrap">
                       首页看板：{perms.homeView}
