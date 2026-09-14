@@ -1710,18 +1710,19 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
     () => Array.from(new Set(farmRoles.flatMap((fr) => fr.roles))).length,
     [farmRoles],
   );
-  // 角色组合完全相同的牧场合并为同一张卡片
+  // 以角色为维度：每个角色一张卡片，列出该角色适用的牧场
   const groups = useMemo(() => {
-    const map = new Map<string, { key: string; farms: string[]; roles: string[] }>();
+    const map = new Map<string, { key: string; role: string; farms: string[] }>();
     for (const fr of farmRoles) {
-      const roles = Array.from(new Set(fr.roles)).sort();
-      const key = roles.join("|") || "__none__";
-      const hit = map.get(key);
-      if (hit) hit.farms.push(fr.farm);
-      else map.set(key, { key, farms: [fr.farm], roles });
+      for (const role of fr.roles) {
+        const hit = map.get(role);
+        if (hit) hit.farms.push(fr.farm);
+        else map.set(role, { key: role, role, farms: [fr.farm] });
+      }
     }
     return Array.from(map.values());
   }, [farmRoles]);
+
 
   return (
     <section className="px-6 py-5 border-b border-border">
@@ -1745,25 +1746,19 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
       {open && (
         <div className="mt-4 space-y-4">
           {groups.map((g) => {
-            const perms = unionPermsForRoles(g.roles);
+            const perms = unionPermsForRoles([g.role]);
             const empty = perms.pc.length === 0 && perms.mini.length === 0;
             return (
               <div key={g.key} className="rounded-lg border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-border">
-                  {g.farms.map((f) => (
-                    <span key={f} className="text-body-sm font-medium text-foreground whitespace-nowrap">{f}</span>
-                  ))}
+                  <span className="tag tag-brand whitespace-nowrap">{g.role}</span>
                   <span className="ml-auto flex items-center gap-2 flex-wrap justify-end">
-                    {g.roles.length === 0 ? (
-                      <span className="tag tag-muted">未分配</span>
-                    ) : (
-                      g.roles.map((r) => (
-                        <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
-                      ))
-                    )}
+                    {g.farms.map((f) => (
+                      <span key={f} className="text-caption text-text-secondary whitespace-nowrap">{f}</span>
+                    ))}
                   </span>
-
                 </div>
+
 
                 {empty ? (
                   <p className="px-4 py-3 text-caption text-text-tertiary">该角色暂无权限，请前往「角色权限」配置。</p>
