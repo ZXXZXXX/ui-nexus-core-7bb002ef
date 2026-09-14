@@ -1283,30 +1283,6 @@ function FarmRolePicker({
               })
             )}
           </div>
-          <div className="border-t border-border p-2 flex items-center gap-2">
-            <Input
-              value={newRole}
-              onChange={(e) => setNewRole(e.target.value.slice(0, 6))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleCreateRole();
-                }
-              }}
-              placeholder="新角色（≤6 字）"
-              className="h-8 text-body-sm"
-            />
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={handleCreateRole}
-              disabled={!newRole.trim()}
-              className="h-8 gap-1 px-2 text-body-sm shrink-0 text-primary hover:text-primary hover:bg-brand-subtle"
-            >
-              <Plus className="h-3.5 w-3.5" /> 新建
-            </Button>
-          </div>
         </div>
 
         {/* 右：牧场 */}
