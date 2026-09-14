@@ -589,7 +589,26 @@ export function ListPage<T>({
                     return (
                       <div key={c.key}>
                         <div className="text-caption text-text-tertiary mb-1.5">{c.label}</div>
-                        {type === "select" ? (
+                        {type === "range" ? (
+                          <Select
+                            value={draft[c.key] || "__all"}
+                            onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}
+                          >
+                            <SelectTrigger className="h-9 text-body-sm">
+                              <SelectValue placeholder="全部" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__all" className="text-body-sm">
+                                全部
+                              </SelectItem>
+                              {(c.ranges ?? []).map((r) => (
+                                <SelectItem key={r.label} value={r.label} className="text-body-sm">
+                                  {r.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : type === "select" ? (
                           <Select
                             value={draft[c.key] || "__all"}
                             onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}
