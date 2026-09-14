@@ -205,10 +205,7 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       },
       {
         menu: "工单管理",
-        subs: WO_SUBS.map((name) => ({
-          name,
-          actions: ["查看", "新建工单", "下发 / 指派", "执行 / 完成", "导出"],
-        })),
+        subs: WO_SUBS.map((name) => ({ name, actions: woSubActions(name) })),
       },
       {
         menu: "药品管理",
@@ -249,10 +246,7 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       { menu: "基础档案", subs: [{ name: "牛只信息", actions: ["查看", "导出"] }] },
       {
         menu: "工单管理",
-        subs: ["疾病治疗", "疫苗免疫", "产后护理"].map((name) => ({
-          name,
-          actions: ["查看", "新建工单", "下发 / 指派", "诊断 / 确认方案", "执行 / 完成"],
-        })),
+        subs: ["疾病治疗", "疫苗免疫", "产后护理"].map((name) => ({ name, actions: woSubActions(name) })),
       },
       {
         menu: "药品管理",
@@ -410,10 +404,7 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       },
       {
         menu: "工单管理",
-        subs: WO_SUBS.map((name) => ({
-          name,
-          actions: ["查看", "新建工单", "下发 / 指派", "诊断 / 确认方案", "执行 / 完成", "导出"],
-        })),
+        subs: WO_SUBS.map((name) => ({ name, actions: woSubActions(name) })),
       },
       {
         menu: "药品管理",
