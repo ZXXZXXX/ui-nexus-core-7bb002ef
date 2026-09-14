@@ -96,12 +96,14 @@ type NavGroupDef = {
   required?: boolean;
 };
 
-const woActions: NavAction[] = [
+// 工单通用能力：仅查看与删除
+const woActions: NavAction[] = [{ key: "delete", name: "删除" }];
+
+// 仅疫苗免疫、修蹄、干奶、驱虫工单额外支持新建与诊断
+const woFullActions: NavAction[] = [
   { key: "create", name: "新建工单" },
-  { key: "assign", name: "下发 / 指派" },
   { key: "diagnose", name: "诊断 / 确认方案" },
-  { key: "execute", name: "执行 / 完成" },
-  { key: "export", name: "导出" },
+  { key: "delete", name: "删除" },
 ];
 
 const crudActions: NavAction[] = [
