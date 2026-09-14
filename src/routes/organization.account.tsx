@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -116,6 +116,40 @@ const maskIdShort = (id: string) => `****${id.slice(-4)}`;
 
 // 手机号脱敏：中间四位隐藏
 const maskPhone = (p: string) => (p.length >= 7 ? `${p.slice(0, 3)}****${p.slice(-4)}` : p);
+
+// 管理员每日为单个账号变更手机号的次数上限
+const PHONE_CHANGE_LIMIT = 3;
+const PHONE_CHANGE_KEY = "org:phone-change-log";
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+function readPhoneChangeLog(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = JSON.parse(localStorage.getItem(PHONE_CHANGE_KEY) || "{}") as {
+      date?: string;
+      counts?: Record<string, number>;
+    };
+    return raw.date === todayKey() ? (raw.counts ?? {}) : {};
+  } catch {
+    return {};
+  }
+}
+function phoneChangeUsed(accountId: string) {
+  return readPhoneChangeLog()[accountId] ?? 0;
+}
+function bumpPhoneChange(accountId: string) {
+  if (typeof window === "undefined") return 0;
+  const counts = readPhoneChangeLog();
+  const next = (counts[accountId] ?? 0) + 1;
+  counts[accountId] = next;
+  try {
+    localStorage.setItem(PHONE_CHANGE_KEY, JSON.stringify({ date: todayKey(), counts }));
+  } catch {}
+  return next;
+}
 
 // 文本省略
 const ellipsize = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)}…` : s);
