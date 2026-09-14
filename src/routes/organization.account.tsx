@@ -1753,19 +1753,16 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
                   {g.farms.map((f) => (
                     <span key={f} className="text-body-sm font-medium text-foreground whitespace-nowrap">{f}</span>
                   ))}
-                  {g.roles.length === 0 ? (
-                    <span className="tag tag-muted">未分配</span>
-                  ) : (
-                    g.roles.map((r) => (
-                      <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
-                    ))
-                  )}
+                  <span className="ml-auto flex items-center gap-2 flex-wrap justify-end">
+                    {g.roles.length === 0 ? (
+                      <span className="tag tag-muted">未分配</span>
+                    ) : (
+                      g.roles.map((r) => (
+                        <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
+                      ))
+                    )}
+                  </span>
 
-                  {perms.homeView && (
-                    <span className="ml-auto text-caption text-text-tertiary whitespace-nowrap">
-                      首页看板：{perms.homeView}
-                    </span>
-                  )}
                 </div>
 
                 {empty ? (
