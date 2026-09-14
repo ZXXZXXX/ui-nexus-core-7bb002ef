@@ -1752,10 +1752,8 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
               <div key={g.key} className="rounded-lg border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-border">
                   <span className="tag tag-brand whitespace-nowrap">{g.role}</span>
-                  <span className="ml-auto flex items-center gap-2 flex-wrap justify-end">
-                    {g.farms.map((f) => (
-                      <span key={f} className="text-caption text-text-secondary whitespace-nowrap">{f}</span>
-                    ))}
+                  <span className="ml-auto text-caption text-text-secondary whitespace-nowrap">
+                    共计 {g.farms.length} 个牧场
                   </span>
                 </div>
 
@@ -1764,6 +1762,20 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
                   <p className="px-4 py-3 text-caption text-text-tertiary">该角色暂无权限，请前往「角色权限」配置。</p>
                 ) : (
                   <div className="divide-y divide-border">
+                    <div className="px-4 py-3 flex items-start gap-3">
+                      <div className="w-20 shrink-0 text-body-sm text-foreground">适用牧场</div>
+                      <div className="flex-1 flex flex-wrap gap-1">
+                        {g.farms.map((f) => (
+                          <span
+                            key={f}
+                            className="inline-flex items-center rounded px-1.5 py-0.5 text-caption bg-[var(--surface-subtle)] text-text-secondary whitespace-nowrap"
+                          >
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
                     <PermBlock title="PC 端权限" count={perms.pc.length} unit="个菜单">
                       {perms.pc.length === 0 ? (
                         <p className="text-caption text-text-tertiary">无 PC 端访问权限</p>
