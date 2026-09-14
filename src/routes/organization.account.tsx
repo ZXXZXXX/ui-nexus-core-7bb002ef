@@ -184,6 +184,10 @@ const VIEW_ONLY = ["查看"];
 // 以下权限项名称与「角色权限」配置中的菜单 / 模块 / 功能完全一致
 const WO_SUBS = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄工单", "干奶工单", "驱虫工单", "普修工单"];
 const ALL_WO_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干奶", "驱虫", "普修"];
+// 工单通用能力仅查看、删除；疫苗免疫 / 修蹄 / 干奶 / 驱虫额外支持新建与诊断
+const WO_FULL_SUBS = ["疫苗免疫", "修蹄工单", "干奶工单", "驱虫工单"];
+const woSubActions = (name: string): string[] =>
+  WO_FULL_SUBS.includes(name) ? ["查看", "新建工单", "诊断 / 确认方案", "删除"] : ["查看", "删除"];
 const ALL_EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场"];
 
 const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
@@ -201,10 +205,7 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       },
       {
         menu: "工单管理",
-        subs: WO_SUBS.map((name) => ({
-          name,
-          actions: ["查看", "新建工单", "下发 / 指派", "执行 / 完成", "导出"],
-        })),
+        subs: WO_SUBS.map((name) => ({ name, actions: woSubActions(name) })),
       },
       {
         menu: "药品管理",
@@ -245,10 +246,7 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       { menu: "基础档案", subs: [{ name: "牛只信息", actions: ["查看", "导出"] }] },
       {
         menu: "工单管理",
-        subs: ["疾病治疗", "疫苗免疫", "产后护理"].map((name) => ({
-          name,
-          actions: ["查看", "新建工单", "下发 / 指派", "诊断 / 确认方案", "执行 / 完成"],
-        })),
+        subs: ["疾病治疗", "疫苗免疫", "产后护理"].map((name) => ({ name, actions: woSubActions(name) })),
       },
       {
         menu: "药品管理",
@@ -406,10 +404,7 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       },
       {
         menu: "工单管理",
-        subs: WO_SUBS.map((name) => ({
-          name,
-          actions: ["查看", "新建工单", "下发 / 指派", "诊断 / 确认方案", "执行 / 完成", "导出"],
-        })),
+        subs: WO_SUBS.map((name) => ({ name, actions: woSubActions(name) })),
       },
       {
         menu: "药品管理",
