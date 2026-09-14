@@ -1710,18 +1710,19 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
     () => Array.from(new Set(farmRoles.flatMap((fr) => fr.roles))).length,
     [farmRoles],
   );
-  // 角色组合完全相同的牧场合并为同一张卡片
+  // 以角色为维度：每个角色一张卡片，列出该角色适用的牧场
   const groups = useMemo(() => {
-    const map = new Map<string, { key: string; farms: string[]; roles: string[] }>();
+    const map = new Map<string, { key: string; role: string; farms: string[] }>();
     for (const fr of farmRoles) {
-      const roles = Array.from(new Set(fr.roles)).sort();
-      const key = roles.join("|") || "__none__";
-      const hit = map.get(key);
-      if (hit) hit.farms.push(fr.farm);
-      else map.set(key, { key, farms: [fr.farm], roles });
+      for (const role of fr.roles) {
+        const hit = map.get(role);
+        if (hit) hit.farms.push(fr.farm);
+        else map.set(role, { key: role, role, farms: [fr.farm] });
+      }
     }
     return Array.from(map.values());
   }, [farmRoles]);
+
 
   return (
     <section className="px-6 py-5 border-b border-border">
