@@ -1561,10 +1561,11 @@ function AccountDrawerInner({
                         <button
                           type="button"
                           className="text-body-sm text-primary hover:underline"
-                          onClick={() => setPhoneConfirmOpen(true)}
+                          onClick={() => { setPhone(""); setPhoneEditing(true); }}
                         >
                           变更手机号
                         </button>
+
                       ) : (
                         <span className="text-body-sm text-text-tertiary">
                           今日变更次数已用完
