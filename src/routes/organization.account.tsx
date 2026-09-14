@@ -1708,6 +1708,9 @@ function AccountDrawerInner({
               手机号是该账号的唯一登录凭证，换绑后原手机号将立即失效。请先与本人确认新号码归属。
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <p className="text-caption text-text-tertiary">
+            每个账号每日最多变更 {PHONE_CHANGE_LIMIT} 次，今日还可为本账号变更 {phoneRemain} 次
+          </p>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
@@ -1721,9 +1724,7 @@ function AccountDrawerInner({
               确认换绑
             </AlertDialogAction>
           </AlertDialogFooter>
-          <p className="text-caption text-text-tertiary text-center">
-            每个账号每日最多变更 {PHONE_CHANGE_LIMIT} 次，今日还可为本账号变更 {phoneRemain} 次
-          </p>
+
         </AlertDialogContent>
       </AlertDialog>
 
