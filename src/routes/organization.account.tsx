@@ -1464,6 +1464,14 @@ function AccountDrawerInner({
 
   const [phone, setPhone] = useState(account.phone);
   const [phoneEditing, setPhoneEditing] = useState(false);
+  const [phoneUsed, setPhoneUsed] = useState(0);
+  const [phoneConfirmOpen, setPhoneConfirmOpen] = useState(false);
+  const phoneRemain = Math.max(0, PHONE_CHANGE_LIMIT - phoneUsed);
+  useEffect(() => {
+    setPhoneUsed(phoneChangeUsed(account.id));
+    setPhoneEditing(false);
+    setPhone(account.phone);
+  }, [account.id, account.phone]);
   const [userType, setUserType] = useState<UserType>(account.userType);
   const [farmRoles, setFarmRoles] = useState<FarmRole[]>(account.farmRoles);
   const [wecomId, setWecomId] = useState<string | null>(account.wecomId);
