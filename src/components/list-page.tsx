@@ -35,9 +35,11 @@ export type ListColumn<T> = {
   /** raw value used for search / filter / date parsing */
   value?: (row: T) => string | number | null | undefined;
   /** advanced-filter control type. default: text */
-  filter?: "text" | "select" | "number" | "date" | "none";
+  filter?: "text" | "select" | "number" | "date" | "range" | "none";
   /** options for select filter; auto-derived from data when omitted */
   options?: string[];
+  /** numeric ranges for filter="range"（label 用作筛选值） */
+  ranges?: { label: string; min?: number; max?: number }[];
   /** horizontal alignment of header + cell. default: left */
   align?: "left" | "right";
   /** grid track size, e.g. "7em"; default minmax(0, 1fr) */
@@ -200,6 +202,13 @@ export function ListPage<T>({
         const cell = raw(col, row).toLowerCase();
         if (col.filter === "select") {
           if (cell !== val.toLowerCase()) return false;
+        } else if (col.filter === "range") {
+          const r = (col.ranges ?? []).find((x) => x.label === val);
+          if (!r) continue;
+          const n = Number(String(raw(col, row)).replace(/[^\d.-]/g, ""));
+          if (!Number.isFinite(n)) return false;
+          if (r.min !== undefined && n < r.min) return false;
+          if (r.max !== undefined && n > r.max) return false;
         } else if (!cell.includes(val.toLowerCase())) return false;
       }
       return true;
@@ -580,7 +589,26 @@ export function ListPage<T>({
                     return (
                       <div key={c.key}>
                         <div className="text-caption text-text-tertiary mb-1.5">{c.label}</div>
-                        {type === "select" ? (
+                        {type === "range" ? (
+                          <Select
+                            value={draft[c.key] || "__all"}
+                            onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}
+                          >
+                            <SelectTrigger className="h-9 text-body-sm">
+                              <SelectValue placeholder="全部" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="__all" className="text-body-sm">
+                                全部
+                              </SelectItem>
+                              {(c.ranges ?? []).map((r) => (
+                                <SelectItem key={r.label} value={r.label} className="text-body-sm">
+                                  {r.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : type === "select" ? (
                           <Select
                             value={draft[c.key] || "__all"}
                             onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}

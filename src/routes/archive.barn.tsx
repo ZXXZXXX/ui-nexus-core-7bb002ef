@@ -118,7 +118,15 @@ function BarnPage() {
     { key: "desc", label: "牛舍描述", render: (b) => <span className="text-body-sm text-text-secondary" title={b.desc}>{b.desc}</span> },
     { key: "type", label: "类型", filter: "select", render: (b) => <span className={typeTone(b.type)}>{b.type}</span> },
     {
-      key: "stock", label: "存栏只数", filter: "number", value: (b) => b.stock,
+      key: "stock", label: "存栏只数", filter: "range", value: (b) => b.stock,
+      ranges: [
+        { label: "0（空栏）", min: 0, max: 0 },
+        { label: "1 - 50", min: 1, max: 50 },
+        { label: "51 - 100", min: 51, max: 100 },
+        { label: "101 - 200", min: 101, max: 200 },
+        { label: "201 - 500", min: 201, max: 500 },
+        { label: "500 以上", min: 501 },
+      ],
       render: (b) => <span className="tabular-nums text-body text-foreground">{b.stock}</span>,
     },
     {
