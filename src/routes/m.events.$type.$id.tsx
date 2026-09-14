@@ -978,7 +978,8 @@ function ScoreRow({
 
 function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [reason, setReason] = useState<"淘汰" | "死亡" | "出售" | "转场">("淘汰");
+  const [reason, setReason] = useState<"淘汰" | "死亡">("淘汰");
+  const [cullReason, setCullReason] = useState("");
   const [detail, setDetail] = useState("");
   const [price, setPrice] = useState("");
   const [note, setNote] = useState("");
@@ -986,23 +987,41 @@ function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
   const [anglePhotos, setAnglePhotos] = useState<AnglePhotos>(emptyAnglePhotos);
   const [relatedOrder, setRelatedOrder] = useState<string | null>(null);
 
-  const isCowPhoto = reason === "淘汰" || reason === "死亡";
+  const isCowPhoto = true;
 
   const submit = () => {
     if (!date) return toast.error("请选择离场日期");
-    if (!detail) return toast.error("请填写离场原因/详情");
-    if (isCowPhoto) {
-      if (!anglePhotosDone(anglePhotos)) return toast.error("请上传正面、左视角、右视角照片");
-      if (reason === "淘汰" && !relatedOrder) return toast.error("请选择关联工单");
-    } else if (media.length === 0) {
-      return toast.error("请上传或拍摄现场照片 / 视频");
+    if (reason === "淘汰") {
+      if (!cullReason) return toast.error("请选择淘汰原因");
+      if (cullReason === "其他" && !detail) return toast.error("请填写淘汰原因说明");
+    } else if (!detail) {
+      return toast.error("请填写死亡原因");
     }
+    if (!anglePhotosDone(anglePhotos)) return toast.error("请上传正面、左视角、右视角照片");
+    if (reason === "淘汰" && !relatedOrder) return toast.error("请选择关联工单");
     toast.success("离场记录已保存");
     onDone();
   };
 
 
-  const reasons = ["淘汰", "死亡", "出售", "转场"] as const;
+  const reasons = ["死亡", "淘汰"] as const;
+  const cullReasons = [
+    "猝死",
+    "疾病",
+    "盘亏",
+    "育肥",
+    "意外死亡",
+    "屡配不孕",
+    "发育不良",
+    "低产/无奶",
+    "习惯性流产",
+    "乳区结构差",
+    "遗传性能差",
+    "优秀奶牛出售",
+    "犊牛正常出售",
+    "先天性生殖系统异常",
+    "其他",
+  ];
 
   return (
     <MobileShell title={`#${id} · 离场记录`} back hideTabBar>
@@ -1013,7 +1032,7 @@ function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
             <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputCls} />
           </Field>
           <Field label="离场类型" required>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {reasons.map((k) => (
                 <button
                   key={k}
@@ -1030,23 +1049,44 @@ function LeaveForm({ id, onDone }: { id: string; onDone: () => void }) {
               ))}
             </div>
           </Field>
-          <Field label={reason === "死亡" ? "死亡原因" : reason === "出售" ? "买方 / 去向" : "详情"} required>
-            <input
-              value={detail}
-              onChange={(e) => setDetail(e.target.value)}
-              className={inputCls}
-              placeholder={
-                reason === "死亡"
-                  ? "如：乳房炎并发症"
-                  : reason === "出售"
-                  ? "如：XX 屠宰场"
-                  : reason === "转场"
-                  ? "目标牧场"
-                  : "淘汰原因"
-              }
-            />
-          </Field>
-          {(reason === "出售" || reason === "淘汰") && (
+          {reason === "淘汰" && (
+            <Field label="淘汰原因" required>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                {cullReasons.map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setCullReason(r)}
+                    className="flex items-center gap-2 py-2 text-left"
+                  >
+                    <span
+                      className={`h-4 w-4 shrink-0 rounded-full border flex items-center justify-center ${
+                        cullReason === r ? "border-primary" : "border-border"
+                      }`}
+                    >
+                      {cullReason === r && <span className="h-2 w-2 rounded-full bg-primary" />}
+                    </span>
+                    <span
+                      className={`text-body-sm ${cullReason === r ? "text-foreground" : "text-text-secondary"}`}
+                    >
+                      {r}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </Field>
+          )}
+          {(reason === "死亡" || cullReason === "其他") && (
+            <Field label={reason === "死亡" ? "死亡原因" : "原因说明"} required>
+              <input
+                value={detail}
+                onChange={(e) => setDetail(e.target.value)}
+                className={inputCls}
+                placeholder={reason === "死亡" ? "如：乳房炎并发症" : "请填写淘汰原因"}
+              />
+            </Field>
+          )}
+          {reason === "淘汰" && (
             <Field label="金额 (元)">
               <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className={inputCls} />
             </Field>
