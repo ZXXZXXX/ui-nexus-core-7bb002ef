@@ -1687,11 +1687,8 @@ function AccountDrawerInner({
                   toast.error("今日该账号手机号变更次数已用完");
                   return;
                 }
-                const used = bumpPhoneChange(account.id);
-                setPhoneUsed(used);
-                toast.success(
-                  `手机号已换绑，今日还可为该账号变更 ${Math.max(0, PHONE_CHANGE_LIMIT - used)} 次`,
-                );
+                setPhoneConfirmOpen(true);
+                return;
               }
               onSave({ ...account, phone, userType, farmRoles: effectiveFarmRoles, wecomId, wechatId, status });
             }}
@@ -1704,30 +1701,46 @@ function AccountDrawerInner({
       <AlertDialog open={phoneConfirmOpen} onOpenChange={setPhoneConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>请确认是否要为「{account.name}」换绑手机号？</AlertDialogTitle>
-            <AlertDialogDescription>
-              手机号是该账号的唯一登录凭证，换绑后原手机号将立即失效。请先与本人确认新号码归属。
+            <AlertDialogTitle>确认要为「{account.name}（{account.id}）」换绑手机号？</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <div className="rounded-md border border-border bg-bg-subtle/40 p-3 space-y-1.5">
+                  <div className="flex items-center justify-between text-body-sm">
+                    <span className="text-text-tertiary">原手机号</span>
+                    <span className="text-text-secondary tabular-nums line-through">{account.phone}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-body-sm">
+                    <span className="text-text-tertiary">新手机号</span>
+                    <span className="text-foreground font-medium tabular-nums">{phone}</span>
+                  </div>
+                </div>
+                <p>换绑后，原手机号将无法用于此账号登录，请确认已核实本人意愿及新号码归属。</p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <p className="text-caption text-text-tertiary">
-            每个账号每日最多变更 {PHONE_CHANGE_LIMIT} 次，今日还可为本账号变更 {phoneRemain} 次
+            今日还可为本账号变更 {phoneRemain} 次（含本次），每日最多 {PHONE_CHANGE_LIMIT} 次。
           </p>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
-                setPhone("");
-                setPhoneEditing(true);
+                const used = bumpPhoneChange(account.id);
+                setPhoneUsed(used);
                 setPhoneConfirmOpen(false);
+                toast.success(
+                  `手机号已换绑，今日还可为该账号变更 ${Math.max(0, PHONE_CHANGE_LIMIT - used)} 次`,
+                );
+                onSave({ ...account, phone, userType, farmRoles: effectiveFarmRoles, wecomId, wechatId, status });
               }}
               className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
             >
               确认换绑
             </AlertDialogAction>
           </AlertDialogFooter>
-
         </AlertDialogContent>
       </AlertDialog>
+
 
       <AlertDialog open={pendingUserType !== null} onOpenChange={(o) => !o && setPendingUserType(null)}>
         <AlertDialogContent>
