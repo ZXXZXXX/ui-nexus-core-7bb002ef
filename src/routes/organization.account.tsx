@@ -1710,6 +1710,19 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
     () => Array.from(new Set(farmRoles.flatMap((fr) => fr.roles))).length,
     [farmRoles],
   );
+  // 角色组合完全相同的牧场合并为同一张卡片
+  const groups = useMemo(() => {
+    const map = new Map<string, { key: string; farms: string[]; roles: string[] }>();
+    for (const fr of farmRoles) {
+      const roles = Array.from(new Set(fr.roles)).sort();
+      const key = roles.join("|") || "__none__";
+      const hit = map.get(key);
+      if (hit) hit.farms.push(fr.farm);
+      else map.set(key, { key, farms: [fr.farm], roles });
+    }
+    return Array.from(map.values());
+  }, [farmRoles]);
+
   return (
     <section className="px-6 py-5 border-b border-border">
       <button
@@ -1731,20 +1744,23 @@ function PermissionScopeSection({ farmRoles }: { farmRoles: FarmRole[] }) {
 
       {open && (
         <div className="mt-4 space-y-4">
-          {farmRoles.map((fr) => {
-            const perms = unionPermsForRoles(fr.roles);
+          {groups.map((g) => {
+            const perms = unionPermsForRoles(g.roles);
             const empty = perms.pc.length === 0 && perms.mini.length === 0;
             return (
-              <div key={fr.farm} className="rounded-lg border border-border bg-card overflow-hidden">
+              <div key={g.key} className="rounded-lg border border-border bg-card overflow-hidden">
                 <div className="flex items-center gap-2 flex-wrap px-4 py-2.5 border-b border-border">
-                  <span className="text-body-sm font-medium text-foreground whitespace-nowrap">{fr.farm}</span>
-                  {fr.roles.length === 0 ? (
+                  {g.farms.map((f) => (
+                    <span key={f} className="text-body-sm font-medium text-foreground whitespace-nowrap">{f}</span>
+                  ))}
+                  {g.roles.length === 0 ? (
                     <span className="tag tag-muted">未分配</span>
                   ) : (
-                    fr.roles.map((r) => (
+                    g.roles.map((r) => (
                       <span key={r} className="tag tag-brand whitespace-nowrap">{r}</span>
                     ))
                   )}
+
                   {perms.homeView && (
                     <span className="ml-auto text-caption text-text-tertiary whitespace-nowrap">
                       首页看板：{perms.homeView}
