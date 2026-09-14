@@ -2109,7 +2109,7 @@ function CreateDialog({
               onCreateRole={(r) => onCreateRole(userType, r)}
             />
             <p className="text-caption text-text-tertiary">
-              勾选牧场后请为每个牧场至少指定一个角色；未选角色的牧场切走时会自动取消关联。当前为「{userType}」人员，可在右上方输入新角色名创建。
+              勾选牧场后请为每个牧场至少指定一个角色；未选角色的牧场切走时会自动取消关联。当前为「{userType}」人员。
             </p>
             {incomplete && (
               <p className="text-caption text-warning">当前牧场未选择角色，提交时将自动取消该牧场关联</p>
