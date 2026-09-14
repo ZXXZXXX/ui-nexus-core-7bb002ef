@@ -1674,7 +1674,7 @@ function AccountDrawerInner({
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingUserType === "外部"
-                ? "外部账号将无法查看工单信息、药品信息等业务数据，请确认是否更改为外部账号"
+                ? "请谨慎对外开放药品管理与工单管理的权限"
                 : "内部账号可以查看工单信息、药品信息等业务数据，请确认是否更改为内部账号"}
             </AlertDialogDescription>
           </AlertDialogHeader>
