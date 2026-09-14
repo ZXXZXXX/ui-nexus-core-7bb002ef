@@ -1592,13 +1592,19 @@ function AccountDrawerInner({
                   ) : (
                     <div className="flex h-9 items-center gap-3">
                       <span className="text-body text-foreground tabular-nums">{phone}</span>
-                      <button
-                        type="button"
-                        className="text-body-sm text-primary hover:underline"
-                        onClick={() => { setPhone(""); setPhoneEditing(true); }}
-                      >
-                        变更手机号
-                      </button>
+                      {phoneRemain > 0 ? (
+                        <button
+                          type="button"
+                          className="text-body-sm text-primary hover:underline"
+                          onClick={() => setPhoneConfirmOpen(true)}
+                        >
+                          变更手机号
+                        </button>
+                      ) : (
+                        <span className="text-body-sm text-text-tertiary">
+                          今日变更次数已用完
+                        </span>
+                      )}
                     </div>
                   )
                 ) : (
