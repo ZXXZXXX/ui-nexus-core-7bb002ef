@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -116,6 +116,40 @@ const maskIdShort = (id: string) => `****${id.slice(-4)}`;
 
 // 手机号脱敏：中间四位隐藏
 const maskPhone = (p: string) => (p.length >= 7 ? `${p.slice(0, 3)}****${p.slice(-4)}` : p);
+
+// 管理员每日为单个账号变更手机号的次数上限
+const PHONE_CHANGE_LIMIT = 3;
+const PHONE_CHANGE_KEY = "org:phone-change-log";
+
+function todayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+}
+function readPhoneChangeLog(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = JSON.parse(localStorage.getItem(PHONE_CHANGE_KEY) || "{}") as {
+      date?: string;
+      counts?: Record<string, number>;
+    };
+    return raw.date === todayKey() ? (raw.counts ?? {}) : {};
+  } catch {
+    return {};
+  }
+}
+function phoneChangeUsed(accountId: string) {
+  return readPhoneChangeLog()[accountId] ?? 0;
+}
+function bumpPhoneChange(accountId: string) {
+  if (typeof window === "undefined") return 0;
+  const counts = readPhoneChangeLog();
+  const next = (counts[accountId] ?? 0) + 1;
+  counts[accountId] = next;
+  try {
+    localStorage.setItem(PHONE_CHANGE_KEY, JSON.stringify({ date: todayKey(), counts }));
+  } catch {}
+  return next;
+}
 
 // 文本省略
 const ellipsize = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)}…` : s);
@@ -1430,6 +1464,14 @@ function AccountDrawerInner({
 
   const [phone, setPhone] = useState(account.phone);
   const [phoneEditing, setPhoneEditing] = useState(false);
+  const [phoneUsed, setPhoneUsed] = useState(0);
+  const [phoneConfirmOpen, setPhoneConfirmOpen] = useState(false);
+  const phoneRemain = Math.max(0, PHONE_CHANGE_LIMIT - phoneUsed);
+  useEffect(() => {
+    setPhoneUsed(phoneChangeUsed(account.id));
+    setPhoneEditing(false);
+    setPhone(account.phone);
+  }, [account.id, account.phone]);
   const [userType, setUserType] = useState<UserType>(account.userType);
   const [farmRoles, setFarmRoles] = useState<FarmRole[]>(account.farmRoles);
   const [wecomId, setWecomId] = useState<string | null>(account.wecomId);
@@ -1550,13 +1592,19 @@ function AccountDrawerInner({
                   ) : (
                     <div className="flex h-9 items-center gap-3">
                       <span className="text-body text-foreground tabular-nums">{phone}</span>
-                      <button
-                        type="button"
-                        className="text-body-sm text-primary hover:underline"
-                        onClick={() => { setPhone(""); setPhoneEditing(true); }}
-                      >
-                        变更手机号
-                      </button>
+                      {phoneRemain > 0 ? (
+                        <button
+                          type="button"
+                          className="text-body-sm text-primary hover:underline"
+                          onClick={() => setPhoneConfirmOpen(true)}
+                        >
+                          变更手机号
+                        </button>
+                      ) : (
+                        <span className="text-body-sm text-text-tertiary">
+                          今日变更次数已用完
+                        </span>
+                      )}
                     </div>
                   )
                 ) : (
@@ -1662,13 +1710,58 @@ function AccountDrawerInner({
           <Button variant="outline" onClick={onClose} className="h-9 text-body-sm font-normal">取消</Button>
           <Button
             disabled={!canSave}
-            onClick={() => onSave({ ...account, phone, userType, farmRoles: effectiveFarmRoles, wecomId, wechatId, status })}    
+            onClick={() => {
+              const changed = phone !== account.phone;
+              if (changed) {
+                if (!/^1\d{10}$/.test(phone)) {
+                  toast.error("请输入正确的手机号");
+                  return;
+                }
+                if (phoneRemain <= 0) {
+                  toast.error("今日该账号手机号变更次数已用完");
+                  return;
+                }
+                const used = bumpPhoneChange(account.id);
+                setPhoneUsed(used);
+                toast.success(
+                  `手机号已换绑，今日还可为该账号变更 ${Math.max(0, PHONE_CHANGE_LIMIT - used)} 次`,
+                );
+              }
+              onSave({ ...account, phone, userType, farmRoles: effectiveFarmRoles, wecomId, wechatId, status });
+            }}
             className="h-9 text-body-sm font-normal bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
           >
             保存
           </Button>
         </SheetFooter>
       )}
+      <AlertDialog open={phoneConfirmOpen} onOpenChange={setPhoneConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>请确认是否要为「{account.name}」换绑手机号？</AlertDialogTitle>
+            <AlertDialogDescription>
+              手机号是该账号的唯一登录凭证，换绑后原手机号将立即失效。请先与本人确认新号码归属。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setPhone("");
+                setPhoneEditing(true);
+                setPhoneConfirmOpen(false);
+              }}
+              className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
+            >
+              确认换绑
+            </AlertDialogAction>
+          </AlertDialogFooter>
+          <p className="text-caption text-text-tertiary text-center">
+            每个账号每日最多变更 {PHONE_CHANGE_LIMIT} 次，今日还可为本账号变更 {phoneRemain} 次
+          </p>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <AlertDialog open={pendingUserType !== null} onOpenChange={(o) => !o && setPendingUserType(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
