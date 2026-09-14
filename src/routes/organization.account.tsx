@@ -1509,7 +1509,13 @@ function AccountDrawerInner({
                     value={userType}
                     onValueChange={(v) => {
                       const next = v as UserType;
-                      if (next !== userType) setPendingUserType(next);
+                      if (next === userType) return;
+                      if (next === "外部") {
+                        setPendingUserType(next);
+                      } else {
+                        setUserType(next);
+                        setFarmRoles((cur) => cur.map((fr) => ({ ...fr, roles: [] })));
+                      }
                     }}
                   >
                     <SelectTrigger className="h-9 text-body-sm bg-card border-border"><SelectValue /></SelectTrigger>
