@@ -1352,9 +1352,6 @@ function FarmRolePicker({
                   </div>
                 )}
               </div>
-              <div className="px-4 py-2 border-t border-border text-caption text-text-tertiary bg-surface-subtle">
-                同一牧场可分配多个角色，权限取并集 · 共关联 {distinctFarmsCount} 个牧场
-              </div>
             </>
           )}
         </div>
