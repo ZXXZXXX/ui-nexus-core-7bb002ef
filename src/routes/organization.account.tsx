@@ -1549,7 +1549,7 @@ function AccountDrawerInner({
                     </div>
                   ) : (
                     <div className="flex h-9 items-center gap-3">
-                      <span className="text-body text-foreground tabular-nums">{maskPhone(phone)}</span>
+                      <span className="text-body text-foreground tabular-nums">{phone}</span>
                       <button
                         type="button"
                         className="text-body-sm text-primary hover:underline"
