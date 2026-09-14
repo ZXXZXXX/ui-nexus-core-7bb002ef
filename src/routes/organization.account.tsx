@@ -1175,17 +1175,6 @@ function FarmRolePicker({
     onChange(next);
   };
 
-  const handleCreateRole = () => {
-    const kw = newRole.trim();
-    if (!kw) return;
-    if (kw.length > 6) {
-      toast.error("角色名称不超过 6 个字");
-      return;
-    }
-    if (!roles.includes(kw)) onCreateRole(kw);
-    setActiveRole(kw);
-    setNewRole("");
-  };
 
   const activeFarmsSet = useMemo(
     () => new Set(activeRole ? farmsForRole(activeRole) : []),
