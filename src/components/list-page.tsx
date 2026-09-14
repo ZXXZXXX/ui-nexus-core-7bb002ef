@@ -202,6 +202,13 @@ export function ListPage<T>({
         const cell = raw(col, row).toLowerCase();
         if (col.filter === "select") {
           if (cell !== val.toLowerCase()) return false;
+        } else if (col.filter === "range") {
+          const r = (col.ranges ?? []).find((x) => x.label === val);
+          if (!r) continue;
+          const n = Number(String(raw(col, row)).replace(/[^\d.-]/g, ""));
+          if (!Number.isFinite(n)) return false;
+          if (r.min !== undefined && n < r.min) return false;
+          if (r.max !== undefined && n > r.max) return false;
         } else if (!cell.includes(val.toLowerCase())) return false;
       }
       return true;
