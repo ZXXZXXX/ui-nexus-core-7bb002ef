@@ -198,8 +198,8 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       {
         menu: "基础档案",
         subs: [
-          { name: "牛场信息", actions: ["查看", "导出"] },
-          { name: "牛舍信息", actions: ["查看", "导出"] },
+          { name: "牛场信息", actions: ["查看", "编辑", "导出"] },
+          { name: "牛舍信息", actions: ["查看", "编辑", "导出"] },
           { name: "牛只信息", actions: ["查看", "导出"] },
         ],
       },
@@ -397,8 +397,8 @@ const ROLE_PERMISSIONS: Record<string, RolePermPreview> = {
       {
         menu: "基础档案",
         subs: [
-          { name: "牛场信息", actions: ["查看", "导出"] },
-          { name: "牛舍信息", actions: ["查看", "导出"] },
+          { name: "牛场信息", actions: ["查看", "编辑", "导出"] },
+          { name: "牛舍信息", actions: ["查看", "编辑", "导出"] },
           { name: "牛只信息", actions: ["查看", "导出"] },
         ],
       },
