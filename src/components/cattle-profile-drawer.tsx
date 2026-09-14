@@ -400,8 +400,11 @@ export function CattleProfileDrawer({
             }
           >
             <div className="grid grid-cols-4 gap-x-6 gap-y-3">
-              {breedingFields(cow).map((f) => (
-                <div key={f.label} className="flex items-baseline justify-between gap-3 border-b border-border/60 pb-2">
+              {breedingFields(cow).map((f, i) => (
+                <div
+                  key={f.label}
+                  className={`flex items-baseline justify-between gap-3 pb-2 ${i < 4 ? "border-b border-border/60" : ""}`}
+                >
                   <span className="text-body-sm text-text-tertiary shrink-0">{f.label}</span>
                   <span className="text-body-sm text-foreground font-medium tabular-nums truncate">{f.value}</span>
                 </div>
