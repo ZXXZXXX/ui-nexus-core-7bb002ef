@@ -35,9 +35,11 @@ export type ListColumn<T> = {
   /** raw value used for search / filter / date parsing */
   value?: (row: T) => string | number | null | undefined;
   /** advanced-filter control type. default: text */
-  filter?: "text" | "select" | "number" | "date" | "none";
+  filter?: "text" | "select" | "number" | "date" | "range" | "none";
   /** options for select filter; auto-derived from data when omitted */
   options?: string[];
+  /** numeric ranges for filter="range"（label 用作筛选值） */
+  ranges?: { label: string; min?: number; max?: number }[];
   /** horizontal alignment of header + cell. default: left */
   align?: "left" | "right";
   /** grid track size, e.g. "7em"; default minmax(0, 1fr) */
