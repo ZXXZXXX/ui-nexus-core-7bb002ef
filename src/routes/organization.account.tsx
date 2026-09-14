@@ -1118,7 +1118,7 @@ function FarmRolePicker({
   const initialActive =
     [...roles].find((r) => isRoleUsed(r)) ?? roles[0] ?? null;
   const [activeRole, setActiveRole] = useState<string | null>(initialActive);
-  const [newRole, setNewRole] = useState("");
+  
 
   const filteredRoles = useMemo(() => {
     const kw = roleKw.trim().toLowerCase();
