@@ -6,16 +6,21 @@ import { EvidenceSection } from "@/components/evidence-section";
 import { DrugItemPicker } from "@/components/drug-item-picker";
 import { toast } from "sonner";
 
-// 物品/药品候选（含参考单价，用于自动估算金额）
+// 物品/药品候选
+// 每个药品有两种单位：
+//   specUnit 规格单位（采购 / 库存单位，单价按此计）
+//   doseUnit 用药单位（最小使用单位），perSpec = 1 规格单位含多少用药单位
 const ITEMS = [
-  { id: "DR-0108", name: "乳房炎抗生素 5mg", unit: "支", price: 18 },
-  { id: "DR-0214", name: "口蹄疫疫苗 A 型", unit: "支", price: 60 },
-  { id: "DR-0306", name: "驱虫剂 伊维菌素", unit: "瓶", price: 45 },
-  { id: "DR-0412", name: "营养补充剂 复合维生素", unit: "罐", price: 88 },
-  { id: "DR-0521", name: "消毒液 戊二醛", unit: "L", price: 44 },
-  { id: "DR-0633", name: "葡萄糖注射液", unit: "瓶", price: 12 },
-  { id: "DR-0712", name: "碳酸氢钠", unit: "袋", price: 9 },
+  { id: "DR-0108", name: "乳房炎抗生素 5mg", specUnit: "盒", doseUnit: "支", perSpec: 10, price: 180 },
+  { id: "DR-0214", name: "口蹄疫疫苗 A 型", specUnit: "瓶", doseUnit: "ml", perSpec: 50, price: 60 },
+  { id: "DR-0306", name: "驱虫剂 伊维菌素", specUnit: "瓶", doseUnit: "ml", perSpec: 100, price: 45 },
+  { id: "DR-0412", name: "营养补充剂 复合维生素", specUnit: "罐", doseUnit: "g", perSpec: 500, price: 88 },
+  { id: "DR-0521", name: "消毒液 戊二醛", specUnit: "桶", doseUnit: "L", perSpec: 5, price: 220 },
+  { id: "DR-0633", name: "葡萄糖注射液", specUnit: "瓶", doseUnit: "ml", perSpec: 250, price: 12 },
+  { id: "DR-0712", name: "碳酸氢钠", specUnit: "袋", doseUnit: "g", perSpec: 100, price: 9 },
 ];
+
+type UnitMode = "dose" | "spec";
 
 // 损耗发生环节 → 具体原因
 const LOSS_STAGES = [
