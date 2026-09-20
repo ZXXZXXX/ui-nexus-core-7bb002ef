@@ -207,11 +207,34 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                       placeholder={`${word}数量`}
                       className="flex-1 h-11 px-3 rounded-lg text-body"
                     />
-                    <span
-                      className={`text-body-sm w-10 text-center ${item ? "text-text-secondary" : "text-text-tertiary"}`}
-                    >
-                      {item?.unit ?? "单位"}
-                    </span>
+                    {item ? (
+                      <div className="flex items-center rounded-lg border border-border overflow-hidden shrink-0">
+                        {([
+                          { key: "dose" as UnitMode, unit: item.doseUnit },
+                          { key: "spec" as UnitMode, unit: item.specUnit },
+                        ]).map((o) => {
+                          const active = l.unitMode === o.key;
+                          return (
+                            <button
+                              key={o.key}
+                              type="button"
+                              onClick={() => setLine(idx, { unitMode: o.key })}
+                              className={`h-9 min-w-11 px-2 text-body-sm ${
+                                active
+                                  ? "bg-brand-subtle text-primary font-medium"
+                                  : "bg-card text-text-tertiary"
+                              }`}
+                            >
+                              {o.unit}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <span className="text-body-sm w-10 text-center text-text-tertiary">
+                        单位
+                      </span>
+                    )}
                     {!isReturn && (
                       <span
                         className={`text-body-sm w-20 text-right tabular-nums ${lineAmount > 0 ? "text-text-secondary" : "text-text-tertiary"}`}
@@ -220,6 +243,17 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                       </span>
                     )}
                   </div>
+                  {item && (
+                    <div className="text-caption text-text-tertiary">
+                      当前按{l.unitMode === "spec" ? "规格单位" : "用药单位"}（
+                      {curUnit}）填报
+                      {qty && !Number.isNaN(qty)
+                        ? l.unitMode === "spec"
+                          ? ` · 折合 ${(qty * item.perSpec).toLocaleString("zh-CN")} ${item.doseUnit}`
+                          : ` · 折合 ${(qty / item.perSpec).toFixed(2)} ${item.specUnit}`
+                        : ""}
+                    </div>
+                  )}
                 </div>
               );
             })}
