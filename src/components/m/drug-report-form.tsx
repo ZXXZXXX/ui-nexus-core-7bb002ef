@@ -140,7 +140,14 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
               const item = ITEMS.find((i) => i.id === l.itemId);
               const qty = Number(l.qty);
               const lineAmount =
-                item && qty && !Number.isNaN(qty) ? item.price * qty : 0;
+                item && qty && !Number.isNaN(qty)
+                  ? item.price * toSpecQty(item, qty, l.unitMode)
+                  : 0;
+              const curUnit = item
+                ? l.unitMode === "spec"
+                  ? item.specUnit
+                  : item.doseUnit
+                : "单位";
               const canDelete = lines.length > 1;
               return (
                 <div key={idx} className="space-y-2">
