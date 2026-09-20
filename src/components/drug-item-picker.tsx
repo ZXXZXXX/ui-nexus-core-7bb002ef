@@ -5,7 +5,13 @@ import { toast } from "sonner";
 export type DrugItem = {
   id: string;
   name: string;
-  unit: string;
+  /** 规格单位（采购/库存单位，如 瓶、盒） */
+  specUnit: string;
+  /** 用药单位（最小使用单位，如 ml、支） */
+  doseUnit: string;
+  /** 1 规格单位 = 多少用药单位 */
+  perSpec: number;
+  /** 单价：元 / 规格单位 */
   price: number;
 };
 
@@ -116,10 +122,11 @@ export function DrugItemPicker({
                     <span>·</span>
                     <span className="inline-flex items-center gap-1">
                       <Pill className="h-3 w-3" />
-                      {i.unit}
+                      1{i.specUnit} = {i.perSpec}
+                      {i.doseUnit}
                     </span>
                     <span className="ml-auto tabular-nums text-text-secondary">
-                      ¥ {i.price}/{i.unit}
+                      ¥ {i.price}/{i.specUnit}
                     </span>
                   </div>
                   <div className="text-body-sm text-foreground font-medium truncate">

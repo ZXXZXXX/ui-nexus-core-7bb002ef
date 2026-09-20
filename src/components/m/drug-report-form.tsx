@@ -6,16 +6,21 @@ import { EvidenceSection } from "@/components/evidence-section";
 import { DrugItemPicker } from "@/components/drug-item-picker";
 import { toast } from "sonner";
 
-// 物品/药品候选（含参考单价，用于自动估算金额）
+// 物品/药品候选
+// 每个药品有两种单位：
+//   specUnit 规格单位（采购 / 库存单位，单价按此计）
+//   doseUnit 用药单位（最小使用单位），perSpec = 1 规格单位含多少用药单位
 const ITEMS = [
-  { id: "DR-0108", name: "乳房炎抗生素 5mg", unit: "支", price: 18 },
-  { id: "DR-0214", name: "口蹄疫疫苗 A 型", unit: "支", price: 60 },
-  { id: "DR-0306", name: "驱虫剂 伊维菌素", unit: "瓶", price: 45 },
-  { id: "DR-0412", name: "营养补充剂 复合维生素", unit: "罐", price: 88 },
-  { id: "DR-0521", name: "消毒液 戊二醛", unit: "L", price: 44 },
-  { id: "DR-0633", name: "葡萄糖注射液", unit: "瓶", price: 12 },
-  { id: "DR-0712", name: "碳酸氢钠", unit: "袋", price: 9 },
+  { id: "DR-0108", name: "乳房炎抗生素 5mg", specUnit: "盒", doseUnit: "支", perSpec: 10, price: 180 },
+  { id: "DR-0214", name: "口蹄疫疫苗 A 型", specUnit: "瓶", doseUnit: "ml", perSpec: 50, price: 60 },
+  { id: "DR-0306", name: "驱虫剂 伊维菌素", specUnit: "瓶", doseUnit: "ml", perSpec: 100, price: 45 },
+  { id: "DR-0412", name: "营养补充剂 复合维生素", specUnit: "罐", doseUnit: "g", perSpec: 500, price: 88 },
+  { id: "DR-0521", name: "消毒液 戊二醛", specUnit: "桶", doseUnit: "L", perSpec: 5, price: 220 },
+  { id: "DR-0633", name: "葡萄糖注射液", specUnit: "瓶", doseUnit: "ml", perSpec: 250, price: 12 },
+  { id: "DR-0712", name: "碳酸氢钠", specUnit: "袋", doseUnit: "g", perSpec: 100, price: 9 },
 ];
+
+type UnitMode = "dose" | "spec";
 
 // 损耗发生环节 → 具体原因
 const LOSS_STAGES = [
@@ -36,7 +41,12 @@ const RETURN_REASONS = [
   "其他 ",
 ];
 
-type Line = { itemId: string; qty: string };
+type Line = { itemId: string; qty: string; unitMode: UnitMode };
+
+/** 按填报单位折算成规格单位数量（用于金额估算） */
+function toSpecQty(item: (typeof ITEMS)[number], qty: number, unitMode: UnitMode) {
+  return unitMode === "spec" ? qty : qty / item.perSpec;
+}
 
 export type DrugReportMode = "loss" | "return";
 
@@ -46,7 +56,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
   const isReturn = mode === "return";
   const word = isReturn ? "退料" : "损耗";
 
-  const [lines, setLines] = useState<Line[]>([{ itemId: "", qty: "" }]);
+  const [lines, setLines] = useState<Line[]>([{ itemId: "", qty: "", unitMode: "dose" }]);
   const [reasons, setReasons] = useState<string[]>([]);
   const [stage, setStage] = useState<LossStage | null>(null);
   const stageReasons: string[] = [
@@ -64,13 +74,14 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
       const item = ITEMS.find((i) => i.id === l.itemId);
       const qty = Number(l.qty);
       if (!item || !qty || Number.isNaN(qty)) return sum;
-      return sum + item.price * qty;
+      return sum + item.price * toSpecQty(item, qty, l.unitMode);
     }, 0);
   }, [lines]);
 
   const setLine = (idx: number, patch: Partial<Line>) =>
     setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
-  const addLine = () => setLines((prev) => [...prev, { itemId: "", qty: "" }]);
+  const addLine = () =>
+    setLines((prev) => [...prev, { itemId: "", qty: "", unitMode: "dose" }]);
   const removeLine = (idx: number) =>
     setLines((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
 
@@ -129,7 +140,14 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
               const item = ITEMS.find((i) => i.id === l.itemId);
               const qty = Number(l.qty);
               const lineAmount =
-                item && qty && !Number.isNaN(qty) ? item.price * qty : 0;
+                item && qty && !Number.isNaN(qty)
+                  ? item.price * toSpecQty(item, qty, l.unitMode)
+                  : 0;
+              const curUnit = item
+                ? l.unitMode === "spec"
+                  ? item.specUnit
+                  : item.doseUnit
+                : "单位";
               const canDelete = lines.length > 1;
               return (
                 <div key={idx} className="space-y-2">
@@ -148,7 +166,9 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                               {item.name}
                             </div>
                             <div className="text-caption text-text-tertiary font-mono leading-tight">
-                              {item.id} · ¥ {item.price}/{item.unit}
+                              {item.id} · ¥ {item.price}/{item.specUnit} · 1
+                              {item.specUnit}={item.perSpec}
+                              {item.doseUnit}
                             </div>
                           </>
                         ) : (
@@ -187,11 +207,34 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                       placeholder={`${word}数量`}
                       className="flex-1 h-11 px-3 rounded-lg text-body"
                     />
-                    <span
-                      className={`text-body-sm w-10 text-center ${item ? "text-text-secondary" : "text-text-tertiary"}`}
-                    >
-                      {item?.unit ?? "单位"}
-                    </span>
+                    {item ? (
+                      <div className="flex items-center rounded-lg border border-border overflow-hidden shrink-0">
+                        {([
+                          { key: "dose" as UnitMode, unit: item.doseUnit },
+                          { key: "spec" as UnitMode, unit: item.specUnit },
+                        ]).map((o) => {
+                          const active = l.unitMode === o.key;
+                          return (
+                            <button
+                              key={o.key}
+                              type="button"
+                              onClick={() => setLine(idx, { unitMode: o.key })}
+                              className={`h-9 min-w-11 px-2 text-body-sm ${
+                                active
+                                  ? "bg-brand-subtle text-primary font-medium"
+                                  : "bg-card text-text-tertiary"
+                              }`}
+                            >
+                              {o.unit}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <span className="text-body-sm w-10 text-center text-text-tertiary">
+                        单位
+                      </span>
+                    )}
                     {!isReturn && (
                       <span
                         className={`text-body-sm w-20 text-right tabular-nums ${lineAmount > 0 ? "text-text-secondary" : "text-text-tertiary"}`}
@@ -200,6 +243,17 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                       </span>
                     )}
                   </div>
+                  {item && (
+                    <div className="text-caption text-text-tertiary">
+                      当前按{l.unitMode === "spec" ? "规格单位" : "用药单位"}（
+                      {curUnit}）填报
+                      {qty && !Number.isNaN(qty)
+                        ? l.unitMode === "spec"
+                          ? ` · 折合 ${(qty * item.perSpec).toLocaleString("zh-CN")} ${item.doseUnit}`
+                          : ` · 折合 ${(qty / item.perSpec).toFixed(2)} ${item.specUnit}`
+                        : ""}
+                    </div>
+                  )}
                 </div>
               );
             })}
