@@ -41,7 +41,12 @@ const RETURN_REASONS = [
   "其他 ",
 ];
 
-type Line = { itemId: string; qty: string };
+type Line = { itemId: string; qty: string; unitMode: UnitMode };
+
+/** 按填报单位折算成规格单位数量（用于金额估算） */
+function toSpecQty(item: (typeof ITEMS)[number], qty: number, unitMode: UnitMode) {
+  return unitMode === "spec" ? qty : qty / item.perSpec;
+}
 
 export type DrugReportMode = "loss" | "return";
 
@@ -51,7 +56,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
   const isReturn = mode === "return";
   const word = isReturn ? "退料" : "损耗";
 
-  const [lines, setLines] = useState<Line[]>([{ itemId: "", qty: "" }]);
+  const [lines, setLines] = useState<Line[]>([{ itemId: "", qty: "", unitMode: "dose" }]);
   const [reasons, setReasons] = useState<string[]>([]);
   const [stage, setStage] = useState<LossStage | null>(null);
   const stageReasons: string[] = [
@@ -69,13 +74,14 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
       const item = ITEMS.find((i) => i.id === l.itemId);
       const qty = Number(l.qty);
       if (!item || !qty || Number.isNaN(qty)) return sum;
-      return sum + item.price * qty;
+      return sum + item.price * toSpecQty(item, qty, l.unitMode);
     }, 0);
   }, [lines]);
 
   const setLine = (idx: number, patch: Partial<Line>) =>
     setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
-  const addLine = () => setLines((prev) => [...prev, { itemId: "", qty: "" }]);
+  const addLine = () =>
+    setLines((prev) => [...prev, { itemId: "", qty: "", unitMode: "dose" }]);
   const removeLine = (idx: number) =>
     setLines((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
 
