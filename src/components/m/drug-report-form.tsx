@@ -166,7 +166,9 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                               {item.name}
                             </div>
                             <div className="text-caption text-text-tertiary font-mono leading-tight">
-                              {item.id} · ¥ {item.price}/{item.unit}
+                              {item.id} · ¥ {item.price}/{item.specUnit} · 1
+                              {item.specUnit}={item.perSpec}
+                              {item.doseUnit}
                             </div>
                           </>
                         ) : (
