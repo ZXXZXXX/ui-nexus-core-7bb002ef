@@ -67,6 +67,7 @@ type Drug = {
   routes: string[]; // 默认给药方式
   withdraw: string; // 休药期
   doseUnit: string; // 默认用药单位
+  specUnit?: string; // 规格单位（采购/库存单位）
   freqRule?: string; // 用药频次规则
   minDays?: number; // 最少用药天数
   maxDays?: number; // 最大用药天数
@@ -85,6 +86,7 @@ type Drug = {
 
 const ROUTE_OPTIONS = ["肌肉注射", "静脉注射", "皮下注射", "乳注", "口服", "局部用药"];
 const UNIT_OPTIONS = ["ml", "g", "kg", "支", "头份", "片"];
+const SPEC_UNIT_OPTIONS = ["瓶", "盒", "支", "罐", "桶", "袋", "板", "箱"];
 const VARIABLE_OPTIONS = ["体重区间", "非盲乳数", "自定义变量"];
 
 const initialDrugs: Drug[] = [
@@ -505,6 +507,13 @@ function DrugForm({
             options={UNIT_OPTIONS}
             readOnly={readOnly}
             onChange={(v) => patch({ doseUnit: v })}
+          />
+          <FSelect
+            label="规格单位"
+            value={d.specUnit ?? ""}
+            options={SPEC_UNIT_OPTIONS}
+            readOnly={readOnly}
+            onChange={(v) => patch({ specUnit: v })}
           />
           <FrequencyEditor
             label="用药频次规则"
