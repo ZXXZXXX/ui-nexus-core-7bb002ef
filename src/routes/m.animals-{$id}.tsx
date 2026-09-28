@@ -171,9 +171,12 @@ function AnimalDetailPage() {
                 <div className="text-[26px] font-mono font-semibold leading-none tracking-tight">
                   #{a.id}
                 </div>
-                <div className="mt-2 inline-flex items-center gap-1 text-caption opacity-90">
+                <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-caption opacity-90">
                   <MapPin className="h-3 w-3 shrink-0" />
                   <span className="truncate">{a.farm} · {a.barn}</span>
+                  <span className="opacity-60">·</span>
+                  <span>电子耳标号</span>
+                  <span className="font-mono tabular-nums tracking-tight">{electronicTagOf(a.id)}</span>
                 </div>
               </div>
               <div className="shrink-0 inline-flex items-center gap-1.5">
