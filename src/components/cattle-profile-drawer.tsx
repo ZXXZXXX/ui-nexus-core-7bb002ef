@@ -17,6 +17,7 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { electronicTagOf } from "@/lib/electronic-tag";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -594,6 +595,7 @@ function PedigreeDialog({
   const female = cow.sex === "母" || cow.sex === "♀";
   const farmNo = cow.ear.slice(0, 2);
   const pedigree = [
+    { label: "电子耳标号", value: electronicTagOf(cow.ear) },
     { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
     { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
     { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
