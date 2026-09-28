@@ -352,6 +352,8 @@ export function CattleProfileDrawer({
                   <span>{cow.ageDays > 90 ? `${Math.floor(cow.ageDays / 30)} 月龄` : `${cow.ageDays} 日龄`}</span>
                   <span className="h-3 w-px bg-border" />
                   <span>{cow.type}</span>
+                  <span className="h-3 w-px bg-border" />
+                  <span className="font-mono tabular-nums">{electronicTagOf(cow.ear)}</span>
                 </div>
               </div>
             </div>
@@ -595,7 +597,6 @@ function PedigreeDialog({
   const female = cow.sex === "母" || cow.sex === "♀";
   const farmNo = cow.ear.slice(0, 2);
   const pedigree = [
-    { label: "电子耳标号", value: electronicTagOf(cow.ear) },
     { label: "母号", value: `${farmNo}-${18 + pick(2, 5)}-${String(pick(3, 9999)).padStart(4, "0")}` },
     { label: "父号", value: `USA-${1000000 + pick(4, 900000)}` },
     { label: "出生体重", value: `${(38 + pick(1, 8)).toFixed(0)} kg` },
