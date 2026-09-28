@@ -22,6 +22,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
+import { electronicTagOf } from "@/lib/electronic-tag";
 import { markAlertHandled } from "@/lib/alert-store";
 import { MobileShell } from "@/components/mobile-shell";
 import { cowStatusOf, leaveInfoOf, locateCow } from "@/lib/cow-status";
@@ -218,6 +219,10 @@ function AnimalDetailPage() {
                 <HeaderInfo label="泌乳天数" value={`${a.lactationDays} 天`} />
                 <HeaderInfo label="怀孕天数" value={a.pregnancyDays > 0 ? `${a.pregnancyDays} 天` : "—"} />
                 <HeaderInfo label="胎次" value={`${a.parity} 胎`} />
+              </div>
+              <div className="flex items-center justify-between px-4 py-2.5">
+                <span className="text-caption opacity-75">电子耳标号</span>
+                <span className="text-body-sm font-mono tabular-nums">{electronicTagOf(a.id)}</span>
               </div>
             </div>
 
