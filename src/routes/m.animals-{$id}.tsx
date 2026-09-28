@@ -171,9 +171,11 @@ function AnimalDetailPage() {
                 <div className="text-[26px] font-mono font-semibold leading-none tracking-tight">
                   #{a.id}
                 </div>
-                <div className="mt-2 inline-flex items-center gap-1 text-caption opacity-90">
+                <div className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-caption opacity-90">
                   <MapPin className="h-3 w-3 shrink-0" />
                   <span className="truncate">{a.farm} · {a.barn}</span>
+                  <span className="opacity-60">·</span>
+                  <span className="whitespace-nowrap">电子耳标号 <span className="font-mono tabular-nums tracking-tight">{electronicTagOf(a.id)}</span></span>
                 </div>
               </div>
               <div className="shrink-0 inline-flex items-center gap-1.5">
@@ -219,10 +221,6 @@ function AnimalDetailPage() {
                 <HeaderInfo label="泌乳天数" value={`${a.lactationDays} 天`} />
                 <HeaderInfo label="怀孕天数" value={a.pregnancyDays > 0 ? `${a.pregnancyDays} 天` : "—"} />
                 <HeaderInfo label="胎次" value={`${a.parity} 胎`} />
-              </div>
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-caption opacity-75">电子耳标号</span>
-                <span className="text-body-sm font-mono tabular-nums">{electronicTagOf(a.id)}</span>
               </div>
             </div>
 
