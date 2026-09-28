@@ -353,7 +353,7 @@ export function CattleProfileDrawer({
                   <span className="h-3 w-px bg-border" />
                   <span>{cow.type}</span>
                   <span className="h-3 w-px bg-border" />
-                  <span className="font-mono tabular-nums">{electronicTagOf(cow.ear)}</span>
+                  <span>电子耳标 <span className="font-mono tabular-nums">{electronicTagOf(cow.ear)}</span></span>
                 </div>
               </div>
             </div>
