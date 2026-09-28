@@ -222,7 +222,7 @@ function AnimalDetailPage() {
               </div>
               <div className="flex items-center justify-between px-4 py-2.5">
                 <span className="text-caption opacity-75">电子耳标号</span>
-                <span className="text-body-sm font-mono tabular-nums">{electronicTagOf(a.ear)}</span>
+                <span className="text-body-sm font-mono tabular-nums">{electronicTagOf(a.id)}</span>
               </div>
             </div>
 
