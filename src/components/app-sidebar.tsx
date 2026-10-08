@@ -10,7 +10,6 @@ import {
   MessageSquare,
   BarChart3,
   ChevronDown,
-  Bell,
 } from "lucide-react";
 
 
@@ -99,11 +98,6 @@ const groups: NavGroup[] = [
     title: "统计分析",
     icon: BarChart3,
     url: "/stats",
-  },
-  {
-    title: "消息管理",
-    icon: Bell,
-    url: "/messages",
   },
   {
     title: "反馈管理",
