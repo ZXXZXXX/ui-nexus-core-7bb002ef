@@ -58,6 +58,12 @@ type LossReport = {
 const money = (n: number) =>
   `¥ ${n.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+/** 群防群控场景下的批量均摊耳号（演示数据） */
+const herdEars = (count: number, start = 1001) =>
+  Array.from({ length: count }, (_, i) =>
+    `01-24-${String(start + i).padStart(4, "0")}`,
+  );
+
 const initial: LossReport[] = [
   {
     id: "LS-2026-1086",
