@@ -15,6 +15,9 @@ export type DrugItem = {
   holder?: string;
   spec?: string;
   batch?: string;
+  code?: string;
+  /** 剩余可选的未使用数；为 0 时不可选 */
+  remaining?: number;
 };
 
 export function DrugItemPicker({
@@ -36,7 +39,8 @@ export function DrugItemPicker({
 
   const handleScan = () => {
     // 演示：随机选中一个候选项以模拟扫码识别成功
-    const pick = items[Math.floor(Math.random() * items.length)];
+    const pool = items.filter((i) => (i.remaining ?? 1) > 0);
+    const pick = pool[Math.floor(Math.random() * pool.length)];
     if (pick) {
       toast.success(`扫码识别：${pick.name}`);
       onSelect(pick);
@@ -89,22 +93,26 @@ export function DrugItemPicker({
           ) : (
             list.map((i) => {
               const selected = i.id === selectedId;
+              const disabled = !selected && (i.remaining ?? 1) <= 0;
               return (
                 <button
                   key={i.id}
                   type="button"
+                  disabled={disabled}
                   onClick={() => {
                     onSelect(i);
                     onClose();
                   }}
                   className={`w-full text-left rounded-xl border p-3 bg-card transition-colors ${
-                    selected
+                    disabled
+                      ? "border-border opacity-50 cursor-not-allowed"
+                      : selected
                       ? "border-primary"
                       : "border-border active:bg-surface-subtle"
                   }`}
                 >
                   <div className="flex items-center gap-1.5 text-caption text-text-tertiary mb-1.5">
-                    <span className="font-mono">{i.id}</span>
+                    <span className="font-mono">{i.code ?? i.id}</span>
                     <span>·</span>
                     <span className="inline-flex items-center gap-1">
                       <Pill className="h-3 w-3" />
@@ -120,7 +128,12 @@ export function DrugItemPicker({
                   </div>
                   {(i.holder || i.spec) && (
                     <div className="mt-1 text-caption text-text-tertiary">
-                      {i.spec}{i.batch ? ` · 批号 ${i.batch}` : ""}{i.holder ? ` · 领用人 ${i.holder}` : ""}
+                      {i.spec}{i.holder ? ` · 领用人 ${i.holder}` : ""}
+                      {i.remaining !== undefined && (
+                        <span className={i.remaining > 0 ? "text-primary" : "text-destructive"}>
+                          {" · "}未使用 {Math.max(0, i.remaining)} 件
+                        </span>
+                      )}
                     </div>
                   )}
                   {selected && (
