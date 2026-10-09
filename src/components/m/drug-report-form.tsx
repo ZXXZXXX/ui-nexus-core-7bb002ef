@@ -4,21 +4,30 @@ import { ScanLine, X, Plus, PackageX, ChevronRight } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { EvidenceSection } from "@/components/evidence-section";
 import { DrugItemPicker } from "@/components/drug-item-picker";
+import { L3_ITEMS } from "@/lib/level3-items";
 import { toast } from "sonner";
 
 // 物品/药品候选
 // 每个药品有两种单位：
 //   specUnit 规格单位（采购 / 库存单位，单价按此计）
 //   doseUnit 用药单位（最小使用单位），perSpec = 1 规格单位含多少用药单位
-const ITEMS = [
-  { id: "DR-0108", name: "乳房炎抗生素 5mg", specUnit: "盒", doseUnit: "支", perSpec: 10, price: 180 },
-  { id: "DR-0214", name: "口蹄疫疫苗 A 型", specUnit: "瓶", doseUnit: "ml", perSpec: 50, price: 60 },
-  { id: "DR-0306", name: "驱虫剂 伊维菌素", specUnit: "瓶", doseUnit: "ml", perSpec: 100, price: 45 },
-  { id: "DR-0412", name: "营养补充剂 复合维生素", specUnit: "罐", doseUnit: "g", perSpec: 500, price: 88 },
-  { id: "DR-0521", name: "消毒液 戊二醛", specUnit: "桶", doseUnit: "L", perSpec: 5, price: 220 },
-  { id: "DR-0633", name: "葡萄糖注射液", specUnit: "瓶", doseUnit: "ml", perSpec: 250, price: 12 },
-  { id: "DR-0712", name: "碳酸氢钠", specUnit: "袋", doseUnit: "g", perSpec: 100, price: 9 },
-];
+// 候选来源：本牧场所有人三级库中「未使用」的药品（每件药品有唯一码）
+const PRICE_BY_NAME: Record<string, number> = {};
+const ITEMS = L3_ITEMS.filter((i) => !i.used).map((i) => {
+  const m = i.spec.match(/([\d.]+)\s*(ml|g|L|kg)\s*\/\s*(\S+)$/i);
+  const perSpec = m ? Number(m[1]) : 1;
+  return {
+    id: i.code,
+    name: i.name,
+    specUnit: m ? m[3] : "件",
+    doseUnit: m ? m[2] : "件",
+    perSpec,
+    price: PRICE_BY_NAME[i.name] ?? Math.max(5, Math.round(perSpec / 4)),
+    holder: i.holder,
+    spec: i.spec,
+    batch: i.batch,
+  };
+});
 
 type UnitMode = "dose" | "spec";
 
@@ -173,7 +182,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                           </>
                         ) : (
                           <span className="text-body text-text-tertiary">
-                            选择{word}物品 / 药品
+                            从三级库选择
                           </span>
                         )}
                       </div>
@@ -181,8 +190,11 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                     </button>
                     <button
                       onClick={() => {
-                        setPickerIdx(idx);
-                        toast("已唤起扫码（演示）");
+                        const pick = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+                        if (pick) {
+                          setLine(idx, { itemId: pick.id });
+                          toast.success(`扫码识别：${pick.name}`);
+                        }
                       }}
                       className="h-11 w-11 inline-flex items-center justify-center rounded-lg bg-brand-subtle text-primary shrink-0"
                       aria-label="扫码录入"
