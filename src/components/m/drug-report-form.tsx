@@ -13,19 +13,27 @@ import { toast } from "sonner";
 //   doseUnit 用药单位（最小使用单位），perSpec = 1 规格单位含多少用药单位
 // 候选来源：本牧场所有人三级库中「未使用」的药品（每件药品有唯一码）
 const PRICE_BY_NAME: Record<string, number> = {};
-const ITEMS = L3_ITEMS.filter((i) => !i.used).map((i) => {
+const ITEMS = Object.values(
+  L3_ITEMS.filter((i) => !i.used).reduce<Record<string, { i: (typeof L3_ITEMS)[number]; n: number; holders: Set<string> }>>((acc, i) => {
+    const k = `${i.name}|${i.spec}`;
+    (acc[k] ??= { i, n: 0, holders: new Set() }).n++;
+    acc[k].holders.add(i.holder);
+    return acc;
+  }, {}),
+).map(({ i, n, holders }) => {
   const m = i.spec.match(/([\d.]+)\s*(ml|g|L|kg)\s*\/\s*(\S+)$/i);
   const perSpec = m ? Number(m[1]) : 1;
   return {
-    id: i.code,
+    id: `${i.name}|${i.spec}`,
+    code: i.code,
     name: i.name,
     specUnit: m ? m[3] : "件",
     doseUnit: m ? m[2] : "件",
     perSpec,
     price: PRICE_BY_NAME[i.name] ?? Math.max(5, Math.round(perSpec / 4)),
-    holder: i.holder,
+    holder: [...holders].join("、"),
     spec: i.spec,
-    batch: i.batch,
+    unused: n,
   };
 });
 
@@ -87,6 +95,10 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
     }, 0);
   }, [lines]);
 
+  /** 某药品剩余未使用数 = 三级库未使用数 − 其他行已选数 */
+  const remainingFor = (id: string, exceptIdx: number | null) =>
+    (ITEMS.find((i) => i.id === id)?.unused ?? 0) -
+    lines.filter((l, j) => j !== exceptIdx && l.itemId === id).length;
   const setLine = (idx: number, patch: Partial<Line>) =>
     setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
   const addLine = () =>
@@ -175,7 +187,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                               {item.name}
                             </div>
                             <div className="text-caption text-text-tertiary font-mono leading-tight">
-                              {item.id} · ¥ {item.price}/{item.specUnit} · 1
+                              {item.code} · ¥ {item.price}/{item.specUnit} · 1
                               {item.specUnit}={item.perSpec}
                               {item.doseUnit}
                             </div>
@@ -190,7 +202,9 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                     </button>
                     <button
                       onClick={() => {
-                        const pick = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+                        const avail = ITEMS.filter((it) => remainingFor(it.id, idx) > 0);
+                        const pick = avail[Math.floor(Math.random() * avail.length)];
+                        if (!pick) toast.error("三级库内暂无可选的未使用药品");
                         if (pick) {
                           setLine(idx, { itemId: pick.id });
                           toast.success(`扫码识别：${pick.name}`);
@@ -416,7 +430,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
       <DrugItemPicker
         open={pickerIdx !== null}
         onClose={() => setPickerIdx(null)}
-        items={ITEMS}
+        items={ITEMS.map((it) => ({ ...it, remaining: remainingFor(it.id, pickerIdx) }))}
         selectedId={
           pickerIdx !== null ? lines[pickerIdx]?.itemId || undefined : undefined
         }
