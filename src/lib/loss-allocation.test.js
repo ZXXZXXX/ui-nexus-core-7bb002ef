@@ -26,4 +26,11 @@ describe("牛只均摊耳号折叠规则", () => {
   it("展开后展示全部耳号", () => {
     expect(visibleAllocatedCattle(ears, true)).toEqual(ears);
   });
+
+  it("上千头时默认仍只展示 5 个，其余计入折叠数量", () => {
+    const many = Array.from({ length: 1200 }, (_, i) => `01-24-${i}`);
+    expect(visibleAllocatedCattle(many, false)).toHaveLength(5);
+    expect(hiddenAllocatedCattleCount(many)).toBe(1195);
+    expect(visibleAllocatedCattle(many, true)).toHaveLength(1200);
+  });
 });

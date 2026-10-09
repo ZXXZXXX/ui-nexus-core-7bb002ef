@@ -58,6 +58,12 @@ type LossReport = {
 const money = (n: number) =>
   `¥ ${n.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+/** 群防群控场景下的批量均摊耳号（演示数据） */
+const herdEars = (count: number, start = 1001) =>
+  Array.from({ length: count }, (_, i) =>
+    `01-24-${String(start + i).padStart(4, "0")}`,
+  );
+
 const initial: LossReport[] = [
   {
     id: "LS-2026-1086",
@@ -129,6 +135,22 @@ const initial: LossReport[] = [
     cattleEars: ["01-24-2368", "01-24-2367", "01-24-2366"],
     drugs: [
       { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 1, unit: "瓶", pickedAt: "2026-05-09 14:20", pickedBy: "周主管", value: 38.75 },
+    ],
+  },
+  {
+    id: "LS-2026-1082",
+    drugCount: 1,
+    reportedAt: "2026-05-08 08:05",
+    reason: "群体免疫稀释液失效",
+    reporter: "周主管",
+    value: 1840.0,
+    type: "牛只均摊",
+    stage: "给药用药",
+    remark: "全场群防群控用药，稀释液配制超时失效，按当次免疫存栏头数均摊。",
+    photos: 2,
+    cattleEars: herdEars(1286),
+    drugs: [
+      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 26, unit: "瓶", pickedAt: "2026-05-08 07:40", pickedBy: "周主管", value: 1840.0 },
     ],
   },
 ];
@@ -226,27 +248,22 @@ function LossPage() {
                       {current.type === "-" ? <span className="text-body text-text-tertiary">—</span> : <span className={current.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{current.type}</span>}
                     </div>
                   </div>
+                  <div className="col-span-2 min-w-0">
+                    <div className="text-caption text-text-tertiary">备注</div>
+                    <div className="text-body-sm text-foreground">{current.remark || "—"}</div>
+                  </div>
                   {current.type === "牛只均摊" && current.cattleEars && (
                     <div className="col-span-2 min-w-0">
-                      <div className="text-caption text-text-tertiary">均摊牛只</div>
-                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                        {visibleAllocatedCattle(
-                          current.cattleEars,
-                          expandedAllocationId === current.id,
-                        ).map((ear) => (
-                          <span
-                            key={ear}
-                            className="tag bg-surface-subtle font-mono text-text-secondary"
-                          >
-                            {ear}
-                          </span>
-                        ))}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-caption text-text-tertiary">
+                          均摊牛只 · 共 {current.cattleEars.length} 头
+                        </div>
                         {hiddenAllocatedCattleCount(current.cattleEars) > 0 && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="h-6 px-2 text-caption font-normal text-primary hover:bg-brand-subtle hover:text-primary"
+                            className="h-6 px-2 text-caption font-normal text-primary hover:bg-brand-subtle hover:text-primary shrink-0"
                             onClick={() =>
                               setExpandedAllocationId((id) =>
                                 id === current.id ? null : current.id,
@@ -259,12 +276,27 @@ function LossPage() {
                           </Button>
                         )}
                       </div>
+                      <div
+                        className={`mt-1.5 flex flex-wrap items-start gap-1.5 ${
+                          expandedAllocationId === current.id
+                            ? "max-h-64 overflow-y-auto rounded-lg border border-border p-2.5"
+                            : ""
+                        }`}
+                      >
+                        {visibleAllocatedCattle(
+                          current.cattleEars,
+                          expandedAllocationId === current.id,
+                        ).map((ear) => (
+                          <span
+                            key={ear}
+                            className="tag bg-surface-subtle font-mono text-text-secondary"
+                          >
+                            {ear}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
-                  <div className="col-span-2 min-w-0">
-                    <div className="text-caption text-text-tertiary">备注</div>
-                    <div className="text-body-sm text-foreground">{current.remark || "—"}</div>
-                  </div>
                 </div>
               </section>
 
