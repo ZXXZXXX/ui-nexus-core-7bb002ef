@@ -279,7 +279,7 @@ function LossPage() {
                       <div
                         className={`mt-1.5 flex flex-wrap items-start gap-1.5 ${
                           expandedAllocationId === current.id
-                            ? "max-h-64 overflow-y-auto pr-1"
+                            ? "max-h-64 overflow-y-auto rounded-lg border border-border p-2.5"
                             : ""
                         }`}
                       >
