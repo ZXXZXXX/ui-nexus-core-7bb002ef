@@ -1,5 +1,4 @@
-import { useMemo, useState } from "react";
-import { X, Search, Check, ScanLine, Pill } from "lucide-react";
+import { X, Check, ScanLine, Pill } from "lucide-react";
 import { toast } from "sonner";
 
 export type DrugItem = {
@@ -13,6 +12,9 @@ export type DrugItem = {
   perSpec: number;
   /** 单价：元 / 规格单位 */
   price: number;
+  holder?: string;
+  spec?: string;
+  batch?: string;
 };
 
 export function DrugItemPicker({
@@ -28,16 +30,7 @@ export function DrugItemPicker({
   selectedId?: string;
   onSelect: (item: DrugItem) => void;
 }) {
-  const [q, setQ] = useState("");
-  const list = useMemo(() => {
-    const kw = q.trim().toLowerCase();
-    if (!kw) return items;
-    return items.filter(
-      (i) =>
-        i.id.toLowerCase().includes(kw) ||
-        i.name.toLowerCase().includes(kw),
-    );
-  }, [items, q]);
+  const list = items;
 
   if (!open) return null;
 
@@ -64,7 +57,7 @@ export function DrugItemPicker({
       >
         <div className="px-4 h-12 flex items-center justify-between border-b border-border shrink-0">
           <div className="text-body font-medium text-foreground">
-            选择损耗物品
+            从三级库选择
           </div>
           <button
             type="button"
@@ -76,29 +69,22 @@ export function DrugItemPicker({
         </div>
 
         <div className="px-4 pt-3 shrink-0 flex items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="搜索物品编号 / 名称"
-              className="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-subtle border border-border text-body-sm placeholder:text-text-tertiary"
-            />
+          <div className="flex-1 text-caption text-text-tertiary">
+            本牧场所有人三级库内未使用的药品 · 共 {items.length} 件
           </div>
           <button
             type="button"
             onClick={handleScan}
-            className="h-10 w-10 inline-flex items-center justify-center rounded-lg bg-brand-subtle text-primary shrink-0"
-            aria-label="扫码录入"
+            className="h-9 px-3 inline-flex items-center gap-1 rounded-lg bg-brand-subtle text-primary text-body-sm shrink-0"
           >
-            <ScanLine className="h-4 w-4" />
+            <ScanLine className="h-4 w-4" /> 扫码录入
           </button>
         </div>
 
         <div className="p-4 space-y-2 overflow-y-auto flex-1">
           {list.length === 0 ? (
             <div className="text-center py-12 text-body-sm text-text-tertiary">
-              无匹配物品
+              三级库暂无未使用药品
             </div>
           ) : (
             list.map((i) => {
@@ -132,6 +118,11 @@ export function DrugItemPicker({
                   <div className="text-body-sm text-foreground font-medium truncate">
                     {i.name}
                   </div>
+                  {(i.holder || i.spec) && (
+                    <div className="mt-1 text-caption text-text-tertiary">
+                      {i.spec}{i.batch ? ` · 批号 ${i.batch}` : ""}{i.holder ? ` · 领用人 ${i.holder}` : ""}
+                    </div>
+                  )}
                   {selected && (
                     <div className="mt-1.5 inline-flex items-center gap-0.5 text-caption text-primary font-medium">
                       <Check className="h-3.5 w-3.5" />
