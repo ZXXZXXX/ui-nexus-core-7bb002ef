@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ScanLine, X, Plus, PackageX, ChevronRight } from "lucide-react";
+import { ScanLine, X, PackageX, Boxes } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { EvidenceSection } from "@/components/evidence-section";
-import { DrugItemPicker } from "@/components/drug-item-picker";
+import { DrugItemPicker, type DrugItem } from "@/components/drug-item-picker";
 import { L3_ITEMS } from "@/lib/level3-items";
 import { toast } from "sonner";
 
@@ -50,12 +50,12 @@ const LOSS_STAGES = [
 type LossStage = (typeof LOSS_STAGES)[number]["key"];
 
 const RETURN_REASONS = [
-  "工单变更 ",
+  "工单变更 ",
   "用料剩余",
   "牛只死亡",
   "牛只转出",
   "领取错误",
-  "其他 ",
+  "其他 ",
 ];
 
 type Line = { itemId: string; qty: string; unitMode: UnitMode };
@@ -73,7 +73,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
   const isReturn = mode === "return";
   const word = isReturn ? "退料" : "损耗";
 
-  const [lines, setLines] = useState<Line[]>([{ itemId: "", qty: "", unitMode: "dose" }]);
+  const [lines, setLines] = useState<Line[]>([]);
   const [reasons, setReasons] = useState<string[]>([]);
   const [stage, setStage] = useState<LossStage | null>(null);
   const stageReasons: string[] = [
@@ -84,7 +84,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
   const [videos, setVideos] = useState<number[]>([]);
   const [voiceSecs, setVoiceSecs] = useState<number | null>(null);
   const [recording, setRecording] = useState(false);
-  const [pickerIdx, setPickerIdx] = useState<number | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const estimatedTotal = useMemo(() => {
     return lines.reduce((sum, l) => {
@@ -95,20 +95,33 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
     }, 0);
   }, [lines]);
 
-  /** 某药品剩余未使用数 = 三级库未使用数 − 其他行已选数 */
-  const remainingFor = (id: string, exceptIdx: number | null) =>
+  /** 某药品剩余未使用数 = 三级库未使用数 − 已添加行数 */
+  const remainingFor = (id: string) =>
     (ITEMS.find((i) => i.id === id)?.unused ?? 0) -
-    lines.filter((l, j) => j !== exceptIdx && l.itemId === id).length;
+    lines.filter((l) => l.itemId === id).length;
   const setLine = (idx: number, patch: Partial<Line>) =>
     setLines((prev) => prev.map((l, i) => (i === idx ? { ...l, ...patch } : l)));
-  const addLine = () =>
-    setLines((prev) => [...prev, { itemId: "", qty: "", unitMode: "dose" }]);
+  const addItem = (item: DrugItem) =>
+    setLines((prev) => [...prev, { itemId: item.id, qty: "", unitMode: "dose" }]);
   const removeLine = (idx: number) =>
-    setLines((prev) => (prev.length <= 1 ? prev : prev.filter((_, i) => i !== idx)));
+    setLines((prev) => prev.filter((_, i) => i !== idx));
+
+  /** 扫码录入（演示）：从仍有未使用数的药品中识别一件并添加 */
+  const scanAdd = () => {
+    const avail = ITEMS.filter((it) => remainingFor(it.id) > 0);
+    const pick = avail[Math.floor(Math.random() * avail.length)];
+    if (!pick) {
+      toast.error("三级库内暂无可选的未使用药品");
+      return;
+    }
+    addItem(pick);
+    toast.success(`扫码识别：${pick.name}`);
+  };
 
   const descRequired = reasons.some((r) => r.includes("其他"));
 
   const canSubmit =
+    lines.length > 0 &&
     lines.every((l) => l.itemId && l.qty.trim()) &&
     (isReturn || !!stage) &&
     reasons.length > 0 &&
@@ -155,145 +168,130 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
         </div>
 
 
-        <Section title={`${word}物品`} required hint="可一次性登记多项">
-          <div className="space-y-2">
-            {lines.map((l, idx) => {
-              const item = ITEMS.find((i) => i.id === l.itemId);
-              const qty = Number(l.qty);
-              const lineAmount =
-                item && qty && !Number.isNaN(qty)
-                  ? item.price * toSpecQty(item, qty, l.unitMode)
-                  : 0;
-              const curUnit = item
-                ? l.unitMode === "spec"
-                  ? item.specUnit
-                  : item.doseUnit
-                : "单位";
-              const canDelete = lines.length > 1;
-              return (
-                <div key={idx} className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setPickerIdx(idx)}
-                      className={`flex-1 h-11 px-3 rounded-lg border bg-card flex items-center gap-2 text-left ${
-                        item ? "border-border" : "border-dashed border-border"
-                      }`}
+        <Section title={`${word}物品`} required hint="扫码或从三级库添加，可登记多项">
+          <div className="space-y-3">
+            {/* 统一录入入口：扫码录入 / 从三级库选择 */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={scanAdd}
+                className="h-11 rounded-xl bg-brand-subtle text-primary text-body-sm font-medium inline-flex items-center justify-center gap-1.5 active:opacity-80"
+              >
+                <ScanLine className="h-4 w-4" />
+                扫码录入
+              </button>
+              <button
+                type="button"
+                onClick={() => setPickerOpen(true)}
+                className="h-11 rounded-xl border border-border bg-card text-foreground text-body-sm inline-flex items-center justify-center gap-1.5 active:bg-surface-subtle"
+              >
+                <Boxes className="h-4 w-4" />
+                从三级库选择
+              </button>
+            </div>
+
+            {/* 已录入药品：仅展示名称与规格信息 */}
+            {lines.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border px-3 py-8 text-center text-body-sm text-text-tertiary">
+                尚未添加{word}药品，请扫码或从三级库选择
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {lines.map((l, idx) => {
+                  const item = ITEMS.find((i) => i.id === l.itemId);
+                  if (!item) return null;
+                  const qty = Number(l.qty);
+                  const lineAmount =
+                    qty && !Number.isNaN(qty)
+                      ? item.price * toSpecQty(item, qty, l.unitMode)
+                      : 0;
+                  const curUnit =
+                    l.unitMode === "spec" ? item.specUnit : item.doseUnit;
+                  return (
+                    <div
+                      key={idx}
+                      className="rounded-xl border border-border bg-card p-3 space-y-2.5"
                     >
-                      <div className="flex-1 min-w-0">
-                        {item ? (
-                          <>
-                            <div className="text-body text-foreground truncate leading-tight">
-                              {item.name}
-                            </div>
-                            <div className="text-caption text-text-tertiary font-mono leading-tight">
-                              {item.code} · ¥ {item.price}/{item.specUnit} · 1
-                              {item.specUnit}={item.perSpec}
-                              {item.doseUnit}
-                            </div>
-                          </>
-                        ) : (
-                          <span className="text-body text-text-tertiary">
-                            从三级库选择
+                      <div className="flex items-start gap-2">
+                        <div className="flex-1 min-w-0">
+                          <div className="text-body text-foreground leading-tight">
+                            {item.name}
+                          </div>
+                          <div className="mt-1 text-caption text-text-tertiary">
+                            {item.spec} · 1{item.specUnit}=
+                            {item.perSpec}
+                            {item.doseUnit} · ¥ {item.price}/{item.specUnit}
+                          </div>
+                          <div className="text-caption text-text-tertiary font-mono">
+                            {item.code}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeLine(idx)}
+                          className="h-7 w-7 -mt-1 -mr-1 inline-flex items-center justify-center rounded-full text-text-tertiary active:bg-surface-subtle shrink-0"
+                          aria-label={`移除${item.name}`}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          value={l.qty}
+                          onChange={(e) => setLine(idx, { qty: e.target.value })}
+                          inputMode="decimal"
+                          placeholder={`${word}数量`}
+                          className="flex-1 h-11 px-3 rounded-lg text-body"
+                        />
+                        <div className="flex items-center rounded-lg border border-border overflow-hidden shrink-0">
+                          {([
+                            { key: "dose" as UnitMode, unit: item.doseUnit },
+                            { key: "spec" as UnitMode, unit: item.specUnit },
+                          ]).map((o) => {
+                            const active = l.unitMode === o.key;
+                            return (
+                              <button
+                                key={o.key}
+                                type="button"
+                                onClick={() => setLine(idx, { unitMode: o.key })}
+                                className={`h-9 min-w-11 px-2 text-body-sm ${
+                                  active
+                                    ? "bg-brand-subtle text-primary font-medium"
+                                    : "bg-card text-text-tertiary"
+                                }`}
+                              >
+                                {o.unit}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {!isReturn && (
+                          <span
+                            className={`text-body-sm w-20 text-right tabular-nums ${lineAmount > 0 ? "text-text-secondary" : "text-text-tertiary"}`}
+                          >
+                            {lineAmount > 0 ? `¥ ${lineAmount.toFixed(4)}` : "待估算"}
                           </span>
                         )}
                       </div>
-                      <ChevronRight className="h-4 w-4 text-text-tertiary shrink-0" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        const avail = ITEMS.filter((it) => remainingFor(it.id, idx) > 0);
-                        const pick = avail[Math.floor(Math.random() * avail.length)];
-                        if (!pick) toast.error("三级库内暂无可选的未使用药品");
-                        if (pick) {
-                          setLine(idx, { itemId: pick.id });
-                          toast.success(`扫码识别：${pick.name}`);
-                        }
-                      }}
-                      className="h-11 w-11 inline-flex items-center justify-center rounded-lg bg-brand-subtle text-primary shrink-0"
-                      aria-label="扫码录入"
-                    >
-                      <ScanLine className="h-4 w-4" />
-                    </button>
-                    {canDelete && (
-                      <button
-                        onClick={() => removeLine(idx)}
-                        className="h-9 w-9 inline-flex items-center justify-center rounded-full text-text-tertiary active:bg-surface-subtle shrink-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      value={l.qty}
-                      onChange={(e) => setLine(idx, { qty: e.target.value })}
-                      inputMode="decimal"
-                      placeholder={`${word}数量`}
-                      className="flex-1 h-11 px-3 rounded-lg text-body"
-                    />
-                    {item ? (
-                      <div className="flex items-center rounded-lg border border-border overflow-hidden shrink-0">
-                        {([
-                          { key: "dose" as UnitMode, unit: item.doseUnit },
-                          { key: "spec" as UnitMode, unit: item.specUnit },
-                        ]).map((o) => {
-                          const active = l.unitMode === o.key;
-                          return (
-                            <button
-                              key={o.key}
-                              type="button"
-                              onClick={() => setLine(idx, { unitMode: o.key })}
-                              className={`h-9 min-w-11 px-2 text-body-sm ${
-                                active
-                                  ? "bg-brand-subtle text-primary font-medium"
-                                  : "bg-card text-text-tertiary"
-                              }`}
-                            >
-                              {o.unit}
-                            </button>
-                          );
-                        })}
+                      <div className="text-caption text-text-tertiary">
+                        当前按{l.unitMode === "spec" ? "规格单位" : "用药单位"}（
+                        {curUnit}）填报
+                        {qty && !Number.isNaN(qty)
+                          ? l.unitMode === "spec"
+                            ? ` · 折合 ${(qty * item.perSpec).toLocaleString("zh-CN")} ${item.doseUnit}`
+                            : ` · 折合 ${(qty / item.perSpec).toFixed(2)} ${item.specUnit}`
+                          : ""}
                       </div>
-                    ) : (
-                      <span className="text-body-sm w-10 text-center text-text-tertiary">
-                        单位
-                      </span>
-                    )}
-                    {!isReturn && (
-                      <span
-                        className={`text-body-sm w-20 text-right tabular-nums ${lineAmount > 0 ? "text-text-secondary" : "text-text-tertiary"}`}
-                      >
-                        {lineAmount > 0 ? `¥ ${lineAmount.toFixed(4)}` : "待估算"}
-                      </span>
-                    )}
-                  </div>
-                  {item && (
-                    <div className="text-caption text-text-tertiary">
-                      当前按{l.unitMode === "spec" ? "规格单位" : "用药单位"}（
-                      {curUnit}）填报
-                      {qty && !Number.isNaN(qty)
-                        ? l.unitMode === "spec"
-                          ? ` · 折合 ${(qty * item.perSpec).toLocaleString("zh-CN")} ${item.doseUnit}`
-                          : ` · 折合 ${(qty / item.perSpec).toFixed(2)} ${item.specUnit}`
-                        : ""}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-            <button
-              onClick={addLine}
-              className="w-full h-11 rounded-xl border border-dashed border-border bg-card text-body-sm text-text-secondary inline-flex items-center justify-center gap-1 active:bg-surface-subtle"
-            >
-              <Plus className="h-4 w-4" />
-              追加{word}物品
-            </button>
+                  );
+                })}
+              </div>
+            )}
 
-            {!isReturn && (
+            {!isReturn && lines.length > 0 && (
               <div
-                className="flex items-center justify-between rounded-xl px-3 py-2.5 mt-1"
+                className="flex items-center justify-between rounded-xl px-3 py-2.5"
                 style={{
                   background:
                     "color-mix(in oklab, var(--primary) 6%, transparent)",
@@ -428,15 +426,10 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
       </div>
 
       <DrugItemPicker
-        open={pickerIdx !== null}
-        onClose={() => setPickerIdx(null)}
-        items={ITEMS.map((it) => ({ ...it, remaining: remainingFor(it.id, pickerIdx) }))}
-        selectedId={
-          pickerIdx !== null ? lines[pickerIdx]?.itemId || undefined : undefined
-        }
-        onSelect={(it) => {
-          if (pickerIdx !== null) setLine(pickerIdx, { itemId: it.id });
-        }}
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        items={ITEMS.map((it) => ({ ...it, remaining: remainingFor(it.id) }))}
+        onSelect={(it) => addItem(it)}
       />
     </MobileShell>
   );
