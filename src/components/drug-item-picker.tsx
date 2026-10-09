@@ -1,5 +1,4 @@
-import { X, Check, ScanLine, Pill } from "lucide-react";
-import { toast } from "sonner";
+import { X, Pill } from "lucide-react";
 
 export type DrugItem = {
   id: string;
@@ -24,31 +23,17 @@ export function DrugItemPicker({
   open,
   onClose,
   items,
-  selectedId,
   onSelect,
 }: {
   open: boolean;
   onClose: () => void;
   items: DrugItem[];
-  selectedId?: string;
   onSelect: (item: DrugItem) => void;
 }) {
   const list = items;
 
   if (!open) return null;
 
-  const handleScan = () => {
-    // 演示：随机选中一个候选项以模拟扫码识别成功
-    const pool = items.filter((i) => (i.remaining ?? 1) > 0);
-    const pick = pool[Math.floor(Math.random() * pool.length)];
-    if (pick) {
-      toast.success(`扫码识别：${pick.name}`);
-      onSelect(pick);
-      onClose();
-    } else {
-      toast("已唤起扫码（演示）");
-    }
-  };
 
   return (
     <div
@@ -72,17 +57,9 @@ export function DrugItemPicker({
           </button>
         </div>
 
-        <div className="px-4 pt-3 shrink-0 flex items-center gap-2">
-          <div className="flex-1 text-caption text-text-tertiary">
-            本牧场所有人三级库内未使用的药品 · 共 {items.length} 件
-          </div>
-          <button
-            type="button"
-            onClick={handleScan}
-            className="h-9 px-3 inline-flex items-center gap-1 rounded-lg bg-brand-subtle text-primary text-body-sm shrink-0"
-          >
-            <ScanLine className="h-4 w-4" /> 扫码录入
-          </button>
+        <div className="px-4 pt-3 shrink-0 text-caption text-text-tertiary">
+          本牧场所有人三级库内未使用的药品 · 共 {items.length} 件 ·
+          未使用数为 0 的不可选
         </div>
 
         <div className="p-4 space-y-2 overflow-y-auto flex-1">
@@ -92,8 +69,7 @@ export function DrugItemPicker({
             </div>
           ) : (
             list.map((i) => {
-              const selected = i.id === selectedId;
-              const disabled = !selected && (i.remaining ?? 1) <= 0;
+              const disabled = (i.remaining ?? 1) <= 0;
               return (
                 <button
                   key={i.id}
@@ -106,8 +82,6 @@ export function DrugItemPicker({
                   className={`w-full text-left rounded-xl border p-3 bg-card transition-colors ${
                     disabled
                       ? "border-border opacity-50 cursor-not-allowed"
-                      : selected
-                      ? "border-primary"
                       : "border-border active:bg-surface-subtle"
                   }`}
                 >
@@ -134,12 +108,6 @@ export function DrugItemPicker({
                           {" · "}未使用 {Math.max(0, i.remaining)} 件
                         </span>
                       )}
-                    </div>
-                  )}
-                  {selected && (
-                    <div className="mt-1.5 inline-flex items-center gap-0.5 text-caption text-primary font-medium">
-                      <Check className="h-3.5 w-3.5" />
-                      已选
                     </div>
                   )}
                 </button>
