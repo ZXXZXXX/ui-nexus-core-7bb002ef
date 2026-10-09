@@ -226,27 +226,22 @@ function LossPage() {
                       {current.type === "-" ? <span className="text-body text-text-tertiary">—</span> : <span className={current.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{current.type}</span>}
                     </div>
                   </div>
+                  <div className="col-span-2 min-w-0">
+                    <div className="text-caption text-text-tertiary">备注</div>
+                    <div className="text-body-sm text-foreground">{current.remark || "—"}</div>
+                  </div>
                   {current.type === "牛只均摊" && current.cattleEars && (
                     <div className="col-span-2 min-w-0">
-                      <div className="text-caption text-text-tertiary">均摊牛只</div>
-                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                        {visibleAllocatedCattle(
-                          current.cattleEars,
-                          expandedAllocationId === current.id,
-                        ).map((ear) => (
-                          <span
-                            key={ear}
-                            className="tag bg-surface-subtle font-mono text-text-secondary"
-                          >
-                            {ear}
-                          </span>
-                        ))}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-caption text-text-tertiary">
+                          均摊牛只 · 共 {current.cattleEars.length} 头
+                        </div>
                         {hiddenAllocatedCattleCount(current.cattleEars) > 0 && (
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="h-6 px-2 text-caption font-normal text-primary hover:bg-brand-subtle hover:text-primary"
+                            className="h-6 px-2 text-caption font-normal text-primary hover:bg-brand-subtle hover:text-primary shrink-0"
                             onClick={() =>
                               setExpandedAllocationId((id) =>
                                 id === current.id ? null : current.id,
@@ -259,12 +254,27 @@ function LossPage() {
                           </Button>
                         )}
                       </div>
+                      <div
+                        className={`mt-1.5 flex flex-wrap items-start gap-1.5 ${
+                          expandedAllocationId === current.id
+                            ? "max-h-64 overflow-y-auto pr-1"
+                            : ""
+                        }`}
+                      >
+                        {visibleAllocatedCattle(
+                          current.cattleEars,
+                          expandedAllocationId === current.id,
+                        ).map((ear) => (
+                          <span
+                            key={ear}
+                            className="tag bg-surface-subtle font-mono text-text-secondary"
+                          >
+                            {ear}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
-                  <div className="col-span-2 min-w-0">
-                    <div className="text-caption text-text-tertiary">备注</div>
-                    <div className="text-body-sm text-foreground">{current.remark || "—"}</div>
-                  </div>
                 </div>
               </section>
 
