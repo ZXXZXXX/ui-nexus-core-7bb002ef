@@ -10,9 +10,22 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import {
+  hiddenAllocatedCattleCount,
+  visibleAllocatedCattle,
+} from "@/lib/loss-allocation";
 
 export const Route = createFileRoute("/warehouse/loss")({
-  head: () => ({ meta: [{ title: "损耗管理 — 奇点智牧" }] }),
+  head: () => ({
+    meta: [
+      { title: "损耗管理 — 奇点智牧" },
+      { name: "description", content: "查看药品损耗记录、损耗明细及牛只均摊范围。" },
+      { property: "og:title", content: "损耗管理 — 奇点智牧" },
+      { property: "og:description", content: "查看药品损耗记录、损耗明细及牛只均摊范围。" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: LossPage,
 });
 
@@ -39,6 +52,7 @@ type LossReport = {
   remark?: string;
   drugs: LossDrug[];
   photos: number; // 现场照片数量
+  cattleEars?: string[]; // 牛只均摊范围
 };
 
 const money = (n: number) =>
@@ -72,6 +86,16 @@ const initial: LossReport[] = [
     stage: "给药用药",
     remark: "保定失败，药液外洒。",
     photos: 2,
+    cattleEars: [
+      "01-24-2381",
+      "01-24-2380",
+      "01-24-2379",
+      "01-24-2378",
+      "01-24-2377",
+      "01-24-2376",
+      "01-24-2375",
+      "01-24-2374",
+    ],
     drugs: [
       { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 1, unit: "支", pickedAt: "2026-05-11 14:05", pickedBy: "李兽医", value: 62.5 },
     ],
@@ -102,6 +126,7 @@ const initial: LossReport[] = [
     type: "牛只均摊",
     stage: "取药配药",
     photos: 2,
+    cattleEars: ["01-24-2368", "01-24-2367", "01-24-2366"],
     drugs: [
       { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 1, unit: "瓶", pickedAt: "2026-05-09 14:20", pickedBy: "周主管", value: 38.75 },
     ],
@@ -111,6 +136,7 @@ const initial: LossReport[] = [
 function LossPage() {
   const [data] = useState<LossReport[]>(initial);
   const [current, setCurrent] = useState<LossReport | null>(null);
+  const [expandedAllocationId, setExpandedAllocationId] = useState<string | null>(null);
 
   const columns: ListColumn<LossReport>[] = [
     { key: "id", label: "损耗记录编码", required: true, render: (r) => <span className="font-mono text-body text-foreground">{r.id}</span> },
@@ -145,13 +171,20 @@ function LossPage() {
         searchKeys={["id", "reporter"]}
         searchPlaceholder="按损耗记录编码 / 上报人员搜索"
         getRowKey={(r) => r.id}
-        onRowClick={(r) => setCurrent(r)}
+        onRowClick={(r) => {
+          setCurrent(r);
+          setExpandedAllocationId(null);
+        }}
         rowActions={(r) => (
           <Button
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-body-sm font-normal text-text-secondary hover:bg-surface-subtle hover:text-foreground"
-            onClick={(e) => { e.stopPropagation(); setCurrent(r); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrent(r);
+              setExpandedAllocationId(null);
+            }}
           >
             查看
           </Button>
@@ -193,6 +226,41 @@ function LossPage() {
                       {current.type === "-" ? <span className="text-body text-text-tertiary">—</span> : <span className={current.type === "牛只均摊" ? "tag tag-brand" : "tag tag-info"}>{current.type}</span>}
                     </div>
                   </div>
+                  {current.type === "牛只均摊" && current.cattleEars && (
+                    <div className="col-span-2 min-w-0">
+                      <div className="text-caption text-text-tertiary">均摊牛只</div>
+                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        {visibleAllocatedCattle(
+                          current.cattleEars,
+                          expandedAllocationId === current.id,
+                        ).map((ear) => (
+                          <span
+                            key={ear}
+                            className="tag bg-surface-subtle font-mono text-text-secondary"
+                          >
+                            {ear}
+                          </span>
+                        ))}
+                        {hiddenAllocatedCattleCount(current.cattleEars) > 0 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-caption font-normal text-primary hover:bg-brand-subtle hover:text-primary"
+                            onClick={() =>
+                              setExpandedAllocationId((id) =>
+                                id === current.id ? null : current.id,
+                              )
+                            }
+                          >
+                            {expandedAllocationId === current.id
+                              ? "收起"
+                              : `+${hiddenAllocatedCattleCount(current.cattleEars)} 展开`}
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <div className="col-span-2 min-w-0">
                     <div className="text-caption text-text-tertiary">备注</div>
                     <div className="text-body-sm text-foreground">{current.remark || "—"}</div>
