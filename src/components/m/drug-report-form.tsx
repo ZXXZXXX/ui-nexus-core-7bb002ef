@@ -242,7 +242,7 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                           onChange={(e) => setLine(idx, { qty: e.target.value })}
                           inputMode="decimal"
                           placeholder={`${word}数量`}
-                          className="flex-1 h-11 px-3 rounded-lg text-body"
+                          className="flex-1 min-w-0 h-11 px-3 rounded-lg text-body"
                         />
                         <div className="flex items-center rounded-lg border border-border overflow-hidden shrink-0">
                           {([
@@ -268,7 +268,9 @@ export function DrugReportForm({ mode: initialMode }: { mode?: DrugReportMode })
                         </div>
                         {!isReturn && (
                           <span
-                            className={`text-body-sm w-20 text-right tabular-nums ${lineAmount > 0 ? "text-text-secondary" : "text-text-tertiary"}`}
+                            className={`text-body-sm w-20 shrink-0 whitespace-nowrap text-right tabular-nums ${
+                              lineAmount > 0 ? "text-text-secondary" : "text-text-tertiary"
+                            }`}
                           >
                             {lineAmount > 0 ? `¥ ${lineAmount.toFixed(4)}` : "待估算"}
                           </span>
