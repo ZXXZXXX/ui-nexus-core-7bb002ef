@@ -45,28 +45,28 @@ const skuColumns: ListColumn<SkuRow>[] = [
     render: (i) => <span className="font-mono text-body text-foreground">{i.sku}</span>,
   },
   {
-    key: "name", label: "药品名称", required: true, sortable: true,
+    key: "name", label: "药品名称", required: true, sortable: true, width: "170px", grow: true,
     render: (i) => <span className="text-body text-foreground truncate">{i.name}</span>,
   },
-  { key: "spec", label: "规格型号", render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.spec}</span> },
+  { key: "spec", label: "规格型号", width: "150px", grow: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.spec}</span> },
   {
-    key: "stock", label: "当前库存", filter: "number", align: "right", value: (i) => i.stock, sortable: true,
+    key: "stock", label: "当前库存", filter: "number", value: (i) => i.stock, sortable: true, width: "96px", grow: true,
     render: (i) => <span className="text-body font-medium tabular-nums text-foreground">{i.stock} {i.unit}</span>,
   },
   {
-    key: "lastInDate", label: "最近入库时间", filter: "date", sortable: true,
+    key: "lastInDate", label: "最近入库时间", filter: "date", sortable: true, width: "148px", grow: true,
     render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.lastInDate || "—"}</span>,
   },
   {
-    key: "lastInQty", label: "最近入库数量", filter: "number", align: "right", value: (i) => i.lastInQty ?? 0, sortable: true,
+    key: "lastInQty", label: "最近入库数量", filter: "number", value: (i) => i.lastInQty ?? 0, sortable: true, width: "122px", grow: true,
     render: (i) => <span className="text-body-sm tabular-nums text-primary">{i.lastInQty === null ? "—" : `+${i.lastInQty} ${i.unit}`}</span>,
   },
   {
-    key: "lastOutDate", label: "最近出库时间", filter: "date", sortable: true,
+    key: "lastOutDate", label: "最近出库时间", filter: "date", sortable: true, width: "148px", grow: true,
     render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.lastOutDate || "—"}</span>,
   },
   {
-    key: "lastOutQty", label: "最近出库数量", filter: "number", align: "right", value: (i) => i.lastOutQty ?? 0, sortable: true,
+    key: "lastOutQty", label: "最近出库数量", filter: "number", value: (i) => i.lastOutQty ?? 0, sortable: true, width: "122px", grow: true,
     render: (i) => <span className="text-body-sm tabular-nums text-[var(--state-danger)]">{i.lastOutQty === null ? "—" : `-${i.lastOutQty} ${i.unit}`}</span>,
   },
 ];
