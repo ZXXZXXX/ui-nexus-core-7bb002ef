@@ -3,6 +3,7 @@
  * - 库存列表以「商品编码」为唯一维度，一个编码一行
  * - 常驻规则：药品只要有过入库记录，就常驻库存列表，即使当前库存为 0
  * - 默认按当前库存量倒序排列
+ * - 详情批次分组：有余量的批次在上，已用完的批次统一放到最下方并默认折叠
  */
 
 export type Status = "物资正常" | "物资临期" | "余量紧张";
@@ -175,13 +176,23 @@ export function hasInbound(sku: string): boolean {
   return (inbound[sku] ?? []).length > 0;
 }
 
-/**
- * 批次组默认展开规则：
- * - 当前余量 > 0 的批次默认展开
- * - 当前余量为 0（已领用完）的批次默认折叠，可手动展开查看出入库记录
- */
-export function isBatchCollapsedByDefault(batch: Item): boolean {
+/** 批次是否已用完（当前余量为 0） */
+export function isBatchUsedUp(batch: Item): boolean {
   return batch.stock <= 0;
+}
+
+/**
+ * 批次分组规则：
+ * - 有余量的批次排在前面，按效期由近到远
+ * - 已用完（余量为 0）的批次统一放到最后，默认折叠，
+ *   需在详情中点「查看全部」才展开
+ */
+export function partitionBatches(batches: Item[]): { active: Item[]; used: Item[] } {
+  const byExpiry = (a: Item, b: Item) => a.expiry.localeCompare(b.expiry);
+  return {
+    active: batches.filter((b) => !isBatchUsedUp(b)).sort(byExpiry),
+    used: batches.filter(isBatchUsedUp).sort(byExpiry),
+  };
 }
 
 /** 以商品编码为唯一维度的库存行 */
@@ -217,11 +228,12 @@ export function buildSkuRows(): SkuRow[] {
     const lastIn = flows.find((f) => f.dir === "in");
     const lastOut = flows.find((f) => f.dir === "out");
     const b0 = batches[0];
+    const { active, used } = partitionBatches(batches);
     rows.push({
       sku, name: b0.name, spec: b0.spec, unit: b0.unit, stock,
       lastInDate: lastIn?.date ?? "", lastInQty: lastIn?.qty ?? null,
       lastOutDate: lastOut?.date ?? "", lastOutQty: lastOut?.qty ?? null,
-      batches: [...batches].sort((a, b) => a.expiry.localeCompare(b.expiry)),
+      batches: [...active, ...used],
     });
   }
   return sortSkuRows(rows);
