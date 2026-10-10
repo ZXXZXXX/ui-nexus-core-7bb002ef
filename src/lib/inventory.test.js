@@ -76,4 +76,14 @@ describe("已用完批次分组规则", () => {
     expect(active).toHaveLength(0);
     expect(used.map((b) => b.batchNo)).toEqual(["C25B0330"]);
   });
+
+  it("已用完批次按库存变为 0 的时间由近到远排列", () => {
+    const item = (sku) => inventory.find((i) => i.sku === sku);
+    const c = item("07-00741"); // 出库 2026-08-25 16:40 → 归零
+    const o = item("08-00855"); // 出库 2026-08-18 15:25 → 归零
+    const { used } = partitionBatches([c, o]);
+    expect(used.map((b) => b.batchNo)).toEqual(["C25B0330", "O25D0119"]);
+    expect(usedUpAt(c)).toBe("2026-08-25 16:40");
+    expect(usedUpAt(o)).toBe("2026-08-18 15:25");
+  });
 });
