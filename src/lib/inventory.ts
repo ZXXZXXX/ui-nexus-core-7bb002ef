@@ -211,7 +211,7 @@ export function buildSkuRows(): SkuRow[] {
       batches: [...batches].sort((a, b) => a.expiry.localeCompare(b.expiry)),
     });
   }
-  return rows;
+  return sortSkuRows(rows);
 }
 
 /** 默认排序规则：按当前库存量倒序 */

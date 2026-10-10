@@ -23,6 +23,7 @@ import { ListPage, type ListColumn } from "@/components/list-page";
 import { exportXlsx, type SheetData } from "@/lib/export-xlsx";
 import {
   buildDaily,
+  buildFlows,
   buildRows,
   buildSkuRows,
   DEFAULT_INVENTORY_SORT,
@@ -248,7 +249,7 @@ function ExportDialog({
 /* ------------------------------ 批次详情抽屉 ------------------------------ */
 
 function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => void }) {
-  const flows = row ? buildFlowsOf(row.sku) : [];
+  const flows = row ? buildFlows(row.sku) : [];
 
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
