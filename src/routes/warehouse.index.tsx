@@ -57,7 +57,7 @@ const skuColumns: ListColumn<SkuRow>[] = [
   },
   { key: "spec", label: "规格型号", width: "150px", grow: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.spec}</span> },
   {
-    key: "stock", label: "当前库存", filter: "number", value: (i) => i.stock, sortable: true, width: "112px", grow: true,
+    key: "stock", label: "当前库存", filter: "number", value: (i) => i.stock, sortable: true, width: "104px", grow: true,
     render: (i) => (
       <span className="inline-flex items-baseline gap-1 whitespace-nowrap">
         <span className={`text-metric tabular-nums ${i.stock === 0 ? "text-text-tertiary" : "text-foreground"}`}>
@@ -72,7 +72,7 @@ const skuColumns: ListColumn<SkuRow>[] = [
     render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.lastInDate || "—"}</span>,
   },
   {
-    key: "lastInQty", label: "最近入库数量", filter: "number", value: (i) => i.lastInQty ?? 0, sortable: true, width: "126px", grow: true,
+    key: "lastInQty", label: "最近入库数量", filter: "number", value: (i) => i.lastInQty ?? 0, sortable: true, width: "120px", grow: true,
     render: (i) =>
       i.lastInQty === null ? (
         <span className="text-body-sm tabular-nums text-text-disabled">—</span>
@@ -88,7 +88,7 @@ const skuColumns: ListColumn<SkuRow>[] = [
     render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.lastOutDate || "—"}</span>,
   },
   {
-    key: "lastOutQty", label: "最近出库数量", filter: "number", value: (i) => i.lastOutQty ?? 0, sortable: true, width: "126px", grow: true,
+    key: "lastOutQty", label: "最近出库数量", filter: "number", value: (i) => i.lastOutQty ?? 0, sortable: true, width: "120px", grow: true,
     render: (i) =>
       i.lastOutQty === null ? (
         <span className="text-body-sm tabular-nums text-text-disabled">—</span>
