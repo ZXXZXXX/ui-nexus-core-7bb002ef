@@ -18,7 +18,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Download, Check, ChevronRight } from "lucide-react";
+import { Download, Check, ChevronRight, ChevronDown } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { exportXlsx, type SheetData } from "@/lib/export-xlsx";
 import {
@@ -417,25 +417,19 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
               {active.map(renderBatch)}
 
               {used.length > 0 && (
-                <section className={active.length > 0 ? "border-t border-border" : ""}>
-                  <Button
-                    variant="ghost"
+                <section className={active.length > 0 ? "mt-1 border-t border-dashed border-border" : ""}>
+                  <button
                     type="button"
                     aria-expanded={showUsed}
                     onClick={() => setShowUsed((v) => !v)}
-                    className="h-auto w-full justify-between gap-3 rounded-md px-2 py-4 text-left hover:bg-transparent!"
+                    className="flex w-full items-center justify-center gap-2 py-3 text-caption text-text-tertiary"
                   >
-                    <div className="flex min-w-0 flex-wrap items-center gap-2">
-                      <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${showUsed ? "rotate-90" : ""}`} />
-                      <span className="text-body-sm font-medium text-text-secondary">已用完批次</span>
-                      <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">
-                        共 {used.length} 个
-                      </span>
-                    </div>
-                    <span className="shrink-0 text-body-sm font-normal text-primary">
+                    <span>已用完批次 · 共 {used.length} 个</span>
+                    <span className="inline-flex items-center gap-0.5 text-body-sm text-primary">
                       {showUsed ? "收起" : "查看全部"}
+                      <ChevronDown className={`size-3.5 transition-transform motion-reduce:transition-none ${showUsed ? "rotate-180" : ""}`} />
                     </span>
-                  </Button>
+                  </button>
 
                   {showUsed && used.map(renderBatch)}
                 </section>
