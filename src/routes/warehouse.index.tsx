@@ -57,17 +57,6 @@ const skuColumns: ListColumn<SkuRow>[] = [
   },
   { key: "spec", label: "规格型号", width: "150px", grow: true, render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.spec}</span> },
   {
-    key: "stock", label: "当前库存", filter: "number", value: (i) => i.stock, sortable: true, width: "104px", grow: true,
-    render: (i) => (
-      <span className="inline-flex items-baseline gap-1 whitespace-nowrap">
-        <span className={`text-metric tabular-nums ${i.stock === 0 ? "text-text-tertiary" : "text-foreground"}`}>
-          {i.stock}
-        </span>
-        <span className="text-caption text-text-tertiary">{i.unit}</span>
-      </span>
-    ),
-  },
-  {
     key: "lastInDate", label: "最近入库时间", filter: "date", sortable: true, width: "148px", grow: true,
     render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.lastInDate || "—"}</span>,
   },
@@ -77,10 +66,7 @@ const skuColumns: ListColumn<SkuRow>[] = [
       i.lastInQty === null ? (
         <span className="text-body-sm tabular-nums text-text-disabled">—</span>
       ) : (
-        <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-body-sm tabular-nums text-text-tertiary">
-          <i className="size-1.5 shrink-0 rounded-full bg-[var(--state-success)]" aria-hidden />
-          +{i.lastInQty} {i.unit}
-        </span>
+        <span className="text-body-sm tabular-nums text-text-tertiary">+{i.lastInQty} {i.unit}</span>
       ),
   },
   {
@@ -93,12 +79,19 @@ const skuColumns: ListColumn<SkuRow>[] = [
       i.lastOutQty === null ? (
         <span className="text-body-sm tabular-nums text-text-disabled">—</span>
       ) : (
-        <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-body-sm tabular-nums text-text-tertiary">
-          <i className="size-1.5 shrink-0 rounded-full bg-[var(--state-danger)]" aria-hidden />
-          -{i.lastOutQty} {i.unit}
-        </span>
+        <span className="text-body-sm tabular-nums text-text-tertiary">-{i.lastOutQty} {i.unit}</span>
       ),
   },
+  {
+    key: "stock", label: "当前库存", filter: "number", value: (i) => i.stock, sortable: true, width: "96px", grow: true,
+    render: (i) => (
+      <span className={`text-table-strong tabular-nums ${i.stock === 0 ? "text-text-tertiary" : "text-foreground"}`}>
+        {i.stock}
+      </span>
+    ),
+
+  },
+
 
 ];
 
