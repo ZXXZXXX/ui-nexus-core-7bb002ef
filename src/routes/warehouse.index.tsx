@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -18,7 +18,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Download, Check } from "lucide-react";
+import { Download, Check, ChevronRight } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { exportXlsx, type SheetData } from "@/lib/export-xlsx";
 import {
@@ -28,6 +28,7 @@ import {
   buildSkuRows,
   DEFAULT_INVENTORY_SORT,
   inventory,
+  isBatchCollapsedByDefault,
   LEDGER_OPTIONAL,
   type Item,
   type SkuRow,
@@ -250,6 +251,13 @@ function ExportDialog({
 
 function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => void }) {
   const flows = row ? buildFlows(row.sku) : [];
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
+  const sku = row?.sku ?? "";
+  useEffect(() => setOpenMap({}), [sku]);
+
+  const collapsedCount = row
+    ? row.batches.filter((b) => isBatchCollapsedByDefault(b)).length
+    : 0;
 
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
@@ -263,65 +271,88 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
               </SheetTitle>
               <SheetDescription className="text-caption text-text-tertiary">
                 {row.spec} · 当前库存 {row.stock} {row.unit} · 共 {row.batches.length} 个批次
+                {collapsedCount > 0 ? ` · ${collapsedCount} 个批次已用完（默认折叠）` : ""}
               </SheetDescription>
             </SheetHeader>
 
             <div className="mt-5 space-y-4">
               {row.batches.map((b) => {
                 const list = flows.filter((f) => f.batch === b.batchNo);
+                const open = openMap[b.batchNo] ?? !isBatchCollapsedByDefault(b);
                 return (
                   <section key={b.batchNo} className="rounded-lg border border-border">
-                    <div className="flex items-center justify-between gap-3 border-b border-border bg-surface-subtle px-4 py-3">
-                      <div className="min-w-0">
-                        <div className="text-card-title text-foreground">
-                          批次 <span className="font-mono">{b.batchNo}</span>
-                        </div>
-                        <div className="mt-0.5 text-caption text-text-tertiary tabular-nums">
-                          效期 {b.expiry} · 生产日期 {b.prodDate} · 采购 {b.purchaseDate || "—"}
+                    <button
+                      type="button"
+                      aria-expanded={open}
+                      onClick={() => setOpenMap((m) => ({ ...m, [b.batchNo]: !open }))}
+                      className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-brand-subtle ${
+                        open ? "border-b border-border bg-surface-subtle" : ""
+                      }`}
+                    >
+                      <div className="flex min-w-0 items-start gap-2">
+                        <ChevronRight
+                          className={`mt-1 h-4 w-4 shrink-0 text-text-tertiary transition-transform ${
+                            open ? "rotate-90" : ""
+                          }`}
+                        />
+                        <div className="min-w-0">
+                          <div className="text-card-title text-foreground">
+                            批次 <span className="font-mono">{b.batchNo}</span>
+                          </div>
+                          <div className="mt-0.5 text-caption text-text-tertiary tabular-nums">
+                            效期 {b.expiry} · 生产日期 {b.prodDate} · 采购 {b.purchaseDate || "—"}
+                          </div>
                         </div>
                       </div>
                       <div className="shrink-0 text-right">
                         <div className="text-caption text-text-tertiary">当前余量</div>
                         <div className="text-body font-medium tabular-nums text-foreground">{b.stock} {row.unit}</div>
                       </div>
-                    </div>
-                    {list.length === 0 ? (
-                      <div className="py-6 text-center text-body-sm text-text-tertiary">暂无出入库记录</div>
-                    ) : (
-                      <ol className="relative px-4 py-3">
-                        {list.map((r, idx) => {
-                          const isIn = r.dir === "in";
-                          const last = idx === list.length - 1;
-                          return (
-                            <li key={idx} className="relative flex gap-3 pb-4 last:pb-0">
-                              <div className="relative flex w-3 shrink-0 justify-center">
-                                <span
-                                  className={`mt-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-background ${isIn ? "bg-primary" : "bg-[var(--state-danger)]"}`}
-                                />
-                                {!last && <span className="absolute top-4 bottom-[-16px] w-px bg-border" />}
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <div className="text-caption text-text-tertiary tabular-nums">{r.date}</div>
-                                <div className="mt-0.5 flex items-center justify-between gap-3">
-                                  <div className="flex min-w-0 items-center gap-2">
-                                    <span className={isIn ? "tag tag-success" : "tag tag-danger"}>
-                                      {isIn ? "入库" : "出库"}
+                    </button>
+
+                    {open ? (
+                      list.length === 0 ? (
+                        <div className="py-6 text-center text-body-sm text-text-tertiary">暂无出入库记录</div>
+                      ) : (
+                        <ol className="relative px-4 py-3">
+                          {list.map((r, idx) => {
+                            const isIn = r.dir === "in";
+                            const last = idx === list.length - 1;
+                            return (
+                              <li key={idx} className="relative flex gap-3 pb-4 last:pb-0">
+                                <div className="relative flex w-3 shrink-0 justify-center">
+                                  <span
+                                    className={`mt-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-background ${isIn ? "bg-primary" : "bg-[var(--state-danger)]"}`}
+                                  />
+                                  {!last && <span className="absolute top-4 bottom-[-16px] w-px bg-border" />}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <div className="text-caption text-text-tertiary tabular-nums">{r.date}</div>
+                                  <div className="mt-0.5 flex items-center justify-between gap-3">
+                                    <div className="flex min-w-0 items-center gap-2">
+                                      <span className={isIn ? "tag tag-success" : "tag tag-danger"}>
+                                        {isIn ? "入库" : "出库"}
+                                      </span>
+                                      <span className="truncate text-body-sm font-medium text-foreground">{r.via.trim()}</span>
+                                    </div>
+                                    <span className={`shrink-0 text-body font-medium tabular-nums ${isIn ? "text-primary" : "text-[var(--state-danger)]"}`}>
+                                      {isIn ? "+" : "-"}{r.qty} {row.unit}
                                     </span>
-                                    <span className="truncate text-body-sm font-medium text-foreground">{r.via.trim()}</span>
                                   </div>
-                                  <span className={`shrink-0 text-body font-medium tabular-nums ${isIn ? "text-primary" : "text-[var(--state-danger)]"}`}>
-                                    {isIn ? "+" : "-"}{r.qty} {row.unit}
-                                  </span>
+                                  <div className="mt-0.5 text-caption text-text-tertiary">
+                                    操作人：{r.operator}
+                                    {r.note ? ` · ${r.note}` : ""}
+                                  </div>
                                 </div>
-                                <div className="mt-0.5 text-caption text-text-tertiary">
-                                  操作人：{r.operator}
-                                  {r.note ? ` · ${r.note}` : ""}
-                                </div>
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ol>
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      )
+                    ) : (
+                      <div className="px-4 py-2.5 text-caption text-text-tertiary">
+                        该批次当前余量 0，已默认折叠 · 共 {list.length} 条出入库记录，点击上方展开查看
+                      </div>
                     )}
                   </section>
                 );
