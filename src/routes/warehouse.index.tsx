@@ -406,7 +406,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                 <div className="shrink-0 text-right">
                   <div className="text-caption text-text-tertiary">当前库存</div>
                   <div className="mt-1 flex items-baseline justify-end gap-1.5">
-                    <span className="text-page-title tabular-nums text-foreground">{row.stock}</span>
+                    <span className={`text-page-title tabular-nums ${row.stock === 0 ? "text-text-disabled" : "text-primary"}`}>{row.stock}</span>
                     <span className="text-body-sm text-text-secondary">{row.unit}</span>
                   </div>
                 </div>
