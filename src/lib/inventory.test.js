@@ -3,6 +3,7 @@ import {
   DEFAULT_INVENTORY_SORT,
   buildSkuRows,
   hasInbound,
+  isBatchCollapsedByDefault,
 } from "./inventory";
 
 const bySku = (sku) => buildSkuRows().find((r) => r.sku === sku);
@@ -12,7 +13,7 @@ describe("库存列表常驻与排序规则", () => {
     const rows = buildSkuRows().filter((r) => r.sku === "01-00063");
     expect(rows).toHaveLength(1);
     expect(rows[0].stock).toBe(110);
-    expect(rows[0].batches).toHaveLength(2);
+    expect(rows[0].batches).toHaveLength(3);
   });
 
   it("有过入库、当前库存为 0 的药品仍常驻列表", () => {
