@@ -370,14 +370,6 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
     ? partitionBatches(row.batches)
     : { active: [] as Item[], used: [] as Item[] };
 
-  const usedRecords = used.reduce(
-    (n, b) => n + flows.filter((f) => f.batch === b.batchNo).length,
-    0,
-  );
-  const usedNames = used.map((b) => b.batchNo);
-  const usedHint =
-    usedNames.slice(0, 3).join("、") +
-    (usedNames.length > 3 ? ` 等 ${usedNames.length} 个批次` : "");
 
   const renderBatch = (b: Item) => {
     const open = openMap[b.batchNo] ?? !isBatchUsedUp(b);
@@ -445,13 +437,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                     </span>
                   </Button>
 
-                  {showUsed ? (
-                    used.map(renderBatch)
-                  ) : (
-                    <div className="px-2 pb-5 pl-8 text-caption text-text-tertiary">
-                      {usedHint} · {usedRecords} 条出入库记录
-                    </div>
-                  )}
+                  {showUsed && used.map(renderBatch)}
                 </section>
               )}
             </div>
