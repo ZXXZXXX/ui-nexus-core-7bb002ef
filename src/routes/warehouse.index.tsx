@@ -417,7 +417,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
               {active.map(renderBatch)}
 
               {used.length > 0 && (
-                <section className={active.length > 0 ? "mt-1 border-t border-dashed border-border" : ""}>
+                <section className="mt-1">
                   <button
                     type="button"
                     aria-expanded={showUsed}
