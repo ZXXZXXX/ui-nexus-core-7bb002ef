@@ -85,10 +85,11 @@ const skuColumns: ListColumn<SkuRow>[] = [
   {
     key: "stock", label: "当前库存", filter: "number", value: (i) => i.stock, sortable: true, width: "96px", grow: true,
     render: (i) => (
-      <span className={`text-body font-semibold tabular-nums ${i.stock === 0 ? "text-text-tertiary" : "text-foreground"}`}>
+      <span className={`text-table-strong tabular-nums ${i.stock === 0 ? "text-text-tertiary" : "text-foreground"}`}>
         {i.stock}
       </span>
     ),
+
   },
 
 
