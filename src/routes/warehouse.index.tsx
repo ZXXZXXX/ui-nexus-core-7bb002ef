@@ -68,7 +68,7 @@ const skuColumns: ListColumn<SkuRow>[] = [
       i.lastInQty === null ? (
         <span className="text-body-sm tabular-nums text-text-disabled">—</span>
       ) : (
-        <span className="text-body-sm tabular-nums text-text-tertiary">+{i.lastInQty} {i.unit}</span>
+        <span className="text-body-sm tabular-nums text-text-tertiary">+{i.lastInQty}</span>
       ),
   },
   {
@@ -81,7 +81,7 @@ const skuColumns: ListColumn<SkuRow>[] = [
       i.lastOutQty === null ? (
         <span className="text-body-sm tabular-nums text-text-disabled">—</span>
       ) : (
-        <span className="text-body-sm tabular-nums text-text-tertiary">-{i.lastOutQty} {i.unit}</span>
+        <span className="text-body-sm tabular-nums text-text-tertiary">-{i.lastOutQty}</span>
       ),
   },
   {
