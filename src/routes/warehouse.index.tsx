@@ -28,8 +28,10 @@ import {
   buildSkuRows,
   DEFAULT_INVENTORY_SORT,
   inventory,
-  isBatchCollapsedByDefault,
+  isBatchUsedUp,
   LEDGER_OPTIONAL,
+  partitionBatches,
+  type Flow,
   type Item,
   type SkuRow,
 } from "@/lib/inventory";
@@ -273,15 +275,123 @@ function ExportDialog({
 
 /* ------------------------------ 批次详情抽屉 ------------------------------ */
 
+function BatchSection({
+  batch,
+  unit,
+  list,
+  open,
+  onToggle,
+}: {
+  batch: Item;
+  unit: string;
+  list: Flow[];
+  open: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <section className="border-b border-border py-5 last:border-b-0">
+      <Button
+        variant="ghost"
+        type="button"
+        aria-expanded={open}
+        aria-label={`批次 ${batch.batchNo}`}
+        onClick={onToggle}
+        className="h-auto w-full justify-between gap-3 rounded-md px-2 py-2 text-left"
+      >
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} />
+          <span className="text-body-sm font-normal text-text-secondary">批次</span>
+          <span className="font-mono text-card-title font-medium text-foreground">{batch.batchNo}</span>
+          {isBatchUsedUp(batch) && <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">已用完</span>}
+        </div>
+        <div className="flex shrink-0 items-baseline gap-2">
+          <span className="text-caption font-normal text-text-tertiary">余量</span>
+          <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
+          <span className="text-body-sm font-normal text-text-secondary">{unit}</span>
+        </div>
+      </Button>
+      <dl className="mt-3 grid grid-cols-3 gap-3 pl-8 pr-2">
+        {[["效期", batch.expiry], ["生产日期", batch.prodDate], ["采购时间", batch.purchaseDate || "—"]].map(([label, value]) => (
+          <div key={label} className="min-w-0">
+            <dt className="text-caption text-text-tertiary">{label}</dt>
+            <dd className="mt-1 text-body-sm tabular-nums text-text-secondary">{value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {open ? (
+        list.length === 0 ? (
+          <div className="py-8 text-center text-body-sm text-text-tertiary">暂无出入库记录</div>
+        ) : (
+          <ol className="ml-3 mt-6 pr-2">
+            {list.map((r, idx) => {
+              const isIn = r.dir === "in";
+              return (
+                <li key={idx} className="relative pb-6 pl-5 last:pb-1">
+                  {idx < list.length - 1 && <span className="absolute bottom-0 left-0 top-3 w-px bg-border" />}
+                  <span className={`absolute -left-1 top-2 h-2 w-2 rounded-full ring-4 ring-background ${isIn ? "bg-primary" : "bg-destructive"}`} />
+                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className={`text-body-sm font-medium ${isIn ? "text-primary" : "text-destructive"}`}>{isIn ? "入库" : "出库"}</span>
+                      <span className="text-body font-medium text-foreground">{r.via.trim()}</span>
+                    </div>
+                    <span className={`shrink-0 text-card-title font-medium tabular-nums ${isIn ? "text-primary" : "text-destructive"}`}>
+                      {isIn ? "+" : "−"}{r.qty}<span className="ml-1 text-body-sm font-normal">{unit}</span>
+                    </span>
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-3 text-caption text-text-tertiary">
+                    <time className="tabular-nums">{r.date}</time>
+                    <span>操作人：{r.operator}</span>
+                  </div>
+                  {r.note && <p className="mt-2 border-l-2 border-border pl-2.5 text-body-sm leading-relaxed text-text-secondary">{r.note}</p>}
+                </li>
+              );
+            })}
+          </ol>
+        )
+      ) : (
+        <div className="mt-4 pl-8 text-caption text-text-tertiary">{list.length} 条出入库记录</div>
+      )}
+    </section>
+  );
+}
+
 function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => void }) {
   const flows = row ? buildFlows(row.sku) : [];
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
+  const [showUsed, setShowUsed] = useState(false);
   const sku = row?.sku ?? "";
-  useEffect(() => setOpenMap({}), [sku]);
+  useEffect(() => {
+    setOpenMap({});
+    setShowUsed(false);
+  }, [sku]);
 
-  const collapsedCount = row
-    ? row.batches.filter((b) => isBatchCollapsedByDefault(b)).length
-    : 0;
+  const { active, used } = row
+    ? partitionBatches(row.batches)
+    : { active: [] as Item[], used: [] as Item[] };
+
+  const usedRecords = used.reduce(
+    (n, b) => n + flows.filter((f) => f.batch === b.batchNo).length,
+    0,
+  );
+  const usedNames = used.map((b) => b.batchNo);
+  const usedHint =
+    usedNames.slice(0, 3).join("、") +
+    (usedNames.length > 3 ? ` 等 ${usedNames.length} 个批次` : "");
+
+  const renderBatch = (b: Item) => {
+    const open = openMap[b.batchNo] ?? !isBatchUsedUp(b);
+    return (
+      <BatchSection
+        key={b.batchNo}
+        batch={b}
+        unit={row?.unit ?? ""}
+        list={flows.filter((f) => f.batch === b.batchNo)}
+        open={open}
+        onToggle={() => setOpenMap((m) => ({ ...m, [b.batchNo]: !open }))}
+      />
+    );
+  };
 
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
@@ -297,7 +407,8 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                 <div className="space-y-1">
                   <div className="text-body-sm text-text-secondary">{row.spec}</div>
                   <div className="text-caption text-text-tertiary">
-                    共 {row.batches.length} 个批次{collapsedCount > 0 ? ` · ${collapsedCount} 个已用完` : ""}
+                    共 {row.batches.length} 个批次
+                    {used.length > 0 ? ` · ${used.length} 个已用完` : ""}
                   </div>
                 </div>
                 <div className="shrink-0 text-right">
@@ -311,76 +422,38 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
             </SheetHeader>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-6">
-              {row.batches.map((b) => {
-                const list = flows.filter((f) => f.batch === b.batchNo);
-                const open = openMap[b.batchNo] ?? !isBatchCollapsedByDefault(b);
-                return (
-                  <section key={b.batchNo} className="border-b border-border py-5 last:border-b-0">
-                    <Button
-                      variant="ghost"
-                      type="button"
-                      aria-expanded={open}
-                      aria-label={`批次 ${b.batchNo}`}
-                      onClick={() => setOpenMap((m) => ({ ...m, [b.batchNo]: !open }))}
-                      className="h-auto w-full justify-between gap-3 rounded-md px-2 py-2 text-left"
-                    >
-                      <div className="flex min-w-0 flex-wrap items-center gap-2">
-                        <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} />
-                        <span className="text-body-sm font-normal text-text-secondary">批次</span>
-                        <span className="font-mono text-card-title font-medium text-foreground">{b.batchNo}</span>
-                        {b.stock === 0 && <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">已用完</span>}
-                      </div>
-                      <div className="flex shrink-0 items-baseline gap-2">
-                        <span className="text-caption font-normal text-text-tertiary">余量</span>
-                        <span className="text-card-title tabular-nums text-foreground">{b.stock}</span>
-                        <span className="text-body-sm font-normal text-text-secondary">{row.unit}</span>
-                      </div>
-                    </Button>
-                    <dl className="mt-3 grid grid-cols-3 gap-3 pl-8 pr-2">
-                      {[["效期", b.expiry], ["生产日期", b.prodDate], ["采购时间", b.purchaseDate || "—"]].map(([label, value]) => (
-                        <div key={label} className="min-w-0">
-                          <dt className="text-caption text-text-tertiary">{label}</dt>
-                          <dd className="mt-1 text-body-sm tabular-nums text-text-secondary">{value}</dd>
-                        </div>
-                      ))}
-                    </dl>
+              {active.map(renderBatch)}
 
-                    {open ? (
-                      list.length === 0 ? (
-                        <div className="py-8 text-center text-body-sm text-text-tertiary">暂无出入库记录</div>
-                      ) : (
-                        <ol className="ml-3 mt-6 pr-2">
-                          {list.map((r, idx) => {
-                            const isIn = r.dir === "in";
-                            return (
-                              <li key={idx} className="relative pb-6 pl-5 last:pb-1">
-                                {idx < list.length - 1 && <span className="absolute bottom-0 left-0 top-3 w-px bg-border" />}
-                                <span className={`absolute -left-1 top-2 h-2 w-2 rounded-full ring-4 ring-background ${isIn ? "bg-primary" : "bg-destructive"}`} />
-                                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-                                  <div className="flex min-w-0 items-center gap-2">
-                                    <span className={`text-body-sm font-medium ${isIn ? "text-primary" : "text-destructive"}`}>{isIn ? "入库" : "出库"}</span>
-                                    <span className="text-body font-medium text-foreground">{r.via.trim()}</span>
-                                  </div>
-                                  <span className={`shrink-0 text-card-title font-medium tabular-nums ${isIn ? "text-primary" : "text-destructive"}`}>
-                                    {isIn ? "+" : "−"}{r.qty}<span className="ml-1 text-body-sm font-normal">{row.unit}</span>
-                                  </span>
-                                </div>
-                                <div className="mt-1 flex flex-wrap items-center gap-x-3 text-caption text-text-tertiary">
-                                  <time className="tabular-nums">{r.date}</time>
-                                  <span>操作人：{r.operator}</span>
-                                </div>
-                                {r.note && <p className="mt-2 border-l-2 border-border pl-2.5 text-body-sm leading-relaxed text-text-secondary">{r.note}</p>}
-                              </li>
-                            );
-                          })}
-                        </ol>
-                      )
-                    ) : (
-                      <div className="mt-4 pl-8 text-caption text-text-tertiary">{list.length} 条出入库记录</div>
-                    )}
-                  </section>
-                );
-              })}
+              {used.length > 0 && (
+                <section className={active.length > 0 ? "border-t border-border" : ""}>
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    aria-expanded={showUsed}
+                    onClick={() => setShowUsed((v) => !v)}
+                    className="h-auto w-full justify-between gap-3 rounded-md px-2 py-4 text-left"
+                  >
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${showUsed ? "rotate-90" : ""}`} />
+                      <span className="text-body-sm font-medium text-text-secondary">已用完批次</span>
+                      <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">
+                        共 {used.length} 个
+                      </span>
+                    </div>
+                    <span className="shrink-0 text-body-sm font-normal text-primary">
+                      {showUsed ? "收起" : "查看全部"}
+                    </span>
+                  </Button>
+
+                  {showUsed ? (
+                    used.map(renderBatch)
+                  ) : (
+                    <div className="px-2 pb-5 pl-8 text-caption text-text-tertiary">
+                      {usedHint} · {usedRecords} 条出入库记录
+                    </div>
+                  )}
+                </section>
+              )}
             </div>
           </>
         )}
