@@ -89,3 +89,14 @@ describe("已用完批次分组规则", () => {
     expect(usedUpAt(o)).toBe("2026-08-18 15:25");
   });
 });
+
+import { mergeBatches as _merge } from "./inventory";
+const _b = (o) => ({ sku: "X", batchNo: "B1", price: 10, stock: 5, updatedAt: "2026-01-01", ...o });
+test("同批次同单价合并为一个批次，余量相加", () => {
+  const r = _merge([_b({}), _b({ stock: 7 })]);
+  expect(r).toHaveLength(1);
+  expect(r[0].stock).toBe(12);
+});
+test("同批次不同单价分开展示", () => {
+  expect(_merge([_b({}), _b({ price: 12 })])).toHaveLength(2);
+});
