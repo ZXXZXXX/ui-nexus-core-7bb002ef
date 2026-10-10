@@ -311,7 +311,7 @@ function BatchSection({
         </div>
       </Button>
       <dl className="mt-3 grid grid-cols-3 gap-3 pl-8 pr-2">
-        {[["效期", batch.expiry], ["生产日期", batch.prodDate], ["采购时间", batch.purchaseDate || "—"]].map(([label, value]) => (
+        {[["效期", batch.expiry], ["生产日期", batch.prodDate], ["采购单价", `¥${batch.price.toFixed(2)}`]].map(([label, value]) => (
           <div key={label} className="min-w-0">
             <dt className="text-caption text-text-tertiary">{label}</dt>
             <dd className="mt-1 text-body-sm tabular-nums text-text-secondary">{value}</dd>
@@ -372,15 +372,16 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
 
 
   const renderBatch = (b: Item) => {
-    const open = openMap[b.batchNo] ?? true;
+    const k = `${b.batchNo}__${b.price}`;
+    const open = openMap[k] ?? true;
     return (
       <BatchSection
-        key={b.batchNo}
+        key={k}
         batch={b}
         unit={row?.unit ?? ""}
         list={flows.filter((f) => f.batch === b.batchNo)}
         open={open}
-        onToggle={() => setOpenMap((m) => ({ ...m, [b.batchNo]: !open }))}
+        onToggle={() => setOpenMap((m) => ({ ...m, [k]: !open }))}
       />
     );
   };
