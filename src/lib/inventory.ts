@@ -21,6 +21,8 @@ export const inventory: Item[] = [
   { sku: "05-00521", price: 75.00, name: "戊二醛消毒液", cat: "消毒类", spec: "5L/桶", stock: 18, min: 30, unit: "L", expiry: "2026-12", status: "余量紧张", updatedAt: "2026-07-21", supplier: "洁牧环境", maker: "山东洁牧生物科技有限公司", approvalNo: "兽药字(2024)150233", batchNo: "X24D0210", prodDate: "2024-12-05", shelfLife: "24 个月", purchaseDate: "2024-12-10" },
   { sku: "06-00633", price: 118.00, name: "氟尼新葡甲胺注射液", cat: "解热镇痛", spec: "100ml（含5g）/瓶", stock: 64, min: 25, unit: "瓶", expiry: "2026-10", status: "物资正常", updatedAt: "2026-07-15", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010902", batchNo: "F24B0177", prodDate: "2024-10-16", shelfLife: "24 个月", purchaseDate: "2024-10-20" },
   { sku: "01-00063", price: 52.00, name: "乳房炎抗生素 5mg", cat: "抗生素", spec: "100ml（含5g）/瓶", stock: 24, min: 50, unit: "盒", expiry: "2027-03", status: "物资正常", updatedAt: "2026-08-26", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010321", batchNo: "B25A0142", prodDate: "2025-03-12", shelfLife: "24 个月", purchaseDate: "2025-03-18" },
+  // 该批次已领用完，当前余量 0 → 详情中默认折叠
+  { sku: "01-00063", price: 45.00, name: "乳房炎抗生素 5mg", cat: "抗生素", spec: "100ml（含5g）/瓶", stock: 0, min: 50, unit: "盒", expiry: "2026-04", status: "余量紧张", updatedAt: "2026-07-06", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010321", batchNo: "B23K0518", prodDate: "2024-04-10", shelfLife: "24 个月", purchaseDate: "2024-04-16" },
   { sku: "03-00306", price: 126.00, name: "伊维菌素注射液", cat: "驱虫药", spec: "100ml（含1g）/瓶", stock: 30, min: 20, unit: "瓶", expiry: "2027-01", status: "物资正常", updatedAt: "2026-08-22", supplier: "华牧兽药供应链", maker: "河北远征药业有限公司", approvalNo: "兽药字(2022)070118", batchNo: "Y25A0771", prodDate: "2025-01-09", shelfLife: "24 个月", purchaseDate: "2025-01-15" },
   // 已领用完，当前库存 0，但有过入库 → 仍常驻库存列表
   { sku: "07-00741", price: 18.00, name: "头孢噻呋钠注射液", cat: "抗生素", spec: "1g/瓶", stock: 0, min: 20, unit: "瓶", expiry: "2027-05", status: "余量紧张", updatedAt: "2026-08-25", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010455", batchNo: "C25B0330", prodDate: "2025-05-10", shelfLife: "24 个月", purchaseDate: "2025-05-16" },
@@ -107,6 +109,7 @@ export const inbound: Record<string, Rec[]> = {
   "01-00063": [
     { date: "2026-08-20 09:12", qty: 20, via: "调拨入库", operator: "王磊", note: "", batch: "B25A0142" },
     { date: "2026-08-02 14:30", qty: 40, via: "采购入库", operator: "李静" },
+    { date: "2026-06-18 10:20", qty: 30, via: "采购入库", operator: "李静", batch: "B23K0518" },
   ],
   "02-00214": [
     { date: "2026-08-06 11:20", qty: 2, via: "盘点差异入库", operator: "赵敏", note: "月度盘点实物多于账面，调增 2" },
@@ -132,6 +135,7 @@ export const outbound: Record<string, Rec[]> = {
     { date: "2026-08-20 17:40", qty: 18, via: "用药领取", operator: "陈涛", note: "", batch: "B25A0142" },
     { date: "2026-08-10 18:30", qty: 1, via: "盘点差异\n", operator: "赵敏", note: "" },
     { date: "2026-08-02 18:05", qty: 12, via: "用药领取", operator: "陈涛" },
+    { date: "2026-07-06 16:10", qty: 30, via: "用药领取", operator: "陈涛", note: "干奶期集中治疗领用", batch: "B23K0518" },
   ],
   "02-00214": [
     { date: "2026-08-19 16:22", qty: 14, via: "用药领取", operator: "刘洋" },
@@ -169,6 +173,15 @@ export function buildFlows(sku: string): Flow[] {
 /** 该药品是否有过入库记录 */
 export function hasInbound(sku: string): boolean {
   return (inbound[sku] ?? []).length > 0;
+}
+
+/**
+ * 批次组默认展开规则：
+ * - 当前余量 > 0 的批次默认展开
+ * - 当前余量为 0（已领用完）的批次默认折叠，可手动展开查看出入库记录
+ */
+export function isBatchCollapsedByDefault(batch: Item): boolean {
+  return batch.stock <= 0;
 }
 
 /** 以商品编码为唯一维度的库存行 */
