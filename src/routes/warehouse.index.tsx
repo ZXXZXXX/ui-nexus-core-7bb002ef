@@ -288,27 +288,40 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                     {list.length === 0 ? (
                       <div className="py-6 text-center text-body-sm text-text-tertiary">暂无出入库记录</div>
                     ) : (
-                      <div className="divide-y divide-border">
-                        {list.map((r, idx) => (
-                          <div key={idx} className="flex items-start gap-3 px-4 py-2.5">
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className={r.dir === "in" ? "tag tag-success" : "tag tag-danger"}>
-                                  {r.dir === "in" ? "入库" : "出库"}
-                                </span>
-                                <span className="text-body-sm font-medium text-foreground">{r.via.trim()}</span>
+                      <ol className="relative px-4 py-3">
+                        {list.map((r, idx) => {
+                          const isIn = r.dir === "in";
+                          const last = idx === list.length - 1;
+                          return (
+                            <li key={idx} className="relative flex gap-3 pb-4 last:pb-0">
+                              <div className="relative flex w-3 shrink-0 justify-center">
+                                <span
+                                  className={`mt-1.5 h-2.5 w-2.5 rounded-full ring-4 ring-background ${isIn ? "bg-primary" : "bg-[var(--state-danger)]"}`}
+                                />
+                                {!last && <span className="absolute top-4 bottom-[-16px] w-px bg-border" />}
                               </div>
-                              <div className="mt-1 text-caption text-text-tertiary tabular-nums">
-                                {r.date} · 操作人：{r.operator}
-                                {r.note ? ` · ${r.note}` : ""}
+                              <div className="min-w-0 flex-1">
+                                <div className="text-caption text-text-tertiary tabular-nums">{r.date}</div>
+                                <div className="mt-0.5 flex items-center justify-between gap-3">
+                                  <div className="flex min-w-0 items-center gap-2">
+                                    <span className={isIn ? "tag tag-success" : "tag tag-danger"}>
+                                      {isIn ? "入库" : "出库"}
+                                    </span>
+                                    <span className="truncate text-body-sm font-medium text-foreground">{r.via.trim()}</span>
+                                  </div>
+                                  <span className={`shrink-0 text-body font-medium tabular-nums ${isIn ? "text-primary" : "text-[var(--state-danger)]"}`}>
+                                    {isIn ? "+" : "-"}{r.qty} {row.unit}
+                                  </span>
+                                </div>
+                                <div className="mt-0.5 text-caption text-text-tertiary">
+                                  操作人：{r.operator}
+                                  {r.note ? ` · ${r.note}` : ""}
+                                </div>
                               </div>
-                            </div>
-                            <span className={`shrink-0 text-body font-medium tabular-nums ${r.dir === "in" ? "text-primary" : "text-[var(--state-danger)]"}`}>
-                              {r.dir === "in" ? "+" : "-"}{r.qty} {row.unit}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                            </li>
+                          );
+                        })}
+                      </ol>
                     )}
                   </section>
                 );
