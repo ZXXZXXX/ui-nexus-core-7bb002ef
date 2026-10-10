@@ -5,7 +5,7 @@ import {
   hasInbound,
 } from "./inventory";
 
-const bySku = (sku: string) => buildSkuRows().find((r) => r.sku === sku);
+const bySku = (sku) => buildSkuRows().find((r) => r.sku === sku);
 
 describe("库存列表常驻与排序规则", () => {
   it("同一商品编码只占一行，当前库存为各批次合计", () => {
