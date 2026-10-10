@@ -229,11 +229,34 @@ export function sortSkuRows(rows: SkuRow[], sort = DEFAULT_INVENTORY_SORT): SkuR
   );
 }
 
+/**
+ * 批次合并规则：同一批次号且采购单价相同 → 合并为一个批次（余量相加）；
+ * 同一批次号但采购单价不同 → 分开展示
+ */
+export function mergeBatches(batches: Item[]): Item[] {
+  const map = new Map<string, Item>();
+  for (const b of batches) {
+    const key = `${b.batchNo}__${b.price}`;
+    const prev = map.get(key);
+    map.set(
+      key,
+      prev
+        ? { ...prev, stock: prev.stock + b.stock, updatedAt: b.updatedAt > prev.updatedAt ? b.updatedAt : prev.updatedAt }
+        : { ...b },
+    );
+  }
+  return [...map.values()];
+}
+
+/** 批次在详情中的唯一键（批次号 + 采购单价） */
+export const batchKey = (b: Item) => `${b.batchNo}__${b.price}`;
+
 export function buildSkuRows(): SkuRow[] {
   const map = new Map<string, Item[]>();
   for (const i of inventory) map.set(i.sku, [...(map.get(i.sku) ?? []), i]);
   const rows: SkuRow[] = [];
-  for (const [sku, batches] of map) {
+  for (const [sku, rawBatches] of map) {
+    const batches = mergeBatches(rawBatches);
     const stock = batches.reduce((a, b) => a + b.stock, 0);
     if (stock <= 0 && !hasInbound(sku)) continue;
     const flows = buildFlows(sku);
