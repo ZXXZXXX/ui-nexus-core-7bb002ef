@@ -296,7 +296,7 @@ function BatchSection({
         aria-expanded={open}
         aria-label={`批次 ${batch.batchNo}`}
         onClick={onToggle}
-        className="h-auto w-full justify-between gap-3 rounded-md px-2 py-2 text-left"
+        className="h-auto w-full justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-transparent!"
       >
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} />
@@ -423,7 +423,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                     type="button"
                     aria-expanded={showUsed}
                     onClick={() => setShowUsed((v) => !v)}
-                    className="h-auto w-full justify-between gap-3 rounded-md px-2 py-4 text-left"
+                    className="h-auto w-full justify-between gap-3 rounded-md px-2 py-4 text-left hover:bg-transparent!"
                   >
                     <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${showUsed ? "rotate-90" : ""}`} />
