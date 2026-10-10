@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, SlidersHorizontal, Plus, X, CalendarDays } from "lucide-react";
+import { Search, SlidersHorizontal, Plus, X, CalendarDays, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
 import { exportCsv } from "@/lib/export-csv";
 import { ExportConfirmButton } from "@/components/export-confirm";
 
@@ -50,10 +50,15 @@ export type ListColumn<T> = {
   required?: boolean;
   /** this column holds a time value usable by the quick date range */
   date?: boolean;
+  /** 表头可点击排序 */
+  sortable?: boolean;
   className?: string;
 };
 
 export type QuickRange = "all" | "today" | "7d" | "30d" | "custom";
+
+/** 排序状态：列 key + 方向 */
+export type SortState = { key: string; dir: "asc" | "desc" };
 
 export type ListPageProps<T> = {
   title: string;
@@ -76,6 +81,8 @@ export type ListPageProps<T> = {
   onDateRangeChange?: (r: { from: string; to: string }) => void;
   /** 自定义导出入口：传入默认导出函数，返回替代按钮 */
   renderExport?: (exportCurrent: () => void) => ReactNode;
+  /** 默认排序（进入页面时生效） */
+  defaultSort?: SortState;
   /** extra content rendered above the toolbar */
   children?: ReactNode;
 };
@@ -94,6 +101,30 @@ const RANGES: { key: QuickRange; label: string }[] = [
 function raw<T>(col: ListColumn<T>, row: T): string {
   const v = col.value ? col.value(row) : (row as Record<string, unknown>)[col.key];
   return v === null || v === undefined ? "" : String(v);
+}
+
+/** 排序用的单元格值：数值列按数字比，时间列按时间比，其余按文字比 */
+function sortVal<T>(col: ListColumn<T>, row: T): number | string {
+  const v = col.value ? col.value(row) : (row as Record<string, unknown>)[col.key];
+  if (typeof v === "number") return v;
+  const s = v === null || v === undefined ? "" : String(v);
+  if (col.filter === "date" || col.date) {
+    const t = parseDate(s);
+    return t === null ? Number.MIN_SAFE_INTEGER : t;
+  }
+  if (col.filter === "number") {
+    const n = Number(s.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(n) ? n : Number.MIN_SAFE_INTEGER;
+  }
+  return s;
+}
+
+function compareValues(a: number | string, b: number | string): number {
+  if (typeof a === "number" && typeof b === "number") {
+    if (a === b) return 0;
+    return a < b ? -1 : 1;
+  }
+  return String(a).localeCompare(String(b), "zh-Hans-CN");
 }
 
 function parseDate(s: string): number | null {
@@ -131,6 +162,7 @@ export function ListPage<T>({
   dateRangeMode = false,
   onDateRangeChange,
   renderExport,
+  defaultSort,
   children,
 
 }: ListPageProps<T>) {
@@ -162,6 +194,17 @@ export function ListPage<T>({
     columns.filter((c) => !c.defaultHidden).map((c) => c.key),
   );
   const [draftVisible, setDraftVisible] = useState<string[]>(visible);
+  const [sort, setSort] = useState<SortState | null>(defaultSort ?? null);
+  const toggleSort = (col: ListColumn<T>) => {
+    if (!col.sortable) return;
+    setSort((prev) =>
+      prev?.key === col.key
+        ? prev.dir === "desc"
+          ? { key: col.key, dir: "asc" }
+          : null
+        : { key: col.key, dir: "desc" },
+    );
+  };
   const colSignature = columns.map((c) => c.key).join("|");
   const lastSignature = useRef(colSignature);
   useEffect(() => {
@@ -184,7 +227,7 @@ export function ListPage<T>({
     const end = custom && to ? parseDate(to) : null;
     const dateCol = columns.find((c) => c.key === dateKey);
 
-    return rows.filter((row) => {
+    const list = rows.filter((row) => {
       if (kw && searchCols.length) {
         const hit = searchCols.some((c) => raw(c, row).toLowerCase().includes(kw));
         if (!hit) return false;
@@ -213,7 +256,11 @@ export function ListPage<T>({
       }
       return true;
     });
-  }, [rows, q, range, dateKey, filters, columns, searchCols, dateRangeMode, from, to]);
+    const sortCol = sort ? columns.find((c) => c.key === sort.key && c.sortable) : undefined;
+    if (!sortCol || !sort) return list;
+    const dir = sort.dir === "asc" ? 1 : -1;
+    return [...list].sort((a, b) => dir * compareValues(sortVal(sortCol, a), sortVal(sortCol, b)));
+  }, [rows, q, range, dateKey, filters, columns, searchCols, dateRangeMode, from, to, sort]);
 
 
   const optionsFor = (col: ListColumn<T>) =>
@@ -477,17 +524,42 @@ export function ListPage<T>({
           <div className="overflow-x-auto">
             <div style={{ minWidth: minTableWidth }} className="relative w-full">
               <div className="flex items-center h-12 text-table-header text-text-secondary border-b border-border bg-surface-subtle">
-                {shown.map((c, ci) => (
-                  <div
-                    key={c.key}
-                    style={colStyle(c, ci === 0)}
-                    className={`truncate px-2 ${ci === 0 ? "sticky left-0 z-20 pl-6 border-r border-border bg-surface-subtle" : ""} ${
-                      c.align === "right" ? "text-right" : ""
-                    }`}
-                  >
-                    {c.label}
-                  </div>
-                ))}
+                {shown.map((c, ci) => {
+                  const active = sort?.key === c.key;
+                  return (
+                    <div
+                      key={c.key}
+                      style={colStyle(c, ci === 0)}
+                      className={`truncate px-2 ${ci === 0 ? "sticky left-0 z-20 pl-6 border-r border-border bg-surface-subtle" : ""} ${
+                        c.align === "right" ? "text-right" : ""
+                      }`}
+                    >
+                      {c.sortable ? (
+                        <button
+                          type="button"
+                          onClick={() => toggleSort(c)}
+                          title="点击切换排序"
+                          className={`inline-flex max-w-full items-center gap-1 transition-colors hover:text-foreground ${
+                            active ? "text-foreground" : ""
+                          }`}
+                        >
+                          <span className="truncate">{c.label}</span>
+                          {active && sort ? (
+                            sort.dir === "desc" ? (
+                              <ChevronDown className="h-3.5 w-3.5 shrink-0" />
+                            ) : (
+                              <ChevronUp className="h-3.5 w-3.5 shrink-0" />
+                            )
+                          ) : (
+                            <ChevronsUpDown className="h-3 w-3 shrink-0 opacity-40" />
+                          )}
+                        </button>
+                      ) : (
+                        c.label
+                      )}
+                    </div>
+                  );
+                })}
                 {rowActions && (
                   <div
                     className="sticky right-0 z-20 shrink-0 text-right pl-2 pr-6 border-l border-border bg-surface-subtle"
