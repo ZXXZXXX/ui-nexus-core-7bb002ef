@@ -437,13 +437,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                     </span>
                   </Button>
 
-                  {showUsed ? (
-                    used.map(renderBatch)
-                  ) : (
-                    <div className="px-2 pb-5 pl-8 text-caption text-text-tertiary">
-                      {usedHint} · {usedRecords} 条出入库记录
-                    </div>
-                  )}
+                  {showUsed && used.map(renderBatch)}
                 </section>
               )}
             </div>
