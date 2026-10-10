@@ -184,6 +184,15 @@ export type SkuRow = {
  * - 常驻规则：有过入库记录的药品保留在列表中（当前库存为 0 也保留）；
  *   从未入库的药品不进入库存列表
  */
+/** 按规则列排序（仅数值列） */
+export function sortSkuRows(rows: SkuRow[], sort = DEFAULT_INVENTORY_SORT): SkuRow[] {
+  const dir = sort.dir === "asc" ? 1 : -1;
+  return [...rows].sort(
+    (a, b) =>
+      dir * ((a[sort.key as keyof SkuRow] as number) - (b[sort.key as keyof SkuRow] as number)),
+  );
+}
+
 export function buildSkuRows(): SkuRow[] {
   const map = new Map<string, Item[]>();
   for (const i of inventory) map.set(i.sku, [...(map.get(i.sku) ?? []), i]);
