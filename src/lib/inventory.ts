@@ -182,16 +182,27 @@ export function isBatchUsedUp(batch: Item): boolean {
 }
 
 /**
+ * 批次库存变为 0 的时间：
+ * 取该批次最后一条出库记录的时间；没有出库记录时回退到档案更新时间
+ */
+export function usedUpAt(batch: Item): string {
+  const outs = (outbound[batch.sku] ?? []).filter((r) => r.batch === batch.batchNo);
+  return outs.reduce((latest, r) => (r.date > latest ? r.date : latest), "");
+}
+
+/**
  * 批次分组规则：
  * - 有余量的批次排在前面，按效期由近到远
  * - 已用完（余量为 0）的批次统一放到最后，默认折叠，
- *   需在详情中点「查看全部」才展开
+ *   需在详情中点「查看全部」才展开；
+ *   展开区内按库存变为 0 的时间由近到远排列（最近的在最上）
  */
 export function partitionBatches(batches: Item[]): { active: Item[]; used: Item[] } {
   const byExpiry = (a: Item, b: Item) => a.expiry.localeCompare(b.expiry);
+  const byUsedUpDesc = (a: Item, b: Item) => usedUpAt(b).localeCompare(usedUpAt(a));
   return {
     active: batches.filter((b) => !isBatchUsedUp(b)).sort(byExpiry),
-    used: batches.filter(isBatchUsedUp).sort(byExpiry),
+    used: batches.filter(isBatchUsedUp).sort(byUsedUpDesc),
   };
 }
 
