@@ -370,14 +370,6 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
     ? partitionBatches(row.batches)
     : { active: [] as Item[], used: [] as Item[] };
 
-  const usedRecords = used.reduce(
-    (n, b) => n + flows.filter((f) => f.batch === b.batchNo).length,
-    0,
-  );
-  const usedNames = used.map((b) => b.batchNo);
-  const usedHint =
-    usedNames.slice(0, 3).join("、") +
-    (usedNames.length > 3 ? ` 等 ${usedNames.length} 个批次` : "");
 
   const renderBatch = (b: Item) => {
     const open = openMap[b.batchNo] ?? !isBatchUsedUp(b);
