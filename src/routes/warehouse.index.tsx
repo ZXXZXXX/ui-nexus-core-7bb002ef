@@ -372,7 +372,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
 
 
   const renderBatch = (b: Item) => {
-    const open = openMap[b.batchNo] ?? !isBatchUsedUp(b);
+    const open = openMap[b.batchNo] ?? true;
     return (
       <BatchSection
         key={b.batchNo}
