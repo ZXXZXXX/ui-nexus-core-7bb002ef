@@ -44,6 +44,8 @@ export type ListColumn<T> = {
   align?: "left" | "right";
   /** grid track size, e.g. "7em"; default minmax(0, 1fr) */
   width?: string;
+  /** 剩余宽度按各列 width 比例分摊（需配合 width 使用），避免某一列独占全部留白 */
+  grow?: boolean;
   /** hidden by default in column settings */
   defaultHidden?: boolean;
   /** cannot be hidden */
@@ -282,10 +284,15 @@ export function ListPage<T>({
     const n = parseFloat(m[1]);
     return m[2] === "px" ? n : n * 14;
   };
-  const colStyle = (c: ListColumn<T>, frozen: boolean) =>
-    frozen || c.width
-      ? { flex: `0 0 ${parseW(c.width)}px`, width: parseW(c.width) }
-      : { flex: "1 1 0", minWidth: DEFAULT_COL_PX };
+  const colStyle = (c: ListColumn<T>, frozen: boolean) => {
+    if (frozen || (c.width && !c.grow))
+      return { flex: `0 0 ${parseW(c.width)}px`, width: parseW(c.width) };
+    if (c.grow) {
+      const w = parseW(c.width);
+      return { flex: `${w} ${w} 0px`, minWidth: w };
+    }
+    return { flex: "1 1 0", minWidth: DEFAULT_COL_PX };
+  };
   const minTableWidth =
     shown.reduce((s, c) => s + parseW(c.width), 0) +
     (rowActions ? actionsWidth : 0) +
