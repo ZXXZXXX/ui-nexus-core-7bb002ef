@@ -344,11 +344,11 @@ function ExportDialog({
 
 /* ------------------------------ 出入库记录抽屉 ------------------------------ */
 
-type Rec = { date: string; qty: number; via: string; operator: string; note?: string };
+type Rec = { date: string; qty: number; via: string; operator: string; note?: string; batch?: string };
 
 const inbound: Record<string, Rec[]> = {
   "01-00063": [
-    { date: "2026-08-20 09:12", qty: 20, via: "调拨入库", operator: "王磊", note: "" },
+    { date: "2026-08-20 09:12", qty: 20, via: "调拨入库", operator: "王磊", note: "", batch: "B25A0142" },
     { date: "2026-08-02 14:30", qty: 40, via: "采购入库", operator: "李静" },
   ],
   "02-00214": [
@@ -356,7 +356,7 @@ const inbound: Record<string, Rec[]> = {
     { date: "2026-07-28 10:05", qty: 30, via: "采购入库", operator: "李静" },
   ],
   "03-00306": [
-    { date: "2026-08-14 08:40", qty: 12, via: "退料入库", operator: "赵敏", note: "三级库未用完退回" },
+    { date: "2026-08-14 08:40", qty: 12, via: "退料入库", operator: "赵敏", note: "三级库未用完退回", batch: "Y25A0771" },
     { date: "2026-08-05 16:20", qty: 24, via: "调拨入库", operator: "王磊" },
   ],
   "04-00412": [{ date: "2026-08-02 11:00", qty: 60, via: "采购入库", operator: "李静" }],
@@ -370,7 +370,7 @@ const inbound: Record<string, Rec[]> = {
 
 const outbound: Record<string, Rec[]> = {
   "01-00063": [
-    { date: "2026-08-20 17:40", qty: 18, via: "用药领取", operator: "陈涛", note: "" },
+    { date: "2026-08-20 17:40", qty: 18, via: "用药领取", operator: "陈涛", note: "", batch: "B25A0142" },
     { date: "2026-08-10 18:30", qty: 1, via: "盘点差异\n", operator: "赵敏", note: "" },
     { date: "2026-08-02 18:05", qty: 12, via: "用药领取", operator: "陈涛" },
   ],
@@ -379,7 +379,7 @@ const outbound: Record<string, Rec[]> = {
     { date: "2026-07-28 17:50", qty: 26, via: "用药领取", operator: "刘洋" },
   ],
   "03-00306": [
-    { date: "2026-08-14 17:15", qty: 15, via: "盘点损耗", operator: "赵敏", note: "储存保管破损" },
+    { date: "2026-08-14 17:15", qty: 15, via: "盘点损耗", operator: "赵敏", note: "储存保管破损", batch: "Y25A0771" },
     { date: "2026-08-05 18:00", qty: 9, via: "用药领取", operator: "陈涛" },
   ],
   "04-00412": [
@@ -397,20 +397,66 @@ const outbound: Record<string, Rec[]> = {
 type Flow = Rec & { dir: "in" | "out" };
 
 function buildFlows(sku: string): Flow[] {
+  const first = inventory.find((i) => i.sku === sku)?.batchNo;
   return [
     ...(inbound[sku] ?? []).map((r) => ({ ...r, dir: "in" as const })),
     ...(outbound[sku] ?? []).map((r) => ({ ...r, dir: "out" as const })),
-  ].sort((a, b) => b.date.localeCompare(a.date));
+  ]
+    .map((r) => ({ ...r, batch: r.batch ?? first }))
+    .sort((a, b) => b.date.localeCompare(a.date));
 }
 
-function DetailDrawer({ row, onClose }: { row: Row | null; onClose: () => void }) {
-  const [tab, setTab] = useState<"all" | "in" | "out">("all");
+/** 以商品编码为唯一维度的库存行 */
+type SkuRow = {
+  sku: string; name: string; spec: string; unit: string; stock: number;
+  lastInDate: string; lastInQty: number | null; lastOutDate: string; lastOutQty: number | null;
+  batches: Item[];
+};
+
+function buildSkuRows(): SkuRow[] {
+  const map = new Map<string, Item[]>();
+  for (const i of inventory) map.set(i.sku, [...(map.get(i.sku) ?? []), i]);
+  return [...map.entries()].map(([sku, batches]) => {
+    const flows = buildFlows(sku);
+    const lastIn = flows.find((f) => f.dir === "in");
+    const lastOut = flows.find((f) => f.dir === "out");
+    const b0 = batches[0];
+    return {
+      sku, name: b0.name, spec: b0.spec, unit: b0.unit,
+      stock: batches.reduce((a, b) => a + b.stock, 0),
+      lastInDate: lastIn?.date ?? "", lastInQty: lastIn?.qty ?? null,
+      lastOutDate: lastOut?.date ?? "", lastOutQty: lastOut?.qty ?? null,
+      batches: [...batches].sort((a, b) => a.expiry.localeCompare(b.expiry)),
+    };
+  });
+}
+
+const skuColumns: ListColumn<SkuRow>[] = [
+  { key: "sku", label: "商品编码", required: true, render: (i) => <span className="font-mono text-body text-foreground">{i.sku}</span> },
+  { key: "name", label: "药品名称", required: true, render: (i) => <span className="text-body text-foreground truncate">{i.name}</span> },
+  { key: "spec", label: "规格型号", render: (i) => <span className="text-body-sm text-text-secondary truncate">{i.spec}</span> },
+  {
+    key: "stock", label: "当前库存", filter: "number", align: "right", value: (i) => i.stock,
+    render: (i) => <span className="text-body font-medium tabular-nums text-foreground">{i.stock} {i.unit}</span>,
+  },
+  { key: "lastInDate", label: "最近入库时间", filter: "date", render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.lastInDate || "—"}</span> },
+  {
+    key: "lastInQty", label: "最近入库数量", filter: "number", align: "right", value: (i) => i.lastInQty ?? 0,
+    render: (i) => <span className="text-body-sm tabular-nums text-primary">{i.lastInQty === null ? "—" : `+${i.lastInQty} ${i.unit}`}</span>,
+  },
+  { key: "lastOutDate", label: "最近出库时间", filter: "date", render: (i) => <span className="text-body-sm text-text-secondary tabular-nums">{i.lastOutDate || "—"}</span> },
+  {
+    key: "lastOutQty", label: "最近出库数量", filter: "number", align: "right", value: (i) => i.lastOutQty ?? 0,
+    render: (i) => <span className="text-body-sm tabular-nums text-[var(--state-danger)]">{i.lastOutQty === null ? "—" : `-${i.lastOutQty} ${i.unit}`}</span>,
+  },
+];
+
+function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => void }) {
   const flows = row ? buildFlows(row.sku) : [];
-  const list = flows.filter((f) => tab === "all" || f.dir === tab);
 
   return (
     <Sheet open={!!row} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent className="w-[520px] sm:max-w-[520px] overflow-auto">
+      <SheetContent className="w-[560px] sm:max-w-[560px] overflow-auto">
         {row && (
           <>
             <SheetHeader className="text-left">
@@ -419,69 +465,57 @@ function DetailDrawer({ row, onClose }: { row: Row | null; onClose: () => void }
                 <span className="ml-2 font-mono text-caption font-normal text-text-tertiary">{row.sku}</span>
               </SheetTitle>
               <SheetDescription className="text-caption text-text-tertiary">
-                {row.spec} · 当前库存 {row.stock} {row.unit} · 效期 {row.expiry}
+                {row.spec} · 当前库存 {row.stock} {row.unit} · 共 {row.batches.length} 个批次
               </SheetDescription>
             </SheetHeader>
 
-            <div className="mt-5">
-              <div className="mb-3 inline-flex rounded-md border border-border p-0.5">
-                {([
-                  { k: "all", t: `全部 ${flows.length}` },
-                  { k: "in", t: `入库 ${flows.filter((f) => f.dir === "in").length}` },
-                  { k: "out", t: `出库 ${flows.filter((f) => f.dir === "out").length}` },
-                ] as const).map((o) => (
-                  <button
-                    key={o.k}
-                    onClick={() => setTab(o.k)}
-                    className={`rounded px-3 py-1 text-body-sm transition-colors ${
-                      tab === o.k
-                        ? "bg-brand-subtle text-primary font-medium"
-                        : "text-text-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {o.t}
-                  </button>
-                ))}
-              </div>
-
-              {list.length === 0 ? (
-                <div className="py-10 text-center text-body-sm text-text-tertiary">暂无记录</div>
-              ) : (
-                <div className="relative pl-4">
-                  <span className="absolute left-[3px] top-1.5 bottom-1.5 w-px bg-border" />
-                  {list.map((r, idx) => (
-                    <div key={idx} className="relative py-2.5">
-                      <span
-                        className={`absolute -left-4 top-4 h-[7px] w-[7px] rounded-full ${
-                          r.dir === "in" ? "bg-primary" : "bg-[var(--state-danger)]"
-                        }`}
-                      />
-                      <div className="flex items-start gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className={r.dir === "in" ? "tag tag-success" : "tag tag-danger"}>
-                              {r.dir === "in" ? "入库" : "出库"}
-                            </span>
-                            <span className="text-body-sm font-medium text-foreground">{r.via}</span>
-                          </div>
-                          <div className="mt-1 text-caption text-text-tertiary tabular-nums">
-                            {r.date} · 操作人：{r.operator}
-                            {r.note ? ` · ${r.note}` : ""}
-                          </div>
+            <div className="mt-5 space-y-4">
+              {row.batches.map((b) => {
+                const list = flows.filter((f) => f.batch === b.batchNo);
+                return (
+                  <section key={b.batchNo} className="rounded-lg border border-border">
+                    <div className="flex items-center justify-between gap-3 border-b border-border bg-surface-subtle px-4 py-3">
+                      <div className="min-w-0">
+                        <div className="text-card-title text-foreground">
+                          批次 <span className="font-mono">{b.batchNo}</span>
                         </div>
-                        <span
-                          className={`shrink-0 text-body font-medium tabular-nums ${
-                            r.dir === "in" ? "text-primary" : "text-[var(--state-danger)]"
-                          }`}
-                        >
-                          {r.dir === "in" ? "+" : "-"}
-                          {r.qty} {row.unit}
-                        </span>
+                        <div className="mt-0.5 text-caption text-text-tertiary tabular-nums">
+                          效期 {b.expiry} · 生产日期 {b.prodDate} · 采购 {b.purchaseDate}
+                        </div>
+                      </div>
+                      <div className="shrink-0 text-right">
+                        <div className="text-caption text-text-tertiary">当前余量</div>
+                        <div className="text-body font-medium tabular-nums text-foreground">{b.stock} {row.unit}</div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                    {list.length === 0 ? (
+                      <div className="py-6 text-center text-body-sm text-text-tertiary">暂无出入库记录</div>
+                    ) : (
+                      <div className="divide-y divide-border">
+                        {list.map((r, idx) => (
+                          <div key={idx} className="flex items-start gap-3 px-4 py-2.5">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className={r.dir === "in" ? "tag tag-success" : "tag tag-danger"}>
+                                  {r.dir === "in" ? "入库" : "出库"}
+                                </span>
+                                <span className="text-body-sm font-medium text-foreground">{r.via.trim()}</span>
+                              </div>
+                              <div className="mt-1 text-caption text-text-tertiary tabular-nums">
+                                {r.date} · 操作人：{r.operator}
+                                {r.note ? ` · ${r.note}` : ""}
+                              </div>
+                            </div>
+                            <span className={`shrink-0 text-body font-medium tabular-nums ${r.dir === "in" ? "text-primary" : "text-[var(--state-danger)]"}`}>
+                              {r.dir === "in" ? "+" : "-"}{r.qty} {row.unit}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                );
+              })}
             </div>
           </>
         )}
@@ -492,20 +526,19 @@ function DetailDrawer({ row, onClose }: { row: Row | null; onClose: () => void }
 
 function InventoryPage() {
   const [exportOpen, setExportOpen] = useState(false);
-  const [detail, setDetail] = useState<Row | null>(null);
-  const rows = useMemo(() => buildRows("", ""), []);
-
+  const [detail, setDetail] = useState<SkuRow | null>(null);
+  const rows = useMemo(() => buildSkuRows(), []);
 
   return (
     <>
-      <ListPage<Row>
+      <ListPage<SkuRow>
         title="库存管理"
         breadcrumb={["仓库管理", "库存管理"]}
         rows={rows}
-        columns={columns}
+        columns={skuColumns}
         searchKeys={["name", "sku"]}
-        searchPlaceholder="按 SKU / 药品名称搜索"
-        getRowKey={(i) => `${i.sku}-${i.purchaseDate}`}
+        searchPlaceholder="按商品编码 / 药品名称搜索"
+        getRowKey={(i) => i.sku}
         renderExport={(exportCurrent) => (
           <>
             <Button
