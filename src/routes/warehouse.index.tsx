@@ -335,8 +335,8 @@ function BatchSection({
                       <span className={`text-body-sm font-medium ${isIn ? "text-primary" : "text-destructive"}`}>{isIn ? "入库" : "出库"}</span>
                       <span className="text-body font-medium text-foreground">{r.via.trim()}</span>
                     </div>
-                    <span className={`shrink-0 text-card-title font-medium tabular-nums ${isIn ? "text-primary" : "text-destructive"}`}>
-                      {isIn ? "+" : "−"}{r.qty}<span className="ml-1 text-body-sm font-normal">{unit}</span>
+                    <span className="shrink-0 text-card-title font-medium tabular-nums text-foreground">
+                      {isIn ? "+" : "−"}{r.qty}<span className="ml-1 text-body-sm font-normal text-text-secondary">{unit}</span>
                     </span>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-3 text-caption text-text-tertiary">
