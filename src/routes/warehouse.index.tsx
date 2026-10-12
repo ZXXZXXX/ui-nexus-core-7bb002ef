@@ -343,7 +343,7 @@ function BatchSection({
                     <time className="tabular-nums">{r.date}</time>
                     <span>操作人：{r.operator}</span>
                   </div>
-                  {r.note && <p className="mt-2 border-l-2 border-border pl-2.5 text-body-sm leading-relaxed text-text-secondary">{r.note}</p>}
+
                 </li>
               );
             })}
