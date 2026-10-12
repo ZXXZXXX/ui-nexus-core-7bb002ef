@@ -37,7 +37,9 @@ import {
   Stethoscope,
   Pill,
   Tag,
+  Info,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -123,6 +125,8 @@ type CattleGroup = "泌乳牛" | "青年牛" | "干奶牛" | "围产牛" | "犊�
 type Disease = {
   id: string;
   code: string;              // DZ-xxxxxx
+  diagCode: string;          // 诊断编码：回传 UD 诊断事件时所用编码
+  mapCode: string;           // 映射编码：拉取 UD 工作单时所用编码
   typeId: string;            // 所属疾病类型
   subSeq: string;            // 子类型 3 位序号
   name: string;              // 疾病子类型名称
@@ -162,6 +166,8 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
   return {
     id: d.id.replace("DZ-", "D-"),
     code: d.id,
+    diagCode: `UDX-${d.id.slice(3)}`,
+    mapCode: `UDW-${d.id.slice(3)}`,
     typeId: type?.id ?? "T-001",
     subSeq: d.id.slice(-3),
     name: d.name,
@@ -258,6 +264,8 @@ function DiseaseKBPage() {
     const draft: Disease = {
       id: `D-new-${Date.now()}`,
       code: "DZ-—",
+      diagCode: "",
+      mapCode: "",
       typeId: TYPES[0]?.id ?? "T-001",
       subSeq: nextTypeSeq,
       name: "",
