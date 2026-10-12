@@ -538,11 +538,27 @@ function SectionCard({
   );
 }
 
-function Field({ label, required, children, hint }: { label: string; required?: boolean; children: React.ReactNode; hint?: string }) {
+function TipLabel({ text, tip }: { text: string; tip: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      {text}
+      <TooltipProvider delayDuration={150}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="h-3.5 w-3.5 text-text-tertiary cursor-help shrink-0" />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[260px]">{tip}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </span>
+  );
+}
+
+function Field({ label, required, tip, children, hint }: { label: string; required?: boolean; tip?: string; children: React.ReactNode; hint?: string }) {
   return (
     <div className="space-y-1.5">
       <Label className="text-body-sm text-text-secondary">
-        {label}
+        {tip ? <TipLabel text={label} tip={tip} /> : label}
         {required && <span className="text-[var(--state-danger)] ml-0.5">*</span>}
       </Label>
       {children}
@@ -578,6 +594,14 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
           </Field>
           <Field label="疾病分类" hint="由所属疾病类型带出">
             <Input value={cat?.name ?? "—"} readOnly className="bg-surface-subtle" />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="诊断编码" tip="回传UD诊断事件时所用编码">
+            <Input value={value.diagCode} onChange={(e) => onChange({ ...value, diagCode: e.target.value })} placeholder="如: UDX-001001" className="font-mono" />
+          </Field>
+          <Field label="映射编码" tip="拉取UD工作单时所用编码">
+            <Input value={value.mapCode} onChange={(e) => onChange({ ...value, mapCode: e.target.value })} placeholder="如: UDW-001001" className="font-mono" />
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
