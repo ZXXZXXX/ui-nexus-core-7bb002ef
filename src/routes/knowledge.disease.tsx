@@ -817,6 +817,8 @@ function DetailView({ value }: { value: Disease }) {
       <SectionCard title="基础信息" icon={<FileText className="h-4 w-4 text-primary" />}>
         <KV label="疾病类型" value={t?.name ?? "—"} />
         <KV label="疾病分类" value={cat?.name ?? "—"} />
+        <KV label="诊断编码" tip="回传UD诊断事件时所用编码" value={value.diagCode} mono />
+        <KV label="映射编码" tip="拉取UD工作单时所用编码" value={value.mapCode} mono />
         {value.alias && <KV label="英文/缩写" value={value.alias} />}
         {value.aliases.length > 0 && (
           <KV
@@ -906,10 +908,12 @@ function DetailView({ value }: { value: Disease }) {
   );
 }
 
-function KV({ label, value, valueNode, mono }: { label: string; value?: string; valueNode?: React.ReactNode; mono?: boolean }) {
+function KV({ label, value, valueNode, mono, tip }: { label: string; value?: string; valueNode?: React.ReactNode; mono?: boolean; tip?: string }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-24 shrink-0 text-body-sm text-text-secondary">{label}</div>
+      <div className="w-24 shrink-0 text-body-sm text-text-secondary">
+        {tip ? <TipLabel text={label} tip={tip} /> : label}
+      </div>
       <div className={`flex-1 text-body text-foreground ${mono ? "font-mono" : ""}`}>
         {valueNode ?? value ?? "—"}
       </div>
