@@ -37,7 +37,9 @@ import {
   Stethoscope,
   Pill,
   Tag,
+  Info,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -123,6 +125,8 @@ type CattleGroup = "泌乳牛" | "青年牛" | "干奶牛" | "围产牛" | "犊�
 type Disease = {
   id: string;
   code: string;              // DZ-xxxxxx
+  diagCode: string;          // 诊断编码：回传 UD 诊断事件时所用编码
+  mapCode: string;           // 映射编码：拉取 UD 工作单时所用编码
   typeId: string;            // 所属疾病类型
   subSeq: string;            // 子类型 3 位序号
   name: string;              // 疾病子类型名称
@@ -162,6 +166,8 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
   return {
     id: d.id.replace("DZ-", "D-"),
     code: d.id,
+    diagCode: `UDX-${d.id.slice(3)}`,
+    mapCode: `UDW-${d.id.slice(3)}`,
     typeId: type?.id ?? "T-001",
     subSeq: d.id.slice(-3),
     name: d.name,
@@ -258,6 +264,8 @@ function DiseaseKBPage() {
     const draft: Disease = {
       id: `D-new-${Date.now()}`,
       code: "DZ-—",
+      diagCode: "",
+      mapCode: "",
       typeId: TYPES[0]?.id ?? "T-001",
       subSeq: nextTypeSeq,
       name: "",
@@ -530,11 +538,27 @@ function SectionCard({
   );
 }
 
-function Field({ label, required, children, hint }: { label: string; required?: boolean; children: React.ReactNode; hint?: string }) {
+function TipLabel({ text, tip }: { text: string; tip: string }) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      {text}
+      <TooltipProvider delayDuration={150}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Info className="h-3.5 w-3.5 text-text-tertiary cursor-help shrink-0" />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[260px]">{tip}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </span>
+  );
+}
+
+function Field({ label, required, tip, children, hint }: { label: string; required?: boolean; tip?: string; children: React.ReactNode; hint?: string }) {
   return (
     <div className="space-y-1.5">
       <Label className="text-body-sm text-text-secondary">
-        {label}
+        {tip ? <TipLabel text={label} tip={tip} /> : label}
         {required && <span className="text-[var(--state-danger)] ml-0.5">*</span>}
       </Label>
       {children}
@@ -570,6 +594,14 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
           </Field>
           <Field label="疾病分类" hint="由所属疾病类型带出">
             <Input value={cat?.name ?? "—"} readOnly className="bg-surface-subtle" />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Field label="诊断编码" tip="回传UD诊断事件时所用编码">
+            <Input value={value.diagCode} onChange={(e) => onChange({ ...value, diagCode: e.target.value })} placeholder="如: UDX-001001" className="font-mono" />
+          </Field>
+          <Field label="映射编码" tip="拉取UD工作单时所用编码">
+            <Input value={value.mapCode} onChange={(e) => onChange({ ...value, mapCode: e.target.value })} placeholder="如: UDW-001001" className="font-mono" />
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -785,6 +817,8 @@ function DetailView({ value }: { value: Disease }) {
       <SectionCard title="基础信息" icon={<FileText className="h-4 w-4 text-primary" />}>
         <KV label="疾病类型" value={t?.name ?? "—"} />
         <KV label="疾病分类" value={cat?.name ?? "—"} />
+        <KV label="诊断编码" tip="回传UD诊断事件时所用编码" value={value.diagCode} mono />
+        <KV label="映射编码" tip="拉取UD工作单时所用编码" value={value.mapCode} mono />
         {value.alias && <KV label="英文/缩写" value={value.alias} />}
         {value.aliases.length > 0 && (
           <KV
@@ -874,10 +908,12 @@ function DetailView({ value }: { value: Disease }) {
   );
 }
 
-function KV({ label, value, valueNode, mono }: { label: string; value?: string; valueNode?: React.ReactNode; mono?: boolean }) {
+function KV({ label, value, valueNode, mono, tip }: { label: string; value?: string; valueNode?: React.ReactNode; mono?: boolean; tip?: string }) {
   return (
     <div className="flex items-start gap-3">
-      <div className="w-24 shrink-0 text-body-sm text-text-secondary">{label}</div>
+      <div className="w-24 shrink-0 text-body-sm text-text-secondary">
+        {tip ? <TipLabel text={label} tip={tip} /> : label}
+      </div>
       <div className={`flex-1 text-body text-foreground ${mono ? "font-mono" : ""}`}>
         {valueNode ?? value ?? "—"}
       </div>
