@@ -45,6 +45,9 @@ import { Route as OrganizationTeamRouteImport } from './routes/organization.team
 import { Route as OrganizationRoleRouteImport } from './routes/organization.role'
 import { Route as OrganizationIntegrationRouteImport } from './routes/organization.integration'
 import { Route as OrganizationAccountRouteImport } from './routes/organization.account'
+import { Route as OperationsMessageConfigRouteImport } from './routes/operations.message-config'
+import { Route as OperationsEventMappingRouteImport } from './routes/operations.event-mapping'
+import { Route as OperationsAuditLogRouteImport } from './routes/operations.audit-log'
 import { Route as MSearchRouteImport } from './routes/m.search'
 import { Route as MScanRouteImport } from './routes/m.scan'
 import { Route as MReturnReportRouteImport } from './routes/m.return-report'
@@ -271,6 +274,21 @@ const OrganizationAccountRoute = OrganizationAccountRouteImport.update({
   id: '/account',
   path: '/account',
   getParentRoute: () => OrganizationRoute,
+} as any)
+const OperationsMessageConfigRoute = OperationsMessageConfigRouteImport.update({
+  id: '/operations/message-config',
+  path: '/operations/message-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperationsEventMappingRoute = OperationsEventMappingRouteImport.update({
+  id: '/operations/event-mapping',
+  path: '/operations/event-mapping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperationsAuditLogRoute = OperationsAuditLogRouteImport.update({
+  id: '/operations/audit-log',
+  path: '/operations/audit-log',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MSearchRoute = MSearchRouteImport.update({
   id: '/search',
@@ -548,6 +566,9 @@ export interface FileRoutesByFullPath {
   '/m/return-report': typeof MReturnReportRoute
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
+  '/operations/audit-log': typeof OperationsAuditLogRoute
+  '/operations/event-mapping': typeof OperationsEventMappingRoute
+  '/operations/message-config': typeof OperationsMessageConfigRoute
   '/organization/account': typeof OrganizationAccountRoute
   '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
@@ -627,6 +648,9 @@ export interface FileRoutesByTo {
   '/m/return-report': typeof MReturnReportRoute
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
+  '/operations/audit-log': typeof OperationsAuditLogRoute
+  '/operations/event-mapping': typeof OperationsEventMappingRoute
+  '/operations/message-config': typeof OperationsMessageConfigRoute
   '/organization/account': typeof OrganizationAccountRoute
   '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
@@ -712,6 +736,9 @@ export interface FileRoutesById {
   '/m/return-report': typeof MReturnReportRoute
   '/m/scan': typeof MScanRoute
   '/m/search': typeof MSearchRoute
+  '/operations/audit-log': typeof OperationsAuditLogRoute
+  '/operations/event-mapping': typeof OperationsEventMappingRoute
+  '/operations/message-config': typeof OperationsMessageConfigRoute
   '/organization/account': typeof OrganizationAccountRoute
   '/organization/integration': typeof OrganizationIntegrationRoute
   '/organization/role': typeof OrganizationRoleRoute
@@ -798,6 +825,9 @@ export interface FileRouteTypes {
     | '/m/return-report'
     | '/m/scan'
     | '/m/search'
+    | '/operations/audit-log'
+    | '/operations/event-mapping'
+    | '/operations/message-config'
     | '/organization/account'
     | '/organization/integration'
     | '/organization/role'
@@ -877,6 +907,9 @@ export interface FileRouteTypes {
     | '/m/return-report'
     | '/m/scan'
     | '/m/search'
+    | '/operations/audit-log'
+    | '/operations/event-mapping'
+    | '/operations/message-config'
     | '/organization/account'
     | '/organization/integration'
     | '/organization/role'
@@ -961,6 +994,9 @@ export interface FileRouteTypes {
     | '/m/return-report'
     | '/m/scan'
     | '/m/search'
+    | '/operations/audit-log'
+    | '/operations/event-mapping'
+    | '/operations/message-config'
     | '/organization/account'
     | '/organization/integration'
     | '/organization/role'
@@ -1018,6 +1054,9 @@ export interface RootRouteChildren {
   StatsRoute: typeof StatsRoute
   WarehouseRoute: typeof WarehouseRouteWithChildren
   WorkspaceRoute: typeof WorkspaceRoute
+  OperationsAuditLogRoute: typeof OperationsAuditLogRoute
+  OperationsEventMappingRoute: typeof OperationsEventMappingRoute
+  OperationsMessageConfigRoute: typeof OperationsMessageConfigRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1273,6 +1312,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/organization/account'
       preLoaderRoute: typeof OrganizationAccountRouteImport
       parentRoute: typeof OrganizationRoute
+    }
+    '/operations/message-config': {
+      id: '/operations/message-config'
+      path: '/operations/message-config'
+      fullPath: '/operations/message-config'
+      preLoaderRoute: typeof OperationsMessageConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operations/event-mapping': {
+      id: '/operations/event-mapping'
+      path: '/operations/event-mapping'
+      fullPath: '/operations/event-mapping'
+      preLoaderRoute: typeof OperationsEventMappingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operations/audit-log': {
+      id: '/operations/audit-log'
+      path: '/operations/audit-log'
+      fullPath: '/operations/audit-log'
+      preLoaderRoute: typeof OperationsAuditLogRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/m/search': {
       id: '/m/search'
@@ -1827,6 +1887,9 @@ const rootRouteChildren: RootRouteChildren = {
   StatsRoute: StatsRoute,
   WarehouseRoute: WarehouseRouteWithChildren,
   WorkspaceRoute: WorkspaceRoute,
+  OperationsAuditLogRoute: OperationsAuditLogRoute,
+  OperationsEventMappingRoute: OperationsEventMappingRoute,
+  OperationsMessageConfigRoute: OperationsMessageConfigRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
