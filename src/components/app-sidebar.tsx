@@ -11,6 +11,7 @@ import {
   BarChart3,
   ChevronDown,
   Bell,
+  Settings2,
 } from "lucide-react";
 
 
@@ -92,7 +93,16 @@ const groups: NavGroup[] = [
     children: [
       { title: "账号管理", url: "/organization/account" },
       { title: "角色管理", url: "/organization/role" },
+    ],
+  },
+  {
+    title: "运营管理",
+    icon: Settings2,
+    children: [
       { title: "第三方系统管理", url: "/organization/integration" },
+      { title: "消息配置管理", url: "/operations/message-config" },
+      { title: "事件映射管理", url: "/operations/event-mapping" },
+      { title: "审计日志", url: "/operations/audit-log" },
     ],
   },
   {
