@@ -257,6 +257,8 @@
   .text-body { font-size: 14px; line-height: 24px; font-weight: 400; }
   .text-body-sm { font-size: 13px; line-height: 22px; font-weight: 400; }
   .text-caption { font-size: 12px; line-height: 20px; font-weight: 400; }
+  /* 说明文字加粗版：同 caption 字号，用于小标签内的强调 */
+  .text-caption-strong { font-size: 12px; line-height: 20px; font-weight: 700; }
   .text-table-header { font-size: 13px; line-height: 22px; font-weight: 500; }
   .text-table-cell { font-size: 14px; line-height: 24px; font-weight: 400; }
   /* 表格重点单元格：正常字号 + 加粗 */
