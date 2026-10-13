@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ListPage, type ListColumn } from "@/components/list-page";
+import { FlowCodes } from "@/components/barcode-viewer";
+import { baseUnit, buildCodes, countUnits } from "@/lib/inventory";
 import {
   Sheet,
   SheetContent,
@@ -29,7 +31,6 @@ type TransferItem = {
   name: string; // 药品展示名称
   spec: string; // 规格型号
   qty: number; // 调拨数量
-  unit: string; // 基础单位
 };
 
 type TransferRow = {
@@ -50,8 +51,8 @@ const initial: TransferRow[] = [
     id: "TR-2026-0142",
     type: "入库",
     items: [
-      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20, unit: "支" },
-      { code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 6, unit: "罐" },
+      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20 },
+      { code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 6 },
     ],
     fromStore: "1 号库",
     toStore: "2 号库",
@@ -65,7 +66,7 @@ const initial: TransferRow[] = [
     id: "TR-2026-0141",
     type: "出库",
     items: [
-      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支" },
+      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60 },
     ],
     fromStore: "中心库",
     toStore: "1 号库",
@@ -79,9 +80,9 @@ const initial: TransferRow[] = [
     id: "TR-2026-0140",
     type: "入库",
     items: [
-      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15, unit: "瓶" },
-      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 4, unit: "桶" },
-      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 10, unit: "支" },
+      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15 },
+      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 4 },
+      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 10 },
     ],
     fromStore: "中心库",
     toStore: "3 号库",
@@ -95,7 +96,7 @@ const initial: TransferRow[] = [
     id: "TR-2026-0139",
     type: "出库",
     items: [
-      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶" },
+      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8 },
     ],
     fromStore: "2 号库",
     toStore: "中心库",
@@ -286,17 +287,25 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                   <span className="text-body-sm font-medium text-foreground">药品明细 · {row.items.length} 种</span>
                 </div>
                 <div className="rounded-lg border border-border bg-card divide-y divide-border">
-                  {row.items.map((it) => (
-                    <div key={it.code} className="px-4 py-3 space-y-1">
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="truncate text-body-sm font-medium text-foreground">{it.name}</span>
-                        <span className="shrink-0 text-body-sm tabular-nums text-foreground">{it.qty} {it.unit}</span>
+                  {row.items.map((it) => {
+                    const nodes = buildCodes(`${it.code}|${row.id}|${it.name}`, it.qty);
+                    return (
+                      <div key={it.code} className="px-4 py-3 space-y-1">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption-strong text-primary">{baseUnit(it.spec)}</span>
+                            <span className="truncate text-body-sm font-medium text-foreground">{it.name}</span>
+                          </div>
+                          <FlowCodes nodes={nodes} title={`调拨 ${row.id} · ${row.type} · ${it.name} · 共 ${countUnits(nodes)} 个`}>
+                            {it.qty}
+                          </FlowCodes>
+                        </div>
+                        <div className="text-caption text-text-tertiary">
+                          <span className="font-mono">{it.code}</span> · {it.spec}
+                        </div>
                       </div>
-                      <div className="text-caption text-text-tertiary">
-                        <span className="font-mono">{it.code}</span> · {it.spec}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
 
