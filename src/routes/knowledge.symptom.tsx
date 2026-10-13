@@ -26,8 +26,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Activity, Plus, Search, Pencil, Trash2, X, MoreHorizontal, ChevronsUpDown, Check } from "lucide-react";
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Activity, Plus, Search, Pencil, Trash2, X, ChevronsUpDown, Check } from "lucide-react";
 import { toast } from "sonner";
 import { KB_SYMPTOMS, KB_DISEASES, diseaseName } from "@/lib/disease-kb";
 
@@ -247,26 +246,14 @@ function SymptomKBPage() {
                   >
                     编辑
                   </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-7 w-7 p-0 text-text-secondary hover:bg-surface-subtle hover:text-foreground"
-                        aria-label="更多操作"
-                      >
-                        <MoreHorizontal className="h-3.5 w-3.5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-32">
-                      <DropdownMenuItem
-                        className="text-[var(--state-danger)] focus:text-[var(--state-danger)]"
-                        onClick={() => setPendingDelete([s.id])}
-                      >
-                        <Trash2 className="h-3.5 w-3.5 mr-2" /> 删除
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-body-sm font-normal text-[var(--state-danger)] hover:bg-transparent hover:text-[var(--state-danger)]/80"
+                    onClick={() => setPendingDelete([s.id])}
+                  >
+                    删除
+                  </Button>
                 </div>
               </div>
             );
