@@ -50,7 +50,6 @@ import {
   HeartPulse,
   Monitor,
   Smartphone,
-  MoreVertical,
   Users,
   Power,
   Info,
@@ -831,14 +830,13 @@ function RolePage() {
                     <DropdownMenuTrigger asChild>
                       <button
                         onClick={(e) => e.stopPropagation()}
-                        className={`h-7 w-7 rounded-md flex items-center justify-center transition-colors ${
+                        className={`h-7 px-2 rounded-md text-body-sm transition-colors ${
                           disabled
-                            ? "text-muted-foreground/60 hover:bg-muted hover:text-muted-foreground"
-                            : "text-text-tertiary hover:bg-surface-subtle hover:text-foreground"
+                            ? "text-muted-foreground/60"
+                            : "text-primary hover:text-primary/80"
                         }`}
-                        aria-label="更多操作"
                       >
-                        <MoreVertical className="h-4 w-4" strokeWidth={1.75} />
+                        操作
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent

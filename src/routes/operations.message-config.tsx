@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Bell, MessageSquareText, Pencil, Search, Smartphone } from "lucide-react";
+import { Bell, MessageSquareText, Search, Smartphone } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -128,8 +128,8 @@ function Page() {
                       <Switch checked={m.enabled} onCheckedChange={(v) => setList((p) => p.map((x) => (x.id === m.id ? { ...x, enabled: v } : x)))} />
                     </td>
                     <td className="px-4 py-3">
-                      <Button variant="ghost" size="sm" className="h-8 gap-1 text-primary" onClick={() => setEditing({ ...m })}>
-                        <Pencil className="h-3.5 w-3.5" />配置
+                      <Button variant="ghost" size="sm" className="h-8 px-0 text-primary hover:bg-transparent hover:text-primary/80" onClick={() => setEditing({ ...m })}>
+                        配置
                       </Button>
                     </td>
                   </tr>
