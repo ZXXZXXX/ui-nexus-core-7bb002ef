@@ -15,6 +15,7 @@ import { Route as StatsRouteImport } from './routes/stats'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProductionRouteImport } from './routes/production'
 import { Route as OrganizationRouteImport } from './routes/organization'
+import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as MRouteImport } from './routes/m'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KnowledgeRouteImport } from './routes/knowledge'
@@ -122,6 +123,11 @@ const ProductionRoute = ProductionRouteImport.update({
 const OrganizationRoute = OrganizationRouteImport.update({
   id: '/organization',
   path: '/organization',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MessagesRoute = MessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MRoute = MRouteImport.update({
@@ -525,6 +531,7 @@ export interface FileRoutesByFullPath {
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/login': typeof LoginRoute
   '/m': typeof MRouteWithChildren
+  '/messages': typeof MessagesRoute
   '/organization': typeof OrganizationRouteWithChildren
   '/production': typeof ProductionRouteWithChildren
   '/settings': typeof SettingsRouteWithChildren
@@ -610,6 +617,7 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/login': typeof LoginRoute
+  '/messages': typeof MessagesRoute
   '/stats': typeof StatsRoute
   '/workspace': typeof WorkspaceRoute
   '/archive/barn': typeof ArchiveBarnRoute
@@ -693,6 +701,7 @@ export interface FileRoutesById {
   '/knowledge': typeof KnowledgeRouteWithChildren
   '/login': typeof LoginRoute
   '/m': typeof MRouteWithChildren
+  '/messages': typeof MessagesRoute
   '/organization': typeof OrganizationRouteWithChildren
   '/production': typeof ProductionRouteWithChildren
   '/settings': typeof SettingsRouteWithChildren
@@ -781,6 +790,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/login'
     | '/m'
+    | '/messages'
     | '/organization'
     | '/production'
     | '/settings'
@@ -866,6 +876,7 @@ export interface FileRouteTypes {
     | '/feedback'
     | '/knowledge'
     | '/login'
+    | '/messages'
     | '/stats'
     | '/workspace'
     | '/archive/barn'
@@ -948,6 +959,7 @@ export interface FileRouteTypes {
     | '/knowledge'
     | '/login'
     | '/m'
+    | '/messages'
     | '/organization'
     | '/production'
     | '/settings'
@@ -1035,6 +1047,7 @@ export interface RootRouteChildren {
   KnowledgeRoute: typeof KnowledgeRouteWithChildren
   LoginRoute: typeof LoginRoute
   MRoute: typeof MRouteWithChildren
+  MessagesRoute: typeof MessagesRoute
   OrganizationRoute: typeof OrganizationRouteWithChildren
   ProductionRoute: typeof ProductionRouteWithChildren
   SettingsRoute: typeof SettingsRouteWithChildren
@@ -1088,6 +1101,13 @@ declare module '@tanstack/react-router' {
       path: '/organization'
       fullPath: '/organization'
       preLoaderRoute: typeof OrganizationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/messages': {
+      id: '/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/m': {
@@ -1860,6 +1880,7 @@ const rootRouteChildren: RootRouteChildren = {
   KnowledgeRoute: KnowledgeRouteWithChildren,
   LoginRoute: LoginRoute,
   MRoute: MRouteWithChildren,
+  MessagesRoute: MessagesRoute,
   OrganizationRoute: OrganizationRouteWithChildren,
   ProductionRoute: ProductionRouteWithChildren,
   SettingsRoute: SettingsRouteWithChildren,
