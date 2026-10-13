@@ -109,7 +109,7 @@ function Page() {
             <table className="w-full text-body-sm">
               <thead className="bg-surface-subtle text-text-secondary">
                 <tr className="h-12">
-                  {["消息类型", "消息名称", "提醒文本", "跳转界面", "推送渠道", "推送时间", "启用", "操作"].map((h) => (
+                  {["消息名称", "消息类型", "提醒文本", "跳转界面", "推送渠道", "推送时间", "启用", "操作"].map((h) => (
                     <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -117,8 +117,8 @@ function Page() {
               <tbody>
                 {rows.map((m) => (
                   <tr key={m.id} className="border-t border-border h-12">
-                    <td className="px-4 py-3 whitespace-nowrap"><span className="tag tag-muted">{m.category}</span></td>
                     <td className="px-4 py-3 whitespace-nowrap text-foreground font-medium">{m.name}</td>
+                    <td className="px-4 py-3 whitespace-nowrap"><span className="tag tag-muted">{m.category}</span></td>
                     <td className="px-4 py-3 text-text-secondary max-w-[360px]"><div className="line-clamp-2">{m.template}</div></td>
                     <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{m.jump}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-foreground">{channelText(m)}</td>
