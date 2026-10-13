@@ -229,7 +229,7 @@ function ApiTable() {
                   <KV k="接口" v={detail.endpoint} />
                 </div>
                 {detail.error && (
-                  <div className="rounded-md border border-[var(--danger)]/30 bg-[var(--danger-soft)] p-3 text-body-sm text-foreground">
+                  <div className="callout-danger rounded-md p-3 text-body-sm text-foreground">
                     <div className="text-caption text-text-tertiary mb-1">失败原因</div>
                     {detail.error}
                   </div>
@@ -328,7 +328,7 @@ function PushTable() {
                   <KV k="跳转界面" v={detail.jump} />
                 </div>
                 {detail.error && (
-                  <div className="rounded-md border border-[var(--danger)]/30 bg-[var(--danger-soft)] p-3 text-body-sm text-foreground">
+                  <div className="callout-danger rounded-md p-3 text-body-sm text-foreground">
                     <div className="text-caption text-text-tertiary mb-1">失败原因</div>
                     {detail.error}
                   </div>
