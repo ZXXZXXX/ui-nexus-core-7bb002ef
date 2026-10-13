@@ -290,3 +290,54 @@ export const LEDGER_OPTIONAL: { key: keyof Item; label: string }[] = [
   { key: "prodDate", label: "生产日期" },
   { key: "shelfLife", label: "保质期" },
 ];
+
+/* ------------------------------ 药品条码 ------------------------------ */
+
+/**
+ * 条码层级规则：条码最多两层——一级为外包装码（如整盒），二级为其内含的最小包装码；
+ * 未成整包的散件只有一层（最小包装码）。条码值全为数字。
+ * （演示数据：每 10 个基础单位组成一个外包装）
+ */
+export type CodeNode = { code: string; children: string[] };
+export const PACK_SIZE = 10;
+
+function digits(seed: string, len: number): string {
+  let h = 2166136261;
+  for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0;
+  let s = "";
+  while (s.length < len) {
+    h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+    s += String(h % 100000).padStart(5, "0");
+  }
+  return s.slice(0, len);
+}
+
+const unitCode = (seed: string, i: number) => `8${digits(`${seed}#u${i}`, 19)}`;
+const packCode = (seed: string, i: number) => `9${digits(`${seed}#p${i}`, 19)}`;
+
+/** 按数量生成分层条码：满 PACK_SIZE 归入一个外包装，余数为散件 */
+export function buildCodes(seed: string, qty: number): CodeNode[] {
+  const out: CodeNode[] = [];
+  const packs = Math.floor(qty / PACK_SIZE);
+  for (let p = 0; p < packs; p++)
+    out.push({
+      code: packCode(seed, p),
+      children: Array.from({ length: PACK_SIZE }, (_, k) => unitCode(seed, p * PACK_SIZE + k)),
+    });
+  for (let k = packs * PACK_SIZE; k < qty; k++) out.push({ code: unitCode(seed, k), children: [] });
+  return out;
+}
+
+/** 某批次 + 采购单价下的现存条码 */
+export const batchCodes = (b: Item) => buildCodes(`${b.sku}|${b.batchNo}|${b.price}|stock`, b.stock);
+
+/** 单笔出入库涉及的条码 */
+export const flowCodes = (f: Flow & { sku?: string }, sku: string) =>
+  buildCodes(`${sku}|${f.batch}|${f.date}|${f.dir}`, f.qty);
+
+/** 条码总数（最小包装数） */
+export const countUnits = (nodes: CodeNode[]) =>
+  nodes.reduce((a, n) => a + (n.children.length || 1), 0);
+
+/** 条码按 4 位分组展示，便于肉眼核对 */
+export const groupDigits = (code: string) => code.replace(/(\d{4})(?=\d)/g, "$1 ");
