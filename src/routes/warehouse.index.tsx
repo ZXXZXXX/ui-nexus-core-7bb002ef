@@ -339,7 +339,7 @@ function BatchSection({
             onClick={() => setCodesOpen(true)}
             className="group -ml-1 flex items-center gap-1 self-center rounded-md px-1.5 py-0.5 transition-colors hover:bg-muted"
           >
-            <Barcode className="h-3.5 w-3.5 text-text-tertiary group-hover:text-primary" />
+            <Barcode className="h-3 w-3 text-text-tertiary group-hover:text-primary" />
             <span className="text-card-title font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{batch.stock}</span>
           </button>
         ) : (
