@@ -281,52 +281,50 @@ function ExportDialog({
 /* ------------------------------ 分层条码 ------------------------------ */
 
 function CodeTree({ nodes }: { nodes: CodeNode[] }) {
-  const [open, setOpen] = useState<Record<string, boolean>>({});
   if (!nodes.length) return <div className="py-6 text-center text-body-sm text-text-tertiary">暂无条码</div>;
   return (
-    <ul className="space-y-1">
+    <div className="space-y-3">
       {nodes.map((n) =>
         n.children.length ? (
-          <li key={n.code}>
-            <button
-              type="button"
-              aria-expanded={!!open[n.code]}
-              onClick={() => setOpen((m) => ({ ...m, [n.code]: !m[n.code] }))}
-              className="flex w-full items-center gap-2 py-1 text-left"
-            >
-              <ChevronRight className={`size-3.5 shrink-0 text-text-tertiary transition-transform motion-reduce:transition-none ${open[n.code] ? "rotate-90" : ""}`} />
+          <div key={n.code} className="rounded-md border border-border p-3">
+            <div className="flex items-center gap-2">
               <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
               <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
-              <span className="ml-auto shrink-0 text-caption text-text-tertiary">含 {n.children.length}</span>
-            </button>
-            {open[n.code] && (
-              <ul className="mb-1 ml-[7px] border-l border-border pl-5">
-                {n.children.map((c) => (
-                  <li key={c} className="py-0.5 font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(c)}</li>
-                ))}
-              </ul>
-            )}
-          </li>
+              <span className="ml-auto shrink-0 text-caption text-text-tertiary">内含 {n.children.length}</span>
+            </div>
+            <ul className="mt-2 space-y-1 border-t border-border pt-2">
+              {n.children.map((c) => (
+                <li key={c} className="font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(c)}</li>
+              ))}
+            </ul>
+          </div>
         ) : (
-          <li key={n.code} className="flex items-center gap-2 py-1 pl-[22px]">
+          <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
             <span className="shrink-0 rounded bg-muted px-1.5 text-caption text-text-tertiary">散件</span>
             <span className="font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(n.code)}</span>
-          </li>
+          </div>
         ),
       )}
-    </ul>
+    </div>
   );
 }
 
-function FlowCodes({ nodes }: { nodes: CodeNode[] }) {
+function FlowCodes({ nodes, title }: { nodes: CodeNode[]; title: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-1">
-      <button type="button" onClick={() => setOpen((v) => !v)} className="inline-flex items-center gap-0.5 text-caption text-primary">
+      <button type="button" onClick={() => setOpen(true)} className="text-caption text-primary">
         药品条码 {countUnits(nodes)} 个
-        <ChevronDown className={`size-3.5 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && <div className="mt-2 rounded-md bg-muted/40 p-3"><CodeTree nodes={nodes} /></div>}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[520px]">
+          <DialogHeader>
+            <DialogTitle>药品条码</DialogTitle>
+            <DialogDescription>{title}</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
