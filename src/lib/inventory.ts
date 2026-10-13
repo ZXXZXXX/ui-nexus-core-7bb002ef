@@ -15,6 +15,12 @@ export type Item = {
   supplier: string; maker: string; approvalNo: string; batchNo: string; prodDate: string; shelfLife: string;
 };
 
+/**
+ * 基础计量单位：取规格型号 "/" 之后的最小包装单位（如一盒 30 瓶 → 瓶）。
+ * 各处展示基础单位统一走这里，避免每页各写一份。
+ */
+export const baseUnit = (spec: string) => spec.split("/").pop()?.trim() || "";
+
 export const inventory: Item[] = [
   { sku: "01-00063", price: 48.50, name: "乳房炎抗生素 5mg", cat: "抗生素", spec: "100ml（含5g）/瓶", stock: 86, min: 50, unit: "瓶", expiry: "2026-11", status: "物资正常", updatedAt: "2026-08-20", supplier: "华牧兽药供应链", maker: "齐鲁动物保健品有限公司", approvalNo: "兽药字(2024)010321", batchNo: "B24A0631", prodDate: "2024-11-08", shelfLife: "24 个月", purchaseDate: "2024-11-12" },
   { sku: "02-00214", price: 26.00, name: "口蹄疫疫苗 A 型", cat: "疫苗", spec: "50ml/瓶", stock: 12, min: 30, unit: "瓶", expiry: "2026-06", status: "余量紧张", updatedAt: "2026-08-19", supplier: "中牧生物", maker: "中牧实业股份有限公司", approvalNo: "兽药生字(2023)190024", batchNo: "V23F0912", prodDate: "2024-06-14", shelfLife: "24 个月", purchaseDate: "2024-06-20" },

@@ -50,8 +50,8 @@ const initial: TransferRow[] = [
     id: "TR-2026-0142",
     type: "入库",
     items: [
-      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20, unit: "支" },
-      { code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 6, unit: "罐" },
+      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 20  },
+      { code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 6  },
     ],
     fromStore: "1 号库",
     toStore: "2 号库",
@@ -65,7 +65,7 @@ const initial: TransferRow[] = [
     id: "TR-2026-0141",
     type: "出库",
     items: [
-      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60, unit: "支" },
+      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 60  },
     ],
     fromStore: "中心库",
     toStore: "1 号库",
@@ -79,9 +79,9 @@ const initial: TransferRow[] = [
     id: "TR-2026-0140",
     type: "入库",
     items: [
-      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15, unit: "瓶" },
-      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 4, unit: "桶" },
-      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 10, unit: "支" },
+      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 15  },
+      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 4  },
+      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 10  },
     ],
     fromStore: "中心库",
     toStore: "3 号库",
@@ -95,7 +95,7 @@ const initial: TransferRow[] = [
     id: "TR-2026-0139",
     type: "出库",
     items: [
-      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8, unit: "桶" },
+      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 8  },
     ],
     fromStore: "2 号库",
     toStore: "中心库",
