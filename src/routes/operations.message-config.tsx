@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { categoryTag } from "@/lib/message-category";
 
 export const Route = createFileRoute("/operations/message-config")({
   head: () => ({
@@ -117,7 +118,7 @@ function Page() {
                 {rows.map((m) => (
                   <tr key={m.id} className="border-t border-border h-12">
                     <td className="px-4 py-3 whitespace-nowrap text-foreground font-medium">{m.name}</td>
-                    <td className="px-4 py-3 whitespace-nowrap"><span className="tag tag-muted">{m.category}</span></td>
+                    <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${categoryTag(m.category)}`}>{m.category}</span></td>
                     <td className="px-4 py-3 text-text-secondary max-w-[360px]"><div className="line-clamp-2">{m.template}</div></td>
                     <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{m.jump}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-foreground">{channelText(m)}</td>
