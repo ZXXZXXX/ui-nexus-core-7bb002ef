@@ -170,16 +170,16 @@ function InTable() {
       <Filters kw={kw} onKw={setKw} placeholder="搜索 UD 编码 / 名称 / 本系统表单" group={group} onGroup={setGroup} groups={["工单", "基础事件"]} status={status} onStatus={setStatus} />
       <div className="overflow-x-auto rounded-md border border-border">
         <table className="w-full text-body-sm">
-          <Th cols={["映射分类", "UD 类型", "UD 子类型编码", "UD 子类型名称", "目标业务类别", "本系统类型／表单", "拉取编码（From UD）", "状态", "备注", "操作"]} />
+          <Th cols={["本系统类型／表单", "本系统映射结论", "UD 类型", "UD 子类型编码", "UD 子类型名称", "目标业务类别", "拉取编码（From UD）", "状态", "备注", "操作"]} />
           <tbody>
             {list.map((r) => (
               <tr key={r.id} className="border-t border-border h-12">
-                <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${r.group === "工单" ? "tag-brand" : "tag-info"}`}>{r.group}</span></td>
+                <td className="px-4 py-3 whitespace-nowrap">{r.target}</td>
+                <td className="px-4 py-3 text-text-secondary whitespace-nowrap">{r.group === "工单" ? `创建「${r.target}」，处置后回传 UD` : `生成「${r.target}」基础事件记录`}</td>
                 <td className="px-4 py-3 whitespace-nowrap"><span className="font-mono tabular-nums text-text-secondary">{r.udType}</span> {r.udTypeName}</td>
                 <td className="px-4 py-3 whitespace-nowrap"><Code v={r.udSub} /></td>
                 <td className="px-4 py-3 whitespace-nowrap">{r.udSubName}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{r.bizCategory}</td>
-                <td className="px-4 py-3 whitespace-nowrap">{r.target}</td>
                 <td className="px-4 py-3 whitespace-nowrap"><Code v={r.fromCode} /></td>
                 <td className="px-4 py-3 whitespace-nowrap"><StatusTag ok={!isPending(r.fromCode)} /></td>
                 <td className="px-4 py-3 text-text-secondary max-w-[240px] truncate" title={r.note}>{r.note || "—"}</td>
@@ -219,12 +219,12 @@ function OutTable() {
       <Filters kw={kw} onKw={setKw} placeholder="搜索处置 / 事件 / 回传编码" group={group} onGroup={setGroup} groups={["工单处置", "基础事件", "现场事件"]} status={status} onStatus={setStatus} />
       <div className="overflow-x-auto rounded-md border border-border">
         <table className="w-full text-body-sm">
-          <Th cols={["映射分类", "本系统来源", "处置／事件", "回传类型编码", "回传子类型编码（To UD）", "附带药品信息", "状态", "备注", "操作"]} />
+          <Th cols={["本系统来源", "本系统映射结论", "处置／事件", "回传类型编码", "回传子类型编码（To UD）", "附带药品信息", "状态", "备注", "操作"]} />
           <tbody>
             {list.map((r) => (
               <tr key={r.id} className="border-t border-border h-12">
-                <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${r.group === "工单处置" ? "tag-brand" : r.group === "基础事件" ? "tag-info" : "tag-muted"}`}>{r.group}</span></td>
                 <td className="px-4 py-3 whitespace-nowrap">{r.source}</td>
+                <td className="px-4 py-3 text-text-secondary whitespace-nowrap">{`向 UD 回传「${r.action}」记录${r.withDrug ? "及药品信息" : ""}`}</td>
                 <td className="px-4 py-3 whitespace-nowrap">{r.action}</td>
                 <td className="px-4 py-3 whitespace-nowrap"><Code v={r.toType} /></td>
                 <td className="px-4 py-3 whitespace-nowrap"><Code v={r.toSub} /></td>
