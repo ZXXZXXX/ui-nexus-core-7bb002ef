@@ -36,7 +36,6 @@ type LossDrug = {
   name: string;
   spec: string;
   qty: number;
-  unit: string;
   pickedAt: string; // 领取时间
   pickedBy: string; // 领取人
   value: number;
@@ -79,8 +78,8 @@ const initial: LossReport[] = [
     remark: "冷库压缩机夜间故障，疫苗温度超标。",
     photos: 3,
     drugs: [
-      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 8, unit: "支", pickedAt: "2026-05-10 08:30", pickedBy: "张飞", value: 480.0 },
-      { code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 2, unit: "罐", pickedAt: "2026-05-10 08:32", pickedBy: "张飞", value: 180.0 },
+      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 8, pickedAt: "2026-05-10 08:30", pickedBy: "张飞", value: 480.0 },
+      { code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 2, pickedAt: "2026-05-10 08:32", pickedBy: "张飞", value: 180.0 },
     ],
   },
   {
@@ -105,7 +104,7 @@ const initial: LossReport[] = [
       "01-24-2374",
     ],
     drugs: [
-      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 1, unit: "支", pickedAt: "2026-05-11 14:05", pickedBy: "李兽医", value: 62.5 },
+      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 1, pickedAt: "2026-05-11 14:05", pickedBy: "李兽医", value: 62.5 },
     ],
   },
   {
@@ -119,9 +118,9 @@ const initial: LossReport[] = [
     stage: "储存保管",
     photos: 1,
     drugs: [
-      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 5, unit: "L", pickedAt: "2026-04-28 09:10", pickedBy: "孙库管", value: 220.0 },
-      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 3, unit: "瓶", pickedAt: "2026-04-28 09:12", pickedBy: "孙库管", value: 116.25 },
-      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 1, unit: "支", pickedAt: "2026-04-28 09:15", pickedBy: "王建国", value: 66.5 },
+      { code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 5, pickedAt: "2026-04-28 09:10", pickedBy: "孙库管", value: 220.0 },
+      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 3, pickedAt: "2026-04-28 09:12", pickedBy: "孙库管", value: 116.25 },
+      { code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 1, pickedAt: "2026-04-28 09:15", pickedBy: "王建国", value: 66.5 },
     ],
   },
   {
@@ -136,7 +135,7 @@ const initial: LossReport[] = [
     photos: 2,
     cattleEars: ["01-24-2368", "01-24-2367", "01-24-2366"],
     drugs: [
-      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 1, unit: "瓶", pickedAt: "2026-05-09 14:20", pickedBy: "周主管", value: 38.75 },
+      { code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 1, pickedAt: "2026-05-09 14:20", pickedBy: "周主管", value: 38.75 },
     ],
   },
   {
@@ -152,7 +151,7 @@ const initial: LossReport[] = [
     photos: 2,
     cattleEars: herdEars(1286),
     drugs: [
-      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 26, unit: "瓶", pickedAt: "2026-05-08 07:40", pickedBy: "周主管", value: 1840.0 },
+      { code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 26, pickedAt: "2026-05-08 07:40", pickedBy: "周主管", value: 1840.0 },
     ],
   },
 ];
