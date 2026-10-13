@@ -426,7 +426,7 @@ function BatchSection({
                     <time className="tabular-nums">{r.date}</time>
                     <span>操作人：{r.operator}</span>
                   </div>
-                  <FlowCodes nodes={flowCodes(r, batch.sku)} />
+                  <FlowCodes nodes={flowCodes(r, batch.sku)} title={`${isIn ? "入库" : "出库"} · ${r.date} · 操作人：${r.operator} · 共 ${countUnits(flowCodes(r, batch.sku))} 个`} />
                 </li>
               );
             })}
