@@ -406,11 +406,11 @@ function OrganizationPage() {
                     </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-text-tertiary hover:text-primary hover:bg-brand-subtle"
+                      size="sm"
+                      className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-transparent hover:text-primary/80"
                       onClick={() => setEditing({ index: idx, person: { ...p } })}
                     >
-                      <MoreHorizontal className="h-3.5 w-3.5" />
+                      编辑
                     </Button>
                   </div>
 

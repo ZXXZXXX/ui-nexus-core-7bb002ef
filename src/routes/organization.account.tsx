@@ -66,10 +66,6 @@ import {
   Search,
   Filter,
   SlidersHorizontal,
-  MoreHorizontal,
-  Eye,
-  Pencil,
-  Power,
   Unlink,
   RotateCcw,
   Check,
@@ -906,23 +902,23 @@ function AccountPage() {
               <div className="flex justify-end">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-text-secondary hover:text-foreground">
-                      <MoreHorizontal className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" className="h-8 px-2 text-body-sm text-primary hover:bg-transparent hover:text-primary/80">
+                      操作
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-32">
-                    <DropdownMenuItem onClick={() => openDetail(a)} className="gap-2 text-body-sm">
-                      <Eye className="h-3.5 w-3.5" /> 查看
+                    <DropdownMenuItem onClick={() => openDetail(a)} className="text-body-sm">
+                      查看
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => openEdit(a)} className="gap-2 text-body-sm">
-                      <Pencil className="h-3.5 w-3.5" /> 编辑
+                    <DropdownMenuItem onClick={() => openEdit(a)} className="text-body-sm">
+                      编辑
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => toggleStatus(a.id)}
-                      className={`gap-2 text-body-sm ${a.status === "启用" ? "text-destructive focus:text-destructive" : ""}`}
+                      className={`text-body-sm ${a.status === "启用" ? "text-destructive focus:text-destructive" : ""}`}
                     >
-                      <Power className="h-3.5 w-3.5" /> {a.status === "启用" ? "停用" : "启用"}
+                      {a.status === "启用" ? "停用" : "启用"}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
