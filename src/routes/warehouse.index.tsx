@@ -382,23 +382,28 @@ function BatchSection({
             <span className="font-mono text-card-title font-medium text-foreground">{batch.batchNo}</span>
             {isBatchUsedUp(batch) && <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">已用完</span>}
           </div>
-          <div className="flex shrink-0 items-baseline gap-2">
-            <span className="text-caption font-normal text-text-tertiary">余量</span>
-            <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
-            <span className="text-body-sm font-normal text-text-secondary">{unit}</span>
-          </div>
         </Button>
-        {batch.stock > 0 && (
-          <button
-            type="button"
-            aria-label={`查看批次 ${batch.batchNo} 现存条码，共 ${batch.stock} ${unit}`}
-            onClick={() => setCodesOpen(true)}
-            className="mt-2 flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-body-sm text-text-secondary transition-colors hover:border-primary/40 hover:bg-sidebar-hover hover:text-primary"
-          >
-            <Barcode className="h-4 w-4" />
-            <span className="tabular-nums">{batch.stock}</span>
-          </button>
-        )}
+        <div className="mt-2 flex shrink-0 items-baseline gap-2 pr-2">
+          <span className="text-caption text-text-tertiary">余量</span>
+          {batch.stock > 0 ? (
+            <button
+              type="button"
+              title="查看现存药品条码"
+              aria-label={`查看批次 ${batch.batchNo} 现存条码，共 ${batch.stock} ${unit}`}
+              onClick={() => setCodesOpen(true)}
+              className="group -mr-2 flex items-center gap-1.5 self-center rounded-md px-2 py-0.5 transition-colors hover:bg-muted"
+            >
+              <Barcode className="h-4 w-4 text-text-tertiary group-hover:text-primary" />
+              <span className="text-card-title font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{batch.stock}</span>
+              <span className="text-body-sm text-text-secondary">{unit}</span>
+            </button>
+          ) : (
+            <>
+              <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
+              <span className="text-body-sm text-text-secondary">{unit}</span>
+            </>
+          )}
+        </div>
       </div>
       <BatchCodesDialog batch={batch} unit={unit} open={codesOpen} onOpenChange={setCodesOpen} />
       <dl className="mt-3 grid grid-cols-3 gap-3 pl-8 pr-2">
