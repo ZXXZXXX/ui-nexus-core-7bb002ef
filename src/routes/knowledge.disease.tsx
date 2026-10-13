@@ -126,7 +126,6 @@ type Disease = {
   id: string;
   code: string;              // DZ-xxxxxx
   diagCode: string;          // 诊断编码：回传 UD 诊断事件时所用编码
-  mapCode: string;           // 映射编码：拉取 UD 工作单时所用编码
   typeId: string;            // 所属疾病类型
   subSeq: string;            // 子类型 3 位序号
   name: string;              // 疾病子类型名称
@@ -167,7 +166,6 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
     id: d.id.replace("DZ-", "D-"),
     code: d.id,
     diagCode: `UDX-${d.id.slice(3)}`,
-    mapCode: `UDW-${d.id.slice(3)}`,
     typeId: type?.id ?? "T-001",
     subSeq: d.id.slice(-3),
     name: d.name,
@@ -265,7 +263,6 @@ function DiseaseKBPage() {
       id: `D-new-${Date.now()}`,
       code: "DZ-—",
       diagCode: "",
-      mapCode: "",
       typeId: TYPES[0]?.id ?? "T-001",
       subSeq: nextTypeSeq,
       name: "",
@@ -600,9 +597,6 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
           <Field label="诊断编码" tip="回传UD诊断事件时所用编码">
             <Input value={value.diagCode} onChange={(e) => onChange({ ...value, diagCode: e.target.value })} placeholder="如: UDX-001001" className="font-mono" />
           </Field>
-          <Field label="映射编码" tip="拉取UD工作单时所用编码">
-            <Input value={value.mapCode} onChange={(e) => onChange({ ...value, mapCode: e.target.value })} placeholder="如: UDW-001001" className="font-mono" />
-          </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="疾病英文/缩写">
@@ -818,7 +812,6 @@ function DetailView({ value }: { value: Disease }) {
         <KV label="疾病类型" value={t?.name ?? "—"} />
         <KV label="疾病分类" value={cat?.name ?? "—"} />
         <KV label="诊断编码" tip="回传UD诊断事件时所用编码" value={value.diagCode} mono />
-        <KV label="映射编码" tip="拉取UD工作单时所用编码" value={value.mapCode} mono />
         {value.alias && <KV label="英文/缩写" value={value.alias} />}
         {value.aliases.length > 0 && (
           <KV
