@@ -331,7 +331,7 @@ function FlowCodes({ nodes, title, children }: { nodes: CodeNode[]; title: strin
   );
 }
 
-function BatchCodesDialog({ batch, unit, open, onOpenChange }: { batch: Item; unit: string; open: boolean; onOpenChange: (v: boolean) => void }) {
+function BatchCodesDialog({ batch, open, onOpenChange }: { batch: Item; open: boolean; onOpenChange: (v: boolean) => void }) {
   const nodes = batchCodes(batch);
   const packs = nodes.filter((n) => n.children.length).length;
   return (
@@ -340,7 +340,7 @@ function BatchCodesDialog({ batch, unit, open, onOpenChange }: { batch: Item; un
         <DialogHeader>
           <DialogTitle>现存药品条码</DialogTitle>
           <DialogDescription>
-            批次 <span className="font-mono">{batch.batchNo}</span> · 采购单价 ¥{batch.price.toFixed(2)} · 共 {countUnits(nodes)} {unit}（{packs} 个外包装，{nodes.length - packs} 个散件）
+            批次 <span className="font-mono">{batch.batchNo}</span> · 采购单价 ¥{batch.price.toFixed(2)} · 共 {countUnits(nodes)} 个（{packs} 个外包装，{nodes.length - packs} 个散件）
           </DialogDescription>
         </DialogHeader>
         <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
@@ -395,17 +395,13 @@ function BatchSection({
             >
               <Barcode className="h-4 w-4 text-text-tertiary group-hover:text-primary" />
               <span className="text-card-title font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{batch.stock}</span>
-              <span className="text-body-sm text-text-secondary">{unit}</span>
             </button>
           ) : (
-            <>
-              <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
-              <span className="text-body-sm text-text-secondary">{unit}</span>
-            </>
+            <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
           )}
         </div>
       </div>
-      <BatchCodesDialog batch={batch} unit={unit} open={codesOpen} onOpenChange={setCodesOpen} />
+      <BatchCodesDialog batch={batch} open={codesOpen} onOpenChange={setCodesOpen} />
       <dl className="mt-3 grid grid-cols-3 gap-3 pl-8 pr-2">
         {[["效期", batch.expiry], ["生产日期", batch.prodDate], ["采购单价", `¥${batch.price.toFixed(2)}`]].map(([label, value]) => (
           <div key={label} className="min-w-0">
@@ -433,7 +429,7 @@ function BatchSection({
                       <span className="text-body font-medium text-foreground">{r.via.trim()}</span>
                     </div>
                     <FlowCodes nodes={codes} title={`${isIn ? "入库" : "出库"} · ${r.date} · 操作人：${r.operator} · 共 ${countUnits(codes)} 个`}>
-                      {isIn ? "+" : "−"}{r.qty}<span className="ml-1 text-body-sm font-normal text-text-secondary no-underline">{unit}</span>
+                      {isIn ? "+" : "−"}{r.qty}
                     </FlowCodes>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-3 text-caption text-text-tertiary">
@@ -495,6 +491,9 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
               <div className="flex items-end justify-between gap-4 pt-3">
                 <div className="space-y-1">
                   <div className="text-body-sm text-text-secondary">{row.spec}</div>
+                  <div className="text-body-sm text-text-secondary">
+                    基础单位：<span className="text-foreground">{row.unit}</span>
+                  </div>
                   <div className="text-caption text-text-tertiary">
                     共 {row.batches.length} 个批次
                     {used.length > 0 ? ` · ${used.length} 个已用完` : ""}
@@ -504,7 +503,6 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                   <div className="text-caption text-text-tertiary">当前库存</div>
                   <div className="mt-1 flex items-baseline justify-end gap-1.5">
                     <span className={`text-page-title tabular-nums ${row.stock === 0 ? "text-text-disabled" : "text-primary"}`}>{row.stock}</span>
-                    <span className="text-body-sm text-text-secondary">{row.unit}</span>
                   </div>
                 </div>
               </div>
