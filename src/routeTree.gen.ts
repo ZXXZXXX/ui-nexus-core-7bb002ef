@@ -46,6 +46,7 @@ import { Route as OrganizationRoleRouteImport } from './routes/organization.role
 import { Route as OrganizationIntegrationRouteImport } from './routes/organization.integration'
 import { Route as OrganizationAccountRouteImport } from './routes/organization.account'
 import { Route as OperationsMessageConfigRouteImport } from './routes/operations.message-config'
+import { Route as OperationsLogCenterRouteImport } from './routes/operations.log-center'
 import { Route as OperationsEventMappingRouteImport } from './routes/operations.event-mapping'
 import { Route as OperationsAuditLogRouteImport } from './routes/operations.audit-log'
 import { Route as MSearchRouteImport } from './routes/m.search'
@@ -278,6 +279,11 @@ const OrganizationAccountRoute = OrganizationAccountRouteImport.update({
 const OperationsMessageConfigRoute = OperationsMessageConfigRouteImport.update({
   id: '/operations/message-config',
   path: '/operations/message-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperationsLogCenterRoute = OperationsLogCenterRouteImport.update({
+  id: '/operations/log-center',
+  path: '/operations/log-center',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OperationsEventMappingRoute = OperationsEventMappingRouteImport.update({
@@ -568,6 +574,7 @@ export interface FileRoutesByFullPath {
   '/m/search': typeof MSearchRoute
   '/operations/audit-log': typeof OperationsAuditLogRoute
   '/operations/event-mapping': typeof OperationsEventMappingRoute
+  '/operations/log-center': typeof OperationsLogCenterRoute
   '/operations/message-config': typeof OperationsMessageConfigRoute
   '/organization/account': typeof OrganizationAccountRoute
   '/organization/integration': typeof OrganizationIntegrationRoute
@@ -650,6 +657,7 @@ export interface FileRoutesByTo {
   '/m/search': typeof MSearchRoute
   '/operations/audit-log': typeof OperationsAuditLogRoute
   '/operations/event-mapping': typeof OperationsEventMappingRoute
+  '/operations/log-center': typeof OperationsLogCenterRoute
   '/operations/message-config': typeof OperationsMessageConfigRoute
   '/organization/account': typeof OrganizationAccountRoute
   '/organization/integration': typeof OrganizationIntegrationRoute
@@ -738,6 +746,7 @@ export interface FileRoutesById {
   '/m/search': typeof MSearchRoute
   '/operations/audit-log': typeof OperationsAuditLogRoute
   '/operations/event-mapping': typeof OperationsEventMappingRoute
+  '/operations/log-center': typeof OperationsLogCenterRoute
   '/operations/message-config': typeof OperationsMessageConfigRoute
   '/organization/account': typeof OrganizationAccountRoute
   '/organization/integration': typeof OrganizationIntegrationRoute
@@ -827,6 +836,7 @@ export interface FileRouteTypes {
     | '/m/search'
     | '/operations/audit-log'
     | '/operations/event-mapping'
+    | '/operations/log-center'
     | '/operations/message-config'
     | '/organization/account'
     | '/organization/integration'
@@ -909,6 +919,7 @@ export interface FileRouteTypes {
     | '/m/search'
     | '/operations/audit-log'
     | '/operations/event-mapping'
+    | '/operations/log-center'
     | '/operations/message-config'
     | '/organization/account'
     | '/organization/integration'
@@ -996,6 +1007,7 @@ export interface FileRouteTypes {
     | '/m/search'
     | '/operations/audit-log'
     | '/operations/event-mapping'
+    | '/operations/log-center'
     | '/operations/message-config'
     | '/organization/account'
     | '/organization/integration'
@@ -1056,6 +1068,7 @@ export interface RootRouteChildren {
   WorkspaceRoute: typeof WorkspaceRoute
   OperationsAuditLogRoute: typeof OperationsAuditLogRoute
   OperationsEventMappingRoute: typeof OperationsEventMappingRoute
+  OperationsLogCenterRoute: typeof OperationsLogCenterRoute
   OperationsMessageConfigRoute: typeof OperationsMessageConfigRoute
 }
 
@@ -1318,6 +1331,13 @@ declare module '@tanstack/react-router' {
       path: '/operations/message-config'
       fullPath: '/operations/message-config'
       preLoaderRoute: typeof OperationsMessageConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operations/log-center': {
+      id: '/operations/log-center'
+      path: '/operations/log-center'
+      fullPath: '/operations/log-center'
+      preLoaderRoute: typeof OperationsLogCenterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/operations/event-mapping': {
@@ -1889,6 +1909,7 @@ const rootRouteChildren: RootRouteChildren = {
   WorkspaceRoute: WorkspaceRoute,
   OperationsAuditLogRoute: OperationsAuditLogRoute,
   OperationsEventMappingRoute: OperationsEventMappingRoute,
+  OperationsLogCenterRoute: OperationsLogCenterRoute,
   OperationsMessageConfigRoute: OperationsMessageConfigRoute,
 }
 export const routeTree = rootRouteImport
