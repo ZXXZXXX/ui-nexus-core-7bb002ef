@@ -138,7 +138,7 @@ function Page() {
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       </main>
 
       <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
