@@ -9,144 +9,94 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AnalyticsRouteImport } from './routes/analytics'
-import { Route as ArchiveRouteImport } from './routes/archive'
-import { Route as FeedbackRouteImport } from './routes/feedback'
-import { Route as KnowledgeRouteImport } from './routes/knowledge'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as MRouteImport } from './routes/m'
-import { Route as OrganizationRouteImport } from './routes/organization'
-import { Route as ProductionRouteImport } from './routes/production'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as StatsRouteImport } from './routes/stats'
-import { Route as WarehouseRouteImport } from './routes/warehouse'
 import { Route as WorkspaceRouteImport } from './routes/workspace'
-import { Route as ArchiveBarnRouteImport } from './routes/archive.barn'
-import { Route as ArchiveCattleRouteImport } from './routes/archive.cattle'
-import { Route as ArchiveFarmRouteImport } from './routes/archive.farm'
-import { Route as KnowledgeDiseaseRouteImport } from './routes/knowledge.disease'
-import { Route as KnowledgePrescriptionRouteImport } from './routes/knowledge.prescription'
-import { Route as KnowledgeSymptomRouteImport } from './routes/knowledge.symptom'
-import { Route as MIndexRouteImport } from './routes/m.index'
-import { Route as MAccountSecurityRouteImport } from './routes/m.account-security'
-import { Route as MAnimalsChar123idChar125RouteImport } from './routes/m.animals-{$id}'
-import { Route as MDraftsRouteImport } from './routes/m.drafts'
-import { Route as MDrugReportRouteImport } from './routes/m.drug-report'
-import { Route as MEmptyStatesRouteImport } from './routes/m.empty-states'
-import { Route as MFeedbackRouteImport } from './routes/m.feedback'
-import { Route as MHomepageRouteImport } from './routes/m.homepage'
-import { Route as MKb_diseasesRouteImport } from './routes/m.kb_diseases'
-import { Route as MKb_drugsRouteImport } from './routes/m.kb_drugs'
-import { Route as MKb_symptomsRouteImport } from './routes/m.kb_symptoms'
-import { Route as MLevel3RouteImport } from './routes/m.level3'
-import { Route as MLoginRouteImport } from './routes/m.login'
-import { Route as MLossReportRouteImport } from './routes/m.loss-report'
-import { Route as MMeRouteImport } from './routes/m.me'
-import { Route as MMonthlyReportsRouteImport } from './routes/m.monthly-reports'
-import { Route as MNotificationsRouteImport } from './routes/m.notifications'
-import { Route as MPrepRouteImport } from './routes/m.prep'
-import { Route as MReportRouteImport } from './routes/m.report'
-import { Route as MRespondRouteImport } from './routes/m.respond'
-import { Route as MReturnReportRouteImport } from './routes/m.return-report'
-import { Route as MScanRouteImport } from './routes/m.scan'
-import { Route as MSearchRouteImport } from './routes/m.search'
-import { Route as OperationsAuditLogRouteImport } from './routes/operations.audit-log'
-import { Route as OperationsEventMappingRouteImport } from './routes/operations.event-mapping'
-import { Route as OperationsMessageConfigRouteImport } from './routes/operations.message-config'
-import { Route as OrganizationIndexRouteImport } from './routes/organization.index'
-import { Route as OrganizationAccountRouteImport } from './routes/organization.account'
-import { Route as OrganizationIntegrationRouteImport } from './routes/organization.integration'
-import { Route as OrganizationRoleRouteImport } from './routes/organization.role'
-import { Route as OrganizationTeamRouteImport } from './routes/organization.team'
-import { Route as ProductionIndexRouteImport } from './routes/production.index'
-import { Route as ProductionDewormRouteImport } from './routes/production.deworm'
-import { Route as ProductionDiseaseRouteImport } from './routes/production.disease'
-import { Route as ProductionDryingRouteImport } from './routes/production.drying'
-import { Route as ProductionGeneralRouteImport } from './routes/production.general'
-import { Route as ProductionHoofRouteImport } from './routes/production.hoof'
-import { Route as ProductionPostpartumRouteImport } from './routes/production.postpartum'
-import { Route as ProductionVaccineRouteImport } from './routes/production.vaccine'
-import { Route as SettingsIndexRouteImport } from './routes/settings.index'
-import { Route as SettingsKnowledgeRouteImport } from './routes/settings.knowledge'
-import { Route as SettingsRulesRouteImport } from './routes/settings.rules'
+import { Route as WarehouseRouteImport } from './routes/warehouse'
+import { Route as StatsRouteImport } from './routes/stats'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProductionRouteImport } from './routes/production'
+import { Route as OrganizationRouteImport } from './routes/organization'
+import { Route as MRouteImport } from './routes/m'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as KnowledgeRouteImport } from './routes/knowledge'
+import { Route as FeedbackRouteImport } from './routes/feedback'
+import { Route as ArchiveRouteImport } from './routes/archive'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as WarehouseIndexRouteImport } from './routes/warehouse.index'
-import { Route as WarehouseDispenseRouteImport } from './routes/warehouse.dispense'
-import { Route as WarehouseDrugRouteImport } from './routes/warehouse.drug'
-import { Route as WarehouseLossRouteImport } from './routes/warehouse.loss'
+import { Route as SettingsIndexRouteImport } from './routes/settings.index'
+import { Route as ProductionIndexRouteImport } from './routes/production.index'
+import { Route as OrganizationIndexRouteImport } from './routes/organization.index'
+import { Route as MIndexRouteImport } from './routes/m.index'
 import { Route as WarehouseTransferRouteImport } from './routes/warehouse.transfer'
-import { Route as MAnimalsDeviceIdRouteImport } from './routes/m.animals-device.$id'
-import { Route as MAnimalsEvidenceIdRouteImport } from './routes/m.animals-evidence.$id'
-import { Route as MAnimalsOrdersIdRouteImport } from './routes/m.animals-orders.$id'
-import { Route as MBarnsIdRouteImport } from './routes/m.barns.$id'
+import { Route as WarehouseLossRouteImport } from './routes/warehouse.loss'
+import { Route as WarehouseDrugRouteImport } from './routes/warehouse.drug'
+import { Route as WarehouseDispenseRouteImport } from './routes/warehouse.dispense'
+import { Route as SettingsRulesRouteImport } from './routes/settings.rules'
+import { Route as SettingsKnowledgeRouteImport } from './routes/settings.knowledge'
+import { Route as ProductionVaccineRouteImport } from './routes/production.vaccine'
+import { Route as ProductionPostpartumRouteImport } from './routes/production.postpartum'
+import { Route as ProductionHoofRouteImport } from './routes/production.hoof'
+import { Route as ProductionGeneralRouteImport } from './routes/production.general'
+import { Route as ProductionDryingRouteImport } from './routes/production.drying'
+import { Route as ProductionDiseaseRouteImport } from './routes/production.disease'
+import { Route as ProductionDewormRouteImport } from './routes/production.deworm'
+import { Route as OrganizationTeamRouteImport } from './routes/organization.team'
+import { Route as OrganizationRoleRouteImport } from './routes/organization.role'
+import { Route as OrganizationIntegrationRouteImport } from './routes/organization.integration'
+import { Route as OrganizationAccountRouteImport } from './routes/organization.account'
+import { Route as OperationsMessageConfigRouteImport } from './routes/operations.message-config'
+import { Route as OperationsEventMappingRouteImport } from './routes/operations.event-mapping'
+import { Route as OperationsAuditLogRouteImport } from './routes/operations.audit-log'
+import { Route as MSearchRouteImport } from './routes/m.search'
+import { Route as MScanRouteImport } from './routes/m.scan'
+import { Route as MReturnReportRouteImport } from './routes/m.return-report'
+import { Route as MRespondRouteImport } from './routes/m.respond'
+import { Route as MReportRouteImport } from './routes/m.report'
+import { Route as MPrepRouteImport } from './routes/m.prep'
+import { Route as MNotificationsRouteImport } from './routes/m.notifications'
+import { Route as MMonthlyReportsRouteImport } from './routes/m.monthly-reports'
+import { Route as MMeRouteImport } from './routes/m.me'
+import { Route as MLossReportRouteImport } from './routes/m.loss-report'
+import { Route as MLoginRouteImport } from './routes/m.login'
+import { Route as MLevel3RouteImport } from './routes/m.level3'
+import { Route as MKb_symptomsRouteImport } from './routes/m.kb_symptoms'
+import { Route as MKb_drugsRouteImport } from './routes/m.kb_drugs'
+import { Route as MKb_diseasesRouteImport } from './routes/m.kb_diseases'
+import { Route as MHomepageRouteImport } from './routes/m.homepage'
+import { Route as MFeedbackRouteImport } from './routes/m.feedback'
+import { Route as MEmptyStatesRouteImport } from './routes/m.empty-states'
+import { Route as MDrugReportRouteImport } from './routes/m.drug-report'
+import { Route as MDraftsRouteImport } from './routes/m.drafts'
+import { Route as MAnimalsChar123idChar125RouteImport } from './routes/m.animals-{$id}'
+import { Route as MAccountSecurityRouteImport } from './routes/m.account-security'
+import { Route as KnowledgeSymptomRouteImport } from './routes/knowledge.symptom'
+import { Route as KnowledgePrescriptionRouteImport } from './routes/knowledge.prescription'
+import { Route as KnowledgeDiseaseRouteImport } from './routes/knowledge.disease'
+import { Route as ArchiveFarmRouteImport } from './routes/archive.farm'
+import { Route as ArchiveCattleRouteImport } from './routes/archive.cattle'
+import { Route as ArchiveBarnRouteImport } from './routes/archive.barn'
 import { Route as MHealthIndexRouteImport } from './routes/m.health.index'
-import { Route as MHealthIdRouteImport } from './routes/m.health.$id'
-import { Route as MHealthTodayRouteImport } from './routes/m.health.today'
-import { Route as MMonthlyReportsIdRouteImport } from './routes/m.monthly-reports.$id'
 import { Route as MPensIdRouteImport } from './routes/m.pens.$id'
-import { Route as MEventsTypeIdRouteImport } from './routes/m.events.$type.$id'
-import { Route as MHealthIdAbortRouteImport } from './routes/m.health.$id_.abort'
-import { Route as MHealthIdConfirmCureRouteImport } from './routes/m.health.$id_.confirm-cure'
-import { Route as MHealthIdDiagnoseRouteImport } from './routes/m.health.$id_.diagnose'
-import { Route as MHealthIdExecuteRouteImport } from './routes/m.health.$id_.execute'
-import { Route as MHealthIdReviewRouteImport } from './routes/m.health.$id_.review'
-import { Route as MHealthTodayBatchRouteImport } from './routes/m.health.today_.batch'
+import { Route as MMonthlyReportsIdRouteImport } from './routes/m.monthly-reports.$id'
+import { Route as MHealthTodayRouteImport } from './routes/m.health.today'
+import { Route as MHealthIdRouteImport } from './routes/m.health.$id'
+import { Route as MBarnsIdRouteImport } from './routes/m.barns.$id'
+import { Route as MAnimalsOrdersIdRouteImport } from './routes/m.animals-orders.$id'
+import { Route as MAnimalsEvidenceIdRouteImport } from './routes/m.animals-evidence.$id'
+import { Route as MAnimalsDeviceIdRouteImport } from './routes/m.animals-device.$id'
 import { Route as MHealthTodayPickupRouteImport } from './routes/m.health.today_.pickup'
+import { Route as MHealthTodayBatchRouteImport } from './routes/m.health.today_.batch'
+import { Route as MHealthIdReviewRouteImport } from './routes/m.health.$id_.review'
+import { Route as MHealthIdExecuteRouteImport } from './routes/m.health.$id_.execute'
+import { Route as MHealthIdDiagnoseRouteImport } from './routes/m.health.$id_.diagnose'
+import { Route as MHealthIdConfirmCureRouteImport } from './routes/m.health.$id_.confirm-cure'
+import { Route as MHealthIdAbortRouteImport } from './routes/m.health.$id_.abort'
+import { Route as MEventsTypeIdRouteImport } from './routes/m.events.$type.$id'
 import { Route as MHealthIdExecutePickupIdRouteImport } from './routes/m.health.$id_.execute_.$pickupId'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnalyticsRoute = AnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArchiveRoute = ArchiveRouteImport.update({
-  id: '/archive',
-  path: '/archive',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FeedbackRoute = FeedbackRouteImport.update({
-  id: '/feedback',
-  path: '/feedback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const KnowledgeRoute = KnowledgeRouteImport.update({
-  id: '/knowledge',
-  path: '/knowledge',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MRoute = MRouteImport.update({
-  id: '/m',
-  path: '/m',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrganizationRoute = OrganizationRouteImport.update({
-  id: '/organization',
-  path: '/organization',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProductionRoute = ProductionRouteImport.update({
-  id: '/production',
-  path: '/production',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StatsRoute = StatsRouteImport.update({
-  id: '/stats',
-  path: '/stats',
+const WorkspaceRoute = WorkspaceRouteImport.update({
+  id: '/workspace',
+  path: '/workspace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WarehouseRoute = WarehouseRouteImport.update({
@@ -154,49 +104,284 @@ const WarehouseRoute = WarehouseRouteImport.update({
   path: '/warehouse',
   getParentRoute: () => rootRouteImport,
 } as any)
-const WorkspaceRoute = WorkspaceRouteImport.update({
-  id: '/workspace',
-  path: '/workspace',
+const StatsRoute = StatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArchiveBarnRoute = ArchiveBarnRouteImport.update({
-  id: '/barn',
-  path: '/barn',
-  getParentRoute: () => ArchiveRoute,
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ArchiveCattleRoute = ArchiveCattleRouteImport.update({
-  id: '/cattle',
-  path: '/cattle',
-  getParentRoute: () => ArchiveRoute,
+const ProductionRoute = ProductionRouteImport.update({
+  id: '/production',
+  path: '/production',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const ArchiveFarmRoute = ArchiveFarmRouteImport.update({
-  id: '/farm',
-  path: '/farm',
-  getParentRoute: () => ArchiveRoute,
+const OrganizationRoute = OrganizationRouteImport.update({
+  id: '/organization',
+  path: '/organization',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const KnowledgeDiseaseRoute = KnowledgeDiseaseRouteImport.update({
-  id: '/disease',
-  path: '/disease',
-  getParentRoute: () => KnowledgeRoute,
+const MRoute = MRouteImport.update({
+  id: '/m',
+  path: '/m',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const KnowledgePrescriptionRoute = KnowledgePrescriptionRouteImport.update({
-  id: '/prescription',
-  path: '/prescription',
-  getParentRoute: () => KnowledgeRoute,
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const KnowledgeSymptomRoute = KnowledgeSymptomRouteImport.update({
-  id: '/symptom',
-  path: '/symptom',
-  getParentRoute: () => KnowledgeRoute,
+const KnowledgeRoute = KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArchiveRoute = ArchiveRouteImport.update({
+  id: '/archive',
+  path: '/archive',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WarehouseIndexRoute = WarehouseIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WarehouseRoute,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const ProductionIndexRoute = ProductionIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const OrganizationIndexRoute = OrganizationIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OrganizationRoute,
 } as any)
 const MIndexRoute = MIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MRoute,
 } as any)
-const MAccountSecurityRoute = MAccountSecurityRouteImport.update({
-  id: '/account-security',
-  path: '/account-security',
+const WarehouseTransferRoute = WarehouseTransferRouteImport.update({
+  id: '/transfer',
+  path: '/transfer',
+  getParentRoute: () => WarehouseRoute,
+} as any)
+const WarehouseLossRoute = WarehouseLossRouteImport.update({
+  id: '/loss',
+  path: '/loss',
+  getParentRoute: () => WarehouseRoute,
+} as any)
+const WarehouseDrugRoute = WarehouseDrugRouteImport.update({
+  id: '/drug',
+  path: '/drug',
+  getParentRoute: () => WarehouseRoute,
+} as any)
+const WarehouseDispenseRoute = WarehouseDispenseRouteImport.update({
+  id: '/dispense',
+  path: '/dispense',
+  getParentRoute: () => WarehouseRoute,
+} as any)
+const SettingsRulesRoute = SettingsRulesRouteImport.update({
+  id: '/rules',
+  path: '/rules',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const SettingsKnowledgeRoute = SettingsKnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => SettingsRoute,
+} as any)
+const ProductionVaccineRoute = ProductionVaccineRouteImport.update({
+  id: '/vaccine',
+  path: '/vaccine',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const ProductionPostpartumRoute = ProductionPostpartumRouteImport.update({
+  id: '/postpartum',
+  path: '/postpartum',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const ProductionHoofRoute = ProductionHoofRouteImport.update({
+  id: '/hoof',
+  path: '/hoof',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const ProductionGeneralRoute = ProductionGeneralRouteImport.update({
+  id: '/general',
+  path: '/general',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const ProductionDryingRoute = ProductionDryingRouteImport.update({
+  id: '/drying',
+  path: '/drying',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const ProductionDiseaseRoute = ProductionDiseaseRouteImport.update({
+  id: '/disease',
+  path: '/disease',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const ProductionDewormRoute = ProductionDewormRouteImport.update({
+  id: '/deworm',
+  path: '/deworm',
+  getParentRoute: () => ProductionRoute,
+} as any)
+const OrganizationTeamRoute = OrganizationTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => OrganizationRoute,
+} as any)
+const OrganizationRoleRoute = OrganizationRoleRouteImport.update({
+  id: '/role',
+  path: '/role',
+  getParentRoute: () => OrganizationRoute,
+} as any)
+const OrganizationIntegrationRoute = OrganizationIntegrationRouteImport.update({
+  id: '/integration',
+  path: '/integration',
+  getParentRoute: () => OrganizationRoute,
+} as any)
+const OrganizationAccountRoute = OrganizationAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => OrganizationRoute,
+} as any)
+const OperationsMessageConfigRoute = OperationsMessageConfigRouteImport.update({
+  id: '/operations/message-config',
+  path: '/operations/message-config',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperationsEventMappingRoute = OperationsEventMappingRouteImport.update({
+  id: '/operations/event-mapping',
+  path: '/operations/event-mapping',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperationsAuditLogRoute = OperationsAuditLogRouteImport.update({
+  id: '/operations/audit-log',
+  path: '/operations/audit-log',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MSearchRoute = MSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => MRoute,
+} as any)
+const MScanRoute = MScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => MRoute,
+} as any)
+const MReturnReportRoute = MReturnReportRouteImport.update({
+  id: '/return-report',
+  path: '/return-report',
+  getParentRoute: () => MRoute,
+} as any)
+const MRespondRoute = MRespondRouteImport.update({
+  id: '/respond',
+  path: '/respond',
+  getParentRoute: () => MRoute,
+} as any)
+const MReportRoute = MReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => MRoute,
+} as any)
+const MPrepRoute = MPrepRouteImport.update({
+  id: '/prep',
+  path: '/prep',
+  getParentRoute: () => MRoute,
+} as any)
+const MNotificationsRoute = MNotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => MRoute,
+} as any)
+const MMonthlyReportsRoute = MMonthlyReportsRouteImport.update({
+  id: '/monthly-reports',
+  path: '/monthly-reports',
+  getParentRoute: () => MRoute,
+} as any)
+const MMeRoute = MMeRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => MRoute,
+} as any)
+const MLossReportRoute = MLossReportRouteImport.update({
+  id: '/loss-report',
+  path: '/loss-report',
+  getParentRoute: () => MRoute,
+} as any)
+const MLoginRoute = MLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => MRoute,
+} as any)
+const MLevel3Route = MLevel3RouteImport.update({
+  id: '/level3',
+  path: '/level3',
+  getParentRoute: () => MRoute,
+} as any)
+const MKb_symptomsRoute = MKb_symptomsRouteImport.update({
+  id: '/kb_symptoms',
+  path: '/kb_symptoms',
+  getParentRoute: () => MRoute,
+} as any)
+const MKb_drugsRoute = MKb_drugsRouteImport.update({
+  id: '/kb_drugs',
+  path: '/kb_drugs',
+  getParentRoute: () => MRoute,
+} as any)
+const MKb_diseasesRoute = MKb_diseasesRouteImport.update({
+  id: '/kb_diseases',
+  path: '/kb_diseases',
+  getParentRoute: () => MRoute,
+} as any)
+const MHomepageRoute = MHomepageRouteImport.update({
+  id: '/homepage',
+  path: '/homepage',
+  getParentRoute: () => MRoute,
+} as any)
+const MFeedbackRoute = MFeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => MRoute,
+} as any)
+const MEmptyStatesRoute = MEmptyStatesRouteImport.update({
+  id: '/empty-states',
+  path: '/empty-states',
+  getParentRoute: () => MRoute,
+} as any)
+const MDrugReportRoute = MDrugReportRouteImport.update({
+  id: '/drug-report',
+  path: '/drug-report',
+  getParentRoute: () => MRoute,
+} as any)
+const MDraftsRoute = MDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
   getParentRoute: () => MRoute,
 } as any)
 const MAnimalsChar123idChar125Route =
@@ -205,259 +390,49 @@ const MAnimalsChar123idChar125Route =
     path: '/animals-{$id}',
     getParentRoute: () => MRoute,
   } as any)
-const MDraftsRoute = MDraftsRouteImport.update({
-  id: '/drafts',
-  path: '/drafts',
+const MAccountSecurityRoute = MAccountSecurityRouteImport.update({
+  id: '/account-security',
+  path: '/account-security',
   getParentRoute: () => MRoute,
 } as any)
-const MDrugReportRoute = MDrugReportRouteImport.update({
-  id: '/drug-report',
-  path: '/drug-report',
-  getParentRoute: () => MRoute,
+const KnowledgeSymptomRoute = KnowledgeSymptomRouteImport.update({
+  id: '/symptom',
+  path: '/symptom',
+  getParentRoute: () => KnowledgeRoute,
 } as any)
-const MEmptyStatesRoute = MEmptyStatesRouteImport.update({
-  id: '/empty-states',
-  path: '/empty-states',
-  getParentRoute: () => MRoute,
+const KnowledgePrescriptionRoute = KnowledgePrescriptionRouteImport.update({
+  id: '/prescription',
+  path: '/prescription',
+  getParentRoute: () => KnowledgeRoute,
 } as any)
-const MFeedbackRoute = MFeedbackRouteImport.update({
-  id: '/feedback',
-  path: '/feedback',
-  getParentRoute: () => MRoute,
-} as any)
-const MHomepageRoute = MHomepageRouteImport.update({
-  id: '/homepage',
-  path: '/homepage',
-  getParentRoute: () => MRoute,
-} as any)
-const MKb_diseasesRoute = MKb_diseasesRouteImport.update({
-  id: '/kb_diseases',
-  path: '/kb_diseases',
-  getParentRoute: () => MRoute,
-} as any)
-const MKb_drugsRoute = MKb_drugsRouteImport.update({
-  id: '/kb_drugs',
-  path: '/kb_drugs',
-  getParentRoute: () => MRoute,
-} as any)
-const MKb_symptomsRoute = MKb_symptomsRouteImport.update({
-  id: '/kb_symptoms',
-  path: '/kb_symptoms',
-  getParentRoute: () => MRoute,
-} as any)
-const MLevel3Route = MLevel3RouteImport.update({
-  id: '/level3',
-  path: '/level3',
-  getParentRoute: () => MRoute,
-} as any)
-const MLoginRoute = MLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => MRoute,
-} as any)
-const MLossReportRoute = MLossReportRouteImport.update({
-  id: '/loss-report',
-  path: '/loss-report',
-  getParentRoute: () => MRoute,
-} as any)
-const MMeRoute = MMeRouteImport.update({
-  id: '/me',
-  path: '/me',
-  getParentRoute: () => MRoute,
-} as any)
-const MMonthlyReportsRoute = MMonthlyReportsRouteImport.update({
-  id: '/monthly-reports',
-  path: '/monthly-reports',
-  getParentRoute: () => MRoute,
-} as any)
-const MNotificationsRoute = MNotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => MRoute,
-} as any)
-const MPrepRoute = MPrepRouteImport.update({
-  id: '/prep',
-  path: '/prep',
-  getParentRoute: () => MRoute,
-} as any)
-const MReportRoute = MReportRouteImport.update({
-  id: '/report',
-  path: '/report',
-  getParentRoute: () => MRoute,
-} as any)
-const MRespondRoute = MRespondRouteImport.update({
-  id: '/respond',
-  path: '/respond',
-  getParentRoute: () => MRoute,
-} as any)
-const MReturnReportRoute = MReturnReportRouteImport.update({
-  id: '/return-report',
-  path: '/return-report',
-  getParentRoute: () => MRoute,
-} as any)
-const MScanRoute = MScanRouteImport.update({
-  id: '/scan',
-  path: '/scan',
-  getParentRoute: () => MRoute,
-} as any)
-const MSearchRoute = MSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => MRoute,
-} as any)
-const OperationsAuditLogRoute = OperationsAuditLogRouteImport.update({
-  id: '/operations/audit-log',
-  path: '/operations/audit-log',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OperationsEventMappingRoute = OperationsEventMappingRouteImport.update({
-  id: '/operations/event-mapping',
-  path: '/operations/event-mapping',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OperationsMessageConfigRoute = OperationsMessageConfigRouteImport.update({
-  id: '/operations/message-config',
-  path: '/operations/message-config',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrganizationIndexRoute = OrganizationIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => OrganizationRoute,
-} as any)
-const OrganizationAccountRoute = OrganizationAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
-  getParentRoute: () => OrganizationRoute,
-} as any)
-const OrganizationIntegrationRoute = OrganizationIntegrationRouteImport.update({
-  id: '/integration',
-  path: '/integration',
-  getParentRoute: () => OrganizationRoute,
-} as any)
-const OrganizationRoleRoute = OrganizationRoleRouteImport.update({
-  id: '/role',
-  path: '/role',
-  getParentRoute: () => OrganizationRoute,
-} as any)
-const OrganizationTeamRoute = OrganizationTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
-  getParentRoute: () => OrganizationRoute,
-} as any)
-const ProductionIndexRoute = ProductionIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => ProductionRoute,
-} as any)
-const ProductionDewormRoute = ProductionDewormRouteImport.update({
-  id: '/deworm',
-  path: '/deworm',
-  getParentRoute: () => ProductionRoute,
-} as any)
-const ProductionDiseaseRoute = ProductionDiseaseRouteImport.update({
+const KnowledgeDiseaseRoute = KnowledgeDiseaseRouteImport.update({
   id: '/disease',
   path: '/disease',
-  getParentRoute: () => ProductionRoute,
+  getParentRoute: () => KnowledgeRoute,
 } as any)
-const ProductionDryingRoute = ProductionDryingRouteImport.update({
-  id: '/drying',
-  path: '/drying',
-  getParentRoute: () => ProductionRoute,
+const ArchiveFarmRoute = ArchiveFarmRouteImport.update({
+  id: '/farm',
+  path: '/farm',
+  getParentRoute: () => ArchiveRoute,
 } as any)
-const ProductionGeneralRoute = ProductionGeneralRouteImport.update({
-  id: '/general',
-  path: '/general',
-  getParentRoute: () => ProductionRoute,
+const ArchiveCattleRoute = ArchiveCattleRouteImport.update({
+  id: '/cattle',
+  path: '/cattle',
+  getParentRoute: () => ArchiveRoute,
 } as any)
-const ProductionHoofRoute = ProductionHoofRouteImport.update({
-  id: '/hoof',
-  path: '/hoof',
-  getParentRoute: () => ProductionRoute,
-} as any)
-const ProductionPostpartumRoute = ProductionPostpartumRouteImport.update({
-  id: '/postpartum',
-  path: '/postpartum',
-  getParentRoute: () => ProductionRoute,
-} as any)
-const ProductionVaccineRoute = ProductionVaccineRouteImport.update({
-  id: '/vaccine',
-  path: '/vaccine',
-  getParentRoute: () => ProductionRoute,
-} as any)
-const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsKnowledgeRoute = SettingsKnowledgeRouteImport.update({
-  id: '/knowledge',
-  path: '/knowledge',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const SettingsRulesRoute = SettingsRulesRouteImport.update({
-  id: '/rules',
-  path: '/rules',
-  getParentRoute: () => SettingsRoute,
-} as any)
-const WarehouseIndexRoute = WarehouseIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => WarehouseRoute,
-} as any)
-const WarehouseDispenseRoute = WarehouseDispenseRouteImport.update({
-  id: '/dispense',
-  path: '/dispense',
-  getParentRoute: () => WarehouseRoute,
-} as any)
-const WarehouseDrugRoute = WarehouseDrugRouteImport.update({
-  id: '/drug',
-  path: '/drug',
-  getParentRoute: () => WarehouseRoute,
-} as any)
-const WarehouseLossRoute = WarehouseLossRouteImport.update({
-  id: '/loss',
-  path: '/loss',
-  getParentRoute: () => WarehouseRoute,
-} as any)
-const WarehouseTransferRoute = WarehouseTransferRouteImport.update({
-  id: '/transfer',
-  path: '/transfer',
-  getParentRoute: () => WarehouseRoute,
-} as any)
-const MAnimalsDeviceIdRoute = MAnimalsDeviceIdRouteImport.update({
-  id: '/animals-device/$id',
-  path: '/animals-device/$id',
-  getParentRoute: () => MRoute,
-} as any)
-const MAnimalsEvidenceIdRoute = MAnimalsEvidenceIdRouteImport.update({
-  id: '/animals-evidence/$id',
-  path: '/animals-evidence/$id',
-  getParentRoute: () => MRoute,
-} as any)
-const MAnimalsOrdersIdRoute = MAnimalsOrdersIdRouteImport.update({
-  id: '/animals-orders/$id',
-  path: '/animals-orders/$id',
-  getParentRoute: () => MRoute,
-} as any)
-const MBarnsIdRoute = MBarnsIdRouteImport.update({
-  id: '/barns/$id',
-  path: '/barns/$id',
-  getParentRoute: () => MRoute,
+const ArchiveBarnRoute = ArchiveBarnRouteImport.update({
+  id: '/barn',
+  path: '/barn',
+  getParentRoute: () => ArchiveRoute,
 } as any)
 const MHealthIndexRoute = MHealthIndexRouteImport.update({
   id: '/health/',
   path: '/health/',
   getParentRoute: () => MRoute,
 } as any)
-const MHealthIdRoute = MHealthIdRouteImport.update({
-  id: '/health/$id',
-  path: '/health/$id',
-  getParentRoute: () => MRoute,
-} as any)
-const MHealthTodayRoute = MHealthTodayRouteImport.update({
-  id: '/health/today',
-  path: '/health/today',
+const MPensIdRoute = MPensIdRouteImport.update({
+  id: '/pens/$id',
+  path: '/pens/$id',
   getParentRoute: () => MRoute,
 } as any)
 const MMonthlyReportsIdRoute = MMonthlyReportsIdRouteImport.update({
@@ -465,39 +440,39 @@ const MMonthlyReportsIdRoute = MMonthlyReportsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => MMonthlyReportsRoute,
 } as any)
-const MPensIdRoute = MPensIdRouteImport.update({
-  id: '/pens/$id',
-  path: '/pens/$id',
+const MHealthTodayRoute = MHealthTodayRouteImport.update({
+  id: '/health/today',
+  path: '/health/today',
   getParentRoute: () => MRoute,
 } as any)
-const MEventsTypeIdRoute = MEventsTypeIdRouteImport.update({
-  id: '/events/$type/$id',
-  path: '/events/$type/$id',
+const MHealthIdRoute = MHealthIdRouteImport.update({
+  id: '/health/$id',
+  path: '/health/$id',
   getParentRoute: () => MRoute,
 } as any)
-const MHealthIdAbortRoute = MHealthIdAbortRouteImport.update({
-  id: '/health/$id_/abort',
-  path: '/health/$id/abort',
+const MBarnsIdRoute = MBarnsIdRouteImport.update({
+  id: '/barns/$id',
+  path: '/barns/$id',
   getParentRoute: () => MRoute,
 } as any)
-const MHealthIdConfirmCureRoute = MHealthIdConfirmCureRouteImport.update({
-  id: '/health/$id_/confirm-cure',
-  path: '/health/$id/confirm-cure',
+const MAnimalsOrdersIdRoute = MAnimalsOrdersIdRouteImport.update({
+  id: '/animals-orders/$id',
+  path: '/animals-orders/$id',
   getParentRoute: () => MRoute,
 } as any)
-const MHealthIdDiagnoseRoute = MHealthIdDiagnoseRouteImport.update({
-  id: '/health/$id_/diagnose',
-  path: '/health/$id/diagnose',
+const MAnimalsEvidenceIdRoute = MAnimalsEvidenceIdRouteImport.update({
+  id: '/animals-evidence/$id',
+  path: '/animals-evidence/$id',
   getParentRoute: () => MRoute,
 } as any)
-const MHealthIdExecuteRoute = MHealthIdExecuteRouteImport.update({
-  id: '/health/$id_/execute',
-  path: '/health/$id/execute',
+const MAnimalsDeviceIdRoute = MAnimalsDeviceIdRouteImport.update({
+  id: '/animals-device/$id',
+  path: '/animals-device/$id',
   getParentRoute: () => MRoute,
 } as any)
-const MHealthIdReviewRoute = MHealthIdReviewRouteImport.update({
-  id: '/health/$id_/review',
-  path: '/health/$id/review',
+const MHealthTodayPickupRoute = MHealthTodayPickupRouteImport.update({
+  id: '/health/today_/pickup',
+  path: '/health/today/pickup',
   getParentRoute: () => MRoute,
 } as any)
 const MHealthTodayBatchRoute = MHealthTodayBatchRouteImport.update({
@@ -505,9 +480,34 @@ const MHealthTodayBatchRoute = MHealthTodayBatchRouteImport.update({
   path: '/health/today/batch',
   getParentRoute: () => MRoute,
 } as any)
-const MHealthTodayPickupRoute = MHealthTodayPickupRouteImport.update({
-  id: '/health/today_/pickup',
-  path: '/health/today/pickup',
+const MHealthIdReviewRoute = MHealthIdReviewRouteImport.update({
+  id: '/health/$id_/review',
+  path: '/health/$id/review',
+  getParentRoute: () => MRoute,
+} as any)
+const MHealthIdExecuteRoute = MHealthIdExecuteRouteImport.update({
+  id: '/health/$id_/execute',
+  path: '/health/$id/execute',
+  getParentRoute: () => MRoute,
+} as any)
+const MHealthIdDiagnoseRoute = MHealthIdDiagnoseRouteImport.update({
+  id: '/health/$id_/diagnose',
+  path: '/health/$id/diagnose',
+  getParentRoute: () => MRoute,
+} as any)
+const MHealthIdConfirmCureRoute = MHealthIdConfirmCureRouteImport.update({
+  id: '/health/$id_/confirm-cure',
+  path: '/health/$id/confirm-cure',
+  getParentRoute: () => MRoute,
+} as any)
+const MHealthIdAbortRoute = MHealthIdAbortRouteImport.update({
+  id: '/health/$id_/abort',
+  path: '/health/$id/abort',
+  getParentRoute: () => MRoute,
+} as any)
+const MEventsTypeIdRoute = MEventsTypeIdRouteImport.update({
+  id: '/events/$type/$id',
+  path: '/events/$type/$id',
   getParentRoute: () => MRoute,
 } as any)
 const MHealthIdExecutePickupIdRoute =
@@ -1048,81 +1048,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/analytics': {
-      id: '/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/archive': {
-      id: '/archive'
-      path: '/archive'
-      fullPath: '/archive'
-      preLoaderRoute: typeof ArchiveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feedback': {
-      id: '/feedback'
-      path: '/feedback'
-      fullPath: '/feedback'
-      preLoaderRoute: typeof FeedbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/knowledge': {
-      id: '/knowledge'
-      path: '/knowledge'
-      fullPath: '/knowledge'
-      preLoaderRoute: typeof KnowledgeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/m': {
-      id: '/m'
-      path: '/m'
-      fullPath: '/m'
-      preLoaderRoute: typeof MRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/organization': {
-      id: '/organization'
-      path: '/organization'
-      fullPath: '/organization'
-      preLoaderRoute: typeof OrganizationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/production': {
-      id: '/production'
-      path: '/production'
-      fullPath: '/production'
-      preLoaderRoute: typeof ProductionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/stats': {
-      id: '/stats'
-      path: '/stats'
-      fullPath: '/stats'
-      preLoaderRoute: typeof StatsRouteImport
+    '/workspace': {
+      id: '/workspace'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/warehouse': {
@@ -1132,348 +1062,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WarehouseRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/workspace': {
-      id: '/workspace'
-      path: '/workspace'
-      fullPath: '/workspace'
-      preLoaderRoute: typeof WorkspaceRouteImport
+    '/stats': {
+      id: '/stats'
+      path: '/stats'
+      fullPath: '/stats'
+      preLoaderRoute: typeof StatsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/archive/barn': {
-      id: '/archive/barn'
-      path: '/barn'
-      fullPath: '/archive/barn'
-      preLoaderRoute: typeof ArchiveBarnRouteImport
-      parentRoute: typeof ArchiveRoute
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/archive/cattle': {
-      id: '/archive/cattle'
-      path: '/cattle'
-      fullPath: '/archive/cattle'
-      preLoaderRoute: typeof ArchiveCattleRouteImport
-      parentRoute: typeof ArchiveRoute
+    '/production': {
+      id: '/production'
+      path: '/production'
+      fullPath: '/production'
+      preLoaderRoute: typeof ProductionRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/archive/farm': {
-      id: '/archive/farm'
-      path: '/farm'
-      fullPath: '/archive/farm'
-      preLoaderRoute: typeof ArchiveFarmRouteImport
-      parentRoute: typeof ArchiveRoute
+    '/organization': {
+      id: '/organization'
+      path: '/organization'
+      fullPath: '/organization'
+      preLoaderRoute: typeof OrganizationRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/knowledge/disease': {
-      id: '/knowledge/disease'
-      path: '/disease'
-      fullPath: '/knowledge/disease'
-      preLoaderRoute: typeof KnowledgeDiseaseRouteImport
-      parentRoute: typeof KnowledgeRoute
+    '/m': {
+      id: '/m'
+      path: '/m'
+      fullPath: '/m'
+      preLoaderRoute: typeof MRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/knowledge/prescription': {
-      id: '/knowledge/prescription'
-      path: '/prescription'
-      fullPath: '/knowledge/prescription'
-      preLoaderRoute: typeof KnowledgePrescriptionRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/knowledge/symptom': {
-      id: '/knowledge/symptom'
-      path: '/symptom'
-      fullPath: '/knowledge/symptom'
-      preLoaderRoute: typeof KnowledgeSymptomRouteImport
-      parentRoute: typeof KnowledgeRoute
-    }
-    '/m/': {
-      id: '/m/'
-      path: '/'
-      fullPath: '/m/'
-      preLoaderRoute: typeof MIndexRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/account-security': {
-      id: '/m/account-security'
-      path: '/account-security'
-      fullPath: '/m/account-security'
-      preLoaderRoute: typeof MAccountSecurityRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/animals-{$id}': {
-      id: '/m/animals-{$id}'
-      path: '/animals-{$id}'
-      fullPath: '/m/animals-{$id}'
-      preLoaderRoute: typeof MAnimalsChar123idChar125RouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/drafts': {
-      id: '/m/drafts'
-      path: '/drafts'
-      fullPath: '/m/drafts'
-      preLoaderRoute: typeof MDraftsRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/drug-report': {
-      id: '/m/drug-report'
-      path: '/drug-report'
-      fullPath: '/m/drug-report'
-      preLoaderRoute: typeof MDrugReportRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/empty-states': {
-      id: '/m/empty-states'
-      path: '/empty-states'
-      fullPath: '/m/empty-states'
-      preLoaderRoute: typeof MEmptyStatesRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/feedback': {
-      id: '/m/feedback'
-      path: '/feedback'
-      fullPath: '/m/feedback'
-      preLoaderRoute: typeof MFeedbackRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/homepage': {
-      id: '/m/homepage'
-      path: '/homepage'
-      fullPath: '/m/homepage'
-      preLoaderRoute: typeof MHomepageRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/kb_diseases': {
-      id: '/m/kb_diseases'
-      path: '/kb_diseases'
-      fullPath: '/m/kb_diseases'
-      preLoaderRoute: typeof MKb_diseasesRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/kb_drugs': {
-      id: '/m/kb_drugs'
-      path: '/kb_drugs'
-      fullPath: '/m/kb_drugs'
-      preLoaderRoute: typeof MKb_drugsRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/kb_symptoms': {
-      id: '/m/kb_symptoms'
-      path: '/kb_symptoms'
-      fullPath: '/m/kb_symptoms'
-      preLoaderRoute: typeof MKb_symptomsRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/level3': {
-      id: '/m/level3'
-      path: '/level3'
-      fullPath: '/m/level3'
-      preLoaderRoute: typeof MLevel3RouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/login': {
-      id: '/m/login'
+    '/login': {
+      id: '/login'
       path: '/login'
-      fullPath: '/m/login'
-      preLoaderRoute: typeof MLoginRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/loss-report': {
-      id: '/m/loss-report'
-      path: '/loss-report'
-      fullPath: '/m/loss-report'
-      preLoaderRoute: typeof MLossReportRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/me': {
-      id: '/m/me'
-      path: '/me'
-      fullPath: '/m/me'
-      preLoaderRoute: typeof MMeRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/monthly-reports': {
-      id: '/m/monthly-reports'
-      path: '/monthly-reports'
-      fullPath: '/m/monthly-reports'
-      preLoaderRoute: typeof MMonthlyReportsRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/notifications': {
-      id: '/m/notifications'
-      path: '/notifications'
-      fullPath: '/m/notifications'
-      preLoaderRoute: typeof MNotificationsRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/prep': {
-      id: '/m/prep'
-      path: '/prep'
-      fullPath: '/m/prep'
-      preLoaderRoute: typeof MPrepRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/report': {
-      id: '/m/report'
-      path: '/report'
-      fullPath: '/m/report'
-      preLoaderRoute: typeof MReportRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/respond': {
-      id: '/m/respond'
-      path: '/respond'
-      fullPath: '/m/respond'
-      preLoaderRoute: typeof MRespondRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/return-report': {
-      id: '/m/return-report'
-      path: '/return-report'
-      fullPath: '/m/return-report'
-      preLoaderRoute: typeof MReturnReportRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/scan': {
-      id: '/m/scan'
-      path: '/scan'
-      fullPath: '/m/scan'
-      preLoaderRoute: typeof MScanRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/search': {
-      id: '/m/search'
-      path: '/search'
-      fullPath: '/m/search'
-      preLoaderRoute: typeof MSearchRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/operations/audit-log': {
-      id: '/operations/audit-log'
-      path: '/operations/audit-log'
-      fullPath: '/operations/audit-log'
-      preLoaderRoute: typeof OperationsAuditLogRouteImport
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/operations/event-mapping': {
-      id: '/operations/event-mapping'
-      path: '/operations/event-mapping'
-      fullPath: '/operations/event-mapping'
-      preLoaderRoute: typeof OperationsEventMappingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/operations/message-config': {
-      id: '/operations/message-config'
-      path: '/operations/message-config'
-      fullPath: '/operations/message-config'
-      preLoaderRoute: typeof OperationsMessageConfigRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/organization/': {
-      id: '/organization/'
-      path: '/'
-      fullPath: '/organization/'
-      preLoaderRoute: typeof OrganizationIndexRouteImport
-      parentRoute: typeof OrganizationRoute
-    }
-    '/organization/account': {
-      id: '/organization/account'
-      path: '/account'
-      fullPath: '/organization/account'
-      preLoaderRoute: typeof OrganizationAccountRouteImport
-      parentRoute: typeof OrganizationRoute
-    }
-    '/organization/integration': {
-      id: '/organization/integration'
-      path: '/integration'
-      fullPath: '/organization/integration'
-      preLoaderRoute: typeof OrganizationIntegrationRouteImport
-      parentRoute: typeof OrganizationRoute
-    }
-    '/organization/role': {
-      id: '/organization/role'
-      path: '/role'
-      fullPath: '/organization/role'
-      preLoaderRoute: typeof OrganizationRoleRouteImport
-      parentRoute: typeof OrganizationRoute
-    }
-    '/organization/team': {
-      id: '/organization/team'
-      path: '/team'
-      fullPath: '/organization/team'
-      preLoaderRoute: typeof OrganizationTeamRouteImport
-      parentRoute: typeof OrganizationRoute
-    }
-    '/production/': {
-      id: '/production/'
-      path: '/'
-      fullPath: '/production/'
-      preLoaderRoute: typeof ProductionIndexRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/production/deworm': {
-      id: '/production/deworm'
-      path: '/deworm'
-      fullPath: '/production/deworm'
-      preLoaderRoute: typeof ProductionDewormRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/production/disease': {
-      id: '/production/disease'
-      path: '/disease'
-      fullPath: '/production/disease'
-      preLoaderRoute: typeof ProductionDiseaseRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/production/drying': {
-      id: '/production/drying'
-      path: '/drying'
-      fullPath: '/production/drying'
-      preLoaderRoute: typeof ProductionDryingRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/production/general': {
-      id: '/production/general'
-      path: '/general'
-      fullPath: '/production/general'
-      preLoaderRoute: typeof ProductionGeneralRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/production/hoof': {
-      id: '/production/hoof'
-      path: '/hoof'
-      fullPath: '/production/hoof'
-      preLoaderRoute: typeof ProductionHoofRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/production/postpartum': {
-      id: '/production/postpartum'
-      path: '/postpartum'
-      fullPath: '/production/postpartum'
-      preLoaderRoute: typeof ProductionPostpartumRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/production/vaccine': {
-      id: '/production/vaccine'
-      path: '/vaccine'
-      fullPath: '/production/vaccine'
-      preLoaderRoute: typeof ProductionVaccineRouteImport
-      parentRoute: typeof ProductionRoute
-    }
-    '/settings/': {
-      id: '/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof SettingsIndexRouteImport
-      parentRoute: typeof SettingsRoute
-    }
-    '/settings/knowledge': {
-      id: '/settings/knowledge'
+    '/knowledge': {
+      id: '/knowledge'
       path: '/knowledge'
-      fullPath: '/settings/knowledge'
-      preLoaderRoute: typeof SettingsKnowledgeRouteImport
-      parentRoute: typeof SettingsRoute
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof KnowledgeRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/settings/rules': {
-      id: '/settings/rules'
-      path: '/rules'
-      fullPath: '/settings/rules'
-      preLoaderRoute: typeof SettingsRulesRouteImport
-      parentRoute: typeof SettingsRoute
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/archive': {
+      id: '/archive'
+      path: '/archive'
+      fullPath: '/archive'
+      preLoaderRoute: typeof ArchiveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/warehouse/': {
       id: '/warehouse/'
@@ -1482,18 +1146,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WarehouseIndexRouteImport
       parentRoute: typeof WarehouseRoute
     }
-    '/warehouse/dispense': {
-      id: '/warehouse/dispense'
-      path: '/dispense'
-      fullPath: '/warehouse/dispense'
-      preLoaderRoute: typeof WarehouseDispenseRouteImport
-      parentRoute: typeof WarehouseRoute
+    '/settings/': {
+      id: '/settings/'
+      path: '/'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof SettingsRoute
     }
-    '/warehouse/drug': {
-      id: '/warehouse/drug'
-      path: '/drug'
-      fullPath: '/warehouse/drug'
-      preLoaderRoute: typeof WarehouseDrugRouteImport
+    '/production/': {
+      id: '/production/'
+      path: '/'
+      fullPath: '/production/'
+      preLoaderRoute: typeof ProductionIndexRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/organization/': {
+      id: '/organization/'
+      path: '/'
+      fullPath: '/organization/'
+      preLoaderRoute: typeof OrganizationIndexRouteImport
+      parentRoute: typeof OrganizationRoute
+    }
+    '/m/': {
+      id: '/m/'
+      path: '/'
+      fullPath: '/m/'
+      preLoaderRoute: typeof MIndexRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/warehouse/transfer': {
+      id: '/warehouse/transfer'
+      path: '/transfer'
+      fullPath: '/warehouse/transfer'
+      preLoaderRoute: typeof WarehouseTransferRouteImport
       parentRoute: typeof WarehouseRoute
     }
     '/warehouse/loss': {
@@ -1503,40 +1188,327 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WarehouseLossRouteImport
       parentRoute: typeof WarehouseRoute
     }
-    '/warehouse/transfer': {
-      id: '/warehouse/transfer'
-      path: '/transfer'
-      fullPath: '/warehouse/transfer'
-      preLoaderRoute: typeof WarehouseTransferRouteImport
+    '/warehouse/drug': {
+      id: '/warehouse/drug'
+      path: '/drug'
+      fullPath: '/warehouse/drug'
+      preLoaderRoute: typeof WarehouseDrugRouteImport
       parentRoute: typeof WarehouseRoute
     }
-    '/m/animals-device/$id': {
-      id: '/m/animals-device/$id'
-      path: '/animals-device/$id'
-      fullPath: '/m/animals-device/$id'
-      preLoaderRoute: typeof MAnimalsDeviceIdRouteImport
+    '/warehouse/dispense': {
+      id: '/warehouse/dispense'
+      path: '/dispense'
+      fullPath: '/warehouse/dispense'
+      preLoaderRoute: typeof WarehouseDispenseRouteImport
+      parentRoute: typeof WarehouseRoute
+    }
+    '/settings/rules': {
+      id: '/settings/rules'
+      path: '/rules'
+      fullPath: '/settings/rules'
+      preLoaderRoute: typeof SettingsRulesRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/settings/knowledge': {
+      id: '/settings/knowledge'
+      path: '/knowledge'
+      fullPath: '/settings/knowledge'
+      preLoaderRoute: typeof SettingsKnowledgeRouteImport
+      parentRoute: typeof SettingsRoute
+    }
+    '/production/vaccine': {
+      id: '/production/vaccine'
+      path: '/vaccine'
+      fullPath: '/production/vaccine'
+      preLoaderRoute: typeof ProductionVaccineRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/production/postpartum': {
+      id: '/production/postpartum'
+      path: '/postpartum'
+      fullPath: '/production/postpartum'
+      preLoaderRoute: typeof ProductionPostpartumRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/production/hoof': {
+      id: '/production/hoof'
+      path: '/hoof'
+      fullPath: '/production/hoof'
+      preLoaderRoute: typeof ProductionHoofRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/production/general': {
+      id: '/production/general'
+      path: '/general'
+      fullPath: '/production/general'
+      preLoaderRoute: typeof ProductionGeneralRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/production/drying': {
+      id: '/production/drying'
+      path: '/drying'
+      fullPath: '/production/drying'
+      preLoaderRoute: typeof ProductionDryingRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/production/disease': {
+      id: '/production/disease'
+      path: '/disease'
+      fullPath: '/production/disease'
+      preLoaderRoute: typeof ProductionDiseaseRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/production/deworm': {
+      id: '/production/deworm'
+      path: '/deworm'
+      fullPath: '/production/deworm'
+      preLoaderRoute: typeof ProductionDewormRouteImport
+      parentRoute: typeof ProductionRoute
+    }
+    '/organization/team': {
+      id: '/organization/team'
+      path: '/team'
+      fullPath: '/organization/team'
+      preLoaderRoute: typeof OrganizationTeamRouteImport
+      parentRoute: typeof OrganizationRoute
+    }
+    '/organization/role': {
+      id: '/organization/role'
+      path: '/role'
+      fullPath: '/organization/role'
+      preLoaderRoute: typeof OrganizationRoleRouteImport
+      parentRoute: typeof OrganizationRoute
+    }
+    '/organization/integration': {
+      id: '/organization/integration'
+      path: '/integration'
+      fullPath: '/organization/integration'
+      preLoaderRoute: typeof OrganizationIntegrationRouteImport
+      parentRoute: typeof OrganizationRoute
+    }
+    '/organization/account': {
+      id: '/organization/account'
+      path: '/account'
+      fullPath: '/organization/account'
+      preLoaderRoute: typeof OrganizationAccountRouteImport
+      parentRoute: typeof OrganizationRoute
+    }
+    '/operations/message-config': {
+      id: '/operations/message-config'
+      path: '/operations/message-config'
+      fullPath: '/operations/message-config'
+      preLoaderRoute: typeof OperationsMessageConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operations/event-mapping': {
+      id: '/operations/event-mapping'
+      path: '/operations/event-mapping'
+      fullPath: '/operations/event-mapping'
+      preLoaderRoute: typeof OperationsEventMappingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operations/audit-log': {
+      id: '/operations/audit-log'
+      path: '/operations/audit-log'
+      fullPath: '/operations/audit-log'
+      preLoaderRoute: typeof OperationsAuditLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/m/search': {
+      id: '/m/search'
+      path: '/search'
+      fullPath: '/m/search'
+      preLoaderRoute: typeof MSearchRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/animals-evidence/$id': {
-      id: '/m/animals-evidence/$id'
-      path: '/animals-evidence/$id'
-      fullPath: '/m/animals-evidence/$id'
-      preLoaderRoute: typeof MAnimalsEvidenceIdRouteImport
+    '/m/scan': {
+      id: '/m/scan'
+      path: '/scan'
+      fullPath: '/m/scan'
+      preLoaderRoute: typeof MScanRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/animals-orders/$id': {
-      id: '/m/animals-orders/$id'
-      path: '/animals-orders/$id'
-      fullPath: '/m/animals-orders/$id'
-      preLoaderRoute: typeof MAnimalsOrdersIdRouteImport
+    '/m/return-report': {
+      id: '/m/return-report'
+      path: '/return-report'
+      fullPath: '/m/return-report'
+      preLoaderRoute: typeof MReturnReportRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/barns/$id': {
-      id: '/m/barns/$id'
-      path: '/barns/$id'
-      fullPath: '/m/barns/$id'
-      preLoaderRoute: typeof MBarnsIdRouteImport
+    '/m/respond': {
+      id: '/m/respond'
+      path: '/respond'
+      fullPath: '/m/respond'
+      preLoaderRoute: typeof MRespondRouteImport
       parentRoute: typeof MRoute
+    }
+    '/m/report': {
+      id: '/m/report'
+      path: '/report'
+      fullPath: '/m/report'
+      preLoaderRoute: typeof MReportRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/prep': {
+      id: '/m/prep'
+      path: '/prep'
+      fullPath: '/m/prep'
+      preLoaderRoute: typeof MPrepRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/notifications': {
+      id: '/m/notifications'
+      path: '/notifications'
+      fullPath: '/m/notifications'
+      preLoaderRoute: typeof MNotificationsRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/monthly-reports': {
+      id: '/m/monthly-reports'
+      path: '/monthly-reports'
+      fullPath: '/m/monthly-reports'
+      preLoaderRoute: typeof MMonthlyReportsRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/me': {
+      id: '/m/me'
+      path: '/me'
+      fullPath: '/m/me'
+      preLoaderRoute: typeof MMeRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/loss-report': {
+      id: '/m/loss-report'
+      path: '/loss-report'
+      fullPath: '/m/loss-report'
+      preLoaderRoute: typeof MLossReportRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/login': {
+      id: '/m/login'
+      path: '/login'
+      fullPath: '/m/login'
+      preLoaderRoute: typeof MLoginRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/level3': {
+      id: '/m/level3'
+      path: '/level3'
+      fullPath: '/m/level3'
+      preLoaderRoute: typeof MLevel3RouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/kb_symptoms': {
+      id: '/m/kb_symptoms'
+      path: '/kb_symptoms'
+      fullPath: '/m/kb_symptoms'
+      preLoaderRoute: typeof MKb_symptomsRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/kb_drugs': {
+      id: '/m/kb_drugs'
+      path: '/kb_drugs'
+      fullPath: '/m/kb_drugs'
+      preLoaderRoute: typeof MKb_drugsRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/kb_diseases': {
+      id: '/m/kb_diseases'
+      path: '/kb_diseases'
+      fullPath: '/m/kb_diseases'
+      preLoaderRoute: typeof MKb_diseasesRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/homepage': {
+      id: '/m/homepage'
+      path: '/homepage'
+      fullPath: '/m/homepage'
+      preLoaderRoute: typeof MHomepageRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/feedback': {
+      id: '/m/feedback'
+      path: '/feedback'
+      fullPath: '/m/feedback'
+      preLoaderRoute: typeof MFeedbackRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/empty-states': {
+      id: '/m/empty-states'
+      path: '/empty-states'
+      fullPath: '/m/empty-states'
+      preLoaderRoute: typeof MEmptyStatesRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/drug-report': {
+      id: '/m/drug-report'
+      path: '/drug-report'
+      fullPath: '/m/drug-report'
+      preLoaderRoute: typeof MDrugReportRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/drafts': {
+      id: '/m/drafts'
+      path: '/drafts'
+      fullPath: '/m/drafts'
+      preLoaderRoute: typeof MDraftsRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/animals-{$id}': {
+      id: '/m/animals-{$id}'
+      path: '/animals-{$id}'
+      fullPath: '/m/animals-{$id}'
+      preLoaderRoute: typeof MAnimalsChar123idChar125RouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/account-security': {
+      id: '/m/account-security'
+      path: '/account-security'
+      fullPath: '/m/account-security'
+      preLoaderRoute: typeof MAccountSecurityRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/knowledge/symptom': {
+      id: '/knowledge/symptom'
+      path: '/symptom'
+      fullPath: '/knowledge/symptom'
+      preLoaderRoute: typeof KnowledgeSymptomRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/prescription': {
+      id: '/knowledge/prescription'
+      path: '/prescription'
+      fullPath: '/knowledge/prescription'
+      preLoaderRoute: typeof KnowledgePrescriptionRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/knowledge/disease': {
+      id: '/knowledge/disease'
+      path: '/disease'
+      fullPath: '/knowledge/disease'
+      preLoaderRoute: typeof KnowledgeDiseaseRouteImport
+      parentRoute: typeof KnowledgeRoute
+    }
+    '/archive/farm': {
+      id: '/archive/farm'
+      path: '/farm'
+      fullPath: '/archive/farm'
+      preLoaderRoute: typeof ArchiveFarmRouteImport
+      parentRoute: typeof ArchiveRoute
+    }
+    '/archive/cattle': {
+      id: '/archive/cattle'
+      path: '/cattle'
+      fullPath: '/archive/cattle'
+      preLoaderRoute: typeof ArchiveCattleRouteImport
+      parentRoute: typeof ArchiveRoute
+    }
+    '/archive/barn': {
+      id: '/archive/barn'
+      path: '/barn'
+      fullPath: '/archive/barn'
+      preLoaderRoute: typeof ArchiveBarnRouteImport
+      parentRoute: typeof ArchiveRoute
     }
     '/m/health/': {
       id: '/m/health/'
@@ -1545,18 +1517,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MHealthIndexRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/health/$id': {
-      id: '/m/health/$id'
-      path: '/health/$id'
-      fullPath: '/m/health/$id'
-      preLoaderRoute: typeof MHealthIdRouteImport
-      parentRoute: typeof MRoute
-    }
-    '/m/health/today': {
-      id: '/m/health/today'
-      path: '/health/today'
-      fullPath: '/m/health/today'
-      preLoaderRoute: typeof MHealthTodayRouteImport
+    '/m/pens/$id': {
+      id: '/m/pens/$id'
+      path: '/pens/$id'
+      fullPath: '/m/pens/$id'
+      preLoaderRoute: typeof MPensIdRouteImport
       parentRoute: typeof MRoute
     }
     '/m/monthly-reports/$id': {
@@ -1566,53 +1531,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MMonthlyReportsIdRouteImport
       parentRoute: typeof MMonthlyReportsRoute
     }
-    '/m/pens/$id': {
-      id: '/m/pens/$id'
-      path: '/pens/$id'
-      fullPath: '/m/pens/$id'
-      preLoaderRoute: typeof MPensIdRouteImport
+    '/m/health/today': {
+      id: '/m/health/today'
+      path: '/health/today'
+      fullPath: '/m/health/today'
+      preLoaderRoute: typeof MHealthTodayRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/events/$type/$id': {
-      id: '/m/events/$type/$id'
-      path: '/events/$type/$id'
-      fullPath: '/m/events/$type/$id'
-      preLoaderRoute: typeof MEventsTypeIdRouteImport
+    '/m/health/$id': {
+      id: '/m/health/$id'
+      path: '/health/$id'
+      fullPath: '/m/health/$id'
+      preLoaderRoute: typeof MHealthIdRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/health/$id_/abort': {
-      id: '/m/health/$id_/abort'
-      path: '/health/$id/abort'
-      fullPath: '/m/health/$id/abort'
-      preLoaderRoute: typeof MHealthIdAbortRouteImport
+    '/m/barns/$id': {
+      id: '/m/barns/$id'
+      path: '/barns/$id'
+      fullPath: '/m/barns/$id'
+      preLoaderRoute: typeof MBarnsIdRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/health/$id_/confirm-cure': {
-      id: '/m/health/$id_/confirm-cure'
-      path: '/health/$id/confirm-cure'
-      fullPath: '/m/health/$id/confirm-cure'
-      preLoaderRoute: typeof MHealthIdConfirmCureRouteImport
+    '/m/animals-orders/$id': {
+      id: '/m/animals-orders/$id'
+      path: '/animals-orders/$id'
+      fullPath: '/m/animals-orders/$id'
+      preLoaderRoute: typeof MAnimalsOrdersIdRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/health/$id_/diagnose': {
-      id: '/m/health/$id_/diagnose'
-      path: '/health/$id/diagnose'
-      fullPath: '/m/health/$id/diagnose'
-      preLoaderRoute: typeof MHealthIdDiagnoseRouteImport
+    '/m/animals-evidence/$id': {
+      id: '/m/animals-evidence/$id'
+      path: '/animals-evidence/$id'
+      fullPath: '/m/animals-evidence/$id'
+      preLoaderRoute: typeof MAnimalsEvidenceIdRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/health/$id_/execute': {
-      id: '/m/health/$id_/execute'
-      path: '/health/$id/execute'
-      fullPath: '/m/health/$id/execute'
-      preLoaderRoute: typeof MHealthIdExecuteRouteImport
+    '/m/animals-device/$id': {
+      id: '/m/animals-device/$id'
+      path: '/animals-device/$id'
+      fullPath: '/m/animals-device/$id'
+      preLoaderRoute: typeof MAnimalsDeviceIdRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/health/$id_/review': {
-      id: '/m/health/$id_/review'
-      path: '/health/$id/review'
-      fullPath: '/m/health/$id/review'
-      preLoaderRoute: typeof MHealthIdReviewRouteImport
+    '/m/health/today_/pickup': {
+      id: '/m/health/today_/pickup'
+      path: '/health/today/pickup'
+      fullPath: '/m/health/today/pickup'
+      preLoaderRoute: typeof MHealthTodayPickupRouteImport
       parentRoute: typeof MRoute
     }
     '/m/health/today_/batch': {
@@ -1622,11 +1587,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MHealthTodayBatchRouteImport
       parentRoute: typeof MRoute
     }
-    '/m/health/today_/pickup': {
-      id: '/m/health/today_/pickup'
-      path: '/health/today/pickup'
-      fullPath: '/m/health/today/pickup'
-      preLoaderRoute: typeof MHealthTodayPickupRouteImport
+    '/m/health/$id_/review': {
+      id: '/m/health/$id_/review'
+      path: '/health/$id/review'
+      fullPath: '/m/health/$id/review'
+      preLoaderRoute: typeof MHealthIdReviewRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/health/$id_/execute': {
+      id: '/m/health/$id_/execute'
+      path: '/health/$id/execute'
+      fullPath: '/m/health/$id/execute'
+      preLoaderRoute: typeof MHealthIdExecuteRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/health/$id_/diagnose': {
+      id: '/m/health/$id_/diagnose'
+      path: '/health/$id/diagnose'
+      fullPath: '/m/health/$id/diagnose'
+      preLoaderRoute: typeof MHealthIdDiagnoseRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/health/$id_/confirm-cure': {
+      id: '/m/health/$id_/confirm-cure'
+      path: '/health/$id/confirm-cure'
+      fullPath: '/m/health/$id/confirm-cure'
+      preLoaderRoute: typeof MHealthIdConfirmCureRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/health/$id_/abort': {
+      id: '/m/health/$id_/abort'
+      path: '/health/$id/abort'
+      fullPath: '/m/health/$id/abort'
+      preLoaderRoute: typeof MHealthIdAbortRouteImport
+      parentRoute: typeof MRoute
+    }
+    '/m/events/$type/$id': {
+      id: '/m/events/$type/$id'
+      path: '/events/$type/$id'
+      fullPath: '/m/events/$type/$id'
+      preLoaderRoute: typeof MEventsTypeIdRouteImport
       parentRoute: typeof MRoute
     }
     '/m/health/$id_/execute_/$pickupId': {
