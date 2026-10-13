@@ -179,7 +179,7 @@ function ApiTable() {
           <table className="w-full text-body-sm">
             <thead className="bg-surface-subtle text-text-secondary">
               <tr className="h-12">
-                {["时间", "对接系统", "方向", "事件类型", "业务标识", "状态", "耗时", "触发方式", "操作"].map((h) => (
+                {["时间", "对接系统", "方向", "事件类型", "业务标识", "状态", "耗时", "操作"].map((h) => (
                   <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -194,7 +194,6 @@ function ApiTable() {
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.bizKey}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${statusTag(l.status)}`}>{l.status}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.cost} ms</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.trigger}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Button variant="ghost" size="sm" className="h-8 px-0 text-primary hover:bg-transparent hover:text-primary/80" onClick={() => setDetail(l)}>
                       详情
@@ -202,7 +201,7 @@ function ApiTable() {
                   </td>
                 </tr>
               ))}
-              {!rows.length && <tr><td colSpan={9} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的交互记录</td></tr>}
+              {!rows.length && <tr><td colSpan={8} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的交互记录</td></tr>}
             </tbody>
           </table>
         </div>
@@ -278,7 +277,7 @@ function PushTable() {
           <table className="w-full text-body-sm">
             <thead className="bg-surface-subtle text-text-secondary">
               <tr className="h-12">
-                {["推送时间", "消息名称", "消息类型", "接收人", "牧场", "推送渠道", "推送状态", "查看状态", "查看时间", "操作"].map((h) => (
+                {["推送时间", "消息名称", "消息类型", "接收人", "推送渠道", "推送状态", "查看状态", "操作"].map((h) => (
                   <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -290,11 +289,9 @@ function PushTable() {
                   <td className="px-4 py-3 whitespace-nowrap text-foreground font-medium">{l.name}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className="tag tag-muted">{l.category}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.receiver}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.farm}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.channel}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${pushTag(l.pushStatus)}`}>{l.pushStatus}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${readTag(l.readStatus)}`}>{l.readStatus}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.readTime}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Button variant="ghost" size="sm" className="h-8 px-0 text-primary hover:bg-transparent hover:text-primary/80" onClick={() => setDetail(l)}>
                       详情
@@ -302,7 +299,7 @@ function PushTable() {
                   </td>
                 </tr>
               ))}
-              {!rows.length && <tr><td colSpan={10} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的推送记录</td></tr>}
+              {!rows.length && <tr><td colSpan={8} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的推送记录</td></tr>}
             </tbody>
           </table>
         </div>
