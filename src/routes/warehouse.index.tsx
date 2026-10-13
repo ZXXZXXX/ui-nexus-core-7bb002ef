@@ -1,3 +1,4 @@
+import type React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
@@ -309,13 +310,13 @@ function CodeTree({ nodes }: { nodes: CodeNode[] }) {
   );
 }
 
-function FlowCodes({ nodes, title }: { nodes: CodeNode[]; title: string }) {
+function FlowCodes({ nodes, title, children }: { nodes: CodeNode[]; title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="mt-1">
-      <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-1 text-caption text-primary">
-        <Barcode className="h-3.5 w-3.5" />
-        药品条码 {countUnits(nodes)} 个
+    <>
+      <button type="button" onClick={() => setOpen(true)} title="查看药品条码" className="group flex shrink-0 items-center gap-1.5 rounded-md px-2 py-0.5 -mr-2 transition-colors hover:bg-muted">
+        <Barcode className="h-4 w-4 text-text-tertiary group-hover:text-primary" />
+        <span className="text-card-title font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{children}</span>
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-[520px]">
@@ -326,7 +327,7 @@ function FlowCodes({ nodes, title }: { nodes: CodeNode[]; title: string }) {
           <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
 
@@ -426,15 +427,14 @@ function BatchSection({
                       <span className={`text-body-sm font-medium ${isIn ? "text-primary" : "text-destructive"}`}>{isIn ? "入库" : "出库"}</span>
                       <span className="text-body font-medium text-foreground">{r.via.trim()}</span>
                     </div>
-                    <span className="shrink-0 text-card-title font-medium tabular-nums text-foreground">
-                      {isIn ? "+" : "−"}{r.qty}<span className="ml-1 text-body-sm font-normal text-text-secondary">{unit}</span>
-                    </span>
+                    <FlowCodes nodes={codes} title={`${isIn ? "入库" : "出库"} · ${r.date} · 操作人：${r.operator} · 共 ${countUnits(codes)} 个`}>
+                      {isIn ? "+" : "−"}{r.qty}<span className="ml-1 text-body-sm font-normal text-text-secondary no-underline">{unit}</span>
+                    </FlowCodes>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-x-3 text-caption text-text-tertiary">
                     <time className="tabular-nums">{r.date}</time>
                     <span>操作人：{r.operator}</span>
                   </div>
-                  <FlowCodes nodes={codes} title={`${isIn ? "入库" : "出库"} · ${r.date} · 操作人：${r.operator} · 共 ${countUnits(codes)} 个`} />
                 </li>
               );
             })}
