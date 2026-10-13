@@ -189,7 +189,7 @@ function ApiTable() {
                 <tr key={l.id} className="border-t border-border h-12">
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.time}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.system}</td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className="tag tag-outline">{l.direction}</span></td>
+                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${l.direction === "推送" ? "tag-brand" : "tag-info"}`}>{l.direction}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.event}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.bizKey}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${statusTag(l.status)}`}>{l.status}</span></td>
