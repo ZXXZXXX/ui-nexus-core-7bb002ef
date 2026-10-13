@@ -315,14 +315,14 @@ function BatchSection({
   const [codesOpen, setCodesOpen] = useState(false);
   return (
     <section className="border-b border-border py-5 last:border-b-0">
-      <div className="flex items-start gap-2">
+      <div className="flex flex-wrap items-center gap-1">
         <Button
           variant="ghost"
           type="button"
           aria-expanded={open}
           aria-label={`批次 ${batch.batchNo}`}
           onClick={onToggle}
-          className="h-auto min-w-0 flex-1 justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-transparent!"
+          className="h-auto min-w-0 justify-start gap-3 rounded-md px-2 py-2 text-left hover:bg-transparent!"
         >
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} />
@@ -331,22 +331,20 @@ function BatchSection({
             {isBatchUsedUp(batch) && <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">已用完</span>}
           </div>
         </Button>
-        <div className="mt-2 flex shrink-0 items-baseline gap-2 pr-2">
-          {batch.stock > 0 ? (
-            <button
-              type="button"
-              title="查看现存药品条码"
-              aria-label={`查看批次 ${batch.batchNo} 现存条码，共 ${batch.stock} ${unit}`}
-              onClick={() => setCodesOpen(true)}
-              className="group -mr-2 flex items-center gap-1.5 self-center rounded-md px-2 py-0.5 transition-colors hover:bg-muted"
-            >
-              <Barcode className="h-4 w-4 text-text-tertiary group-hover:text-primary" />
-              <span className="text-card-title font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{batch.stock}</span>
-            </button>
-          ) : (
-            <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
-          )}
-        </div>
+        {batch.stock > 0 ? (
+          <button
+            type="button"
+            title="查看现存药品条码"
+            aria-label={`查看批次 ${batch.batchNo} 现存条码，共 ${batch.stock} ${unit}`}
+            onClick={() => setCodesOpen(true)}
+            className="group -ml-1 flex items-center gap-1 self-center rounded-md px-1.5 py-0.5 transition-colors hover:bg-muted"
+          >
+            <Barcode className="h-3.5 w-3.5 text-text-tertiary group-hover:text-primary" />
+            <span className="text-card-title font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{batch.stock}</span>
+          </button>
+        ) : (
+          <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
+        )}
       </div>
       <BatchCodesDialog batch={batch} open={codesOpen} onOpenChange={setCodesOpen} />
       <dl className="mt-3 grid grid-cols-3 gap-3 pl-8 pr-2">
@@ -370,7 +368,7 @@ function BatchSection({
                 <li key={idx} className="relative pb-6 pl-5 last:pb-1">
                   {idx < list.length - 1 && <span className="absolute bottom-0 left-0 top-3 w-px bg-border" />}
                   <span className={`absolute -left-1 top-2 h-2 w-2 rounded-full ring-4 ring-background ${isIn ? "bg-primary" : "bg-destructive"}`} />
-                  <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <div className="flex min-w-0 items-center gap-2">
                       <span className={`text-body-sm font-medium ${isIn ? "text-primary" : "text-destructive"}`}>{isIn ? "入库" : "出库"}</span>
                       <span className="text-body font-medium text-foreground">{r.via.trim()}</span>

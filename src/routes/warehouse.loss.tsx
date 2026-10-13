@@ -311,7 +311,7 @@ function LossPage() {
                     const nodes = buildCodes(`${d.code}|${current.id}|${d.pickedAt}`, d.qty);
                     return (
                       <div key={d.code + d.pickedAt} className="px-4 py-3 space-y-1.5">
-                        <div className="flex items-center justify-between gap-4">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                           <div className="flex min-w-0 items-center gap-2">
                             <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption-strong text-primary">{baseUnit(d.spec)}</span>
                             <span className="truncate text-body text-foreground">{d.name}</span>
