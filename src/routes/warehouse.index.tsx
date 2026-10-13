@@ -487,7 +487,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                 {row.sku}
               </SheetDescription>
               <div className="flex items-center gap-2 pr-8">
-                <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption font-medium text-primary">{row.unit}</span>
+                <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption-strong text-primary">{row.unit}</span>
                 <SheetTitle className="text-section font-medium">{row.name}</SheetTitle>
               </div>
               <div className="flex items-end justify-between gap-4 pt-3">
