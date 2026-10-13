@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ListPage, type ListColumn } from "@/components/list-page";
+import { FlowCodes } from "@/components/barcode-viewer";
+import { baseUnit, buildCodes, countUnits } from "@/lib/inventory";
 import {
   Sheet,
   SheetContent,
@@ -29,7 +31,6 @@ type TransferItem = {
   name: string; // 药品展示名称
   spec: string; // 规格型号
   qty: number; // 调拨数量
-  unit: string; // 基础单位
 };
 
 type TransferRow = {
@@ -286,17 +287,25 @@ function DetailDrawer({ row, onClose }: { row: TransferRow | null; onClose: () =
                   <span className="text-body-sm font-medium text-foreground">药品明细 · {row.items.length} 种</span>
                 </div>
                 <div className="rounded-lg border border-border bg-card divide-y divide-border">
-                  {row.items.map((it) => (
-                    <div key={it.code} className="px-4 py-3 space-y-1">
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="truncate text-body-sm font-medium text-foreground">{it.name}</span>
-                        <span className="shrink-0 text-body-sm tabular-nums text-foreground">{it.qty} {it.unit}</span>
+                  {row.items.map((it) => {
+                    const nodes = buildCodes(`${it.code}|${row.id}|${it.name}`, it.qty);
+                    return (
+                      <div key={it.code} className="px-4 py-3 space-y-1">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption-strong text-primary">{baseUnit(it.spec)}</span>
+                            <span className="truncate text-body-sm font-medium text-foreground">{it.name}</span>
+                          </div>
+                          <FlowCodes nodes={nodes} title={`调拨 ${row.id} · ${row.type} · ${it.name} · 共 ${countUnits(nodes)} 个`}>
+                            {it.qty}
+                          </FlowCodes>
+                        </div>
+                        <div className="text-caption text-text-tertiary">
+                          <span className="font-mono">{it.code}</span> · {it.spec}
+                        </div>
                       </div>
-                      <div className="text-caption text-text-tertiary">
-                        <span className="font-mono">{it.code}</span> · {it.spec}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
 

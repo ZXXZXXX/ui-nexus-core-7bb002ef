@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import { Download, Check, ChevronRight, ChevronDown, Barcode } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
+import { CodeTree, FlowCodes } from "@/components/barcode-viewer";
 import { exportXlsx, type SheetData } from "@/lib/export-xlsx";
 import {
   buildDaily,
@@ -35,8 +36,6 @@ import {
   batchCodes,
   countUnits,
   flowCodes,
-  groupDigits,
-  type CodeNode,
   type Flow,
   type Item,
   type SkuRow,
@@ -279,57 +278,6 @@ function ExportDialog({
   );
 }
 
-/* ------------------------------ 分层条码 ------------------------------ */
-
-function CodeTree({ nodes }: { nodes: CodeNode[] }) {
-  if (!nodes.length) return <div className="py-6 text-center text-body-sm text-text-tertiary">暂无条码</div>;
-  return (
-    <div className="space-y-3">
-      {nodes.map((n) =>
-        n.children.length ? (
-          <div key={n.code} className="rounded-md border border-border p-3">
-            <div className="flex items-center gap-2">
-              <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
-              <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
-              <span className="ml-auto shrink-0 text-caption text-text-tertiary">内含 {n.children.length}</span>
-            </div>
-            <ul className="mt-2 space-y-1 border-t border-border pt-2">
-              {n.children.map((c) => (
-                <li key={c} className="font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(c)}</li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
-            <span className="shrink-0 rounded bg-muted px-1.5 text-caption text-text-tertiary">散件</span>
-            <span className="font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(n.code)}</span>
-          </div>
-        ),
-      )}
-    </div>
-  );
-}
-
-function FlowCodes({ nodes, title, children }: { nodes: CodeNode[]; title: string; children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <button type="button" onClick={() => setOpen(true)} title="查看药品条码" className="group flex shrink-0 items-center gap-1.5 rounded-md px-2 py-0.5 -mr-2 transition-colors hover:bg-muted">
-        <Barcode className="h-4 w-4 text-text-tertiary group-hover:text-primary" />
-        <span className="text-body font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{children}</span>
-      </button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[520px]">
-          <DialogHeader>
-            <DialogTitle>药品条码</DialogTitle>
-            <DialogDescription>{title}</DialogDescription>
-          </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-}
 
 function BatchCodesDialog({ batch, open, onOpenChange }: { batch: Item; open: boolean; onOpenChange: (v: boolean) => void }) {
   const nodes = batchCodes(batch);
