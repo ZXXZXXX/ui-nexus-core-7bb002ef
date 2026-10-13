@@ -56,6 +56,10 @@ const CRUMB_PATH: Record<string, string> = {
   账号管理: "/organization/account",
   角色管理: "/organization/role",
   第三方系统管理: "/organization/integration",
+  运营管理: "/operations/message-config",
+  消息配置管理: "/operations/message-config",
+  事件映射管理: "/operations/event-mapping",
+  日志中心: "/operations/log-center",
   统计分析: "/stats",
   反馈管理: "/feedback",
 };
