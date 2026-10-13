@@ -101,7 +101,7 @@ const groups: NavGroup[] = [
       { title: "第三方系统管理", url: "/organization/integration" },
       { title: "消息配置管理", url: "/operations/message-config" },
       { title: "事件映射管理", url: "/operations/event-mapping" },
-      { title: "日志中心", url: "/operations/log-center" },
+      { title: "运营日志中心", url: "/operations/log-center" },
     ],
   },
   {
