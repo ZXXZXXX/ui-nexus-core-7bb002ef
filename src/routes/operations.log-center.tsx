@@ -121,10 +121,10 @@ function FilterBar({
   kw: string;
   onKw: (v: string) => void;
   placeholder: string;
-  value: string;
-  onValue: (v: string) => void;
-  options: string[];
-  label: string;
+  value?: string;
+  onValue?: (v: string) => void;
+  options?: string[];
+  label?: string;
 }) {
   return (
     <div className="flex items-center gap-3 flex-wrap">
@@ -132,49 +132,35 @@ function FilterBar({
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
         <Input value={kw} onChange={(e) => onKw(e.target.value)} placeholder={placeholder} className="h-9 pl-8 text-body-sm" />
       </div>
-      <Select value={value} onValueChange={onValue}>
-        <SelectTrigger className="h-9 w-36 text-body-sm">
-          <SelectValue placeholder={label} />
-        </SelectTrigger>
-        <SelectContent>
-          {["全部", ...options].map((c) => (
-            <SelectItem key={c} value={c}>{c}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {options && (
+        <Select value={value} onValueChange={onValue}>
+          <SelectTrigger className="h-9 w-36 text-body-sm">
+            <SelectValue placeholder={label} />
+          </SelectTrigger>
+          <SelectContent>
+            {["全部", ...options].map((c) => (
+              <SelectItem key={c} value={c}>{c}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
     </div>
   );
 }
 
 function ApiTable() {
   const [kw, setKw] = useState("");
-  const [sys, setSys] = useState("全部");
-  const [st, setSt] = useState("全部");
   const [detail, setDetail] = useState<ApiLog | null>(null);
 
   const rows = useMemo(
-    () =>
-      API_LOGS.filter(
-        (l) =>
-          (sys === "全部" || l.system === sys) &&
-          (st === "全部" || l.status === st) &&
-          (!kw || l.bizKey.includes(kw) || l.event.includes(kw) || l.id.includes(kw)),
-      ),
-    [kw, sys, st],
+    () => API_LOGS.filter((l) => !kw || l.bizKey.includes(kw) || l.event.includes(kw) || l.id.includes(kw)),
+    [kw],
   );
 
   return (
     <>
       <Card className="border-border bg-card p-6 space-y-4">
-        <FilterBar
-          kw={kw}
-          onKw={setKw}
-          placeholder="搜索业务标识 / 事件"
-          value={sys}
-          onValue={setSys}
-          options={["UD 平台", "企业微信", "实验室系统"]}
-          label="对接系统"
-        />
+        <FilterBar kw={kw} onKw={setKw} placeholder="搜索业务标识 / 事件" />
         <div className="overflow-x-auto rounded-md border border-border">
           <table className="w-full text-body-sm">
             <thead className="bg-surface-subtle text-text-secondary">
