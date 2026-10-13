@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Search } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -159,7 +158,7 @@ function ApiTable() {
 
   return (
     <>
-      <Card className="border-border bg-card p-6 space-y-4">
+      <div className="space-y-4">
         <FilterBar kw={kw} onKw={setKw} placeholder="搜索业务标识 / 事件" />
         <div className="overflow-x-auto rounded-md border border-border">
           <table className="w-full text-body-sm">
@@ -191,7 +190,7 @@ function ApiTable() {
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
         <SheetContent className="w-[620px] sm:max-w-[620px] overflow-y-auto">
@@ -249,7 +248,7 @@ function PushTable() {
 
   return (
     <>
-      <Card className="border-border bg-card p-6 space-y-4">
+      <div className="space-y-4">
         <FilterBar
           kw={kw}
           onKw={setKw}
@@ -289,7 +288,7 @@ function PushTable() {
             </tbody>
           </table>
         </div>
-      </Card>
+      </div>
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
         <SheetContent className="w-[560px] sm:max-w-[560px] overflow-y-auto">
