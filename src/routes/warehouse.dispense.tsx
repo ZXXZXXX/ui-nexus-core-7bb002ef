@@ -213,9 +213,23 @@ function DispensePage() {
           <div className="mt-4 space-y-5">
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               <Field label="商品编码" value={detail.code} mono />
-              <Field label="药品展示名称" value={detail.name} />
+              <div>
+                <div className="text-caption text-text-tertiary mb-0.5">药品展示名称</div>
+                <div className="flex items-center gap-2">
+                  <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption-strong text-primary">{baseUnit(detail.spec)}</span>
+                  <span className="text-body text-foreground">{detail.name}</span>
+                </div>
+              </div>
               <Field label="规格型号" value={detail.spec} />
-              <Field label="领取数量" value={`${detail.qty} ${detail.unit}`} />
+              <div>
+                <div className="text-caption text-text-tertiary mb-0.5">领取数量</div>
+                <FlowCodes
+                  nodes={detailNodes}
+                  title={`取药 ${detail.id} · ${detail.takenAt} · ${detail.operator} · 共 ${countUnits(detailNodes)} 个`}
+                >
+                  {detail.qty}
+                </FlowCodes>
+              </div>
               <Field label="领取时间" value={detail.takenAt} />
               <Field label="领取人员" value={detail.operator} />
               <div className="col-span-2">
