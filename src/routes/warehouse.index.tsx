@@ -486,13 +486,13 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
               <SheetDescription className="pr-8 font-mono text-caption text-text-tertiary">
                 {row.sku}
               </SheetDescription>
-              <SheetTitle className="pr-8 text-section font-medium">{row.name}</SheetTitle>
+              <div className="flex items-center gap-2 pr-8">
+                <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption font-medium text-primary">{row.unit}</span>
+                <SheetTitle className="text-section font-medium">{row.name}</SheetTitle>
+              </div>
               <div className="flex items-end justify-between gap-4 pt-3">
                 <div className="space-y-1">
                   <div className="text-body-sm text-text-secondary">{row.spec}</div>
-                  <div className="text-body-sm text-text-secondary">
-                    基础单位：<span className="text-foreground">{row.unit}</span>
-                  </div>
                   <div className="text-caption text-text-tertiary">
                     共 {row.batches.length} 个批次
                     {used.length > 0 ? ` · ${used.length} 个已用完` : ""}
