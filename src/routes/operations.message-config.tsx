@@ -93,17 +93,16 @@ function Page() {
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
               <Input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="搜索提醒名称" className="h-9 pl-8 text-body-sm" />
             </div>
-            <div className="flex gap-1">
-              {["全部", ...CATEGORIES].map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCat(c)}
-                  className={`h-8 px-3 rounded-md text-body-sm border ${cat === c ? "border-primary text-primary bg-brand-subtle" : "border-border text-text-secondary"}`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
+            <Select value={cat} onValueChange={setCat}>
+              <SelectTrigger className="h-9 w-36 text-body-sm">
+                <SelectValue placeholder="消息类型" />
+              </SelectTrigger>
+              <SelectContent>
+                {["全部", ...CATEGORIES].map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="overflow-x-auto rounded-md border border-border">
