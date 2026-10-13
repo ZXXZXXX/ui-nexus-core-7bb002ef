@@ -407,14 +407,6 @@ function BatchSection({
           </div>
         ))}
       </dl>
-      {batch.stock > 0 && (
-        <div className="mt-3 pl-8">
-          <button type="button" onClick={() => setCodesOpen(true)} className="text-body-sm text-primary">
-            查看现存条码（{batch.stock}）
-          </button>
-          <BatchCodesDialog batch={batch} unit={unit} open={codesOpen} onOpenChange={setCodesOpen} />
-        </div>
-      )}
 
       {open ? (
         list.length === 0 ? (
