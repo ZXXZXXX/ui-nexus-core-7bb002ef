@@ -10,6 +10,8 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { FlowCodes } from "@/components/barcode-viewer";
+import { baseUnit, buildCodes, countUnits } from "@/lib/inventory";
 import {
   hiddenAllocatedCattleCount,
   visibleAllocatedCattle,
@@ -306,21 +308,30 @@ function LossPage() {
                   药品明细 · {current.drugs.length} 种
                 </div>
                 <div className="divide-y divide-border">
-                  {current.drugs.map((d) => (
-                    <div key={d.code + d.pickedAt} className="px-4 py-3 space-y-1.5">
-                      <div className="flex items-center justify-between gap-4">
-                        <span className="text-body text-foreground truncate">{d.name}</span>
-                        <span className="text-body tabular-nums text-foreground shrink-0">
-                          {d.qty} {d.unit}
-                        </span>
+                  {current.drugs.map((d) => {
+                    const nodes = buildCodes(`${d.code}|${current.id}|${d.pickedAt}`, d.qty);
+                    return (
+                      <div key={d.code + d.pickedAt} className="px-4 py-3 space-y-1.5">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="shrink-0 rounded border border-primary/50 bg-primary/5 px-1.5 py-0.5 text-caption-strong text-primary">{baseUnit(d.spec)}</span>
+                            <span className="truncate text-body text-foreground">{d.name}</span>
+                          </div>
+                          <FlowCodes
+                            nodes={nodes}
+                            title={`损耗 ${current.id} · ${d.name} · 领取 ${d.pickedAt} · ${d.pickedBy} · 共 ${countUnits(nodes)} 个`}
+                          >
+                            {d.qty}
+                          </FlowCodes>
+                        </div>
+                        <div className="flex items-center justify-between gap-4 text-caption text-text-tertiary">
+                          <span className="font-mono">{d.code} · {d.spec}</span>
+                          <span className="tabular-nums">{money(d.value)}</span>
+                        </div>
+                        <div className="text-caption text-text-tertiary">领取时间：{d.pickedAt} · 领取人：{d.pickedBy}</div>
                       </div>
-                      <div className="flex items-center justify-between gap-4 text-caption text-text-tertiary">
-                        <span className="font-mono">{d.code} · {d.spec}</span>
-                        <span className="tabular-nums">{money(d.value)}</span>
-                      </div>
-                      <div className="text-caption text-text-tertiary">领取时间：{d.pickedAt} · 领取人：{d.pickedBy}</div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </section>
 
