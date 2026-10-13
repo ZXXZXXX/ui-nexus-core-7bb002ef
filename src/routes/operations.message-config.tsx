@@ -109,7 +109,7 @@ function Page() {
             <table className="w-full text-body-sm">
               <thead className="bg-surface-subtle text-text-secondary">
                 <tr className="h-12">
-                  {["消息类型", "提醒名称", "提醒文本", "跳转界面", "推送渠道", "推送时间", "启用", "操作"].map((h) => (
+                  {["消息类型", "消息名称", "提醒文本", "跳转界面", "推送渠道", "推送时间", "启用", "操作"].map((h) => (
                     <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
