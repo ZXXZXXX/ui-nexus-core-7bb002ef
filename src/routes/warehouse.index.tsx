@@ -31,6 +31,11 @@ import {
   isBatchUsedUp,
   LEDGER_OPTIONAL,
   partitionBatches,
+  batchCodes,
+  countUnits,
+  flowCodes,
+  groupDigits,
+  type CodeNode,
   type Flow,
   type Item,
   type SkuRow,
@@ -273,6 +278,77 @@ function ExportDialog({
   );
 }
 
+/* ------------------------------ 分层条码 ------------------------------ */
+
+function CodeTree({ nodes }: { nodes: CodeNode[] }) {
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  if (!nodes.length) return <div className="py-6 text-center text-body-sm text-text-tertiary">暂无条码</div>;
+  return (
+    <ul className="space-y-1">
+      {nodes.map((n) =>
+        n.children.length ? (
+          <li key={n.code}>
+            <button
+              type="button"
+              aria-expanded={!!open[n.code]}
+              onClick={() => setOpen((m) => ({ ...m, [n.code]: !m[n.code] }))}
+              className="flex w-full items-center gap-2 py-1 text-left"
+            >
+              <ChevronRight className={`size-3.5 shrink-0 text-text-tertiary transition-transform motion-reduce:transition-none ${open[n.code] ? "rotate-90" : ""}`} />
+              <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
+              <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
+              <span className="ml-auto shrink-0 text-caption text-text-tertiary">含 {n.children.length}</span>
+            </button>
+            {open[n.code] && (
+              <ul className="mb-1 ml-[7px] border-l border-border pl-5">
+                {n.children.map((c) => (
+                  <li key={c} className="py-0.5 font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(c)}</li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ) : (
+          <li key={n.code} className="flex items-center gap-2 py-1 pl-[22px]">
+            <span className="shrink-0 rounded bg-muted px-1.5 text-caption text-text-tertiary">散件</span>
+            <span className="font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(n.code)}</span>
+          </li>
+        ),
+      )}
+    </ul>
+  );
+}
+
+function FlowCodes({ nodes }: { nodes: CodeNode[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-1">
+      <button type="button" onClick={() => setOpen((v) => !v)} className="inline-flex items-center gap-0.5 text-caption text-primary">
+        药品条码 {countUnits(nodes)} 个
+        <ChevronDown className={`size-3.5 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="mt-2 rounded-md bg-muted/40 p-3"><CodeTree nodes={nodes} /></div>}
+    </div>
+  );
+}
+
+function BatchCodesDialog({ batch, unit, open, onOpenChange }: { batch: Item; unit: string; open: boolean; onOpenChange: (v: boolean) => void }) {
+  const nodes = batchCodes(batch);
+  const packs = nodes.filter((n) => n.children.length).length;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[520px]">
+        <DialogHeader>
+          <DialogTitle>现存药品条码</DialogTitle>
+          <DialogDescription>
+            批次 <span className="font-mono">{batch.batchNo}</span> · 采购单价 ¥{batch.price.toFixed(2)} · 共 {countUnits(nodes)} {unit}（{packs} 个外包装，{nodes.length - packs} 个散件）
+          </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /* ------------------------------ 批次详情抽屉 ------------------------------ */
 
 function BatchSection({
@@ -288,6 +364,7 @@ function BatchSection({
   open: boolean;
   onToggle: () => void;
 }) {
+  const [codesOpen, setCodesOpen] = useState(false);
   return (
     <section className="border-b border-border py-5 last:border-b-0">
       <Button
@@ -318,6 +395,14 @@ function BatchSection({
           </div>
         ))}
       </dl>
+      {batch.stock > 0 && (
+        <div className="mt-3 pl-8">
+          <button type="button" onClick={() => setCodesOpen(true)} className="text-body-sm text-primary">
+            查看现存条码（{batch.stock}）
+          </button>
+          <BatchCodesDialog batch={batch} unit={unit} open={codesOpen} onOpenChange={setCodesOpen} />
+        </div>
+      )}
 
       {open ? (
         list.length === 0 ? (
@@ -343,6 +428,7 @@ function BatchSection({
                     <time className="tabular-nums">{r.date}</time>
                     <span>操作人：{r.operator}</span>
                   </div>
+                  <FlowCodes nodes={flowCodes(r, batch.sku)} />
                 </li>
               );
             })}

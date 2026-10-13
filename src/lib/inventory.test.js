@@ -100,3 +100,13 @@ it("同批次同单价合并为一个批次，余量相加", () => {
 it("同批次不同单价分开展示", () => {
   expect(_merge([_b({}), _b({ price: 12 })])).toHaveLength(2);
 });
+
+import { buildCodes, countUnits } from "./inventory";
+it("条码最多两层：满 10 个归入外包装，余数为单层散件，且全为数字", () => {
+  const n = buildCodes("s", 23);
+  expect(n).toHaveLength(5);
+  expect(n.slice(0, 2).every((x) => x.children.length === 10)).toBe(true);
+  expect(n.slice(2).every((x) => x.children.length === 0)).toBe(true);
+  expect(countUnits(n)).toBe(23);
+  expect(n.flatMap((x) => [x.code, ...x.children]).every((c) => /^\d+$/.test(c))).toBe(true);
+});
