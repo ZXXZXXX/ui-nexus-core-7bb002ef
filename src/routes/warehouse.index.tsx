@@ -384,7 +384,6 @@ function BatchSection({
           </div>
         </Button>
         <div className="mt-2 flex shrink-0 items-baseline gap-2 pr-2">
-          <span className="text-caption text-text-tertiary">余量</span>
           {batch.stock > 0 ? (
             <button
               type="button"
