@@ -18,7 +18,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
-import { Download, Check, ChevronRight, ChevronDown } from "lucide-react";
+import { Download, Check, ChevronRight, ChevronDown, Barcode } from "lucide-react";
 import { ListPage, type ListColumn } from "@/components/list-page";
 import { exportXlsx, type SheetData } from "@/lib/export-xlsx";
 import {
@@ -365,26 +365,40 @@ function BatchSection({
   const [codesOpen, setCodesOpen] = useState(false);
   return (
     <section className="border-b border-border py-5 last:border-b-0">
-      <Button
-        variant="ghost"
-        type="button"
-        aria-expanded={open}
-        aria-label={`批次 ${batch.batchNo}`}
-        onClick={onToggle}
-        className="h-auto w-full justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-transparent!"
-      >
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} />
-          <span className="text-body-sm font-normal text-text-secondary">批次</span>
-          <span className="font-mono text-card-title font-medium text-foreground">{batch.batchNo}</span>
-          {isBatchUsedUp(batch) && <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">已用完</span>}
-        </div>
-        <div className="flex shrink-0 items-baseline gap-2">
-          <span className="text-caption font-normal text-text-tertiary">余量</span>
-          <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
-          <span className="text-body-sm font-normal text-text-secondary">{unit}</span>
-        </div>
-      </Button>
+      <div className="flex items-start gap-2">
+        <Button
+          variant="ghost"
+          type="button"
+          aria-expanded={open}
+          aria-label={`批次 ${batch.batchNo}`}
+          onClick={onToggle}
+          className="h-auto min-w-0 flex-1 justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-transparent!"
+        >
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <ChevronRight className={`text-text-tertiary transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`} />
+            <span className="text-body-sm font-normal text-text-secondary">批次</span>
+            <span className="font-mono text-card-title font-medium text-foreground">{batch.batchNo}</span>
+            {isBatchUsedUp(batch) && <span className="rounded bg-muted px-1.5 text-caption font-normal text-text-tertiary">已用完</span>}
+          </div>
+          <div className="flex shrink-0 items-baseline gap-2">
+            <span className="text-caption font-normal text-text-tertiary">余量</span>
+            <span className="text-card-title tabular-nums text-foreground">{batch.stock}</span>
+            <span className="text-body-sm font-normal text-text-secondary">{unit}</span>
+          </div>
+        </Button>
+        {batch.stock > 0 && (
+          <button
+            type="button"
+            aria-label={`查看批次 ${batch.batchNo} 现存条码，共 ${batch.stock} ${unit}`}
+            onClick={() => setCodesOpen(true)}
+            className="mt-2 flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-body-sm text-text-secondary transition-colors hover:border-primary/40 hover:bg-sidebar-hover hover:text-primary"
+          >
+            <Barcode className="h-4 w-4" />
+            <span className="tabular-nums">{batch.stock}</span>
+          </button>
+        )}
+      </div>
+      <BatchCodesDialog batch={batch} unit={unit} open={codesOpen} onOpenChange={setCodesOpen} />
       <dl className="mt-3 grid grid-cols-3 gap-3 pl-8 pr-2">
         {[["效期", batch.expiry], ["生产日期", batch.prodDate], ["采购单价", `¥${batch.price.toFixed(2)}`]].map(([label, value]) => (
           <div key={label} className="min-w-0">
