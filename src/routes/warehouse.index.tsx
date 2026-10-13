@@ -409,6 +409,7 @@ function BatchSection({
           <ol className="ml-3 mt-6 pr-2">
             {list.map((r, idx) => {
               const isIn = r.dir === "in";
+              const codes = flowCodes(r, batch.sku);
               return (
                 <li key={idx} className="relative pb-6 pl-5 last:pb-1">
                   {idx < list.length - 1 && <span className="absolute bottom-0 left-0 top-3 w-px bg-border" />}
