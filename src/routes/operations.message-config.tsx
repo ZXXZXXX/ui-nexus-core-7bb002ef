@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { Bell, MessageSquareText, Search, Smartphone } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -87,7 +86,7 @@ function Page() {
     <>
       <AppHeader title="消息配置管理" breadcrumb={["运营管理", "消息配置管理"]} />
       <main className="flex-1 px-6 py-6 space-y-4">
-        <Card className="border-border bg-card p-6 space-y-4">
+        <div className="space-y-4">
           <div className="flex items-center gap-3 flex-wrap">
             <div className="relative w-64">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
@@ -139,7 +138,7 @@ function Page() {
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       </main>
 
       <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
