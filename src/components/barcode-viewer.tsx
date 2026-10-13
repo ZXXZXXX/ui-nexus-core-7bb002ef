@@ -47,8 +47,8 @@ export function FlowCodes({ nodes, title, children }: { nodes: CodeNode[]; title
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} title="查看药品条码" className="group flex shrink-0 items-center gap-1.5 rounded-md px-2 py-0.5 -mr-2 transition-colors hover:bg-muted">
-        <Barcode className="h-4 w-4 text-text-tertiary group-hover:text-primary" />
+      <button type="button" onClick={() => setOpen(true)} title="查看药品条码" className="group flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 transition-colors hover:bg-muted">
+        <Barcode className="h-3 w-3 text-text-tertiary group-hover:text-primary" />
         <span className="text-body font-medium tabular-nums text-foreground underline decoration-dotted decoration-text-tertiary underline-offset-4 group-hover:text-primary group-hover:decoration-primary">{children}</span>
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
