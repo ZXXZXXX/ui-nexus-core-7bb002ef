@@ -494,8 +494,7 @@ function DetailDrawer({ row, onClose }: { row: SkuRow | null; onClose: () => voi
                 <div className="space-y-1">
                   <div className="text-body-sm text-text-secondary">{row.spec}</div>
                   <div className="text-caption text-text-tertiary">
-                    共 {row.batches.length} 个批次
-                    {used.length > 0 ? ` · ${used.length} 个已用完` : ""}
+                    当前存量共计 {active.length} 个批次
                   </div>
                 </div>
                 <div className="shrink-0 text-right">
