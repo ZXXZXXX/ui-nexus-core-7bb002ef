@@ -181,6 +181,7 @@ const columns: ListColumn<DispenseRow>[] = [
 function DispensePage() {
   const [data] = useState<DispenseRow[]>(initial);
   const [detail, setDetail] = useState<DispenseRow | null>(null);
+  const detailNodes = detail ? buildCodes(`${detail.code}|${detail.id}`, detail.qty) : [];
 
   return (
     <>
