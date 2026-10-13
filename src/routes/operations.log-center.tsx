@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { categoryTag } from "@/lib/message-category";
 
 export const Route = createFileRoute("/operations/log-center")({
   head: () => ({
@@ -272,7 +273,7 @@ function PushTable() {
                 <tr key={l.id} className="border-t border-border h-12">
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.time}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground font-medium">{l.name}</td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className="tag tag-muted">{l.category}</span></td>
+                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${categoryTag(l.category)}`}>{l.category}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.receiver}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.channel}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${pushTag(l.pushStatus)}`}>{l.pushStatus}</span></td>
