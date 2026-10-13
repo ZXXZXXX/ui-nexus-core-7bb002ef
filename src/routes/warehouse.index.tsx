@@ -313,7 +313,8 @@ function FlowCodes({ nodes, title }: { nodes: CodeNode[]; title: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-1">
-      <button type="button" onClick={() => setOpen(true)} className="text-caption text-primary">
+      <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-1 text-caption text-primary">
+        <Barcode className="h-3.5 w-3.5" />
         药品条码 {countUnits(nodes)} 个
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
