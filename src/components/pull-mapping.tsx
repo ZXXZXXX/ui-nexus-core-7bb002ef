@@ -199,10 +199,10 @@ export function PullMapping() {
                   <Input value={draft.title} placeholder="如：驱虫工单拉取" onChange={(e) => patchDraft({ title: e.target.value })} />
                 </Field>
                 <div className="grid grid-cols-2 gap-4">
-                  <Field label="拉取事件类型名称">
+                  <Field label="第三方事件类型名称">
                     <Input value={draft.typeName} onChange={(e) => patchDraft({ typeName: e.target.value })} />
                   </Field>
-                  <Field label="拉取事件类型编码">
+                  <Field label="第三方事件类型编码">
                     <Input value={draft.typeCode} className="font-mono" onChange={(e) => patchDraft({ typeCode: e.target.value.replace(/\D/g, "") })} />
                   </Field>
                 </div>
