@@ -167,7 +167,7 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
   const list = useMemo(() => rows.filter((r) =>
     (status === "全部状态" || (status === "已配置") === done(r)) &&
     (!kw || [r.udType, r.udTypeName, r.udSub, r.udSubName, r.target, r.disease ?? ""].some((s) => s.includes(kw)))), [rows, kw, status]);
-  const cols = ["UD 事件类型编码", "UD 事件类型", "UD 事件子类型编码", "UD 事件子类型", ...(wo ? ["本系统工单类型", "疾病结论"] : ["本系统基础事件任务类型"]), "状态", "备注", "操作"];
+  const cols = ["事件类型编码", "事件类型", "事件子类型编码", "事件子类型", ...(wo ? ["本系统工单类型", "疾病结论"] : ["本系统基础事件任务类型"]), "状态", "备注", "操作"];
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
