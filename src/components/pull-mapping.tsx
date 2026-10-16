@@ -119,6 +119,7 @@ export function PullMapping() {
                 </div>
               </header>
 
+              <div className="relative max-h-[210px] overflow-hidden">
               <div className="divide-y divide-border">
                 {c.subs.map((s) => {
                   const ok = ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false;
