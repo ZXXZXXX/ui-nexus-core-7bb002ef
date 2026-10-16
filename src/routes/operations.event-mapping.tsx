@@ -183,7 +183,7 @@ function InTable() {
                 <td className="px-4 py-3 whitespace-nowrap"><Code v={r.fromCode} /></td>
                 <td className="px-4 py-3 whitespace-nowrap"><StatusTag ok={!isPending(r.fromCode)} /></td>
                 <td className="px-4 py-3 text-text-secondary max-w-[240px] truncate" title={r.note}>{r.note || "—"}</td>
-                <td className="px-4 py-3 whitespace-nowrap"><Button variant="link" className="h-auto p-0" onClick={() => setEdit(r)}>编辑</Button></td>
+                <td className="px-4 py-3 whitespace-nowrap"><Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button></td>
               </tr>
             ))}
           </tbody>
@@ -231,7 +231,7 @@ function OutTable() {
                 <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{r.withDrug ? "是" : "否"}</td>
                 <td className="px-4 py-3 whitespace-nowrap"><StatusTag ok={!isPending(r.toSub)} /></td>
                 <td className="px-4 py-3 text-text-secondary max-w-[240px] truncate" title={r.note}>{r.note || "—"}</td>
-                <td className="px-4 py-3 whitespace-nowrap"><Button variant="link" className="h-auto p-0" onClick={() => setEdit(r)}>编辑</Button></td>
+                <td className="px-4 py-3 whitespace-nowrap"><Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button></td>
               </tr>
             ))}
           </tbody>
