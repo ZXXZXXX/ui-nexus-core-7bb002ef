@@ -96,16 +96,16 @@ export function PullMapping() {
       </div>
 
       <div className="overflow-x-auto rounded-md border border-border">
-        <table className="w-full text-body-sm">
+        <table className="w-full border-separate border-spacing-0 text-body-sm">
           <thead className="bg-surface-subtle text-text-secondary">
             <tr className="h-12">
-              <th className="px-4 text-left font-medium whitespace-nowrap w-[220px] grow">映射名称</th>
+              <th className="sticky left-0 z-20 border-r border-border bg-surface-subtle px-4 text-left font-medium whitespace-nowrap w-[220px] grow">映射名称</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[140px] grow">（第三方）事件类型名称</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[150px]">（第三方）事件类型编号</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[110px]">（我方）对应类型</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">子类型映射数目</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[100px]">状态</th>
-              <th className="px-4 text-left font-medium whitespace-nowrap w-[80px]">操作</th>
+              <th className="sticky right-0 z-20 border-l border-border bg-surface-subtle px-4 text-left font-medium whitespace-nowrap w-[80px]">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -114,20 +114,20 @@ export function PullMapping() {
               const configured = c.subs.filter((s) => (ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false)).length;
               const ok = !!ck && c.subs.length > 0 && configured === c.subs.length;
               return (
-                <tr key={c.id} className="border-t border-border h-12">
-                  <td className="px-4 py-3 whitespace-nowrap">
+                <tr key={c.id} className="group/row h-12">
+                  <td className="sticky left-0 z-10 border-t border-r border-border bg-card px-4 py-3 whitespace-nowrap group-hover/row:bg-surface-subtle">
                     <button type="button" className="text-text-primary hover:text-primary" onClick={() => openView(c)} title="查看全部子类型映射详情">
                       {c.title || "未命名卡片"}
                     </button>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">{c.typeName || "—"}</td>
-                  <td className="px-4 py-3 whitespace-nowrap font-mono tabular-nums">{c.typeCode || "—"}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="border-t border-border px-4 py-3 whitespace-nowrap">{c.typeName || "—"}</td>
+                  <td className="border-t border-border px-4 py-3 whitespace-nowrap font-mono tabular-nums">{c.typeCode || "—"}</td>
+                  <td className="border-t border-border px-4 py-3 whitespace-nowrap">
                     {ck ? <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap tabular-nums text-text-primary">{c.subs.length}</td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="border-t border-border px-4 py-3 whitespace-nowrap tabular-nums text-text-primary">{c.subs.length}</td>
+                  <td className="border-t border-border px-4 py-3 whitespace-nowrap"><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
+                  <td className="sticky right-0 z-10 border-t border-l border-border bg-card px-4 py-3 whitespace-nowrap group-hover/row:bg-surface-subtle">
                     <Button variant="ghost" size="sm" className={textBtn} onClick={() => openEdit(c)}>编辑</Button>
                   </td>
                 </tr>
