@@ -131,6 +131,25 @@ const obsExpiredOrders = new Set<string>([]);
 // 复查任务超时未操作 → 系统自动归档的工单（status 为 已完成 但无人工复查结论）
 const autoArchivedOrders = new Set<string>(["HF-0688", "WO-2199"]);
 
+// 用药异常标记：提交执行记录时写入，执行任务卡片按「工单 + 天次」读回
+const abnormalDayKey = (id: string, day: number) => `health:abnormal:${id}:${day}`;
+export function markDayAbnormal(id: string, day: number) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(abnormalDayKey(id, day), "1");
+  } catch {
+    /* 存储不可用时忽略 */
+  }
+}
+function readDayAbnormal(id: string, day: number) {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(abnormalDayKey(id, day)) === "1";
+  } catch {
+    return false;
+  }
+}
+
 
 function TaskDetailPage() {
   const { id } = useParams({ from: "/m/health/$id" });
@@ -1226,6 +1245,13 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
   const needPickup = hasDrugTasks && Boolean(pickupCode);
 
   const hasUnpicked = needPickup && days.some((d) => d.phase !== "done");
+  // 已标记用药异常的天次：提交执行记录时写入本地，挂载后读回（SSR 不读浏览器存储）
+  const [abnormalDays, setAbnormalDays] = useState<Record<number, boolean>>({});
+  useEffect(() => {
+    const next: Record<number, boolean> = {};
+    for (const d of days) next[d.day] = readDayAbnormal(id, d.day);
+    setAbnormalDays(next);
+  }, [id, status]);
   return (
     <>
 
