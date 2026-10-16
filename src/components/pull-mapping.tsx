@@ -54,14 +54,16 @@ const textBtn = "h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-s
 export function PullMapping() {
   const [cards, setCards] = useState(SEED);
   const [kw, setKw] = useState("");
-  const [draft, setDraft] = useState<Card | null>(null);
-  const [subDlg, setSubDlg] = useState<Sub | null>(null);
+  const [viewCard, setViewCard] = useState<Card | null>(null); // 抽屉查看态
+  const [draft, setDraft] = useState<Card | null>(null); // 抽屉编辑态
 
   const list = useMemo(() => cards.filter((c) => !kw || [c.title, c.typeName, c.typeCode, c.target, ...c.subs.flatMap((s) => [s.name, s.code])].some((v) => v.includes(kw))), [cards, kw]);
   const isNew = !!draft && !cards.some((x) => x.id === draft.id);
   const openEdit = (c: Card) => setDraft({ ...c, subs: c.subs.map((s) => ({ ...s })) });
-  const openNew = () => setDraft({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", subs: [] });
-  const closeEdit = () => setDraft(null);
+  const openView = (c: Card) => setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) });
+  const openNew = () => { setViewCard(null); setDraft({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", subs: [] }); };
+  const closeAll = () => { setViewCard(null); setDraft(null); };
+  const drawerOpen = !!viewCard || !!draft;
   const patchDraft = (p: Partial<Card>) => setDraft((d) => (d ? { ...d, ...p } : d));
   const patchSub = (sid: string, p: Partial<Sub>) =>
     setDraft((d) => (d ? { ...d, subs: d.subs.map((s) => (s.id === sid ? { ...s, ...p } : s)) } : d));
@@ -69,7 +71,7 @@ export function PullMapping() {
   const saveDraft = () => {
     if (!draft) return;
     setCards((cs) => (isNew ? [draft, ...cs] : cs.map((x) => (x.id === draft.id ? draft : x))));
-    setDraft(null);
+    closeAll();
   };
 
   const saveSub = (s: Sub) => {
