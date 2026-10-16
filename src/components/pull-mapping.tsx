@@ -293,32 +293,3 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
     </div>
   );
 }
-
-function FormDialog({ open, title, fields, init, onClose, onSave }: {
-  open: boolean; title: string; fields: [string, string][]; init: Record<string, string>;
-  onClose: () => void; onSave: (v: Record<string, string>) => void;
-}) {
-  const [vals, setVals] = useState<Record<string, string>>({});
-  const [wasOpen, setWasOpen] = useState(false);
-  if (open !== wasOpen) { setWasOpen(open); if (open) setVals(init); }
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
-        <div className="space-y-4">
-          {fields.map(([k, label]) => (
-            <label key={k} className="block space-y-1.5">
-              <span className="text-body-sm text-text-secondary">{label}</span>
-              <Input value={vals[k] ?? ""} className={k.toLowerCase().includes("code") ? "font-mono" : undefined}
-                onChange={(e) => setVals({ ...vals, [k]: k.toLowerCase().includes("code") ? e.target.value.replace(/\D/g, "") : e.target.value })} />
-            </label>
-          ))}
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>取消</Button>
-          <Button disabled={fields.some(([k]) => !vals[k])} onClick={() => onSave(vals)}>保存</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-}
