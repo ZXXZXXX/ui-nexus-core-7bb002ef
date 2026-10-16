@@ -102,7 +102,7 @@ export function PullMapping() {
               <th className="px-4 text-left font-medium whitespace-nowrap w-[220px] grow">映射名称</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[140px] grow">（第三方）事件类型名称</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[150px]">（第三方）事件类型编号</th>
-              <th className="px-4 text-left font-medium whitespace-nowrap w-[170px] grow">（我方）对应类型</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[110px]">（我方）对应类型</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">子类型映射数目</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[100px]">状态</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[80px]">操作</th>
@@ -123,12 +123,7 @@ export function PullMapping() {
                   <td className="px-4 py-3 whitespace-nowrap">{c.typeName || "—"}</td>
                   <td className="px-4 py-3 whitespace-nowrap font-mono tabular-nums">{c.typeCode || "—"}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    {c.target ? (
-                      <span className="inline-flex items-center gap-2">
-                        <span className="text-text-primary">{targetLabel(c.target)}</span>
-                        <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span>
-                      </span>
-                    ) : <span className="text-text-tertiary">未选择</span>}
+                    {ck ? <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap tabular-nums">
                     {ck ? <span className="text-text-primary">{configured}<span className="text-text-tertiary"> / {c.subs.length}</span></span> : c.subs.length}
