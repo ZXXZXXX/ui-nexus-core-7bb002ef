@@ -1089,6 +1089,14 @@ type ExecItem = {
 };
 
 
+// 用药异常：可选体重区间（取区间代表体重重新计算用量）
+const WEIGHT_BANDS: { label: string; kg: number }[] = [
+  { label: "<300kg", kg: 250 },
+  { label: "300–450kg", kg: 400 },
+  { label: "450–600kg", kg: 550 },
+  { label: ">600kg", kg: 650 },
+];
+
 // 演示用：药品关联关系（例如同一组合包装/同处方关联领取）
 const DRUG_ASSOCIATIONS: Record<string, string[]> = {
   "氟尼辛葡甲胺注射液": ["头孢噻呋钠"],
@@ -1406,7 +1414,7 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
 }
 
 // === 执行页：仅显示当前进行中的当天 checklist ===
-export function ActiveDayExecute({ pickupCode, tags, day = 2, date = "05/13", workOrderId, onReadyChange, batchCount = 1 }: { pickupCode: string | null; tags: string[]; day?: number; date?: string; workOrderId: string; onReadyChange?: (ready: boolean) => void; batchCount?: number }) {
+export function ActiveDayExecute({ pickupCode, tags, day = 2, date = "05/13", workOrderId, onReadyChange, onAbnormalChange, batchCount = 1 }: { pickupCode: string | null; tags: string[]; day?: number; date?: string; workOrderId: string; onReadyChange?: (ready: boolean) => void; onAbnormalChange?: (abnormal: boolean) => void; batchCount?: number }) {
   // 疾病治疗（WO）/ 产后护理（PP）默认每日测温；修蹄（HF）/ 干奶（GN）/ 损耗（LS）/ 疫苗免疫（YM）/ 驱虫（QC）无需测温
   const noTempPrefix = ["HF", "GN", "LS", "YM", "QC"].some((p) => workOrderId?.startsWith(p));
   let withTemp = !workOrderId || !noTempPrefix;
@@ -1417,7 +1425,7 @@ export function ActiveDayExecute({ pickupCode, tags, day = 2, date = "05/13", wo
   }
   return (
     <div>
-      <ChecklistDay day={day} date={date} pickupCode={pickupCode} tags={tags} dayState="active" initialNote="" workOrderId={workOrderId} withTemp={withTemp} onReadyChange={onReadyChange} batchCount={batchCount} />
+      <ChecklistDay day={day} date={date} pickupCode={pickupCode} tags={tags} dayState="active" initialNote="" workOrderId={workOrderId} withTemp={withTemp} onReadyChange={onReadyChange} onAbnormalChange={onAbnormalChange} batchCount={batchCount} />
     </div>
   );
 }
@@ -1437,6 +1445,7 @@ function ChecklistDay({
   workOrderId,
   withTemp = false,
   onReadyChange,
+  onAbnormalChange,
   batchCount = 1,
 }: {
   day: number;
@@ -1449,6 +1458,7 @@ function ChecklistDay({
   workOrderId?: string;
   withTemp?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  onAbnormalChange?: (abnormal: boolean) => void;
   batchCount?: number;
 }) {
 
@@ -1473,6 +1483,13 @@ function ChecklistDay({
   const [unableMed, setUnableMed] = useState(false);
   const [unableReason, setUnableReason] = useState("");
   const [unablePhotos, setUnablePhotos] = useState<number[]>([]);
+  // 用药异常：计算参数调整 / 部分药品未使用
+  const [abnOpen, setAbnOpen] = useState(false);
+  const [paramAdjust, setParamAdjust] = useState(false);
+  const [blindTeats, setBlindTeats] = useState(0);
+  const [weightBand, setWeightBand] = useState<string>("");
+  const [partialUse, setPartialUse] = useState(false);
+  const [partialReason, setPartialReason] = useState("");
 
 
   const scannedMap = useScannedCodes(pickupCode ?? "");
@@ -1534,16 +1551,42 @@ function ChecklistDay({
   const medItems = items.filter((it) => it.needMed);
   const therapyItems = items.filter((it) => !it.needMed && !it.title.includes("测温"));
   const hasMed = medItems.length > 0;
+  const planDrugs = (activePlan?.drugs ?? []).filter((d) => d.kind !== "therapy");
+  const baseWeight = activePlan?.weightKg ?? 500;
+  const band = WEIGHT_BANDS.find((b) => b.label === weightBand);
+  const effWeight = paramAdjust && band ? band.kg : baseWeight;
+  const isUdder = (use?: string) => Boolean(use && /乳/.test(use));
+  const hasUdderDrug = planDrugs.some((d) => isUdder(d.use));
+  const activeTeats = paramAdjust ? Math.max(0, 4 - blindTeats) : 4;
+  // 调整参数后重新计算单次用量（体重换算 + 乳房给药按非盲乳数）
+  const adjustedDose = (it: ExecItem): { dose?: string; total?: string } => {
+    const idx = Number(it.id.split("-t")[1]) - 1;
+    const d = planDrugs[idx];
+    if (!paramAdjust || !d) return { dose: it.doseText, total: it.totalText };
+    let dose = actualDoseText(d.dose, effWeight);
+    if (isUdder(d.use)) {
+      const m = dose.match(/^([\d.]+)\s*(.*)$/);
+      if (m) dose = `${Math.round(parseFloat(m[1]) * activeTeats * 10) / 10}${m[2]}（${activeTeats} 个乳区）`;
+    }
+    return { dose, total: totalDoseText(dose, batchCount) ?? undefined };
+  };
+  const scannedMeds = medItems.filter((i) => Boolean(i.scanCode));
   const medScanReady = !hasMed
     ? true
     : unableMed
       ? unableReason.trim().length > 0 && unablePhotos.length > 0
-      : pickupClaimed && items.filter((i) => i.needMed).every((i) => Boolean(i.scanCode));
-  const evidenceRequired = hasMed && !unableMed;
+      : partialUse
+        ? partialReason.trim().length > 0
+        : pickupClaimed && items.filter((i) => i.needMed).every((i) => Boolean(i.scanCode));
+  const evidenceRequired = hasMed && !unableMed && (!partialUse || scannedMeds.length > 0);
   const ready = interactive && medScanReady && tasksReady && (!evidenceRequired || evidencePhotos.length > 0);
+  const abnormal = paramAdjust || partialUse;
   useEffect(() => {
     onReadyChange?.(ready);
   }, [ready, onReadyChange]);
+  useEffect(() => {
+    onAbnormalChange?.(abnormal);
+  }, [abnormal, onAbnormalChange]);
 
   const total = items.length;
   const doneCount = items.filter((i) => i.status === "done").length;
@@ -1667,25 +1710,82 @@ function ChecklistDay({
 
 
 
-          {/* 用药状态切换（异常分支入口，影响下方"用药信息"与"治疗记录"两张卡片形态） */}
+          {/* 用药异常（计算参数调整 / 部分药品未使用），提交后保留异常标记，不终止工单 */}
           {interactive && medItems.length > 0 && (
-            <div className="flex items-center justify-end">
-              {unableMed ? (
-                <button
-                  type="button"
-                  onClick={() => { setUnableMed(false); setUnableReason(""); setUnablePhotos([]); }}
-                  className="text-caption text-primary active:opacity-70"
-                >
-                  恢复正常用药
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setUnableMed(true)}
-                  className="text-caption text-text-tertiary underline underline-offset-2 decoration-border active:opacity-70"
-                >
-                  无法正常用药 ›
-                </button>
+            <div className={`rounded-xl border bg-card ${abnormal ? "border-[var(--state-warning)]/50" : "border-border"}`}>
+              <button
+                type="button"
+                onClick={() => setAbnOpen((v) => !v)}
+                className="w-full flex items-center justify-between px-3 py-2.5"
+              >
+                <span className="text-body-sm text-foreground inline-flex items-center gap-2">
+                  用药异常
+                  {abnormal && (
+                    <span className="inline-flex items-center h-5 px-1.5 rounded text-caption bg-[var(--state-warning)]/10 text-[var(--state-warning)]">
+                      已标记
+                    </span>
+                  )}
+                </span>
+                <span className="text-caption text-text-tertiary">{abnOpen ? "收起" : "展开"}</span>
+              </button>
+              {abnOpen && (
+                <div className="border-t border-border px-3 py-3 space-y-3">
+                  <label className="flex items-start gap-2">
+                    <input type="checkbox" className="mt-1 accent-[var(--primary)]" checked={paramAdjust} onChange={(e) => setParamAdjust(e.target.checked)} />
+                    <span>
+                      <span className="block text-body-sm text-foreground">计算参数调整</span>
+                      <span className="block text-caption text-text-tertiary">修改本次任务的计算参数，系统按调整后的用量重新计算并校验</span>
+                    </span>
+                  </label>
+                  {paramAdjust && (
+                    <div className="ml-6 space-y-2.5">
+                      <div>
+                        <div className="text-caption text-text-tertiary mb-1.5">体重区间（原 {baseWeight}kg）</div>
+                        <div className="flex flex-wrap gap-2">
+                          {WEIGHT_BANDS.map((b) => (
+                            <button key={b.label} type="button" onClick={() => setWeightBand(b.label)}
+                              className={`h-8 px-3 rounded-full text-body-sm border ${weightBand === b.label ? "border-primary bg-brand-subtle text-primary" : "border-border text-text-secondary"}`}>
+                              {b.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {hasUdderDrug && (
+                        <div>
+                          <div className="text-caption text-text-tertiary mb-1.5">盲乳数（非盲乳 {activeTeats} 个）</div>
+                          <div className="flex gap-2">
+                            {[0, 1, 2, 3].map((n) => (
+                              <button key={n} type="button" onClick={() => setBlindTeats(n)}
+                                className={`h-8 w-10 rounded-lg text-body-sm border ${blindTeats === n ? "border-primary bg-brand-subtle text-primary" : "border-border text-text-secondary"}`}>
+                                {n}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <label className="flex items-start gap-2">
+                    <input type="checkbox" className="mt-1 accent-[var(--primary)]" checked={partialUse} onChange={(e) => setPartialUse(e.target.checked)} />
+                    <span>
+                      <span className="block text-body-sm text-foreground">部分药品未使用</span>
+                      <span className="block text-caption text-text-tertiary">填写原因后，药品未全部录入也可提交；已录入药品仍需核验，按实际用药记录和扣减</span>
+                    </span>
+                  </label>
+                  {partialUse && (
+                    <div className="ml-6">
+                      <div className="text-caption text-text-tertiary mb-1.5">未使用原因 <span className="text-[var(--state-danger)]">*</span></div>
+                      <textarea
+                        value={partialReason}
+                        onChange={(e) => setPartialReason(e.target.value.slice(0, 200))}
+                        rows={3}
+                        placeholder="例如：牛只应激无法继续注射 / 药品不足…"
+                        className="w-full rounded-lg border border-border bg-card px-3 py-2 text-body-sm resize-none"
+                      />
+                    </div>
+                  )}
+                  <div className="text-caption text-text-tertiary">提交后本次任务标记为已完成并保留异常标记，不终止工单，不修改原处方及后续任务。</div>
+                </div>
               )}
             </div>
           )}
@@ -1752,13 +1852,16 @@ function ChecklistDay({
                         </div>
                         <div className="mt-1 flex items-center justify-between gap-3 text-caption">
                           <span className="text-text-tertiary">
-                            剂量 {it.doseText ?? "-"}
-                            {it.totalText && (
+                            剂量 {adjustedDose(it).dose ?? "-"}
+                            {adjustedDose(it).total && (
                               <span className="ml-2 text-primary">
-                                总需求 {it.totalText}
+                                总需求 {adjustedDose(it).total}
                               </span>
                             )}
                           </span>
+                          {!scanned && partialUse && (
+                            <span className="shrink-0 rounded-md bg-surface-subtle px-2 py-0.5 text-text-tertiary">未使用</span>
+                          )}
                           {scanned && (
                             <span className="shrink-0 inline-flex items-center gap-1 rounded-md bg-primary/10 px-2 py-0.5">
                               <span className="text-text-tertiary">批次号</span>
