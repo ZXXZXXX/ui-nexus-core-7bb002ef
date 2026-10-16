@@ -226,28 +226,24 @@ export function PullMapping() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="text-card-title font-medium text-text-primary">事件子类型（{draft.subs.length}）</div>
-                  <Button variant="ghost" size="sm" className={textBtn} onClick={() => setSubDlg({ id: `s-${Date.now()}`, name: "", code: "" })}>
+                  <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
                     <Plus className="h-3.5 w-3.5" />添加子类型
                   </Button>
                 </div>
                 {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
                 <div className="divide-y divide-border">
                   {draft.subs.map((s) => (
-                    <div key={s.id} className="py-2.5 flex items-center gap-3 text-body-sm">
-                      <div className="w-44 shrink-0 min-w-0 flex items-baseline gap-2">
-                        <span className="text-text-primary truncate">{s.name || "未命名"}</span>
-                        <span className="font-mono tabular-nums text-caption text-text-tertiary shrink-0">{s.code || "—"}</span>
-                      </div>
+                    <div key={s.id} className="py-2 flex items-center gap-3 text-body-sm">
+                      <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-36 shrink-0 text-body-sm" />
+                      <Input value={s.code} placeholder="子类型编码" className="h-9 w-28 shrink-0 font-mono text-body-sm"
+                        onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
                       {kind === "工单" && (
-                        <>
-                          <Select value={s.diseaseId ?? ""} onValueChange={(v) => patchSub(s.id, { diseaseId: v })}>
-                            <SelectTrigger className="h-9 flex-1 min-w-0 text-body-sm"><SelectValue placeholder="选择疾病名称" /></SelectTrigger>
-                            <SelectContent className="max-h-72">
-                              {KB_DISEASES.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                          <span className="font-mono tabular-nums text-caption text-text-tertiary w-14 text-right shrink-0">{s.diseaseId ?? "—"}</span>
-                        </>
+                        <Select value={s.diseaseId ?? ""} onValueChange={(v) => patchSub(s.id, { diseaseId: v })}>
+                          <SelectTrigger className="h-9 flex-1 min-w-0 text-body-sm"><SelectValue placeholder="选择疾病名称" /></SelectTrigger>
+                          <SelectContent className="max-h-72">
+                            {KB_DISEASES.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       )}
                       {kind === "基础事件" && (
                         <Select value={s.item ?? ""} onValueChange={(v) => patchSub(s.id, { item: v })}>
@@ -256,7 +252,7 @@ export function PullMapping() {
                         </Select>
                       )}
                       {!kind && <div className="flex-1 min-w-0 text-text-tertiary">先在上方选择对应工单 / 任务</div>}
-                      <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => setSubDlg({ ...s })}>编辑</Button>
+                      <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
                     </div>
                   ))}
                 </div>
