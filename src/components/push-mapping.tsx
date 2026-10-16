@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 // 一行一个回传映射，查看与编辑统一走右侧抽屉。
 const KINDS = ["工单", "基础事件"];
 
-type Sub = { id: string; name: string; code: string; drug?: boolean };
+type Sub = { id: string; name: string; code: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
 
 const VACCINES = [
@@ -22,8 +22,8 @@ const SEED: Card[] = [
   { id: "p-6060", title: "驱虫回传", typeName: "驱虫", typeCode: "6060", target: "工单", subs: [{ id: "s-617905", name: "驱虫处置", code: "617905" }] },
   { id: "p-6006", title: "干奶回传", typeName: "干奶", typeCode: "6006", target: "工单", subs: [{ id: "s-617801", name: "干奶处置", code: "617801" }] },
   { id: "p-6005", title: "处置回传", typeName: "处置", typeCode: "6005", target: "工单", subs: [
-    { id: "s-617010", name: "修蹄实际用药", code: "617010", drug: true },
-    ...VACCINES.map((n, i) => ({ id: `s-6176${pad(i)}`, name: `${n} 实际用药`, code: i === VACCINES.length - 1 ? "" : `6176${pad(i)}`, drug: true })),
+    { id: "s-617010", name: "修蹄实际用药", code: "617010" },
+    ...VACCINES.map((n, i) => ({ id: `s-6176${pad(i)}`, name: `${n} 实际用药`, code: i === VACCINES.length - 1 ? "" : `6176${pad(i)}` })),
   ] },
   { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "基础事件", subs: [
     { id: "s-600401", name: "空怀", code: "600401" },
@@ -160,7 +160,6 @@ export function PushMapping() {
                       <div className="flex-1 min-w-0">
                         {s.code ? <span className="font-mono tabular-nums text-text-primary">{s.code}</span> : <span className="text-text-tertiary">回传编码未配置</span>}
                       </div>
-                      {s.drug && <span className="tag tag-outline shrink-0">含药品</span>}
                       <span className={`tag ${s.code ? "tag-success" : "tag-warning"} shrink-0`}>{s.code ? "已配置" : "待配置"}</span>
                     </div>
                   ))}
@@ -205,8 +204,6 @@ export function PushMapping() {
                       <Input value={s.name} placeholder="本系统处置 / 事件" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 flex-1 min-w-0 text-body-sm" />
                       <Input value={s.code} placeholder="回传子类型编码" className="h-9 w-32 shrink-0 font-mono text-body-sm"
                         onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
-                      <button type="button" onClick={() => patchSub(s.id, { drug: !s.drug })}
-                        className={`tag shrink-0 ${s.drug ? "tag-info" : "tag-outline"}`}>{s.drug ? "含药品" : "无药品"}</button>
                       <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
                     </div>
                   ))}
