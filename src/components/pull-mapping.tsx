@@ -8,6 +8,7 @@ import { KB_DISEASES } from "@/lib/disease-kb";
 
 // 拉取映射配置：事件类型（名称 + 编码）决定对应的工单类型 / 基础事件；
 // 子类型决定疾病（工单）或具体检测项目（基础事件）。
+// 卡片区分查看态（纯文本展示）与编辑态（下拉选择），默认查看态。
 export const WO_TYPES = ["疾病治疗", "产后护理", "修蹄", "免疫", "干奶", "驱虫"];
 export const BASE_EVENTS: Record<string, string[]> = {
   孕检: ["空怀判定", "怀孕判定"],
@@ -16,6 +17,8 @@ export const BASE_EVENTS: Record<string, string[]> = {
   转场: ["转场转出"],
 };
 const targetKind = (t: string) => (WO_TYPES.includes(t) ? "工单" : t ? "基础事件" : "");
+const targetLabel = (t: string) => (WO_TYPES.includes(t) ? `${t}工单` : t);
+const diseaseNameOf = (id: string) => KB_DISEASES.find((d) => d.id === id)?.name ?? id;
 
 type Sub = { id: string; name: string; code: string; diseaseId?: string; item?: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
@@ -50,6 +53,7 @@ const textBtn = "h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-s
 export function PullMapping() {
   const [cards, setCards] = useState(SEED);
   const [kw, setKw] = useState("");
+  const [editing, setEditing] = useState<Set<string>>(() => new Set());
   const [cardDlg, setCardDlg] = useState<Card | null>(null);
   const [subDlg, setSubDlg] = useState<{ cardId: string; sub: Sub } | null>(null);
 
@@ -57,10 +61,18 @@ export function PullMapping() {
   const patchCard = (id: string, p: Partial<Card>) => setCards((cs) => cs.map((c) => (c.id === id ? { ...c, ...p } : c)));
   const patchSub = (cid: string, sid: string, p: Partial<Sub>) =>
     setCards((cs) => cs.map((c) => (c.id === cid ? { ...c, subs: c.subs.map((s) => (s.id === sid ? { ...s, ...p } : s)) } : c)));
+  const setEdit = (id: string, on: boolean) =>
+    setEditing((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(id); else next.delete(id);
+      return next;
+    });
 
   const saveCard = (c: Card) => {
-    setCards((cs) => (cs.some((x) => x.id === c.id) ? cs.map((x) => (x.id === c.id ? c : x)) : [c, ...cs]));
+    const isNew = !cards.some((x) => x.id === c.id);
+    setCards((cs) => (isNew ? [c, ...cs] : cs.map((x) => (x.id === c.id ? c : x))));
     setCardDlg(null);
+    if (isNew) setEdit(c.id, true); // 新建卡片直接进入编辑态
   };
   const saveSub = (cid: string, s: Sub) => {
     setCards((cs) => cs.map((c) => (c.id !== cid ? c : { ...c, subs: c.subs.some((x) => x.id === s.id) ? c.subs.map((x) => (x.id === s.id ? s : x)) : [...c.subs, s] })));
@@ -82,11 +94,15 @@ export function PullMapping() {
       <div className="space-y-4">
         {list.map((c) => {
           const kind = targetKind(c.target);
+          const isEdit = editing.has(c.id);
           return (
-            <section key={c.id} className="rounded-lg border border-border bg-card overflow-hidden">
+            <section key={c.id} className={`rounded-lg border bg-card overflow-hidden ${isEdit ? "border-primary/40" : "border-border"}`}>
               <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 bg-surface-subtle">
                 <div className="min-w-0">
-                  <div className="text-card-title font-medium text-text-primary truncate">{c.title || "未命名卡片"}</div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-card-title font-medium text-text-primary truncate">{c.title || "未命名卡片"}</span>
+                    {isEdit && <span className="tag tag-warning">编辑中</span>}
+                  </div>
                   <div className="mt-0.5 flex items-center gap-3 text-body-sm text-text-secondary">
                     <span>拉取事件类型：<span className="text-text-primary">{c.typeName}</span></span>
                     <span>编码：<span className="font-mono tabular-nums text-text-primary">{c.typeCode}</span></span>
@@ -94,64 +110,103 @@ export function PullMapping() {
                 </div>
                 <div className="ml-auto flex items-center gap-2">
                   <span className="text-body-sm text-text-secondary shrink-0">对应工单 / 任务</span>
-                  <Select value={c.target} onValueChange={(v) => {
-                    const changed = targetKind(v) !== kind;
-                    patchCard(c.id, { target: v, subs: changed ? c.subs.map((s) => ({ ...s, diseaseId: undefined, item: undefined })) : c.subs.map((s) => ({ ...s, item: targetKind(v) === "基础事件" && v !== c.target ? undefined : s.item })) });
-                  }}>
-                    <SelectTrigger className="h-9 w-48 bg-card text-body-sm"><SelectValue placeholder="请选择" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup><SelectLabel>工单类型</SelectLabel>{WO_TYPES.map((t) => <SelectItem key={t} value={t}>{t}工单</SelectItem>)}</SelectGroup>
-                      <SelectGroup><SelectLabel>基础事件</SelectLabel>{Object.keys(BASE_EVENTS).map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectGroup>
-                    </SelectContent>
-                  </Select>
+                  {isEdit ? (
+                    <Select value={c.target} onValueChange={(v) => {
+                      const changed = targetKind(v) !== kind;
+                      patchCard(c.id, { target: v, subs: changed ? c.subs.map((s) => ({ ...s, diseaseId: undefined, item: undefined })) : c.subs.map((s) => ({ ...s, item: targetKind(v) === "基础事件" && v !== c.target ? undefined : s.item })) });
+                    }}>
+                      <SelectTrigger className="h-9 w-48 bg-card text-body-sm"><SelectValue placeholder="请选择" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup><SelectLabel>工单类型</SelectLabel>{WO_TYPES.map((t) => <SelectItem key={t} value={t}>{t}工单</SelectItem>)}</SelectGroup>
+                        <SelectGroup><SelectLabel>基础事件</SelectLabel>{Object.keys(BASE_EVENTS).map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    c.target
+                      ? <span className="text-body-sm text-text-primary">{targetLabel(c.target)}</span>
+                      : <span className="text-body-sm text-text-tertiary">未选择</span>
+                  )}
                   {kind && <span className={`tag ${kind === "工单" ? "tag-success" : "tag-info"}`}>{kind}</span>}
-                  <Button variant="ghost" size="sm" className={textBtn} onClick={() => setCardDlg(c)}>编辑</Button>
+                  {isEdit ? (
+                    <>
+                      <Button variant="ghost" size="sm" className={textBtn} onClick={() => setCardDlg(c)}>编辑信息</Button>
+                      <Button variant="ghost" size="sm" className={textBtn} onClick={() => setEdit(c.id, false)}>完成</Button>
+                    </>
+                  ) : (
+                    <Button variant="ghost" size="sm" className={textBtn} onClick={() => setEdit(c.id, true)}>编辑</Button>
+                  )}
                 </div>
               </header>
 
               <div className="divide-y divide-border">
-                {c.subs.map((s) => (
-                  <div key={s.id} className="flex items-center gap-6 px-5 py-3 text-body-sm">
-                    <div className="w-56 min-w-0">
-                      <div className="text-caption text-text-tertiary">事件子类型</div>
-                      <div className="text-text-primary truncate">{s.name}</div>
+                {c.subs.map((s) => {
+                  const ok = kind === "工单" ? !!s.diseaseId : kind === "基础事件" ? !!s.item : false;
+                  return (
+                    <div key={s.id} className="flex items-center gap-6 px-5 py-3 text-body-sm">
+                      <div className="w-56 min-w-0">
+                        <div className="text-caption text-text-tertiary">事件子类型</div>
+                        <div className="text-text-primary truncate">{s.name || "—"}</div>
+                      </div>
+                      <div className="w-28">
+                        <div className="text-caption text-text-tertiary">子类型编码</div>
+                        <div className="font-mono tabular-nums">{s.code || "—"}</div>
+                      </div>
+                      <div className="flex-1 min-w-0 flex items-center gap-3">
+                        {kind === "工单" && (isEdit ? (
+                          <>
+                            <span className="text-text-secondary shrink-0">疾病</span>
+                            <Select value={s.diseaseId ?? ""} onValueChange={(v) => patchSub(c.id, s.id, { diseaseId: v })}>
+                              <SelectTrigger className="h-9 w-64 text-body-sm"><SelectValue placeholder="选择疾病名称" /></SelectTrigger>
+                              <SelectContent className="max-h-72">
+                                {KB_DISEASES.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                              </SelectContent>
+                            </Select>
+                            <span className="text-text-secondary shrink-0">疾病编码</span>
+                            <span className="font-mono tabular-nums">{s.diseaseId ?? <span className="text-text-tertiary">—</span>}</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-text-secondary shrink-0">疾病</span>
+                            {s.diseaseId ? (
+                              <>
+                                <span className="text-text-primary truncate max-w-64">{diseaseNameOf(s.diseaseId)}</span>
+                                <span className="font-mono tabular-nums text-caption text-text-tertiary">{s.diseaseId}</span>
+                              </>
+                            ) : (
+                              <span className="text-text-tertiary">未配置</span>
+                            )}
+                          </>
+                        ))}
+                        {kind === "基础事件" && (isEdit ? (
+                          <>
+                            <span className="text-text-secondary shrink-0">检测项目</span>
+                            <Select value={s.item ?? ""} onValueChange={(v) => patchSub(c.id, s.id, { item: v })}>
+                              <SelectTrigger className="h-9 w-64 text-body-sm"><SelectValue placeholder="选择具体检测项目" /></SelectTrigger>
+                              <SelectContent>{BASE_EVENTS[c.target].map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                            </Select>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-text-secondary shrink-0">检测项目</span>
+                            {s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">未配置</span>}
+                          </>
+                        ))}
+                        {!kind && (
+                          isEdit
+                            ? <span className="text-text-tertiary">请先在卡片顶部选择对应工单 / 任务</span>
+                            : <span className="text-text-tertiary">未选择对应工单 / 任务，点击「编辑」配置</span>
+                        )}
+                      </div>
+                      <span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span>
+                      {isEdit && <Button variant="ghost" size="sm" className={textBtn} onClick={() => setSubDlg({ cardId: c.id, sub: s })}>编辑</Button>}
                     </div>
-                    <div className="w-28">
-                      <div className="text-caption text-text-tertiary">子类型编码</div>
-                      <div className="font-mono tabular-nums">{s.code}</div>
-                    </div>
-                    <div className="flex-1 min-w-0 flex items-center gap-3">
-                      {kind === "工单" && (
-                        <>
-                          <span className="text-text-secondary shrink-0">疾病</span>
-                          <Select value={s.diseaseId ?? ""} onValueChange={(v) => patchSub(c.id, s.id, { diseaseId: v })}>
-                            <SelectTrigger className="h-9 w-64 text-body-sm"><SelectValue placeholder="选择疾病名称" /></SelectTrigger>
-                            <SelectContent className="max-h-72">
-                              {KB_DISEASES.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                          <span className="text-text-secondary shrink-0">疾病编码</span>
-                          <span className="font-mono tabular-nums">{s.diseaseId ?? <span className="text-text-tertiary">—</span>}</span>
-                        </>
-                      )}
-                      {kind === "基础事件" && (
-                        <>
-                          <span className="text-text-secondary shrink-0">检测项目</span>
-                          <Select value={s.item ?? ""} onValueChange={(v) => patchSub(c.id, s.id, { item: v })}>
-                            <SelectTrigger className="h-9 w-64 text-body-sm"><SelectValue placeholder="选择具体检测项目" /></SelectTrigger>
-                            <SelectContent>{BASE_EVENTS[c.target].map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                          </Select>
-                        </>
-                      )}
-                      {!kind && <span className="text-text-tertiary">请先在卡片顶部选择对应工单 / 任务</span>}
-                    </div>
-                    <span className={`tag ${(kind === "工单" ? s.diseaseId : s.item) ? "tag-success" : "tag-warning"}`}>{(kind === "工单" ? s.diseaseId : s.item) ? "已配置" : "待配置"}</span>
-                    <Button variant="ghost" size="sm" className={textBtn} onClick={() => setSubDlg({ cardId: c.id, sub: s })}>编辑</Button>
+                  );
+                })}
+                {isEdit && (
+                  <div className="px-5 py-2">
+                    <Button variant="ghost" size="sm" className={textBtn} onClick={() => setSubDlg({ cardId: c.id, sub: { id: `s-${Date.now()}`, name: "", code: "" } })}>添加子类型</Button>
                   </div>
-                ))}
-                <div className="px-5 py-2">
-                  <Button variant="ghost" size="sm" className={textBtn} onClick={() => setSubDlg({ cardId: c.id, sub: { id: `s-${Date.now()}`, name: "", code: "" } })}>添加子类型</Button>
-                </div>
+                )}
               </div>
             </section>
           );
