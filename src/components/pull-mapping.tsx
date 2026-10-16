@@ -123,12 +123,7 @@ export function PullMapping() {
                   <td className="px-4 py-3 whitespace-nowrap">{c.typeName || "—"}</td>
                   <td className="px-4 py-3 whitespace-nowrap font-mono tabular-nums">{c.typeCode || "—"}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
-                    {c.target ? (
-                      <span className="inline-flex items-center gap-2">
-                        <span className="text-text-primary">{targetLabel(c.target)}</span>
-                        <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span>
-                      </span>
-                    ) : <span className="text-text-tertiary">未选择</span>}
+                    {ck ? <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap tabular-nums">
                     {ck ? <span className="text-text-primary">{configured}<span className="text-text-tertiary"> / {c.subs.length}</span></span> : c.subs.length}
