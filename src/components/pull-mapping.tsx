@@ -272,15 +272,6 @@ export function PullMapping() {
           </div>
         </SheetContent>
       </Sheet>
-
-      <FormDialog
-        open={!!subDlg}
-        title="事件子类型"
-        fields={[["name", "事件子类型名称"], ["code", "事件子类型编码"]]}
-        init={subDlg ? { name: subDlg.name, code: subDlg.code } : {}}
-        onClose={() => setSubDlg(null)}
-        onSave={(v) => subDlg && saveSub({ ...subDlg, ...v })}
-      />
     </div>
   );
 }
