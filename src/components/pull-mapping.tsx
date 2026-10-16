@@ -72,12 +72,9 @@ export function PullMapping() {
     closeAll();
   };
 
-  const saveSub = (s: Sub) => {
-    setDraft((d) =>
-      d ? { ...d, subs: d.subs.some((x) => x.id === s.id) ? d.subs.map((x) => (x.id === s.id ? s : x)) : [...d.subs, s] } : d,
-    );
-    setSubDlg(null);
-  };
+  const addSub = () =>
+    setDraft((d) => (d ? { ...d, subs: [...d.subs, { id: `s-${Date.now()}`, name: "", code: "" }] } : d));
+  const delSub = (sid: string) => setDraft((d) => (d ? { ...d, subs: d.subs.filter((s) => s.id !== sid) } : d));
 
   const kind = draft ? targetKind(draft.target) : "";
 
