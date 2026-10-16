@@ -7,9 +7,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { KB_DISEASES } from "@/lib/disease-kb";
 
-// 拉取映射配置：事件类型（名称 + 编码）决定对应的工单类型 / 基础事件；
-// 子类型决定疾病（工单）或具体检测项目（基础事件）。
-// 卡片只做查看展示，编辑统一走右侧抽屉。
+// 拉取映射配置：映射关系以表格呈现，一行一个映射卡片；
+// 查看与编辑统一走右侧抽屉。
 export const WO_TYPES = ["疾病治疗", "产后护理", "修蹄", "免疫", "干奶", "驱虫"];
 export const BASE_EVENTS: Record<string, string[]> = {
   孕检: ["空怀判定", "怀孕判定"],
