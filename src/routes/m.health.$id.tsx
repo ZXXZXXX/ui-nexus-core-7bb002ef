@@ -1765,7 +1765,7 @@ function ChecklistDay({
               {abnOpen && (
                 <div className="rounded-xl border border-border bg-card px-3 py-3 space-y-3">
                   <label className={`flex items-start gap-2 ${hasVarCalc ? "" : "opacity-50 cursor-not-allowed"}`}>
-                    <input type="checkbox" className="sr-only" disabled={!hasVarCalc} checked={hasVarCalc && paramAdjust} onChange={(e) => setParamAdjust(e.target.checked)} /><RoundCheck on={hasVarCalc && paramAdjust} />
+                    <input type="radio" name="abnormal-mode" aria-label="计算参数调整" className="sr-only" disabled={!hasVarCalc} checked={hasVarCalc && paramAdjust} onClick={() => { if (paramAdjust) setParamAdjust(false); else { setParamAdjust(true); setPartialUse(false); } }} /><RoundCheck on={hasVarCalc && paramAdjust} />
                     <span>
                       <span className="block text-body-sm text-foreground">计算参数调整</span>
                       <span className="block text-caption text-text-tertiary">
@@ -1804,7 +1804,7 @@ function ChecklistDay({
                     </div>
                   )}
                   <label className="flex items-start gap-2">
-                    <input type="checkbox" className="sr-only" checked={partialUse} onChange={(e) => setPartialUse(e.target.checked)} /><RoundCheck on={partialUse} />
+                    <input type="radio" name="abnormal-mode" aria-label="部分药品未使用" className="sr-only" checked={partialUse} onClick={() => { if (partialUse) setPartialUse(false); else { setPartialUse(true); setParamAdjust(false); } }} /><RoundCheck on={partialUse} />
                     <span>
                       <span className="block text-body-sm text-foreground">部分药品未使用</span>
                       <span className="block text-caption text-text-tertiary">填写原因后，药品未全部录入也可提交；已录入药品仍需核验，按实际用药记录和扣减</span>
