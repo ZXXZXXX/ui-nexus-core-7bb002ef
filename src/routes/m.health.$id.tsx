@@ -131,20 +131,20 @@ const obsExpiredOrders = new Set<string>([]);
 // 复查任务超时未操作 → 系统自动归档的工单（status 为 已完成 但无人工复查结论）
 const autoArchivedOrders = new Set<string>(["HF-0688", "WO-2199"]);
 
-// 用药异常标记：提交执行记录时写入，执行任务卡片按「工单 + 天次」读回
-const abnormalDayKey = (id: string, day: number) => `health:abnormal:${id}:${day}`;
-export function markDayAbnormal(id: string, day: number) {
+// 用药异常标记：提交执行记录时写入，执行任务卡片按工单读回并标到本次任务那条
+const abnormalKey = (id: string) => `health:abnormal:${id}`;
+export function markOrderAbnormal(id: string) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(abnormalDayKey(id, day), "1");
+    window.localStorage.setItem(abnormalKey(id), "1");
   } catch {
     /* 存储不可用时忽略 */
   }
 }
-function readDayAbnormal(id: string, day: number) {
+function readOrderAbnormal(id: string) {
   if (typeof window === "undefined") return false;
   try {
-    return window.localStorage.getItem(abnormalDayKey(id, day)) === "1";
+    return window.localStorage.getItem(abnormalKey(id)) === "1";
   } catch {
     return false;
   }
@@ -1245,13 +1245,13 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
   const needPickup = hasDrugTasks && Boolean(pickupCode);
 
   const hasUnpicked = needPickup && days.some((d) => d.phase !== "done");
-  // 已标记用药异常的天次：提交执行记录时写入本地，挂载后读回（SSR 不读浏览器存储）
-  const [abnormalDays, setAbnormalDays] = useState<Record<number, boolean>>({});
+  // 用药异常标记：提交执行记录时写入本地，挂载后读回（SSR 不读浏览器存储）
+  const [abnormalOrder, setAbnormalOrder] = useState(false);
   useEffect(() => {
-    const next: Record<number, boolean> = {};
-    for (const d of days) next[d.day] = readDayAbnormal(id, d.day);
-    setAbnormalDays(next);
+    setAbnormalOrder(readOrderAbnormal(id));
   }, [id, status]);
+  // 标记落在本次任务上：进行中的那条，没有则最后一条
+  const abnormalDay = days.length ? (days.find((d) => d.phase === "active") ?? days[days.length - 1]).day : 0;
   return (
     <>
 
@@ -1260,7 +1260,7 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
       {days.map((d) => {
         const isDone = d.phase === "done";
         const isActive = d.phase === "active";
-        const flagged = Boolean(abnormalDays[d.day]);
+        const flagged = abnormalOrder && d.day === abnormalDay;
         const statusLabel = flagged ? "异常 · 完成" : isDone ? "已完成" : isActive ? "进行中" : "未开始";
         const statusClass = flagged ? "tag-danger" : isDone ? "tag-success" : isActive ? "tag-info" : "tag-muted";
 
