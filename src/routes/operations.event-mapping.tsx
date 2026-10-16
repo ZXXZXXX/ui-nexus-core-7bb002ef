@@ -56,11 +56,11 @@ const IN_SEED: InRow[] = [
   })),
   { id: "in-600401", group: "基础事件", udType: "6004", udTypeName: "孕检", udSub: "600401", udSubName: "空怀", bizCategory: "基础事件任务", target: "孕检", fromCode: PENDING, note: "UD 工作单中的编码待确认" },
   { id: "in-600402", group: "基础事件", udType: "6004", udTypeName: "孕检", udSub: "600402", udSubName: "怀孕", bizCategory: "基础事件任务", target: "孕检", fromCode: PENDING, note: "" },
-  { id: "in-602503", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602503", udSubName: "血中酮体", bizCategory: "基础事件任务", target: "血酮检查", fromCode: PENDING, note: "" },
-  { id: "in-602518", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602518", udSubName: "体温", bizCategory: "基础事件任务", target: "体温检查", fromCode: PENDING, note: "" },
-  { id: "in-602519", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602519", udSubName: "尿液PH值", bizCategory: "基础事件任务", target: "尿液pH检查", fromCode: PENDING, note: "" },
-  { id: "in-602523", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602523", udSubName: "子宫分泌物", bizCategory: "基础事件任务", target: "子宫分泌物检查", fromCode: PENDING, note: "" },
-  { id: "in-605601", group: "基础事件", udType: "6056", udTypeName: "转场", udSub: "605601", udSubName: "转场转出", bizCategory: "现场事件记录", target: "离场—转场", fromCode: PENDING, note: "" },
+  { id: "in-602503", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602503", udSubName: "血中酮体", bizCategory: "基础事件任务", target: "检测检查", fromCode: PENDING, note: "" },
+  { id: "in-602518", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602518", udSubName: "体温", bizCategory: "基础事件任务", target: "检测检查", fromCode: PENDING, note: "" },
+  { id: "in-602519", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602519", udSubName: "尿液PH值", bizCategory: "基础事件任务", target: "检测检查", fromCode: PENDING, note: "" },
+  { id: "in-602523", group: "基础事件", udType: "6025", udTypeName: "检测检查", udSub: "602523", udSubName: "子宫分泌物", bizCategory: "基础事件任务", target: "检测检查", fromCode: PENDING, note: "" },
+  { id: "in-605601", group: "基础事件", udType: "6056", udTypeName: "转场", udSub: "605601", udSubName: "转场转出", bizCategory: "现场事件记录", target: "转场", fromCode: PENDING, note: "" },
   { id: "in-602302", group: "基础事件", udType: "6023", udTypeName: "转群", udSub: "602302", udSubName: "围产转群", bizCategory: "基础事件任务", target: "转群／转栏", fromCode: "602302", note: "UD 通过工作单发布围产转群任务，完成后需回填" },
 ];
 
@@ -167,7 +167,13 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
   const list = useMemo(() => rows.filter((r) =>
     (status === "全部状态" || (status === "已配置") === done(r)) &&
     (!kw || [r.udType, r.udTypeName, r.udSub, r.udSubName, r.target, r.disease ?? ""].some((s) => s.includes(kw)))), [rows, kw, status]);
-  const cols = ["事件类型编码", "事件类型", "事件子类型编码", "事件子类型", ...(wo ? ["本系统工单类型", "疾病结论"] : ["本系统基础事件任务类型"]), "状态", "备注", "操作"];
+  const cols = ["事件类型编码", "事件类型", wo ? "本系统工单类型" : "本系统基础事件任务类型", "事件子类型编码", "事件子类型", ...(wo ? ["疾病结论"] : []), "状态", "备注", "操作"];
+  // 事件类型名称 + 编码 决定映射到的工单类型 / 基础事件任务类型：同一事件类型的行合并展示
+  const span = (i: number) => {
+    if (i > 0 && list[i - 1].udType === list[i].udType) return 0;
+    let n = 1; while (i + n < list.length && list[i + n].udType === list[i].udType) n++;
+    return n;
+  };
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -184,19 +190,21 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
         <table className="w-full text-body-sm">
           <Th cols={cols} />
           <tbody>
-            {list.map((r) => (
+            {list.map((r, i) => { const n = span(i); return (
               <tr key={r.id} className="border-t border-border h-12">
-                <td className="px-4 py-3 whitespace-nowrap"><Code v={r.udType} /></td>
-                <td className="px-4 py-3 whitespace-nowrap">{r.udTypeName}</td>
+                {n > 0 && <>
+                  <td rowSpan={n} className="px-4 py-3 whitespace-nowrap align-top border-r border-border"><Code v={r.udType} /></td>
+                  <td rowSpan={n} className="px-4 py-3 whitespace-nowrap align-top border-r border-border">{r.udTypeName}</td>
+                  <td rowSpan={n} className="px-4 py-3 whitespace-nowrap align-top border-r border-border font-medium">{r.target || <span className="text-text-tertiary">—</span>}</td>
+                </>}
                 <td className="px-4 py-3 whitespace-nowrap"><Code v={r.udSub} /></td>
                 <td className="px-4 py-3 whitespace-nowrap">{r.udSubName}</td>
-                <td className="px-4 py-3 whitespace-nowrap">{r.target || <span className="text-text-tertiary">—</span>}</td>
                 {wo && <td className="px-4 py-3 whitespace-nowrap">{r.disease || <span className="text-text-tertiary">—</span>}</td>}
                 <td className="px-4 py-3 whitespace-nowrap"><StatusTag ok={done(r)} /></td>
                 <td className="px-4 py-3 text-text-secondary max-w-[240px] truncate" title={r.note}>{r.note || "—"}</td>
                 <td className="px-4 py-3 whitespace-nowrap"><Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button></td>
               </tr>
-            ))}
+            ); })}
           </tbody>
         </table>
       </div>
@@ -204,13 +212,15 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
         open={!!edit} onClose={() => setEdit(null)}
         title={edit ? `编辑${kind}映射 · ${edit.udTypeName} / ${edit.udSubName}` : ""}
         fields={edit ? [
-          { k: "udType", label: "UD 事件类型编码", v: edit.udType, code: true },
-          { k: "udSub", label: "UD 事件子类型编码", v: edit.udSub, code: true },
-          { k: "target", label: wo ? "本系统工单类型" : "本系统基础事件任务类型", v: edit.target },
+          { k: "target", label: `${wo ? "本系统工单类型" : "本系统基础事件任务类型"}（按事件类型 ${edit.udType} ${edit.udTypeName} 统一生效）`, v: edit.target },
           ...(wo ? [{ k: "disease", label: "疾病结论", v: edit.disease ?? "" }] : []),
           { k: "note", label: "备注", v: edit.note, multi: true },
         ] : []}
-        onSave={(vals) => { setRows((rs) => rs.map((r) => r.id === edit!.id ? { ...r, ...vals } : r)); setEdit(null); }}
+        onSave={(vals) => { setRows((rs) => rs.map((r) => {
+          if (r.id === edit!.id) return { ...r, ...vals };
+          if (r.udType === edit!.udType && "target" in vals) return { ...r, target: vals.target };
+          return r;
+        })); setEdit(null); }}
       />
     </div>
   );
