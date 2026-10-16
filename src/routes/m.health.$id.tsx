@@ -1767,9 +1767,12 @@ function ChecklistDay({
                   <label className={`flex items-start gap-2 ${hasVarCalc ? "" : "opacity-50 cursor-not-allowed"}`}>
                     <input type="radio" name="abnormal-mode" aria-label="计算参数调整" className="sr-only" disabled={!hasVarCalc} checked={hasVarCalc && paramAdjust} onClick={() => { if (paramAdjust) setParamAdjust(false); else { setParamAdjust(true); setPartialUse(false); } }} /><RoundCheck on={hasVarCalc && paramAdjust} />
                     <span>
-                      <span className="block text-body-sm text-foreground">计算参数调整</span>
+                      <span className="flex items-center gap-2">
+                        <span className="text-body-sm text-foreground">计算参数调整</span>
+                        {hasVarCalc && <span className="tag tag-brand">改变校验内容</span>}
+                      </span>
                       <span className="block text-caption text-text-tertiary">
-                        {hasVarCalc ? "修改本次任务的计算参数，系统按调整后的用量重新计算并校验" : "本次处方不涉及变量计算，无需调整参数"}
+                        {hasVarCalc ? "按新参数重新计算用量，校验内容随之改变，仍须按调整后的用量逐条核验" : "本次处方不涉及变量计算，无需调整参数"}
                       </span>
                     </span>
                   </label>
