@@ -1557,6 +1557,9 @@ function ChecklistDay({
   const effWeight = paramAdjust && band ? band.kg : baseWeight;
   const isUdder = (use?: string) => Boolean(use && /乳/.test(use));
   const hasUdderDrug = planDrugs.some((d) => isUdder(d.use));
+  const isWeightDose = (dose: string) => /\/\s*(100\s*)?kg/i.test(dose);
+  const hasWeightDrug = planDrugs.some((d) => isWeightDose(d.dose));
+  const hasVarCalc = hasWeightDrug || hasUdderDrug;
   const activeTeats = paramAdjust ? Math.max(0, 4 - blindTeats) : 4;
   // 调整参数后重新计算单次用量（体重换算 + 乳房给药按非盲乳数）
   const adjustedDose = (it: ExecItem): { dose?: string; total?: string } => {
@@ -1728,15 +1731,18 @@ function ChecklistDay({
               </div>
               {abnOpen && (
                 <div className="rounded-xl border border-border bg-card px-3 py-3 space-y-3">
-                  <label className="flex items-start gap-2">
-                    <input type="checkbox" className="mt-1 accent-[var(--primary)]" checked={paramAdjust} onChange={(e) => setParamAdjust(e.target.checked)} />
+                  <label className={`flex items-start gap-2 ${hasVarCalc ? "" : "opacity-50 cursor-not-allowed"}`}>
+                    <input type="checkbox" className="mt-1 accent-[var(--primary)]" disabled={!hasVarCalc} checked={hasVarCalc && paramAdjust} onChange={(e) => setParamAdjust(e.target.checked)} />
                     <span>
                       <span className="block text-body-sm text-foreground">计算参数调整</span>
-                      <span className="block text-caption text-text-tertiary">修改本次任务的计算参数，系统按调整后的用量重新计算并校验</span>
+                      <span className="block text-caption text-text-tertiary">
+                        {hasVarCalc ? "修改本次任务的计算参数，系统按调整后的用量重新计算并校验" : "本次处方不涉及变量计算，无需调整参数"}
+                      </span>
                     </span>
                   </label>
-                  {paramAdjust && (
+                  {hasVarCalc && paramAdjust && (
                     <div className="ml-6 space-y-2.5">
+                      {hasWeightDrug && (
                       <div>
                         <div className="text-caption text-text-tertiary mb-1.5">体重区间（原 {baseWeight}kg）</div>
                         <div className="flex flex-wrap gap-2">
@@ -1748,6 +1754,7 @@ function ChecklistDay({
                           ))}
                         </div>
                       </div>
+                      )}
                       {hasUdderDrug && (
                         <div>
                           <div className="text-caption text-text-tertiary mb-1.5">盲乳数（非盲乳 {activeTeats} 个）</div>
