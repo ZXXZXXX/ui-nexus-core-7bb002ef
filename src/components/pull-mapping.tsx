@@ -125,9 +125,7 @@ export function PullMapping() {
                   <td className="px-4 py-3 whitespace-nowrap">
                     {ck ? <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                    {ck ? <span className="text-text-primary">{configured}<span className="text-text-tertiary"> / {c.subs.length}</span></span> : c.subs.length}
-                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap tabular-nums text-text-primary">{c.subs.length}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <Button variant="ghost" size="sm" className={textBtn} onClick={() => openEdit(c)}>编辑</Button>
