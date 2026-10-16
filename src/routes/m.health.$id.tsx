@@ -5,6 +5,7 @@ import {
   ClipboardList,
   AlertTriangle,
   CheckCircle2,
+  Check,
   PlayCircle,
   Camera,
   Pill,
