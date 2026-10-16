@@ -172,7 +172,6 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
     list.forEach((r) => m.set(r.udType, [...(m.get(r.udType) ?? []), r]));
     return [...m.values()];
   }, [list]);
-  const cols = ["事件子类型编码", "事件子类型", ...(wo ? ["疾病结论"] : []), "状态", "备注", "操作"];
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -197,23 +196,25 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
               <span className="ml-auto text-caption text-text-tertiary">{g.length} 个子类型</span>
               <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit({ ...h, id: "__type__" })}>编辑</Button>
             </div>
-            <table className="w-full text-body-sm table-fixed">
-              <thead className="text-text-tertiary">
-                <tr className="h-10 border-t border-border">{cols.map((c, i) => <th key={c} className={`px-4 text-left font-normal ${["w-36", "w-48", ...(wo ? ["w-56"] : []), "w-24", "", "w-24"][i]}`}>{c}</th>)}</tr>
-              </thead>
-              <tbody>
-                {g.map((r) => (
-                  <tr key={r.id} className="border-t border-border h-12">
-                    <td className="px-4"><Code v={r.udSub} /></td>
-                    <td className="px-4 truncate">{r.udSubName}</td>
-                    {wo && <td className="px-4 truncate">{r.disease || <span className="text-text-tertiary">—</span>}</td>}
-                    <td className="px-4"><StatusTag ok={done(r)} /></td>
-                    <td className="px-4 text-text-secondary truncate" title={r.note}>{r.note || "—"}</td>
-                    <td className="px-4"><Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <ul className="divide-y divide-border border-t border-border">
+              {g.map((r) => (
+                <li key={r.id} className="flex items-center gap-4 px-4 py-3 text-body-sm">
+                  <div className="min-w-0 w-64 shrink-0">
+                    <div className="text-text-primary truncate">{r.udSubName}</div>
+                    <div className="text-caption text-text-tertiary font-mono tabular-nums">{r.udSub}</div>
+                  </div>
+                  {wo && (
+                    <div className="min-w-0 flex-1">
+                      <div className="text-caption text-text-tertiary">疾病结论</div>
+                      <div className="truncate">{r.disease || <span className="text-text-tertiary">未配置</span>}</div>
+                    </div>
+                  )}
+                  <div className={`min-w-0 ${wo ? "w-56" : "flex-1"} text-caption text-text-secondary truncate`} title={r.note}>{r.note}</div>
+                  <StatusTag ok={done(r)} />
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button>
+                </li>
+              ))}
+            </ul>
           </div>
         ); })}
       </div>
