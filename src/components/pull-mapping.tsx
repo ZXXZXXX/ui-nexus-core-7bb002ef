@@ -60,7 +60,7 @@ export function PullMapping() {
 
   const list = useMemo(() => cards.filter((c) => !kw || [c.title, c.typeName, c.typeCode, c.target, ...c.subs.flatMap((s) => [s.name, s.code])].some((v) => v.includes(kw))), [cards, kw]);
   const isNew = !!draft && !cards.some((x) => x.id === draft.id);
-  const openEdit = (c: Card) => setDraft({ ...c, subs: c.subs.map((s) => ({ ...s })) });
+  const openEdit = (c: Card) => { setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) }); setDraft({ ...c, subs: c.subs.map((s) => ({ ...s })) }); };
   const openView = (c: Card) => setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) });
   const openNew = () => { setViewCard(null); setDraft({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", subs: [] }); };
   const closeAll = () => { setViewCard(null); setDraft(null); };
@@ -171,13 +171,55 @@ export function PullMapping() {
         })}
       </div>
 
-      <Sheet open={!!draft} onOpenChange={(o) => !o && closeEdit()}>
+      <Sheet open={drawerOpen} onOpenChange={(o) => !o && closeAll()}>
         <SheetContent side="right" className="w-full sm:w-[560px] sm:max-w-none overflow-y-auto bg-card">
           <SheetHeader className="text-left px-0 pb-4 border-b border-border">
-            <SheetTitle className="text-section text-foreground">{isNew ? "新建映射卡片" : "编辑映射卡片"}</SheetTitle>
-            <SheetDescription className="text-caption text-text-tertiary">配置事件类型到工单 / 基础事件的映射关系</SheetDescription>
+            <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "新建映射卡片" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
+            <SheetDescription className="text-caption text-text-tertiary">事件子类型的映射编码与配置详情</SheetDescription>
           </SheetHeader>
 
+          {viewCard && !draft && (() => {
+            const vk = targetKind(viewCard.target);
+            return (
+              <div className="space-y-6 py-5">
+                <div className="grid gap-3 text-body-sm">
+                  <Row label="卡片名称" value={viewCard.title || "未命名卡片"} />
+                  <Row label="拉取事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
+                  <div className="flex items-center gap-3">
+                    <span className="text-text-secondary shrink-0 w-24">对应工单 / 任务</span>
+                    {viewCard.target ? <span className="text-text-primary">{targetLabel(viewCard.target)}</span> : <span className="text-text-tertiary">未选择</span>}
+                    {vk && <span className={`tag ${vk === "工单" ? "tag-success" : "tag-info"}`}>{vk}</span>}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="text-card-title font-medium text-text-primary">事件子类型（{viewCard.subs.length}）</div>
+                  {viewCard.subs.length === 0 && <div className="rounded-md border border-dashed border-border px-4 py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
+                  {viewCard.subs.map((s) => {
+                    const ok = vk === "工单" ? !!s.diseaseId : vk === "基础事件" ? !!s.item : false;
+                    return (
+                      <div key={s.id} className="rounded-md border border-border px-4 py-3 flex items-center gap-3 text-body-sm">
+                        <div className="min-w-0 w-40 shrink-0">
+                          <div className="text-text-primary truncate">{s.name || "—"}</div>
+                          <div className="font-mono tabular-nums text-caption text-text-tertiary">{s.code || "—"}</div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          {vk === "工单" && (s.diseaseId ? (
+                            <>
+                              <span className="text-text-primary truncate">{diseaseNameOf(s.diseaseId)}</span>{" "}
+                              <span className="font-mono tabular-nums text-caption text-text-tertiary">{s.diseaseId}</span>
+                            </>
+                          ) : <span className="text-text-tertiary">疾病未配置</span>)}
+                          {vk === "基础事件" && (s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">检测项目未配置</span>)}
+                          {!vk && <span className="text-text-tertiary">未选择对应工单 / 任务</span>}
+                        </div>
+                        <span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
           {draft && (
             <div className="space-y-6 py-5">
               <div className="grid gap-4">
@@ -266,8 +308,14 @@ export function PullMapping() {
           )}
 
           <div className="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-3 border-t border-border bg-card px-6 py-4">
-            <Button variant="outline" onClick={closeEdit}>取消</Button>
-            <Button disabled={!draft || !draft.title || !draft.typeName || !draft.typeCode} onClick={saveDraft}>保存</Button>
+            {draft ? (
+              <>
+                <Button variant="outline" onClick={() => setDraft(viewCard ? { ...viewCard, subs: viewCard.subs.map((s) => ({ ...s })) } : null)}>取消</Button>
+                <Button disabled={!draft.title || !draft.typeName || !draft.typeCode} onClick={saveDraft}>保存</Button>
+              </>
+            ) : (
+              <Button onClick={() => setDraft(viewCard ? { ...viewCard, subs: viewCard.subs.map((s) => ({ ...s })) } : null)}>编辑</Button>
+            )}
           </div>
         </SheetContent>
       </Sheet>
@@ -290,6 +338,15 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       <span className="text-body-sm text-text-secondary">{label}</span>
       {children}
     </label>
+  );
+}
+
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="text-text-secondary shrink-0 w-24">{label}</span>
+      <span className={`text-text-primary ${mono ? "font-mono tabular-nums" : ""}`}>{value}</span>
+    </div>
   );
 }
 
