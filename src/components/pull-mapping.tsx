@@ -161,6 +161,7 @@ export function PullMapping() {
                 })}
                 {c.subs.length > 3 && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent" />}
               </div>
+              </div>
               {c.subs.length > 3 && (
                 <button type="button" onClick={() => openView(c)} className="block w-full border-t border-border py-2.5 text-center text-body-sm text-primary hover:bg-brand-subtle">
                   查看全部 {c.subs.length} 个子类型
