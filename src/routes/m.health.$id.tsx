@@ -36,6 +36,15 @@ import {
 } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { MediaGrid } from "@/components/m/media-grid";
+import {
+  WEIGHT_BANDS,
+  activeTeatCount,
+  evidenceRequired as abnEvidenceRequired,
+  expectedDose,
+  hasVarCalc as planHasVarCalc,
+  medScanReady as abnMedScanReady,
+  type AbnormalMode,
+} from "@/lib/wo-abnormal";
 
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
@@ -1109,13 +1118,7 @@ type ExecItem = {
 };
 
 
-// 用药异常：可选体重区间（取区间代表体重重新计算用量）
-const WEIGHT_BANDS: { label: string; kg: number }[] = [
-  { label: "<300kg", kg: 250 },
-  { label: "300–450kg", kg: 400 },
-  { label: "450–600kg", kg: 550 },
-  { label: ">600kg", kg: 650 },
-];
+// 用药异常：可选体重区间见 @/lib/wo-abnormal
 
 // 演示用：药品关联关系（例如同一组合包装/同处方关联领取）
 const DRUG_ASSOCIATIONS: Record<string, string[]> = {
@@ -1523,6 +1526,7 @@ function ChecklistDay({
   const [weightBand, setWeightBand] = useState<string>("");
   const [partialUse, setPartialUse] = useState(false);
   const [partialReason, setPartialReason] = useState("");
+  const abnMode: AbnormalMode = paramAdjust ? "param" : partialUse ? "partial" : "none";
 
 
   const scannedMap = useScannedCodes(pickupCode ?? "");
@@ -1587,34 +1591,38 @@ function ChecklistDay({
   const planDrugs = (activePlan?.drugs ?? []).filter((d) => d.kind !== "therapy");
   const baseWeight = activePlan?.weightKg ?? 500;
   const band = WEIGHT_BANDS.find((b) => b.label === weightBand);
-  const effWeight = paramAdjust && band ? band.kg : baseWeight;
   const isUdder = (use?: string) => Boolean(use && /乳/.test(use));
   const hasUdderDrug = planDrugs.some((d) => isUdder(d.use));
   const isWeightDose = (dose: string) => /\/\s*(100\s*)?kg/i.test(dose);
   const hasWeightDrug = planDrugs.some((d) => isWeightDose(d.dose));
-  const hasVarCalc = hasWeightDrug || hasUdderDrug;
-  const activeTeats = paramAdjust ? Math.max(0, 4 - blindTeats) : 4;
-  // 调整参数后重新计算单次用量（体重换算 + 乳房给药按非盲乳数）
+  const hasVarCalc = planHasVarCalc(planDrugs);
+  const activeTeats = paramAdjust ? activeTeatCount(blindTeats) : 4;
+  // 本次应当校验的用量：只有「计算参数调整」会改变它，「部分药品未使用」保持原处方用量
   const adjustedDose = (it: ExecItem): { dose?: string; total?: string } => {
     const idx = Number(it.id.split("-t")[1]) - 1;
-    const d = planDrugs[idx];
-    if (!paramAdjust || !d) return { dose: it.doseText, total: it.totalText };
-    let dose = actualDoseText(d.dose, effWeight);
-    if (isUdder(d.use)) {
-      const m = dose.match(/^([\d.]+)\s*(.*)$/);
-      if (m) dose = `${Math.round(parseFloat(m[1]) * activeTeats * 10) / 10}${m[2]}（${activeTeats} 个乳区）`;
-    }
-    return { dose, total: totalDoseText(dose, batchCount) ?? undefined };
+    return expectedDose({
+      drug: planDrugs[idx],
+      mode: abnMode,
+      baseWeight,
+      bandKg: band?.kg,
+      blindTeats,
+      batchCount,
+      origDoseText: it.doseText,
+      origTotalText: it.totalText,
+    });
   };
   const scannedMeds = medItems.filter((i) => Boolean(i.scanCode));
-  const medScanReady = !hasMed
-    ? true
-    : unableMed
-      ? unableReason.trim().length > 0 && unablePhotos.length > 0
-      : partialUse
-        ? partialReason.trim().length > 0
-        : pickupClaimed && items.filter((i) => i.needMed).every((i) => Boolean(i.scanCode));
-  const evidenceRequired = hasMed && !unableMed && (!partialUse || scannedMeds.length > 0);
+  const medScanReady = abnMedScanReady({
+    hasMed,
+    mode: abnMode,
+    unableMed,
+    unableReason,
+    unablePhotos: unablePhotos.length,
+    partialReason,
+    pickupClaimed,
+    missingScans: medItems.filter((i) => !i.scanCode).length,
+  });
+  const evidenceRequired = abnEvidenceRequired({ hasMed, mode: abnMode, unableMed, scannedMeds: scannedMeds.length });
   const ready = interactive && medScanReady && tasksReady && (!evidenceRequired || evidencePhotos.length > 0);
   const abnormal = paramAdjust || partialUse;
   useEffect(() => {
@@ -1767,9 +1775,12 @@ function ChecklistDay({
                   <label className={`flex items-start gap-2 ${hasVarCalc ? "" : "opacity-50 cursor-not-allowed"}`}>
                     <input type="radio" name="abnormal-mode" aria-label="计算参数调整" className="sr-only" disabled={!hasVarCalc} checked={hasVarCalc && paramAdjust} onClick={() => { if (paramAdjust) setParamAdjust(false); else { setParamAdjust(true); setPartialUse(false); } }} /><RoundCheck on={hasVarCalc && paramAdjust} />
                     <span>
-                      <span className="block text-body-sm text-foreground">计算参数调整</span>
+                      <span className="flex items-center gap-2">
+                        <span className="text-body-sm text-foreground">计算参数调整</span>
+                        {hasVarCalc && <span className="tag tag-brand">改变校验内容</span>}
+                      </span>
                       <span className="block text-caption text-text-tertiary">
-                        {hasVarCalc ? "修改本次任务的计算参数，系统按调整后的用量重新计算并校验" : "本次处方不涉及变量计算，无需调整参数"}
+                        {hasVarCalc ? "按新参数重新计算用量，校验内容随之改变，仍须按调整后的用量逐条核验" : "本次处方不涉及变量计算，无需调整参数"}
                       </span>
                     </span>
                   </label>
@@ -1806,8 +1817,11 @@ function ChecklistDay({
                   <label className="flex items-start gap-2">
                     <input type="radio" name="abnormal-mode" aria-label="部分药品未使用" className="sr-only" checked={partialUse} onClick={() => { if (partialUse) setPartialUse(false); else { setPartialUse(true); setParamAdjust(false); } }} /><RoundCheck on={partialUse} />
                     <span>
-                      <span className="block text-body-sm text-foreground">部分药品未使用</span>
-                      <span className="block text-caption text-text-tertiary">填写原因后，药品未全部录入也可提交；已录入药品仍需核验，按实际用药记录和扣减</span>
+                      <span className="flex items-center gap-2">
+                        <span className="text-body-sm text-foreground">部分药品未使用</span>
+                        <span className="tag tag-warning">取消校验限制</span>
+                      </span>
+                      <span className="block text-caption text-text-tertiary">不改变用量校验内容，仅放开提交限制：填写原因后，药品未全部录入或核验数量不足也可提交；已录入药品仍按实际用药记录和扣减</span>
                     </span>
                   </label>
                   {partialUse && (
