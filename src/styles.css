@@ -317,6 +317,11 @@
     box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--state-danger) 28%, transparent);
   }
 
+  /* 异常标记任务卡片：与逾期归档同款高亮描边（偏移 + 危险色环） */
+  .card-abnormal {
+    box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px color-mix(in oklab, var(--state-danger) 45%, transparent);
+  }
+
 
 
 
