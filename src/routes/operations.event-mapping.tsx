@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PullMapping } from "@/components/pull-mapping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/operations/event-mapping")({
@@ -111,14 +112,12 @@ function Page() {
     <>
       <AppHeader title="事件映射管理" breadcrumb={["运营管理", "事件映射管理"]} />
       <main className="flex-1 px-6 py-6 space-y-4">
-        <Tabs defaultValue="wo">
+        <Tabs defaultValue="in">
           <TabsList className="h-9 rounded-lg bg-surface-subtle">
-            <TabsTrigger value="wo" className="rounded-md px-4">工单映射（UD → 工单类型／疾病结论）</TabsTrigger>
-            <TabsTrigger value="ev" className="rounded-md px-4">基础事件映射（UD → 基础事件任务）</TabsTrigger>
-            <TabsTrigger value="out" className="rounded-md px-4">回传映射（本系统 → UD）</TabsTrigger>
+            <TabsTrigger value="in" className="rounded-md px-4">拉取映射配置</TabsTrigger>
+            <TabsTrigger value="out" className="rounded-md px-4">回传映射配置</TabsTrigger>
           </TabsList>
-          <TabsContent value="wo" className="mt-4"><InTable kind="工单" /></TabsContent>
-          <TabsContent value="ev" className="mt-4"><InTable kind="基础事件" /></TabsContent>
+          <TabsContent value="in" className="mt-4"><PullMapping /></TabsContent>
           <TabsContent value="out" className="mt-4"><OutTable /></TabsContent>
         </Tabs>
       </main>
@@ -154,86 +153,6 @@ function Th({ cols }: { cols: string[] }) {
     <thead className="bg-surface-subtle text-text-secondary">
       <tr className="h-12">{cols.map((h) => <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>)}</tr>
     </thead>
-  );
-}
-
-function InTable({ kind }: { kind: "工单" | "基础事件" }) {
-  const wo = kind === "工单";
-  const [rows, setRows] = useState(() => IN_SEED.filter((r) => r.group === kind));
-  const [kw, setKw] = useState("");
-  const [status, setStatus] = useState("全部状态");
-  const [edit, setEdit] = useState<InRow | null>(null);
-  const done = (r: InRow) => !!r.target && (!wo || !!r.disease);
-  const list = useMemo(() => rows.filter((r) =>
-    (status === "全部状态" || (status === "已配置") === done(r)) &&
-    (!kw || [r.udType, r.udTypeName, r.udSub, r.udSubName, r.target, r.disease ?? ""].some((s) => s.includes(kw)))), [rows, kw, status]);
-  const groups = useMemo(() => {
-    const m = new Map<string, InRow[]>();
-    list.forEach((r) => m.set(r.udType, [...(m.get(r.udType) ?? []), r]));
-    return [...m.values()];
-  }, [list]);
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="relative w-64">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
-          <Input value={kw} onChange={(e) => setKw(e.target.value)} placeholder={wo ? "搜索 UD 编码 / 工单类型 / 疾病结论" : "搜索 UD 编码 / 基础事件任务"} className="h-9 pl-8 text-body-sm" />
-        </div>
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="h-9 w-32 text-body-sm"><SelectValue /></SelectTrigger>
-          <SelectContent>{["全部状态", "已配置", "待确认"].map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
-        </Select>
-      </div>
-      <div className="space-y-3">
-        {groups.map((g) => { const h = g[0]; return (
-          <div key={h.udType} className="rounded-md border border-border overflow-hidden">
-            <div className="flex items-center gap-3 px-4 h-12 bg-surface-subtle">
-              <span className="font-mono tabular-nums text-body-sm text-text-secondary">{h.udType}</span>
-              <span className="text-body font-medium text-text-primary">{h.udTypeName}</span>
-              <span className="text-text-tertiary">→</span>
-              <span className="text-caption text-text-tertiary">{wo ? "本系统工单类型" : "本系统基础事件任务类型"}</span>
-              <span className="tag tag-success">{h.target || "未配置"}</span>
-              <span className="ml-auto text-caption text-text-tertiary">{g.length} 个子类型</span>
-              <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit({ ...h, id: "__type__" })}>编辑</Button>
-            </div>
-            <ul className="divide-y divide-border border-t border-border">
-              {g.map((r) => (
-                <li key={r.id} className="flex items-center gap-4 px-4 py-3 text-body-sm">
-                  <div className="min-w-0 w-64 shrink-0">
-                    <div className="text-text-primary truncate">{r.udSubName}</div>
-                    <div className="text-caption text-text-tertiary font-mono tabular-nums">{r.udSub}</div>
-                  </div>
-                  {wo && (
-                    <div className="min-w-0 flex-1">
-                      <div className="text-caption text-text-tertiary">疾病结论</div>
-                      <div className="truncate">{r.disease || <span className="text-text-tertiary">未配置</span>}</div>
-                    </div>
-                  )}
-                  <div className={`min-w-0 ${wo ? "w-56" : "flex-1"} text-caption text-text-secondary truncate`} title={r.note}>{r.note}</div>
-                  <StatusTag ok={done(r)} />
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ); })}
-      </div>
-      <EditDialog
-        open={!!edit} onClose={() => setEdit(null)}
-        title={edit ? (edit.id === "__type__" ? `编辑事件类型映射 · ${edit.udType} ${edit.udTypeName}` : `编辑子类型映射 · ${edit.udTypeName} / ${edit.udSubName}`) : ""}
-        fields={edit ? (edit.id === "__type__" ? [
-          { k: "target", label: wo ? "本系统工单类型" : "本系统基础事件任务类型", v: edit.target },
-        ] : [
-          ...(wo ? [{ k: "disease", label: "疾病结论", v: edit.disease ?? "" }] : []),
-          { k: "note", label: "备注", v: edit.note, multi: true },
-        ]) : []}
-        onSave={(vals) => { setRows((rs) => rs.map((r) => {
-          if (r.id === edit!.id) return { ...r, ...vals };
-          if (r.udType === edit!.udType && "target" in vals) return { ...r, target: vals.target };
-          return r;
-        })); setEdit(null); }}
-      />
-    </div>
   );
 }
 
