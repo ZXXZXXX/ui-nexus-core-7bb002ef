@@ -5,6 +5,7 @@ import {
   ClipboardList,
   AlertTriangle,
   CheckCircle2,
+  Check,
   PlayCircle,
   Camera,
   Pill,
@@ -1732,7 +1733,7 @@ function ChecklistDay({
               {abnOpen && (
                 <div className="rounded-xl border border-border bg-card px-3 py-3 space-y-3">
                   <label className={`flex items-start gap-2 ${hasVarCalc ? "" : "opacity-50 cursor-not-allowed"}`}>
-                    <input type="checkbox" className="mt-1 accent-[var(--primary)]" disabled={!hasVarCalc} checked={hasVarCalc && paramAdjust} onChange={(e) => setParamAdjust(e.target.checked)} />
+                    <input type="checkbox" className="sr-only" disabled={!hasVarCalc} checked={hasVarCalc && paramAdjust} onChange={(e) => setParamAdjust(e.target.checked)} /><RoundCheck on={hasVarCalc && paramAdjust} />
                     <span>
                       <span className="block text-body-sm text-foreground">计算参数调整</span>
                       <span className="block text-caption text-text-tertiary">
@@ -1771,7 +1772,7 @@ function ChecklistDay({
                     </div>
                   )}
                   <label className="flex items-start gap-2">
-                    <input type="checkbox" className="mt-1 accent-[var(--primary)]" checked={partialUse} onChange={(e) => setPartialUse(e.target.checked)} />
+                    <input type="checkbox" className="sr-only" checked={partialUse} onChange={(e) => setPartialUse(e.target.checked)} /><RoundCheck on={partialUse} />
                     <span>
                       <span className="block text-body-sm text-foreground">部分药品未使用</span>
                       <span className="block text-caption text-text-tertiary">填写原因后，药品未全部录入也可提交；已录入药品仍需核验，按实际用药记录和扣减</span>
@@ -2446,3 +2447,11 @@ function DayDot({ active, done, type }: { active: boolean; done: boolean; type?:
 
 
 
+
+function RoundCheck({ on }: { on: boolean }) {
+  return (
+    <span className={`mt-0.5 h-5 w-5 shrink-0 rounded-full flex items-center justify-center border ${on ? "bg-primary border-primary" : "border-border bg-card"}`}>
+      {on && <Check className="h-3 w-3 text-primary-foreground" strokeWidth={3} />}
+    </span>
+  );
+}
