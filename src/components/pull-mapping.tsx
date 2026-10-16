@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { ArrowRight, ChevronRight, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -99,74 +99,70 @@ export function PullMapping() {
       <div className="space-y-4">
         {list.map((c) => {
           const ck = targetKind(c.target);
+          const configured = c.subs.filter((s) => (ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false)).length;
           return (
-            <section key={c.id} className="rounded-lg border border-border bg-card overflow-hidden">
-              <header className="flex flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4 bg-surface-subtle">
-                <div className="min-w-0">
-                  <span className="text-card-title font-medium text-text-primary">{c.title || "未命名卡片"}</span>
-                  <div className="mt-0.5 flex items-center gap-3 text-body-sm text-text-secondary">
-                    <span>拉取事件类型：<span className="text-text-primary">{c.typeName}</span></span>
-                    <span>编码：<span className="font-mono tabular-nums text-text-primary">{c.typeCode}</span></span>
-                  </div>
-                </div>
-                <div className="ml-auto flex items-center gap-2">
-                  <span className="text-body-sm text-text-secondary shrink-0">对应工单 / 任务</span>
-                  {c.target
-                    ? <span className="text-body-sm text-text-primary">{targetLabel(c.target)}</span>
-                    : <span className="text-body-sm text-text-tertiary">未选择</span>}
+            <section key={c.id} className="rounded-xl border border-border bg-card overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+              <header className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
+                <div className="min-w-0 flex items-center gap-2.5">
+                  <span className="h-5 w-1 rounded-full bg-primary shrink-0" aria-hidden />
+                  <h3 className="text-card-title font-medium text-text-primary truncate">{c.title || "未命名卡片"}</h3>
                   {ck && <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span>}
+                </div>
+                <div className="ml-auto flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-2 text-body-sm">
+                    <span className="rounded-md bg-surface-subtle px-2 py-0.5 font-mono tabular-nums text-caption text-text-secondary">{c.typeCode || "——"}</span>
+                    <span className="text-text-primary">{c.typeName || "未命名事件类型"}</span>
+                    <ArrowRight className="h-3.5 w-3.5 text-text-tertiary" aria-hidden />
+                    {c.target
+                      ? <span className="rounded-md bg-brand-subtle px-2 py-0.5 font-medium text-primary">{targetLabel(c.target)}</span>
+                      : <span className="text-text-tertiary">未选择对应工单 / 任务</span>}
+                  </div>
+                  <span className="h-4 w-px bg-border" aria-hidden />
                   <Button variant="ghost" size="sm" className={textBtn} onClick={() => openEdit(c)}>编辑</Button>
                 </div>
               </header>
 
-              <div className="relative max-h-[210px] overflow-hidden">
-              <div className="divide-y divide-border">
-                {c.subs.map((s) => {
-                  const ok = ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false;
-                  return (
-                    <div key={s.id} className="flex items-center gap-6 px-5 py-3 text-body-sm">
-                      <div className="w-56 min-w-0">
-                        <div className="text-caption text-text-tertiary">事件子类型</div>
-                        <div className="text-text-primary truncate">{s.name || "—"}</div>
+              <div className="relative max-h-[168px] overflow-hidden border-t border-border/60 bg-surface-subtle/40">
+                <div className="divide-y divide-border/60">
+                  {c.subs.map((s) => {
+                    const ok = ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false;
+                    return (
+                      <div key={s.id} className="flex items-center gap-3 px-5 py-2.5 text-body-sm">
+                        <span className="w-[72px] shrink-0 rounded bg-card px-1.5 py-0.5 text-center font-mono tabular-nums text-caption text-text-secondary border border-border/60">{s.code || "——"}</span>
+                        <span className="w-44 min-w-0 truncate text-text-primary">{s.name || "—"}</span>
+                        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-text-tertiary/70" aria-hidden />
+                        <div className="flex-1 min-w-0 flex items-center gap-2">
+                          {ck === "工单" && (s.diseaseId ? (
+                            <>
+                              <span className="truncate text-text-primary">{diseaseNameOf(s.diseaseId)}</span>
+                              <span className="font-mono tabular-nums text-caption text-text-tertiary shrink-0">{s.diseaseId}</span>
+                            </>
+                          ) : <span className="text-text-tertiary">疾病未配置</span>)}
+                          {ck === "基础事件" && (s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">检测项目未配置</span>)}
+                          {!ck && <span className="text-text-tertiary">先在编辑中选择对应工单 / 任务</span>}
+                        </div>
+                        <span className={`tag shrink-0 ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span>
                       </div>
-                      <div className="w-28">
-                        <div className="text-caption text-text-tertiary">子类型编码</div>
-                        <div className="font-mono tabular-nums">{s.code || "—"}</div>
-                      </div>
-                      <div className="flex-1 min-w-0 flex items-center gap-3">
-                        {ck === "工单" && (
-                          <>
-                            <span className="text-text-secondary shrink-0">疾病</span>
-                            {s.diseaseId ? (
-                              <>
-                                <span className="text-text-primary truncate max-w-64">{diseaseNameOf(s.diseaseId)}</span>
-                                <span className="font-mono tabular-nums text-caption text-text-tertiary">{s.diseaseId}</span>
-                              </>
-                            ) : (
-                              <span className="text-text-tertiary">未配置</span>
-                            )}
-                          </>
-                        )}
-                        {ck === "基础事件" && (
-                          <>
-                            <span className="text-text-secondary shrink-0">检测项目</span>
-                            {s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">未配置</span>}
-                          </>
-                        )}
-                        {!ck && <span className="text-text-tertiary">未选择对应工单 / 任务，点击「编辑」配置</span>}
-                      </div>
-                      <span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span>
-                    </div>
-                  );
-                })}
-                {c.subs.length > 3 && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-card to-transparent" />}
+                    );
+                  })}
+                  {c.subs.length === 0 && (
+                    <div className="px-5 py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「编辑」添加</div>
+                  )}
+                  {c.subs.length > 3 && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-card to-transparent" />}
+                </div>
               </div>
-              </div>
-              {c.subs.length > 3 && (
-                <button type="button" onClick={() => openView(c)} className="block w-full border-t border-border py-2.5 text-center text-body-sm text-primary hover:bg-brand-subtle">
-                  查看全部 {c.subs.length} 个子类型
-                </button>
-              )}
+
+              <footer className="flex items-center border-t border-border bg-card">
+                <span className="px-5 text-caption text-text-tertiary">
+                  {ck ? `已配置 ${configured} / ${c.subs.length} 个子类型` : `共 ${c.subs.length} 个子类型`}
+                </span>
+                {c.subs.length > 3 && (
+                  <button type="button" onClick={() => openView(c)} className="ml-auto flex items-center gap-1 border-l border-border py-2.5 pl-4 pr-5 text-body-sm text-primary hover:bg-brand-subtle">
+                    查看全部 {c.subs.length} 个子类型
+                    <ChevronRight className="h-3.5 w-3.5" aria-hidden />
+                  </button>
+                )}
+              </footer>
             </section>
           );
         })}
