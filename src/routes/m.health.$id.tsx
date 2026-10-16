@@ -1809,8 +1809,11 @@ function ChecklistDay({
                   <label className="flex items-start gap-2">
                     <input type="radio" name="abnormal-mode" aria-label="部分药品未使用" className="sr-only" checked={partialUse} onClick={() => { if (partialUse) setPartialUse(false); else { setPartialUse(true); setParamAdjust(false); } }} /><RoundCheck on={partialUse} />
                     <span>
-                      <span className="block text-body-sm text-foreground">部分药品未使用</span>
-                      <span className="block text-caption text-text-tertiary">填写原因后，药品未全部录入也可提交；已录入药品仍需核验，按实际用药记录和扣减</span>
+                      <span className="flex items-center gap-2">
+                        <span className="text-body-sm text-foreground">部分药品未使用</span>
+                        <span className="tag tag-warning">取消校验限制</span>
+                      </span>
+                      <span className="block text-caption text-text-tertiary">不改变用量校验内容，仅放开提交限制：填写原因后，药品未全部录入或核验数量不足也可提交；已录入药品仍按实际用药记录和扣减</span>
                     </span>
                   </label>
                   {partialUse && (
