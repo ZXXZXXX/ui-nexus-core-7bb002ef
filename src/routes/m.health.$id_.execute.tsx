@@ -44,10 +44,12 @@ function ExecuteRecordPage() {
 
   const [ready, setReady] = useState(false);
   const handleReady = useCallback((r: boolean) => setReady(r), []);
+  const [abnormal, setAbnormal] = useState(false);
+  const handleAbnormal = useCallback((a: boolean) => setAbnormal(a), []);
 
   const handleSubmit = () => {
     if (!ready) return;
-    toast.success(isMerge ? `已提交 ${mergeIds.length} 项执行记录` : "提交成功");
+    toast.success(isMerge ? `已提交 ${mergeIds.length} 项执行记录` : "提交成功", abnormal ? { description: "本次任务已完成，并保留「用药异常」标记" } : undefined);
 
     if (isMerge) {
       navigate({ to: "/m/health/today", search: {} });
@@ -100,7 +102,7 @@ function ExecuteRecordPage() {
           )}
         </div>
         <div className="px-4 space-y-3">
-          <ActiveDayExecute pickupCode={pickupCode} tags={execTags} workOrderId={id} onReadyChange={handleReady} batchCount={isMerge ? mergeIds.length : 1} />
+          <ActiveDayExecute pickupCode={pickupCode} tags={execTags} workOrderId={id} onReadyChange={handleReady} onAbnormalChange={handleAbnormal} batchCount={isMerge ? mergeIds.length : 1} />
         </div>
       </div>
 
