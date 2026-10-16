@@ -3,7 +3,6 @@ import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { KB_DISEASES } from "@/lib/disease-kb";
 
@@ -55,7 +54,6 @@ export function PullMapping() {
   const [kw, setKw] = useState("");
   const [viewCard, setViewCard] = useState<Card | null>(null); // 抽屉查看态
   const [draft, setDraft] = useState<Card | null>(null); // 抽屉编辑态
-  const [subDlg, setSubDlg] = useState<Sub | null>(null);
 
   const list = useMemo(() => cards.filter((c) => !kw || [c.title, c.typeName, c.typeCode, c.target, ...c.subs.flatMap((s) => [s.name, s.code])].some((v) => v.includes(kw))), [cards, kw]);
   const isNew = !!draft && !cards.some((x) => x.id === draft.id);
@@ -74,12 +72,9 @@ export function PullMapping() {
     closeAll();
   };
 
-  const saveSub = (s: Sub) => {
-    setDraft((d) =>
-      d ? { ...d, subs: d.subs.some((x) => x.id === s.id) ? d.subs.map((x) => (x.id === s.id ? s : x)) : [...d.subs, s] } : d,
-    );
-    setSubDlg(null);
-  };
+  const addSub = () =>
+    setDraft((d) => (d ? { ...d, subs: [...d.subs, { id: `s-${Date.now()}`, name: "", code: "" }] } : d));
+  const delSub = (sid: string) => setDraft((d) => (d ? { ...d, subs: d.subs.filter((s) => s.id !== sid) } : d));
 
   const kind = draft ? targetKind(draft.target) : "";
 
@@ -231,28 +226,24 @@ export function PullMapping() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="text-card-title font-medium text-text-primary">事件子类型（{draft.subs.length}）</div>
-                  <Button variant="ghost" size="sm" className={textBtn} onClick={() => setSubDlg({ id: `s-${Date.now()}`, name: "", code: "" })}>
+                  <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
                     <Plus className="h-3.5 w-3.5" />添加子类型
                   </Button>
                 </div>
                 {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
                 <div className="divide-y divide-border">
                   {draft.subs.map((s) => (
-                    <div key={s.id} className="py-2.5 flex items-center gap-3 text-body-sm">
-                      <div className="w-44 shrink-0 min-w-0 flex items-baseline gap-2">
-                        <span className="text-text-primary truncate">{s.name || "未命名"}</span>
-                        <span className="font-mono tabular-nums text-caption text-text-tertiary shrink-0">{s.code || "—"}</span>
-                      </div>
+                    <div key={s.id} className="py-2 flex items-center gap-3 text-body-sm">
+                      <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-36 shrink-0 text-body-sm" />
+                      <Input value={s.code} placeholder="子类型编码" className="h-9 w-28 shrink-0 font-mono text-body-sm"
+                        onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
                       {kind === "工单" && (
-                        <>
-                          <Select value={s.diseaseId ?? ""} onValueChange={(v) => patchSub(s.id, { diseaseId: v })}>
-                            <SelectTrigger className="h-9 flex-1 min-w-0 text-body-sm"><SelectValue placeholder="选择疾病名称" /></SelectTrigger>
-                            <SelectContent className="max-h-72">
-                              {KB_DISEASES.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                          <span className="font-mono tabular-nums text-caption text-text-tertiary w-14 text-right shrink-0">{s.diseaseId ?? "—"}</span>
-                        </>
+                        <Select value={s.diseaseId ?? ""} onValueChange={(v) => patchSub(s.id, { diseaseId: v })}>
+                          <SelectTrigger className="h-9 flex-1 min-w-0 text-body-sm"><SelectValue placeholder="选择疾病名称" /></SelectTrigger>
+                          <SelectContent className="max-h-72">
+                            {KB_DISEASES.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
                       )}
                       {kind === "基础事件" && (
                         <Select value={s.item ?? ""} onValueChange={(v) => patchSub(s.id, { item: v })}>
@@ -261,7 +252,7 @@ export function PullMapping() {
                         </Select>
                       )}
                       {!kind && <div className="flex-1 min-w-0 text-text-tertiary">先在上方选择对应工单 / 任务</div>}
-                      <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => setSubDlg({ ...s })}>编辑</Button>
+                      <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
                     </div>
                   ))}
                 </div>
@@ -281,15 +272,6 @@ export function PullMapping() {
           </div>
         </SheetContent>
       </Sheet>
-
-      <FormDialog
-        open={!!subDlg}
-        title="事件子类型"
-        fields={[["name", "事件子类型名称"], ["code", "事件子类型编码"]]}
-        init={subDlg ? { name: subDlg.name, code: subDlg.code } : {}}
-        onClose={() => setSubDlg(null)}
-        onSave={(v) => subDlg && saveSub({ ...subDlg, ...v })}
-      />
     </div>
   );
 }
@@ -309,34 +291,5 @@ function Row({ label, value, mono }: { label: string; value: string; mono?: bool
       <span className="text-text-secondary shrink-0 w-24">{label}</span>
       <span className={`text-text-primary ${mono ? "font-mono tabular-nums" : ""}`}>{value}</span>
     </div>
-  );
-}
-
-function FormDialog({ open, title, fields, init, onClose, onSave }: {
-  open: boolean; title: string; fields: [string, string][]; init: Record<string, string>;
-  onClose: () => void; onSave: (v: Record<string, string>) => void;
-}) {
-  const [vals, setVals] = useState<Record<string, string>>({});
-  const [wasOpen, setWasOpen] = useState(false);
-  if (open !== wasOpen) { setWasOpen(open); if (open) setVals(init); }
-  return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader><DialogTitle>{title}</DialogTitle></DialogHeader>
-        <div className="space-y-4">
-          {fields.map(([k, label]) => (
-            <label key={k} className="block space-y-1.5">
-              <span className="text-body-sm text-text-secondary">{label}</span>
-              <Input value={vals[k] ?? ""} className={k.toLowerCase().includes("code") ? "font-mono" : undefined}
-                onChange={(e) => setVals({ ...vals, [k]: k.toLowerCase().includes("code") ? e.target.value.replace(/\D/g, "") : e.target.value })} />
-            </label>
-          ))}
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>取消</Button>
-          <Button disabled={fields.some(([k]) => !vals[k])} onClick={() => onSave(vals)}>保存</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   );
 }
