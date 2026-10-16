@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Send } from "lucide-react";
 import { MobileShell } from "@/components/mobile-shell";
 import { useRole } from "@/lib/mobile-role";
-import { ActiveDayExecute } from "./m.health.$id";
+import { ActiveDayExecute, markDayAbnormal } from "./m.health.$id";
 
 export const Route = createFileRoute("/m/health/$id_/execute")({
   head: () => ({ meta: [{ title: "执行记录 · 奇点智牧" }] }),
@@ -49,6 +49,7 @@ function ExecuteRecordPage() {
 
   const handleSubmit = () => {
     if (!ready) return;
+    if (abnormal) for (const tid of isMerge ? mergeIds : [id]) markDayAbnormal(tid, 2);
     toast.success(isMerge ? `已提交 ${mergeIds.length} 项执行记录` : "提交成功", abnormal ? { description: "本次任务已完成，并保留「用药异常」标记" } : undefined);
 
     if (isMerge) {
