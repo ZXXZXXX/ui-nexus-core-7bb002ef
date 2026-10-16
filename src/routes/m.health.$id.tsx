@@ -1260,14 +1260,15 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
       {days.map((d) => {
         const isDone = d.phase === "done";
         const isActive = d.phase === "active";
-        const statusLabel = isDone ? "已完成" : isActive ? "进行中" : "未开始";
-        const statusClass = isDone ? "tag-success" : isActive ? "tag-info" : "tag-muted";
+        const flagged = Boolean(abnormalDays[d.day]);
+        const statusLabel = flagged ? "异常 · 完成" : isDone ? "已完成" : isActive ? "进行中" : "未开始";
+        const statusClass = flagged ? "tag-danger" : isDone ? "tag-success" : isActive ? "tag-info" : "tag-muted";
 
         return (
-          <div key={d.day} className={`rounded-2xl bg-card border border-border p-4 ${d.phase === "pending" ? "opacity-50" : ""}`}>
+          <div key={d.day} className={`rounded-2xl bg-card border border-border p-4 ${d.phase === "pending" ? "opacity-50" : ""} ${flagged ? "card-abnormal" : ""}`}>
             <div className="flex items-center justify-between mb-2 min-h-6">
               <div className="flex items-center gap-2 leading-6">
-                <DayDot active={isActive} done={isDone} type={orderType} />
+                <DayDot active={isActive && !flagged} done={isDone || flagged} type={orderType} />
                 <span className={`text-body font-medium leading-6 ${isDone || isActive ? "text-foreground" : "text-text-tertiary"}`}>
                   执行任务{String(d.day).padStart(2, "0")}
                 </span>
@@ -1285,11 +1286,16 @@ export function ExecuteSummary({ id, status, pickupCode, tags, platformAction, p
               <div className="text-caption text-text-tertiary mb-0.5">具体动作</div>
               <div className="text-body-sm leading-relaxed text-foreground">{d.action}</div>
             </div>
+            {flagged && (
+              <div className="callout-danger rounded-lg px-3 py-2 mb-2 text-caption text-destructive leading-relaxed">
+                本次任务已标记用药异常，按实际执行记录完成
+              </div>
+            )}
             <div className="flex items-center justify-between gap-2 text-caption text-text-tertiary">
               <div className="flex items-center gap-1.5">
                 <PickupStatus needPickup={needPickup} />
               </div>
-              {isDone && (
+              {(isDone || flagged) && (
                 <div className="flex items-center gap-1.5">
                   <span>执行人</span>
                   <PersonChip name={["李雨晴", "王建国", "张伟"][(d.day - 1) % 3]} />
