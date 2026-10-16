@@ -1712,24 +1712,22 @@ function ChecklistDay({
 
           {/* 用药异常（计算参数调整 / 部分药品未使用），提交后保留异常标记，不终止工单 */}
           {interactive && medItems.length > 0 && (
-            <div className={`rounded-xl border bg-card ${abnormal ? "border-[var(--state-warning)]/50" : "border-border"}`}>
-              <button
-                type="button"
-                onClick={() => setAbnOpen((v) => !v)}
-                className="w-full flex items-center justify-between px-3 py-2.5"
-              >
-                <span className="text-body-sm text-foreground inline-flex items-center gap-2">
-                  用药异常
-                  {abnormal && (
-                    <span className="inline-flex items-center h-5 px-1.5 rounded text-caption bg-[var(--state-warning)]/10 text-[var(--state-warning)]">
-                      已标记
-                    </span>
-                  )}
-                </span>
-                <span className="text-caption text-text-tertiary">{abnOpen ? "收起" : "展开"}</span>
-              </button>
+            <>
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setAbnOpen((v) => !v)}
+                  className={
+                    abnormal
+                      ? "text-caption text-primary active:opacity-70"
+                      : "text-caption text-text-tertiary underline underline-offset-2 decoration-border active:opacity-70"
+                  }
+                >
+                  {abnormal ? "用药异常 · 已标记 ›" : abnOpen ? "收起" : "用药异常 ›"}
+                </button>
+              </div>
               {abnOpen && (
-                <div className="border-t border-border px-3 py-3 space-y-3">
+                <div className="rounded-xl border border-border bg-card px-3 py-3 space-y-3">
                   <label className="flex items-start gap-2">
                     <input type="checkbox" className="mt-1 accent-[var(--primary)]" checked={paramAdjust} onChange={(e) => setParamAdjust(e.target.checked)} />
                     <span>
@@ -1787,7 +1785,7 @@ function ChecklistDay({
                   <div className="text-caption text-text-tertiary">提交后本次任务标记为已完成并保留异常标记，不终止工单，不修改原处方及后续任务。</div>
                 </div>
               )}
-            </div>
+            </>
           )}
 
 
