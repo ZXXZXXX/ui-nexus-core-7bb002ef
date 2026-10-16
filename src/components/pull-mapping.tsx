@@ -59,7 +59,7 @@ export function PullMapping() {
     setCards((cs) => cs.map((c) => (c.id === cid ? { ...c, subs: c.subs.map((s) => (s.id === sid ? { ...s, ...p } : s)) } : c)));
 
   const saveCard = (c: Card) => {
-    setCards((cs) => (cs.some((x) => x.id === c.id) ? cs.map((x) => (x.id === c.id ? c : x)) : [...cs, c]));
+    setCards((cs) => (cs.some((x) => x.id === c.id) ? cs.map((x) => (x.id === c.id ? c : x)) : [c, ...cs]));
     setCardDlg(null);
   };
   const saveSub = (cid: string, s: Sub) => {
@@ -75,7 +75,7 @@ export function PullMapping() {
           <Input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="搜索卡片名称 / 事件类型 / 子类型 / 编码" className="h-9 pl-8 text-body-sm" />
         </div>
         <Button className="ml-auto h-9" onClick={() => setCardDlg({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", subs: [] })}>
-          <Plus className="h-4 w-4" />新增映射卡片
+          <Plus className="h-4 w-4" />新建映射卡片
         </Button>
       </div>
 
@@ -160,7 +160,7 @@ export function PullMapping() {
 
       <FormDialog
         open={!!cardDlg}
-        title={cardDlg && cards.some((x) => x.id === cardDlg.id) ? "编辑映射卡片" : "新增映射卡片"}
+        title={cardDlg && cards.some((x) => x.id === cardDlg.id) ? "编辑映射卡片" : "新建映射卡片"}
         fields={[["title", "卡片名称"], ["typeName", "拉取事件类型名称"], ["typeCode", "拉取事件类型编码"]]}
         init={cardDlg ? { title: cardDlg.title, typeName: cardDlg.typeName, typeCode: cardDlg.typeCode } : {}}
         onClose={() => setCardDlg(null)}
