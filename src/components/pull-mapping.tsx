@@ -56,6 +56,7 @@ export function PullMapping() {
   const [kw, setKw] = useState("");
   const [viewCard, setViewCard] = useState<Card | null>(null); // 抽屉查看态
   const [draft, setDraft] = useState<Card | null>(null); // 抽屉编辑态
+  const [subDlg, setSubDlg] = useState<Sub | null>(null);
 
   const list = useMemo(() => cards.filter((c) => !kw || [c.title, c.typeName, c.typeCode, c.target, ...c.subs.flatMap((s) => [s.name, s.code])].some((v) => v.includes(kw))), [cards, kw]);
   const isNew = !!draft && !cards.some((x) => x.id === draft.id);
