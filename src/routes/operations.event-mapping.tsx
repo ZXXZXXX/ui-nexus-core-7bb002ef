@@ -167,13 +167,12 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
   const list = useMemo(() => rows.filter((r) =>
     (status === "全部状态" || (status === "已配置") === done(r)) &&
     (!kw || [r.udType, r.udTypeName, r.udSub, r.udSubName, r.target, r.disease ?? ""].some((s) => s.includes(kw)))), [rows, kw, status]);
-  const cols = ["事件类型编码", "事件类型", wo ? "本系统工单类型" : "本系统基础事件任务类型", "事件子类型编码", "事件子类型", ...(wo ? ["疾病结论"] : []), "状态", "备注", "操作"];
-  // 事件类型名称 + 编码 决定映射到的工单类型 / 基础事件任务类型：同一事件类型的行合并展示
-  const span = (i: number) => {
-    if (i > 0 && list[i - 1].udType === list[i].udType) return 0;
-    let n = 1; while (i + n < list.length && list[i + n].udType === list[i].udType) n++;
-    return n;
-  };
+  const groups = useMemo(() => {
+    const m = new Map<string, InRow[]>();
+    list.forEach((r) => m.set(r.udType, [...(m.get(r.udType) ?? []), r]));
+    return [...m.values()];
+  }, [list]);
+  const cols = ["事件子类型编码", "事件子类型", ...(wo ? ["疾病结论"] : []), "状态", "备注", "操作"];
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -186,36 +185,47 @@ function InTable({ kind }: { kind: "工单" | "基础事件" }) {
           <SelectContent>{["全部状态", "已配置", "待确认"].map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
         </Select>
       </div>
-      <div className="overflow-x-auto rounded-md border border-border">
-        <table className="w-full text-body-sm">
-          <Th cols={cols} />
-          <tbody>
-            {list.map((r, i) => { const n = span(i); return (
-              <tr key={r.id} className="border-t border-border h-12">
-                {n > 0 && <>
-                  <td rowSpan={n} className="px-4 py-3 whitespace-nowrap align-top border-r border-border"><Code v={r.udType} /></td>
-                  <td rowSpan={n} className="px-4 py-3 whitespace-nowrap align-top border-r border-border">{r.udTypeName}</td>
-                  <td rowSpan={n} className="px-4 py-3 whitespace-nowrap align-top border-r border-border font-medium">{r.target || <span className="text-text-tertiary">—</span>}</td>
-                </>}
-                <td className="px-4 py-3 whitespace-nowrap"><Code v={r.udSub} /></td>
-                <td className="px-4 py-3 whitespace-nowrap">{r.udSubName}</td>
-                {wo && <td className="px-4 py-3 whitespace-nowrap">{r.disease || <span className="text-text-tertiary">—</span>}</td>}
-                <td className="px-4 py-3 whitespace-nowrap"><StatusTag ok={done(r)} /></td>
-                <td className="px-4 py-3 text-text-secondary max-w-[240px] truncate" title={r.note}>{r.note || "—"}</td>
-                <td className="px-4 py-3 whitespace-nowrap"><Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button></td>
-              </tr>
-            ); })}
-          </tbody>
-        </table>
+      <div className="space-y-3">
+        {groups.map((g) => { const h = g[0]; return (
+          <div key={h.udType} className="rounded-md border border-border overflow-hidden">
+            <div className="flex items-center gap-3 px-4 h-12 bg-surface-subtle">
+              <span className="font-mono tabular-nums text-body-sm text-text-secondary">{h.udType}</span>
+              <span className="text-body font-medium text-text-primary">{h.udTypeName}</span>
+              <span className="text-text-tertiary">→</span>
+              <span className="text-caption text-text-tertiary">{wo ? "本系统工单类型" : "本系统基础事件任务类型"}</span>
+              <span className="tag tag-success">{h.target || "未配置"}</span>
+              <span className="ml-auto text-caption text-text-tertiary">{g.length} 个子类型</span>
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit({ ...h, id: "__type__" })}>编辑</Button>
+            </div>
+            <table className="w-full text-body-sm table-fixed">
+              <thead className="text-text-tertiary">
+                <tr className="h-10 border-t border-border">{cols.map((c, i) => <th key={c} className={`px-4 text-left font-normal ${["w-36", "w-48", ...(wo ? ["w-56"] : []), "w-24", "", "w-24"][i]}`}>{c}</th>)}</tr>
+              </thead>
+              <tbody>
+                {g.map((r) => (
+                  <tr key={r.id} className="border-t border-border h-12">
+                    <td className="px-4"><Code v={r.udSub} /></td>
+                    <td className="px-4 truncate">{r.udSubName}</td>
+                    {wo && <td className="px-4 truncate">{r.disease || <span className="text-text-tertiary">—</span>}</td>}
+                    <td className="px-4"><StatusTag ok={done(r)} /></td>
+                    <td className="px-4 text-text-secondary truncate" title={r.note}>{r.note || "—"}</td>
+                    <td className="px-4"><Button variant="ghost" size="sm" className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary" onClick={() => setEdit(r)}>编辑</Button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ); })}
       </div>
       <EditDialog
         open={!!edit} onClose={() => setEdit(null)}
-        title={edit ? `编辑${kind}映射 · ${edit.udTypeName} / ${edit.udSubName}` : ""}
-        fields={edit ? [
-          { k: "target", label: `${wo ? "本系统工单类型" : "本系统基础事件任务类型"}（按事件类型 ${edit.udType} ${edit.udTypeName} 统一生效）`, v: edit.target },
+        title={edit ? (edit.id === "__type__" ? `编辑事件类型映射 · ${edit.udType} ${edit.udTypeName}` : `编辑子类型映射 · ${edit.udTypeName} / ${edit.udSubName}`) : ""}
+        fields={edit ? (edit.id === "__type__" ? [
+          { k: "target", label: wo ? "本系统工单类型" : "本系统基础事件任务类型", v: edit.target },
+        ] : [
           ...(wo ? [{ k: "disease", label: "疾病结论", v: edit.disease ?? "" }] : []),
           { k: "note", label: "备注", v: edit.note, multi: true },
-        ] : []}
+        ]) : []}
         onSave={(vals) => { setRows((rs) => rs.map((r) => {
           if (r.id === edit!.id) return { ...r, ...vals };
           if (r.udType === edit!.udType && "target" in vals) return { ...r, target: vals.target };
