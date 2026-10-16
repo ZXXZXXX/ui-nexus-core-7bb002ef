@@ -96,76 +96,56 @@ export function PullMapping() {
         </Button>
       </div>
 
-      <div className="space-y-4">
-        {list.map((c) => {
-          const ck = targetKind(c.target);
-          const configured = c.subs.filter((s) => (ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false)).length;
-          return (
-            <section key={c.id} className="rounded-xl border border-border bg-card overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-              <header className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5">
-                <div className="min-w-0 flex items-center gap-2.5">
-                  <span className="h-5 w-1 rounded-full bg-primary shrink-0" aria-hidden />
-                  <h3 className="text-card-title font-medium text-text-primary truncate">{c.title || "未命名卡片"}</h3>
-                  {ck && <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span>}
-                </div>
-                <div className="ml-auto flex items-center gap-3 shrink-0">
-                  <div className="flex items-center gap-2 text-body-sm">
-                    <span className="rounded-md bg-surface-subtle px-2 py-0.5 font-mono tabular-nums text-caption text-text-secondary">{c.typeCode || "——"}</span>
-                    <span className="text-text-primary">{c.typeName || "未命名事件类型"}</span>
-                    <ArrowRight className="h-3.5 w-3.5 text-text-tertiary" aria-hidden />
-                    {c.target
-                      ? <span className="rounded-md bg-brand-subtle px-2 py-0.5 font-medium text-primary">{targetLabel(c.target)}</span>
-                      : <span className="text-text-tertiary">未选择对应工单 / 任务</span>}
-                  </div>
-                  <span className="h-4 w-px bg-border" aria-hidden />
-                  <Button variant="ghost" size="sm" className={textBtn} onClick={() => openEdit(c)}>编辑</Button>
-                </div>
-              </header>
-
-              <div className="relative max-h-[168px] overflow-hidden border-t border-border/60 bg-surface-subtle/40">
-                <div className="divide-y divide-border/60">
-                  {c.subs.map((s) => {
-                    const ok = ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false;
-                    return (
-                      <div key={s.id} className="flex items-center gap-3 px-5 py-2.5 text-body-sm">
-                        <span className="w-[72px] shrink-0 rounded bg-card px-1.5 py-0.5 text-center font-mono tabular-nums text-caption text-text-secondary border border-border/60">{s.code || "——"}</span>
-                        <span className="w-44 min-w-0 truncate text-text-primary">{s.name || "—"}</span>
-                        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-text-tertiary/70" aria-hidden />
-                        <div className="flex-1 min-w-0 flex items-center gap-2">
-                          {ck === "工单" && (s.diseaseId ? (
-                            <>
-                              <span className="truncate text-text-primary">{diseaseNameOf(s.diseaseId)}</span>
-                              <span className="font-mono tabular-nums text-caption text-text-tertiary shrink-0">{s.diseaseId}</span>
-                            </>
-                          ) : <span className="text-text-tertiary">疾病未配置</span>)}
-                          {ck === "基础事件" && (s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">检测项目未配置</span>)}
-                          {!ck && <span className="text-text-tertiary">先在编辑中选择对应工单 / 任务</span>}
-                        </div>
-                        <span className={`tag shrink-0 ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span>
-                      </div>
-                    );
-                  })}
-                  {c.subs.length === 0 && (
-                    <div className="px-5 py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「编辑」添加</div>
-                  )}
-                  {c.subs.length > 3 && <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-card to-transparent" />}
-                </div>
-              </div>
-
-              <footer className="flex items-center border-t border-border bg-card">
-                <span className="px-5 text-caption text-text-tertiary">
-                  {ck ? `已配置 ${configured} / ${c.subs.length} 个子类型` : `共 ${c.subs.length} 个子类型`}
-                </span>
-                {c.subs.length > 3 && (
-                  <button type="button" onClick={() => openView(c)} className="ml-auto flex items-center gap-1 border-l border-border py-2.5 pl-4 pr-5 text-body-sm text-primary hover:bg-brand-subtle">
-                    查看全部 {c.subs.length} 个子类型
-                    <ChevronRight className="h-3.5 w-3.5" aria-hidden />
-                  </button>
-                )}
-              </footer>
-            </section>
-          );
-        })}
+      <div className="overflow-x-auto rounded-md border border-border">
+        <table className="w-full text-body-sm">
+          <thead className="bg-surface-subtle text-text-secondary">
+            <tr className="h-12">
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[220px] grow">映射名称</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[140px] grow">（第三方）事件类型名称</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[150px]">（第三方）事件类型编号</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[170px] grow">（我方）对应类型</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">子类型映射数目</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[100px]">状态</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[80px]">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.map((c) => {
+              const ck = targetKind(c.target);
+              const configured = c.subs.filter((s) => (ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false)).length;
+              const ok = !!ck && c.subs.length > 0 && configured === c.subs.length;
+              return (
+                <tr key={c.id} className="border-t border-border h-12">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <button type="button" className="text-text-primary hover:text-primary" onClick={() => openView(c)} title="查看全部子类型映射详情">
+                      {c.title || "未命名卡片"}
+                    </button>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">{c.typeName || "—"}</td>
+                  <td className="px-4 py-3 whitespace-nowrap font-mono tabular-nums">{c.typeCode || "—"}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {c.target ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="text-text-primary">{targetLabel(c.target)}</span>
+                        <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span>
+                      </span>
+                    ) : <span className="text-text-tertiary">未选择</span>}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap tabular-nums">
+                    {ck ? <span className="text-text-primary">{configured}<span className="text-text-tertiary"> / {c.subs.length}</span></span> : c.subs.length}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <Button variant="ghost" size="sm" className={textBtn} onClick={() => openEdit(c)}>编辑</Button>
+                  </td>
+                </tr>
+              );
+            })}
+            {list.length === 0 && (
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-body-sm text-text-tertiary">暂无映射卡片，点击右上角「新建映射卡片」新增</td></tr>
+            )}
+          </tbody>
+        </table>
       </div>
 
       <Sheet open={drawerOpen} onOpenChange={(o) => !o && closeAll()}>
