@@ -167,31 +167,34 @@ export function PullMapping() {
                     {vk && <span className={`tag ${vk === "工单" ? "tag-success" : "tag-info"}`}>{vk}</span>}
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <div className="text-card-title font-medium text-text-primary">事件子类型（{viewCard.subs.length}）</div>
-                  {viewCard.subs.length === 0 && <div className="rounded-md border border-dashed border-border px-4 py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
-                  {viewCard.subs.map((s) => {
-                    const ok = vk === "工单" ? !!s.diseaseId : vk === "基础事件" ? !!s.item : false;
-                    return (
-                      <div key={s.id} className="rounded-md border border-border px-4 py-3 flex items-center gap-3 text-body-sm">
-                        <div className="min-w-0 w-40 shrink-0">
-                          <div className="text-text-primary truncate">{s.name || "—"}</div>
-                          <div className="font-mono tabular-nums text-caption text-text-tertiary">{s.code || "—"}</div>
+                  {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
+                  <div className="divide-y divide-border">
+                    {viewCard.subs.map((s) => {
+                      const ok = vk === "工单" ? !!s.diseaseId : vk === "基础事件" ? !!s.item : false;
+                      return (
+                        <div key={s.id} className="py-2.5 flex items-center gap-3 text-body-sm">
+                          <div className="w-44 shrink-0 min-w-0 flex items-baseline gap-2">
+                            <span className="text-text-primary truncate">{s.name || "—"}</span>
+                            <span className="font-mono tabular-nums text-caption text-text-tertiary shrink-0">{s.code || "—"}</span>
+                          </div>
+                          <span className="text-text-tertiary shrink-0">→</span>
+                          <div className="flex-1 min-w-0 truncate">
+                            {vk === "工单" && (s.diseaseId ? (
+                              <>
+                                <span className="text-text-primary">{diseaseNameOf(s.diseaseId)}</span>{" "}
+                                <span className="font-mono tabular-nums text-caption text-text-tertiary">{s.diseaseId}</span>
+                              </>
+                            ) : <span className="text-text-tertiary">疾病未配置</span>)}
+                            {vk === "基础事件" && (s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">检测项目未配置</span>)}
+                            {!vk && <span className="text-text-tertiary">未选择对应工单 / 任务</span>}
+                          </div>
+                          <span className={`tag ${ok ? "tag-success" : "tag-warning"} shrink-0`}>{ok ? "已配置" : "待配置"}</span>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          {vk === "工单" && (s.diseaseId ? (
-                            <>
-                              <span className="text-text-primary truncate">{diseaseNameOf(s.diseaseId)}</span>{" "}
-                              <span className="font-mono tabular-nums text-caption text-text-tertiary">{s.diseaseId}</span>
-                            </>
-                          ) : <span className="text-text-tertiary">疾病未配置</span>)}
-                          {vk === "基础事件" && (s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">检测项目未配置</span>)}
-                          {!vk && <span className="text-text-tertiary">未选择对应工单 / 任务</span>}
-                        </div>
-                        <span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             );
