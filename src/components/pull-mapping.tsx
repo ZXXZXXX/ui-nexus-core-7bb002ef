@@ -311,7 +311,7 @@ export function PullMapping() {
           <div className="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-3 border-t border-border bg-card px-6 py-4">
             {draft ? (
               <>
-                <Button variant="outline" onClick={() => setDraft(viewCard ? { ...viewCard, subs: viewCard.subs.map((s) => ({ ...s })) } : null)}>取消</Button>
+                <Button variant="outline" onClick={() => setDraft(null)}>取消</Button>
                 <Button disabled={!draft.title || !draft.typeName || !draft.typeCode} onClick={saveDraft}>保存</Button>
               </>
             ) : (
