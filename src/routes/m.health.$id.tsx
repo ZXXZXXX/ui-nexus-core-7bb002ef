@@ -1777,7 +1777,6 @@ function ChecklistDay({
                     <span>
                       <span className="flex items-center gap-2">
                         <span className="text-body-sm text-foreground">计算参数调整</span>
-                        {hasVarCalc && <span className="tag tag-brand">改变校验内容</span>}
                       </span>
                       <span className="block text-caption text-text-tertiary">
                         {hasVarCalc ? "按新参数重算用量" : "本处方无需调整"}
