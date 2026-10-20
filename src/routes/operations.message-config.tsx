@@ -46,7 +46,11 @@ type Msg = {
   pushMode: PushMode;
   pushTime: string;
   enabled: boolean;
+  recipients?: string[];
 };
+
+const RECIPIENTS = ["牧场负责人", "管理员", "场长", "兽医", "兽医助理"];
+
 
 const INITIAL: Msg[] = [
   { id: "wo-due", name: "工单临期提醒", category: "工单类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
@@ -206,6 +210,21 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
           <div className="mt-3 rounded-md bg-surface-subtle p-3 text-body-sm text-text-secondary">
             <div className="text-caption text-text-tertiary mb-1">预览</div>
             {preview}
+          </div>
+        </Section>
+
+        <Section title="接收人">
+          <div className="flex flex-wrap gap-2">
+            {RECIPIENTS.map((r) => {
+              const on = (m.recipients ?? []).includes(r);
+              return (
+                <button key={r} type="button"
+                  onClick={() => set({ recipients: on ? (m.recipients ?? []).filter((x) => x !== r) : [...(m.recipients ?? []), r] })}
+                  className={`h-8 px-3 rounded-md border text-body-sm transition-colors ${on ? "border-primary bg-brand-subtle text-primary" : "border-border text-text-secondary hover:border-primary"}`}>
+                  {r}
+                </button>
+              );
+            })}
           </div>
         </Section>
 
