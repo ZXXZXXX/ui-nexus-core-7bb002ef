@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { Bell, MessageSquareText, Search, Smartphone } from "lucide-react";
+import { Bell, MessageSquareText, Plus, Search, Smartphone } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,7 +113,10 @@ function Page() {
                 ))}
               </SelectContent>
             </Select>
-            <Button className="ml-auto h-9" onClick={openNew}>新增消息配置</Button>
+            <Button className="ml-auto h-9" onClick={openNew}>
+              <Plus className="size-4" />
+              新增消息配置
+            </Button>
           </div>
 
           <div className="overflow-x-auto rounded-md border border-border">
