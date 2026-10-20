@@ -60,6 +60,7 @@ const INITIAL: Msg[] = [
   { id: "lab-result", name: "实验室结果更新提醒", category: "其他类", template: "牛号 {牛号} 的 {检测项目} 实验室结果已更新，请查看。", variables: ["牛号", "检测项目"], jump: "牛只档案页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: false },
 ];
 
+const varsOf = (c: Category) => [...new Set(INITIAL.filter((m) => m.category === c).flatMap((m) => m.variables))];
 const channelText = (m: Msg) => [m.inApp && "站内信", m.wecom && "企微消息"].filter(Boolean).join("、") || "—";
 const timeText = (m: Msg) => (m.pushMode === "realtime" ? "实时推送" : `定时 ${m.pushTime}`);
 
@@ -78,10 +79,12 @@ function Page() {
     if (!m.name.trim()) return toast.error("提醒名称不能为空");
     if (!m.template.trim()) return toast.error("提醒文本不能为空");
     if (!m.inApp && !m.wecom) return toast.error("请至少选择一个推送渠道");
-    setList((p) => p.map((x) => (x.id === m.id ? m : x)));
+    setList((p) => (p.some((x) => x.id === m.id) ? p.map((x) => (x.id === m.id ? m : x)) : [m, ...p]));
     setEditing(null);
     toast.success("消息配置已保存");
   };
+  const openNew = () =>
+    setEditing({ id: `new-${Date.now()}`, name: "", category: "工单类", template: "", variables: varsOf("工单类"), jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true });
 
   return (
     <>
@@ -103,6 +106,7 @@ function Page() {
                 ))}
               </SelectContent>
             </Select>
+            <Button className="ml-auto h-9" onClick={openNew}>新增消息配置</Button>
           </div>
 
           <div className="overflow-x-auto rounded-md border border-border">
@@ -169,7 +173,16 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
       </SheetHeader>
       <div className="space-y-6 py-4">
         <Section title="提醒名称">
-          <Input value={m.name} onChange={(e) => set({ name: e.target.value })} maxLength={20} className="h-9 text-body-sm" />
+          <Input value={m.name} onChange={(e) => set({ name: e.target.value })} maxLength={20} placeholder="请输入提醒名称" className="h-9 text-body-sm" />
+        </Section>
+
+        <Section title="消息类型">
+          <Select value={m.category} onValueChange={(v) => set({ category: v as Category, variables: varsOf(v as Category) })}>
+            <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </Section>
 
         <Section title="提醒文本">
