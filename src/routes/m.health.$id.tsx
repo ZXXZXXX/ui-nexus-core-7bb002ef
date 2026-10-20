@@ -1780,7 +1780,7 @@ function ChecklistDay({
                         {hasVarCalc && <span className="tag tag-brand">改变校验内容</span>}
                       </span>
                       <span className="block text-caption text-text-tertiary">
-                        {hasVarCalc ? "按新参数重新计算用量，校验内容随之改变，仍须按调整后的用量逐条核验" : "本次处方不涉及变量计算，无需调整参数"}
+                        {hasVarCalc ? "按新参数重算用量" : "本处方无需调整"}
                       </span>
                     </span>
                   </label>
@@ -1819,9 +1819,8 @@ function ChecklistDay({
                     <span>
                       <span className="flex items-center gap-2">
                         <span className="text-body-sm text-foreground">部分药品未使用</span>
-                        <span className="tag tag-warning">取消校验限制</span>
                       </span>
-                      <span className="block text-caption text-text-tertiary">不改变用量校验内容，仅放开提交限制：填写原因后，药品未全部录入或核验数量不足也可提交；已录入药品仍按实际用药记录和扣减</span>
+                      <span className="block text-caption text-text-tertiary">填写原因后可提交</span>
                     </span>
                   </label>
                   {partialUse && (
@@ -1836,7 +1835,6 @@ function ChecklistDay({
                       />
                     </div>
                   )}
-                  <div className="text-caption text-text-tertiary">提交后本次任务标记为已完成并保留异常标记，不终止工单，不修改原处方及后续任务。</div>
                 </div>
               )}
             </>
