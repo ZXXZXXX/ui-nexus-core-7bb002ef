@@ -61,6 +61,13 @@ const INITIAL: Msg[] = [
 ];
 
 const varsOf = (c: Category) => [...new Set(INITIAL.filter((m) => m.category === c).flatMap((m) => m.variables))];
+// 预览用示例值（模拟真实数据）
+const SAMPLE: Record<string, string> = {
+  工单类型: "疾病治疗", 工单号: "GD20261020-0137", 牛号: "#01-23-0412", 截止时间: "10月21日 18:00",
+  逾期时长: "6小时", 执行人: "王建国", 疾病名称: "乳房炎", 上报人: "李明", 异常描述: "实际用药量与处方不符",
+  药品名称: "头孢噻呋钠", 库位: "3号舍药品柜", 库存数量: "48支", 批号: "B240815", 有效期: "2026-11-30",
+  牧场名称: "奇点一牧", 角色名称: "兽医", 操作人: "张伟", 检测项目: "隐性乳房炎检测",
+};
 const channelText = (m: Msg) => [m.inApp && "站内信", m.wecom && "企微消息"].filter(Boolean).join("、") || "—";
 const timeText = (m: Msg) => (m.pushMode === "realtime" ? "实时推送" : `定时 ${m.pushTime}`);
 
@@ -164,7 +171,7 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
     const e = el?.selectionEnd ?? m.template.length;
     set({ template: m.template.slice(0, s) + `{${v}}` + m.template.slice(e) });
   };
-  const preview = m.template.replace(/\{([^}]+)\}/g, (_, k) => `【${k}】`);
+  const preview = m.template.replace(/\{([^}]+)\}/g, (_, k) => SAMPLE[k] ?? k);
 
   return (
     <>
