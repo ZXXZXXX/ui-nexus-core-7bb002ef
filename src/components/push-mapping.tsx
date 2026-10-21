@@ -12,19 +12,8 @@ const KINDS = ["工单", "基础事件"];
 type Sub = { id: string; name: string; code: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
 
-const VACCINES = [
-  "口蹄疫", "传染性鼻支气管炎", "魏氏梭菌", "布病疫苗", "犊牛腹泻五联苗", "巴氏杆菌免疫", "流行热免疫", "结核免疫",
-  "IBR/BVDV疫苗", "山羊痘活疫苗", "病毒性腹泻", "曼氏杆菌免疫", "副伤寒免疫", "炭疽免疫", "支原体免疫", "大肠杆菌免疫", "乳房炎免疫",
-];
-const pad = (i: number) => String(i + 1).padStart(2, "0");
-
 const SEED: Card[] = [
-  { id: "p-6060", title: "驱虫回传", typeName: "驱虫", typeCode: "6060", target: "工单", subs: [{ id: "s-617905", name: "驱虫处置", code: "617905" }] },
-  { id: "p-6006", title: "干奶回传", typeName: "干奶", typeCode: "6006", target: "工单", subs: [{ id: "s-617801", name: "干奶处置", code: "617801" }] },
-  { id: "p-6005", title: "处置回传", typeName: "处置", typeCode: "6005", target: "工单", subs: [
-    { id: "s-617010", name: "修蹄实际用药", code: "617010" },
-    ...VACCINES.map((n, i) => ({ id: `s-6176${pad(i)}`, name: `${n} 实际用药`, code: i === VACCINES.length - 1 ? "" : `6176${pad(i)}` })),
-  ] },
+  { id: "p-6018", title: "治愈回传", typeName: "治愈", typeCode: "6018", target: "工单", subs: [{ id: "s-617001", name: "治愈", code: "" }] },
   { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "基础事件", subs: [
     { id: "s-600401", name: "空怀", code: "600401" },
     { id: "s-600402", name: "怀孕", code: "600402" },
