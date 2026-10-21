@@ -49,7 +49,13 @@ type Msg = {
   recipients?: string[];
 };
 
-const RECIPIENTS = ["牧场负责人", "管理员", "场长", "兽医", "兽医助理"];
+const ROLES = ["管理员", "场长", "兽医", "兽医助理", "免疫员", "修蹄工"];
+const RECIPIENTS_BY_CAT: Record<string, string[]> = {
+  工单任务类: ["第一责任人", ...ROLES, "牧场负责人"],
+  药品类: ["相关领取人", "牧场负责人"],
+  系统类: ["账户本人"],
+  其他类: [...ROLES, "牧场负责人"],
+};
 
 
 const INITIAL: Msg[] = [
@@ -191,7 +197,7 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
         </Section>
 
         <Section title="消息类型">
-          <Select value={m.category} onValueChange={(v) => set({ category: v as Category, variables: varsOf(v as Category) })}>
+          <Select value={m.category} onValueChange={(v) => set({ category: v as Category, variables: varsOf(v as Category), recipients: (m.recipients ?? []).filter((r) => RECIPIENTS_BY_CAT[v].includes(r)) })}>
             <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
             <SelectContent>
               {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
@@ -215,7 +221,7 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
 
         <Section title="接收人">
           <div className="flex flex-wrap gap-2">
-            {RECIPIENTS.map((r) => {
+            {RECIPIENTS_BY_CAT[m.category].map((r) => {
               const on = (m.recipients ?? []).includes(r);
               return (
                 <button key={r} type="button"
