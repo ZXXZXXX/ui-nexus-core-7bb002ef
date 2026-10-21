@@ -7,7 +7,9 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 
 // 回传映射配置：本系统 → 第三方系统。表格结构与「拉取映射配置」保持一致，
 // 一行一个回传映射，查看与编辑统一走右侧抽屉。
-const KINDS = ["工单", "基础事件"];
+const KINDS = ["工单", "任务", "基础事件"];
+// 回传语义：工单=复查任务的结论；任务=检查结果（如孕检的是否怀孕）；基础事件=牧场作业事实
+const targetTag = (t: string) => (t === "工单" ? "tag-success" : t === "任务" ? "tag-info" : "tag-muted");
 
 type Sub = { id: string; name: string; code: string; extName?: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
@@ -18,11 +20,11 @@ const SEED: Card[] = [
     { id: "s-606102", name: "续治", code: "606102", extName: "续治" },
     { id: "s-606103", name: "放弃", code: "606103", extName: "放弃" },
   ] },
-  { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "基础事件", subs: [
+  { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "任务", subs: [
     { id: "s-600401", name: "空怀", code: "600401", extName: "空怀" },
     { id: "s-600402", name: "怀孕", code: "600402", extName: "怀孕" },
   ] },
-  { id: "p-6025", title: "检测检查回传", typeName: "检测检查", typeCode: "6025", target: "基础事件", subs: [
+  { id: "p-6025", title: "检测检查回传", typeName: "检测检查", typeCode: "6025", target: "任务", subs: [
     { id: "s-602503", name: "血中酮体", code: "", extName: "血中酮体" },
     { id: "s-602518", name: "体温", code: "", extName: "体温" },
     { id: "s-602519", name: "尿液PH值", code: "", extName: "尿液PH值" },
@@ -108,7 +110,7 @@ export function PushMapping() {
                   <td className={`${cell} whitespace-nowrap`}>{c.typeName || "—"}</td>
                   <td className={`${cell} font-mono tabular-nums whitespace-nowrap`}>{c.typeCode || "—"}</td>
                   <td className={`${cell} whitespace-nowrap`}>
-                    {c.target ? <span className={`tag ${c.target === "工单" ? "tag-success" : "tag-info"}`}>{c.target}</span> : <span className="text-text-tertiary">未选择</span>}
+                    {c.target ? <span className={`tag ${targetTag(c.target)}`}>{c.target}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
                   <td className={`${cell} tabular-nums text-text-primary whitespace-nowrap`}>{c.subs.length}</td>
                   <td className={`${cell} whitespace-nowrap`}><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
@@ -129,7 +131,7 @@ export function PushMapping() {
         <SheetContent side="right" className="w-full sm:w-[560px] sm:max-w-none overflow-y-auto bg-card">
           <SheetHeader className="text-left px-0 pb-4 border-b border-border">
             <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "新建映射卡片" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
-            <SheetDescription className="text-caption text-text-tertiary">本系统处置 / 事件回传第三方系统的编码详情</SheetDescription>
+            <SheetDescription className="text-caption text-text-tertiary">回传内容为我方系统产生的结果数据</SheetDescription>
           </SheetHeader>
 
           {viewCard && !draft && (
@@ -139,7 +141,7 @@ export function PushMapping() {
                 <Row label="回传事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
                 <div className="flex items-center gap-3">
                   <span className="text-text-secondary shrink-0 w-24">对应类型</span>
-                  {viewCard.target ? <span className={`tag ${viewCard.target === "工单" ? "tag-success" : "tag-info"}`}>{viewCard.target}</span> : <span className="text-text-tertiary">未选择</span>}
+                  {viewCard.target ? <span className={`tag ${targetTag(viewCard.target)}`}>{viewCard.target}</span> : <span className="text-text-tertiary">未选择</span>}
                 </div>
               </div>
                 <div className="space-y-1">
