@@ -15,7 +15,7 @@ export function SearchableSelect({
   onChange,
 }: {
   value: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; group?: string }[];
   placeholder: string;
   searchPlaceholder?: string;
   emptyText?: string;
@@ -24,6 +24,15 @@ export function SearchableSelect({
 }) {
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value);
+  // 选项可带 group（如 工单 / 基础事件）：同组连续渲染，多于一个组时显示组名。
+  const groups: { name: string; items: typeof options }[] = [];
+  for (const o of options) {
+    const name = o.group ?? "";
+    const last = groups[groups.length - 1];
+    if (last && last.name === name) last.items.push(o);
+    else groups.push({ name, items: [o] });
+  }
+  const showHeading = groups.length > 1;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -47,19 +56,21 @@ export function SearchableSelect({
           </div>
           <CommandList>
             <CommandEmpty className="py-6 text-center text-body-sm text-text-tertiary">{emptyText}</CommandEmpty>
-            <CommandGroup>
-              {options.map((o) => (
-                <CommandItem
-                  key={o.value}
-                  value={o.value}
-                  keywords={[o.label]}
-                  onSelect={() => { onChange(o.value); setOpen(false); }}
-                >
-                  <Check className={cn("h-4 w-4", value === o.value ? "opacity-100" : "opacity-0")} />
-                  {o.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {groups.map((g) => (
+              <CommandGroup key={g.name || "default"} heading={showHeading ? g.name : undefined}>
+                {g.items.map((o) => (
+                  <CommandItem
+                    key={o.value}
+                    value={o.value}
+                    keywords={[o.label, o.group ?? ""]}
+                    onSelect={() => { onChange(o.value); setOpen(false); }}
+                  >
+                    <Check className={cn("h-4 w-4", value === o.value ? "opacity-100" : "opacity-0")} />
+                    {o.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            ))}
           </CommandList>
         </Command>
       </PopoverContent>
