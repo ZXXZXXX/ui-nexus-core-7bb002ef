@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { categoryTag } from "@/lib/message-category";
@@ -111,89 +112,207 @@ function Page() {
   );
 }
 
-function FilterBar({
+type Col<T> = {
+  key: string;
+  label: string;
+  render: (row: T) => ReactNode;
+  /** 可筛选列：选项 + 取值 */
+  options?: string[];
+  value?: (row: T) => string;
+  required?: boolean;
+};
+
+type LogTableState<T> = ReturnType<typeof useLogTable<T>>;
+
+function useLogTable<T>(cols: Col<T>[], statusKey: string) {
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [visible, setVisible] = useState<string[]>(cols.map((c) => c.key));
+  return useMemo(() => {
+    const apply = (rows: T[]) =>
+      rows.filter((r) =>
+        Object.entries(filters).every(([k, v]) => {
+          if (!v || v === ALL) return true;
+          const c = cols.find((x) => x.key === k);
+          return !c?.value || c.value(r) === v;
+        }),
+      );
+    const statusCol = cols.find((c) => c.key === statusKey)!;
+    const activeCount = Object.values(filters).filter((v) => v && v !== ALL).length;
+    return { cols, filters, setFilters, visible, setVisible, apply, statusCol, activeCount, shown: cols.filter((c) => visible.includes(c.key)) };
+  }, [cols, filters, visible, statusKey]);
+}
+
+const ALL = "全部";
+
+function FilterBar<T>({
   kw,
   onKw,
   placeholder,
-  value,
-  onValue,
-  options,
-  label,
+  table,
+  statusLabel,
 }: {
   kw: string;
   onKw: (v: string) => void;
   placeholder: string;
-  value?: string;
-  onValue?: (v: string) => void;
-  options?: string[];
-  label?: string;
+  table: LogTableState<T>;
+  statusLabel: string;
 }) {
+  const [open, setOpen] = useState(false);
+  const sk = table.statusCol.key;
   return (
     <div className="flex items-center gap-3 flex-wrap">
       <div className="relative w-64">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-text-tertiary" />
         <Input value={kw} onChange={(e) => onKw(e.target.value)} placeholder={placeholder} className="h-9 pl-8 text-body-sm" />
       </div>
-      {options && (
-        <Select value={value} onValueChange={onValue}>
-          <SelectTrigger className="h-9 w-36 text-body-sm">
-            <SelectValue placeholder={label} />
-          </SelectTrigger>
-          <SelectContent>
-            {["全部", ...options].map((c) => (
-              <SelectItem key={c} value={c}>{c}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
+      <Select value={table.filters[sk] || ALL} onValueChange={(v) => table.setFilters((p) => ({ ...p, [sk]: v }))}>
+        <SelectTrigger className="h-9 w-36 text-body-sm">
+          <span className="text-text-tertiary mr-1">{statusLabel}</span>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {[ALL, ...(table.statusCol.options ?? [])].map((c) => (
+            <SelectItem key={c} value={c}>{c}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Button variant="outline" className="relative ml-auto h-9 gap-1.5 text-body-sm font-normal" onClick={() => setOpen(true)}>
+        <SlidersHorizontal className="h-4 w-4" />
+        列设置与筛选
+        {table.activeCount > 0 && (
+          <span className="ml-0.5 min-w-4 h-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] leading-4 text-center tabular-nums">
+            {table.activeCount}
+          </span>
+        )}
+      </Button>
+      <SettingsSheet open={open} onOpenChange={setOpen} table={table} />
     </div>
   );
 }
 
+function SettingsSheet<T>({ open, onOpenChange, table }: { open: boolean; onOpenChange: (o: boolean) => void; table: LogTableState<T> }) {
+  const [draft, setDraft] = useState<Record<string, string>>({});
+  const [vis, setVis] = useState<string[]>([]);
+  useEffect(() => {
+    if (open) {
+      setDraft(table.filters);
+      setVis(table.visible);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="w-[420px] sm:max-w-[420px] flex flex-col">
+        <SheetHeader>
+          <SheetTitle>列设置与筛选</SheetTitle>
+        </SheetHeader>
+        <div className="flex-1 overflow-y-auto space-y-6 py-4">
+          <section className="space-y-3">
+            <div className="text-card-title text-foreground">筛选条件</div>
+            {table.cols.filter((c) => c.options).map((c) => (
+              <div key={c.key} className="space-y-1.5">
+                <div className="text-caption text-text-secondary">{c.label}</div>
+                <Select value={draft[c.key] || ALL} onValueChange={(v) => setDraft((p) => ({ ...p, [c.key]: v }))}>
+                  <SelectTrigger className="h-9 text-body-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {[ALL, ...c.options!].map((o) => (
+                      <SelectItem key={o} value={o}>{o}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+          </section>
+          <section className="space-y-3">
+            <div className="text-card-title text-foreground">列设置</div>
+            <div className="grid grid-cols-2 gap-2">
+              {table.cols.map((c) => (
+                <label key={c.key} className="flex items-center gap-2 text-body-sm text-foreground cursor-pointer">
+                  <Checkbox
+                    checked={vis.includes(c.key)}
+                    disabled={c.required}
+                    onCheckedChange={(v) => setVis((p) => (v ? [...p, c.key] : p.filter((k) => k !== c.key)))}
+                  />
+                  {c.label}
+                </label>
+              ))}
+            </div>
+          </section>
+        </div>
+        <SheetFooter className="border-t border-border pt-4 gap-2">
+          <Button variant="outline" onClick={() => { setDraft({}); setVis(table.cols.map((c) => c.key)); }}>重置</Button>
+          <Button
+            onClick={() => {
+              table.setFilters(draft);
+              table.setVisible(table.cols.map((c) => c.key).filter((k) => vis.includes(k)));
+              onOpenChange(false);
+            }}
+          >
+            确定
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function LogGrid<T>({ table, rows, rowKey, onDetail, empty }: { table: LogTableState<T>; rows: T[]; rowKey: (r: T) => string; onDetail: (r: T) => void; empty: string }) {
+  return (
+    <div className="overflow-x-auto rounded-md border border-border">
+      <table className="w-full text-body-sm">
+        <thead className="bg-surface-subtle text-text-secondary">
+          <tr className="h-12">
+            {[...table.shown.map((c) => c.label), "操作"].map((h) => (
+              <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={rowKey(r)} className="border-t border-border h-12">
+              {table.shown.map((c) => (
+                <td key={c.key} className="px-4 py-3 whitespace-nowrap text-foreground">{c.render(r)}</td>
+              ))}
+              <td className="px-4 py-3 whitespace-nowrap">
+                <Button variant="ghost" size="sm" className="h-8 px-0 text-primary hover:bg-transparent hover:text-primary/80" onClick={() => onDetail(r)}>
+                  详情
+                </Button>
+              </td>
+            </tr>
+          ))}
+          {!rows.length && <tr><td colSpan={table.shown.length + 1} className="px-4 py-10 text-center text-text-tertiary">{empty}</td></tr>}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+const API_COLS: Col<ApiLog>[] = [
+  { key: "time", label: "时间", required: true, render: (l) => <span className="text-text-secondary">{l.time}</span> },
+  { key: "system", label: "对接系统", render: (l) => l.system, options: ["UD 平台", "企业微信", "实验室系统"], value: (l) => l.system },
+  { key: "direction", label: "方向", render: (l) => <span className={`tag ${l.direction === "推送" ? "tag-brand" : "tag-info"}`}>{l.direction}</span>, options: ["推送", "拉取"], value: (l) => l.direction },
+  { key: "event", label: "事件类型", render: (l) => l.event, options: [...new Set(API_LOGS.map((l) => l.event))], value: (l) => l.event },
+  { key: "bizKey", label: "业务标识", render: (l) => <span className="text-text-secondary">{l.bizKey}</span> },
+  { key: "farm", label: "关联牧场", render: (l) => l.farm, options: ["奶牛一场", "奶牛二场", "全部牧场"], value: (l) => l.farm },
+  { key: "status", label: "状态", render: (l) => <span className={`tag ${statusTag(l.status)}`}>{l.status}</span>, options: ["成功", "失败", "重试中"], value: (l) => l.status },
+  { key: "cost", label: "耗时", render: (l) => <span className="text-text-secondary">{l.cost} ms</span> },
+];
+
 function ApiTable() {
   const [kw, setKw] = useState("");
   const [detail, setDetail] = useState<ApiLog | null>(null);
+  const t = useLogTable(API_COLS, "status");
 
   const rows = useMemo(
-    () => API_LOGS.filter((l) => !kw || l.bizKey.includes(kw) || l.event.includes(kw) || l.id.includes(kw)),
-    [kw],
+    () => t.apply(API_LOGS).filter((l) => !kw || l.bizKey.includes(kw) || l.event.includes(kw) || l.id.includes(kw)),
+    [kw, t],
   );
 
   return (
     <>
       <div className="space-y-4">
-        <FilterBar kw={kw} onKw={setKw} placeholder="搜索业务标识 / 事件" />
-        <div className="overflow-x-auto rounded-md border border-border">
-          <table className="w-full text-body-sm">
-            <thead className="bg-surface-subtle text-text-secondary">
-              <tr className="h-12">
-                {["时间", "对接系统", "方向", "事件类型", "业务标识", "关联牧场", "状态", "耗时", "操作"].map((h) => (
-                  <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((l) => (
-                <tr key={l.id} className="border-t border-border h-12">
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.time}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.system}</td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${l.direction === "推送" ? "tag-brand" : "tag-info"}`}>{l.direction}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.event}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.bizKey}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.farm}</td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${statusTag(l.status)}`}>{l.status}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.cost} ms</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <Button variant="ghost" size="sm" className="h-8 px-0 text-primary hover:bg-transparent hover:text-primary/80" onClick={() => setDetail(l)}>
-                      详情
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-              {!rows.length && <tr><td colSpan={9} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的交互记录</td></tr>}
-            </tbody>
-          </table>
-        </div>
+        <FilterBar kw={kw} onKw={setKw} placeholder="搜索业务标识 / 事件" table={t} statusLabel="状态" />
+        <LogGrid table={t} rows={rows} rowKey={(l) => l.id} onDetail={setDetail} empty="暂无匹配的交互记录" />
       </div>
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
@@ -234,66 +353,35 @@ function ApiTable() {
   );
 }
 
+const PUSH_COLS: Col<PushLog>[] = [
+  { key: "time", label: "推送时间", required: true, render: (l) => <span className="text-text-secondary">{l.time}</span> },
+  { key: "name", label: "消息名称", render: (l) => <span className="font-medium">{l.name}</span>, options: [...new Set(PUSH_LOGS.map((l) => l.name))], value: (l) => l.name },
+  { key: "category", label: "消息类型", render: (l) => <span className={`tag ${categoryTag(l.category)}`}>{l.category}</span>, options: ["工单任务类", "药品类", "系统类", "其他类"], value: (l) => l.category },
+  { key: "farm", label: "关联牧场", render: (l) => l.farm, options: ["奶牛一场", "奶牛二场", "全部牧场"], value: (l) => l.farm },
+  { key: "receivers", label: "接收人", render: (l) => <ReceiverCell names={l.receivers} /> },
+  { key: "channel", label: "推送渠道", render: (l) => <span className="text-text-secondary">{l.channel}</span>, options: ["站内信", "企微消息", "站内信、企微消息"], value: (l) => l.channel },
+  { key: "pushStatus", label: "推送状态", render: (l) => <span className={`tag ${pushTag(l.pushStatus)}`}>{l.pushStatus}</span>, options: ["已送达", "发送失败"], value: (l) => l.pushStatus },
+  { key: "readStatus", label: "查看状态", render: (l) => <span className={`tag ${readTag(l.readStatus)}`}>{l.readStatus}</span>, options: ["已读", "未读"], value: (l) => l.readStatus },
+];
+
 function PushTable() {
   const [kw, setKw] = useState("");
-  const [ch, setCh] = useState("全部");
-  const [rd, setRd] = useState("全部");
   const [detail, setDetail] = useState<PushLog | null>(null);
+  const t = useLogTable(PUSH_COLS, "pushStatus");
 
   const rows = useMemo(
     () =>
-      PUSH_LOGS.filter(
-        (l) =>
-          (ch === "全部" || l.channel === ch) &&
-          (rd === "全部" || l.readStatus === rd) &&
-          (!kw || l.name.includes(kw) || l.receivers.some((r) => r.includes(kw)) || l.id.includes(kw)),
+      t.apply(PUSH_LOGS).filter(
+        (l) => !kw || l.name.includes(kw) || l.receivers.some((r) => r.includes(kw)) || l.id.includes(kw),
       ),
-    [kw, ch, rd],
+    [kw, t],
   );
 
   return (
     <>
       <div className="space-y-4">
-        <FilterBar
-          kw={kw}
-          onKw={setKw}
-          placeholder="搜索消息名称 / 接收人"
-          value={ch}
-          onValue={setCh}
-          options={["站内信", "企微消息", "站内信、企微消息"]}
-          label="推送渠道"
-        />
-        <div className="overflow-x-auto rounded-md border border-border">
-          <table className="w-full text-body-sm">
-            <thead className="bg-surface-subtle text-text-secondary">
-              <tr className="h-12">
-                {["推送时间", "消息名称", "消息类型", "关联牧场", "接收人", "推送渠道", "推送状态", "查看状态", "操作"].map((h) => (
-                  <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((l) => (
-                <tr key={l.id} className="border-t border-border h-12">
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.time}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-foreground font-medium">{l.name}</td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${categoryTag(l.category)}`}>{l.category}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.farm}</td>
-                  <td className="px-4 py-3 whitespace-nowrap text-foreground"><ReceiverCell names={l.receivers} /></td>
-                  <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.channel}</td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${pushTag(l.pushStatus)}`}>{l.pushStatus}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${readTag(l.readStatus)}`}>{l.readStatus}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <Button variant="ghost" size="sm" className="h-8 px-0 text-primary hover:bg-transparent hover:text-primary/80" onClick={() => setDetail(l)}>
-                      详情
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-              {!rows.length && <tr><td colSpan={9} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的推送记录</td></tr>}
-            </tbody>
-          </table>
-        </div>
+        <FilterBar kw={kw} onKw={setKw} placeholder="搜索消息名称 / 接收人" table={t} statusLabel="推送状态" />
+        <LogGrid table={t} rows={rows} rowKey={(l) => l.id} onDetail={setDetail} empty="暂无匹配的推送记录" />
       </div>
 
       <Sheet open={!!detail} onOpenChange={(o) => !o && setDetail(null)}>
