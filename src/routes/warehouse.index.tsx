@@ -288,7 +288,7 @@ function BatchCodesDialog({ batch, open, onOpenChange }: { batch: Item; open: bo
         <DialogHeader>
           <DialogTitle>现存药品条码</DialogTitle>
           <DialogDescription>
-            批次 <span className="font-mono">{batch.batchNo}</span> · 采购单价 ¥{batch.price.toFixed(2)} · 共 {countUnits(nodes)} 个（{packs} 个外包装，{nodes.length - packs} 个散件）
+            批次 <span className="font-mono">{batch.batchNo}</span> · 采购单价 ¥{batch.price.toFixed(2)} · 共 {countUnits(nodes)} 个
           </DialogDescription>
         </DialogHeader>
         <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
