@@ -13,7 +13,11 @@ type Sub = { id: string; name: string; code: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
 
 const SEED: Card[] = [
-  { id: "p-6018", title: "治愈回传", typeName: "治愈", typeCode: "6018", target: "工单", subs: [{ id: "s-617001", name: "治愈", code: "" }] },
+  { id: "p-100", title: "诊断治疗结果回传", typeName: "诊断治疗结果", typeCode: "100", target: "工单", subs: [
+    { id: "s-606101", name: "治愈", code: "606101" },
+    { id: "s-606102", name: "续治", code: "606102" },
+    { id: "s-606103", name: "放弃", code: "606103" },
+  ] },
   { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "基础事件", subs: [
     { id: "s-600401", name: "空怀", code: "600401" },
     { id: "s-600402", name: "怀孕", code: "600402" },
