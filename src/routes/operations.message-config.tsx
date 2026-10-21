@@ -28,7 +28,7 @@ export const Route = createFileRoute("/operations/message-config")({
   component: Page,
 });
 
-const CATEGORIES = ["工单类", "药品类", "系统类", "其他类"] as const;
+const CATEGORIES = ["工单任务类", "药品类", "系统类", "其他类"] as const;
 type Category = (typeof CATEGORIES)[number];
 const JUMPS = ["牛只档案页", "工单详情页", "工单列表页", "任务列表页", "三级库详情页", "不跳转"] as const;
 type Jump = (typeof JUMPS)[number];
@@ -53,10 +53,10 @@ const RECIPIENTS = ["牧场负责人", "管理员", "场长", "兽医", "兽医�
 
 
 const INITIAL: Msg[] = [
-  { id: "wo-due", name: "工单临期提醒", category: "工单类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "wo-overdue", name: "工单逾期提醒", category: "工单类", template: "{工单类型}工单 {工单号} 已逾期 {逾期时长}，执行人：{执行人}，请尽快跟进。", variables: ["工单类型", "工单号", "逾期时长", "执行人"], jump: "工单列表页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "09:00", enabled: true },
-  { id: "wo-diagnose", name: "待诊断提醒", category: "工单类", template: "牛号 {牛号} 上报疑似 {疾病名称}，上报人 {上报人}，请及时诊断。", variables: ["牛号", "疾病名称", "上报人"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "wo-abnormal", name: "工单异常提醒", category: "工单类", template: "工单 {工单号} 出现异常：{异常描述}，牛号 {牛号}。", variables: ["工单号", "异常描述", "牛号"], jump: "牛只档案页", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "wo-due", name: "工单临期提醒", category: "工单任务类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "wo-overdue", name: "工单逾期提醒", category: "工单任务类", template: "{工单类型}工单 {工单号} 已逾期 {逾期时长}，执行人：{执行人}，请尽快跟进。", variables: ["工单类型", "工单号", "逾期时长", "执行人"], jump: "工单列表页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "09:00", enabled: true },
+  { id: "wo-diagnose", name: "待诊断提醒", category: "工单任务类", template: "牛号 {牛号} 上报疑似 {疾病名称}，上报人 {上报人}，请及时诊断。", variables: ["牛号", "疾病名称", "上报人"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "wo-abnormal", name: "工单异常提醒", category: "工单任务类", template: "工单 {工单号} 出现异常：{异常描述}，牛号 {牛号}。", variables: ["工单号", "异常描述", "牛号"], jump: "牛只档案页", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
   { id: "drug-pile", name: "药品堆积提醒", category: "药品类", template: "{药品名称} 在三级库 {库位} 堆积 {库存数量}，超过建议存量，请及时处理。", variables: ["药品名称", "库位", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "08:30", enabled: true },
   { id: "drug-near", name: "药品临期提醒", category: "药品类", template: "{药品名称}（批号 {批号}）将于 {有效期} 过期，剩余 {库存数量}。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: false, pushMode: "scheduled", pushTime: "08:30", enabled: true },
   { id: "drug-expired", name: "药品过期提醒", category: "药品类", template: "{药品名称}（批号 {批号}）已于 {有效期} 过期，剩余 {库存数量}，请勿使用。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
@@ -95,7 +95,7 @@ function Page() {
     toast.success("消息配置已保存");
   };
   const openNew = () =>
-    setEditing({ id: `new-${Date.now()}`, name: "", category: "工单类", template: "", variables: varsOf("工单类"), jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true });
+    setEditing({ id: `new-${Date.now()}`, name: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true });
 
   return (
     <>
