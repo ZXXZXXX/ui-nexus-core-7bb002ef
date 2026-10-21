@@ -5,7 +5,7 @@ import { ListPage, type ListColumn } from "@/components/list-page";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FlowCodes } from "@/components/barcode-viewer";
-import { baseUnit, buildCodes, countUnits } from "@/lib/inventory";
+import { baseUnit, pickupCodes, countUnits } from "@/lib/inventory";
 
 export const Route = createFileRoute("/warehouse/dispense")({
   head: () => ({
@@ -51,6 +51,9 @@ const initial: DispenseRow[] = [
   { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", usedQty: 1, returnedQty: 0, lostQty: 0, users: ["李雨晴", "周敏"], cows: ["3301", "3315"], usage: [{ user: "李雨晴", cows: ["3301"] }, { user: "周敏", cows: ["3315"] }], remark: "" },
   { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", usedQty: 1, returnedQty: 1, lostQty: 0, users: ["王建国"], cows: ["2210"], usage: [{ user: "王建国", cows: ["2210"] }], remark: "工单 WO-2350 已终止，未开封退回" },
 ];
+
+/** 最小单位无码、只能按外包装扫码取数的药品（M 端领药情况二） */
+const NON_UNIT_SCANNABLE = new Set(["03-00306", "02-00214", "05-00521"]);
 
 const USE_COLORS = {
   unused: "var(--border-default)",
@@ -181,7 +184,7 @@ const columns: ListColumn<DispenseRow>[] = [
 function DispensePage() {
   const [data] = useState<DispenseRow[]>(initial);
   const [detail, setDetail] = useState<DispenseRow | null>(null);
-  const detailNodes = detail ? buildCodes(`${detail.code}|${detail.id}`, detail.qty) : [];
+  const detailNodes = detail ? pickupCodes(`${detail.code}|${detail.id}`, detail.qty, !NON_UNIT_SCANNABLE.has(detail.code)) : [];
 
   return (
     <>
