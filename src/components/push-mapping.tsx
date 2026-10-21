@@ -4,12 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { SearchableSelect } from "@/components/searchable-select";
 
 // 回传映射配置：本系统 → 第三方系统。表格结构与「拉取映射配置」保持一致，
 // 一行一个回传映射，查看与编辑统一走右侧抽屉。
 const KINDS = ["工单", "任务", "基础事件"];
 // 回传语义：工单=复查任务的结论；任务=检查结果（如孕检的是否怀孕）；基础事件=牧场作业事实
 const targetTag = (t: string) => (t === "工单" ? "tag-success" : t === "基础事件" ? "tag-info" : "tag-muted");
+
+// 我方可回传的事件 / 处置清单：编辑时只能从这份清单里选，不手填。
+const OUR_EVENTS = [
+  "治愈", "续治", "放弃",
+  "怀孕", "空怀",
+  "血中酮体", "体温", "尿液PH值", "子宫分泌物",
+  "普通转群", "围产转群", "产犊", "死亡", "淘汰", "转场转出",
+];
+const ourEventOptions = OUR_EVENTS.map((n) => ({ value: n, label: n }));
 
 type Sub = { id: string; name: string; code: string; extName?: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
@@ -204,7 +214,14 @@ export function PushMapping() {
                 <div className="divide-y divide-border">
                   {draft.subs.map((s) => (
                     <div key={s.id} className="py-2 grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
-                      <Input value={s.name} placeholder="本系统处置 / 事件" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
+                      <SearchableSelect
+                        value={s.name}
+                        options={ourEventOptions}
+                        placeholder="选择我方事件"
+                        searchPlaceholder="搜索我方事件"
+                        className="h-9 w-full min-w-0"
+                        onChange={(v) => patchSub(s.id, { name: v })}
+                      />
                       <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
                         onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
                       <Input value={s.extName ?? ""} placeholder="第三方事件名称" onChange={(e) => patchSub(s.id, { extName: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
