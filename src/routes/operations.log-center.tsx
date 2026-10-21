@@ -92,7 +92,6 @@ const PUSH_LOGS: PushLog[] = [
 
 const statusTag = (s: ApiStatus) => (s === "成功" ? "tag-success" : s === "失败" ? "tag-danger" : "tag-warning");
 const pushTag = (s: PushLog["pushStatus"]) => (s === "已送达" ? "tag-success" : "tag-danger");
-const readTag = (s: PushLog["readStatus"]) => (s === "已读" ? "tag-brand" : "tag-muted");
 
 function Page() {
   return (
