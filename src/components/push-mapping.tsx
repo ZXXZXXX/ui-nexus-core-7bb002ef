@@ -14,7 +14,7 @@ const targetTag = (t: string) => (t === "工单" ? "tag-success" : t === "基础
 
 // 我方可回传的事件 / 处置清单：编辑时只能从这份清单里选，不手填。
 const OUR_EVENTS = [
-  "治愈", "续治", "放弃",
+  "正常", "复诊", "放弃",
   "怀孕", "空怀",
   "血中酮体", "体温", "尿液PH值", "子宫分泌物",
   "普通转群", "围产转群", "产犊", "死亡", "淘汰", "转场转出",
@@ -26,8 +26,8 @@ type Card = { id: string; title: string; typeName: string; typeCode: string; tar
 
 const SEED: Card[] = [
   { id: "p-100", title: "诊断治疗结果回传", typeName: "诊断治疗结果", typeCode: "100", target: "工单", subs: [
-    { id: "s-606101", name: "治愈", code: "606101", extName: "治愈" },
-    { id: "s-606102", name: "续治", code: "606102", extName: "续治" },
+    { id: "s-606101", name: "正常", code: "606101", extName: "治愈" },
+    { id: "s-606102", name: "复诊", code: "606102", extName: "续治" },
     { id: "s-606103", name: "放弃", code: "606103", extName: "放弃" },
   ] },
   { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "基础事件", subs: [
