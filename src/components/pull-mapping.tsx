@@ -107,9 +107,8 @@ export function PullMapping() {
           <tbody>
             {list.map((c) => {
               const ck = targetKind(c.target);
-              // 工单类的子类型编码在「疾病管理」的诊断编码里维护，本页选到对应工单即算配置完成
               const configured = c.subs.filter((s) => (ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false)).length;
-              const ok = ck === "工单" ? true : !!ck && c.subs.length > 0 && configured === c.subs.length;
+              const ok = !!ck && c.subs.length > 0 && configured === c.subs.length;
               return (
                 <tr key={c.id} className="group/row h-12">
                   <td className="sticky left-0 z-10 border-t border-r border-border bg-card px-4 py-3 whitespace-nowrap group-hover/row:bg-surface-subtle">
@@ -122,8 +121,7 @@ export function PullMapping() {
                   <td className="border-t border-border px-4 py-3 whitespace-nowrap">
                     {ck ? <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
-                  {/* 工单类的子类型在疾病管理里维护，本页不统计数目 */}
-                  <td className="border-t border-border px-4 py-3 whitespace-nowrap tabular-nums text-text-primary">{ck === "工单" ? "—" : c.subs.length}</td>
+                  <td className="border-t border-border px-4 py-3 whitespace-nowrap tabular-nums text-text-primary">{c.subs.length}</td>
                   <td className="border-t border-border px-4 py-3 whitespace-nowrap"><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
                   <td className="sticky right-0 z-10 border-t border-l border-border bg-card px-4 py-3 whitespace-nowrap group-hover/row:bg-surface-subtle">
                     <Button variant="ghost" size="sm" className={textBtn} onClick={() => openEdit(c)}>编辑</Button>
@@ -230,18 +228,12 @@ export function PullMapping() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-card-title font-medium text-text-primary">事件子类型{kind === "工单" ? "" : `（${draft.subs.length}）`}</div>
-                  {kind !== "工单" && (
-                    <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
-                      <Plus className="h-3.5 w-3.5" />添加子类型
-                    </Button>
-                  )}
+                  <div className="text-card-title font-medium text-text-primary">事件子类型（{draft.subs.length}）</div>
+                  <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
+                    <Plus className="h-3.5 w-3.5" />添加子类型
+                  </Button>
                 </div>
-                {kind === "工单" ? (
-                  <div className="rounded-md border border-border bg-surface-subtle px-4 py-3 text-body-sm text-text-secondary">
-                    请前往「诊疗管理 &gt; 疾病管理」中查看/维护对应编码
-                  </div>
-                ) : (
+                {(
                   <>
                     {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
                     {draft.subs.length > 0 && (
@@ -255,6 +247,16 @@ export function PullMapping() {
                           <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
                           <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
                             onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
+                          {kind === "工单" && (
+                            <SearchableSelect
+                              className="flex-1 min-w-0"
+                              value={s.diseaseId ?? ""}
+                              options={KB_DISEASES.map((d) => ({ value: d.id, label: d.name }))}
+                              placeholder="选择对应疾病"
+                              searchPlaceholder="搜索疾病"
+                              onChange={(v) => patchSub(s.id, { diseaseId: v })}
+                            />
+                          )}
                           {kind === "基础事件" && (
                             <SearchableSelect
                               className="flex-1 min-w-0"
