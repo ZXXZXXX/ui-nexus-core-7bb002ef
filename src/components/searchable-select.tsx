@@ -42,8 +42,7 @@ export function SearchableSelect({
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[240px] p-0" align="start">
         <Command>
-          <div className="flex items-center gap-2 border-b border-border px-3">
-            <Search className="h-3.5 w-3.5 shrink-0 text-text-tertiary" />
+          <div className="border-b border-border [&_svg]:hidden">
             <CommandInput className="h-9 border-0 focus-visible:ring-0" placeholder={searchPlaceholder ?? placeholder} />
           </div>
           <CommandList>
