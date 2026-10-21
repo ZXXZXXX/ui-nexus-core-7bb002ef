@@ -159,7 +159,7 @@ export function PushMapping() {
                   {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
                   {viewCard.subs.length > 0 && (
                     <div className="grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] gap-3 px-1 pb-1 text-caption text-text-tertiary">
-                      <span>我方事件</span><span>第三方编码</span><span>第三方事件</span><span />
+                      <span>我方</span><span>第三方编码</span><span>第三方</span><span />
                     </div>
                   )}
                   <div className="divide-y divide-border">
@@ -208,7 +208,7 @@ export function PushMapping() {
                 {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
                 {draft.subs.length > 0 && (
                   <div className="grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
-                    <span>我方事件</span><span>第三方编码</span><span>第三方事件</span><span />
+                    <span>我方</span><span>第三方编码</span><span>第三方</span><span />
                   </div>
                 )}
                 <div className="divide-y divide-border">
@@ -217,14 +217,14 @@ export function PushMapping() {
                       <SearchableSelect
                         value={s.name}
                         options={ourEventOptions}
-                        placeholder="选择我方事件"
-                        searchPlaceholder="搜索我方事件"
+                        placeholder="选择我方"
+                        searchPlaceholder="搜索我方"
                         className="h-9 w-full min-w-0"
                         onChange={(v) => patchSub(s.id, { name: v })}
                       />
                       <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
                         onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
-                      <Input value={s.extName ?? ""} placeholder="第三方事件名称" onChange={(e) => patchSub(s.id, { extName: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
+                      <Input value={s.extName ?? ""} placeholder="第三方名称" onChange={(e) => patchSub(s.id, { extName: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
                       <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
                     </div>
                   ))}
