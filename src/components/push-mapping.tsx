@@ -110,7 +110,7 @@ export function PushMapping() {
                   <td className={`${cell} whitespace-nowrap`}>{c.typeName || "—"}</td>
                   <td className={`${cell} font-mono tabular-nums whitespace-nowrap`}>{c.typeCode || "—"}</td>
                   <td className={`${cell} whitespace-nowrap`}>
-                    {c.target ? <span className={`tag ${c.target === "工单" ? "tag-success" : "tag-info"}`}>{c.target}</span> : <span className="text-text-tertiary">未选择</span>}
+                    {c.target ? <span className={`tag ${targetTag(c.target)}`}>{c.target}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
                   <td className={`${cell} tabular-nums text-text-primary whitespace-nowrap`}>{c.subs.length}</td>
                   <td className={`${cell} whitespace-nowrap`}><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
@@ -141,7 +141,7 @@ export function PushMapping() {
                 <Row label="回传事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
                 <div className="flex items-center gap-3">
                   <span className="text-text-secondary shrink-0 w-24">对应类型</span>
-                  {viewCard.target ? <span className={`tag ${viewCard.target === "工单" ? "tag-success" : "tag-info"}`}>{viewCard.target}</span> : <span className="text-text-tertiary">未选择</span>}
+                  {viewCard.target ? <span className={`tag ${targetTag(viewCard.target)}`}>{viewCard.target}</span> : <span className="text-text-tertiary">未选择</span>}
                 </div>
               </div>
                 <div className="space-y-1">
