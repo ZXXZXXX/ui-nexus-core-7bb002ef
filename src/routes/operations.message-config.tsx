@@ -84,8 +84,8 @@ const SAMPLE: Record<string, string> = {
 const channelText = (m: Msg) => [m.inApp && "站内信", m.wecom && "企微消息"].filter(Boolean).join("、") || "—";
 const timeText = (m: Msg) => {
   const parts: string[] = [];
-  if (m.inApp) parts.push(`站内信：${m.inAppMode === "realtime" ? "实时" : `定时 ${m.inAppTime}`}`);
-  if (m.wecom) parts.push(`企微消息：${m.wecomMode === "realtime" ? "实时" : `定时 ${m.wecomTime}`}`);
+  if (m.inApp) parts.push(`站内信：${m.inAppMode === "realtime" ? "实时" : "定时"}`);
+  if (m.wecom) parts.push(`企微消息：${m.wecomMode === "realtime" ? "实时" : "定时"}`);
   return parts.join(" / ") || "—";
 };
 
