@@ -153,7 +153,7 @@ export function PullMapping() {
                   <Row label="卡片名称" value={viewCard.title || "未命名卡片"} />
                   <Row label="拉取事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
                   <div className="flex items-center gap-3">
-                    <span className="text-text-secondary shrink-0 w-24">对应工单 / 任务</span>
+                    <span className="text-text-secondary shrink-0 w-24">对应工单 / 基础事件</span>
                     {viewCard.target ? <span className="text-text-primary">{targetLabel(viewCard.target)}</span> : <span className="text-text-tertiary">未选择</span>}
                     {vk && <span className={`tag ${vk === "工单" ? "tag-success" : "tag-info"}`}>{vk}</span>}
                   </div>
@@ -181,7 +181,7 @@ export function PullMapping() {
                               </>
                             ) : <span className="text-text-tertiary">疾病未配置</span>)}
                             {vk === "基础事件" && (s.item ? <span className="text-text-primary">{s.item}</span> : <span className="text-text-tertiary">检测项目未配置</span>)}
-                            {!vk && <span className="text-text-tertiary">未选择对应工单 / 任务</span>}
+                            {!vk && <span className="text-text-tertiary">未选择对应工单 / 基础事件</span>}
                           </div>
                           <span className={`tag ${ok ? "tag-success" : "tag-warning"} shrink-0`}>{ok ? "已配置" : "待配置"}</span>
                         </div>
@@ -206,7 +206,7 @@ export function PullMapping() {
                     <Input value={draft.typeCode} className="font-mono" onChange={(e) => patchDraft({ typeCode: e.target.value.replace(/\D/g, "") })} />
                   </Field>
                 </div>
-                <Field label="对应工单 / 任务">
+                <Field label="对应工单 / 基础事件">
                   <Select
                     value={draft.target}
                     onValueChange={(v) => {
@@ -265,7 +265,7 @@ export function PullMapping() {
                               onChange={(v) => patchSub(s.id, { item: v })}
                             />
                           )}
-                          {!kind && <div className="flex-1 min-w-0 text-text-tertiary">先在上方选择对应工单 / 任务</div>}
+                          {!kind && <div className="flex-1 min-w-0 text-text-tertiary">先在上方选择对应工单 / 基础事件</div>}
                           <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
                         </div>
                       ))}
