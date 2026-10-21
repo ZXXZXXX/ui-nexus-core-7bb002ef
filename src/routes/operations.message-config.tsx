@@ -37,6 +37,7 @@ type PushMode = "realtime" | "scheduled";
 type Msg = {
   id: string;
   name: string;
+  desc?: string;
   category: Category;
   template: string;
   variables: string[];
@@ -59,15 +60,15 @@ const RECIPIENTS_BY_CAT: Record<string, string[]> = {
 
 
 const INITIAL: Msg[] = [
-  { id: "wo-due", name: "工单临期提醒", category: "工单任务类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "wo-overdue", name: "工单逾期提醒", category: "工单任务类", template: "{工单类型}工单 {工单号} 已逾期 {逾期时长}，执行人：{执行人}，请尽快跟进。", variables: ["工单类型", "工单号", "逾期时长", "执行人"], jump: "工单列表页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "09:00", enabled: true },
-  { id: "wo-diagnose", name: "待诊断提醒", category: "工单任务类", template: "牛号 {牛号} 上报疑似 {疾病名称}，上报人 {上报人}，请及时诊断。", variables: ["牛号", "疾病名称", "上报人"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "wo-abnormal", name: "工单异常提醒", category: "工单任务类", template: "工单 {工单号} 出现异常：{异常描述}，牛号 {牛号}。", variables: ["工单号", "异常描述", "牛号"], jump: "牛只档案页", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "drug-pile", name: "药品堆积提醒", category: "药品类", template: "{药品名称} 在三级库 {库位} 堆积 {库存数量}，超过建议存量，请及时处理。", variables: ["药品名称", "库位", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "08:30", enabled: true },
-  { id: "drug-near", name: "药品临期提醒", category: "药品类", template: "{药品名称}（批号 {批号}）将于 {有效期} 过期，剩余 {库存数量}。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: false, pushMode: "scheduled", pushTime: "08:30", enabled: true },
-  { id: "drug-expired", name: "药品过期提醒", category: "药品类", template: "{药品名称}（批号 {批号}）已于 {有效期} 过期，剩余 {库存数量}，请勿使用。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "sys-role", name: "角色权限变更提醒", category: "系统类", template: "您在 {牧场名称} 的角色已变更为 {角色名称}，操作人 {操作人}。", variables: ["牧场名称", "角色名称", "操作人"], jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "lab-result", name: "实验室结果更新提醒", category: "其他类", template: "牛号 {牛号} 的 {检测项目} 实验室结果已更新，请查看。", variables: ["牛号", "检测项目"], jump: "牛只档案页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: false },
+  { id: "wo-due", name: "工单临期提醒", desc: "工单临近截止时间时提醒责任人尽快处理，避免任务逾期。", category: "工单任务类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "wo-overdue", name: "工单逾期提醒", desc: "工单超过截止时间仍未完成，提醒责任人及管理层跟进。", category: "工单任务类", template: "{工单类型}工单 {工单号} 已逾期 {逾期时长}，执行人：{执行人}，请尽快跟进。", variables: ["工单类型", "工单号", "逾期时长", "执行人"], jump: "工单列表页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "09:00", enabled: true },
+  { id: "wo-diagnose", name: "待诊断提醒", desc: "牧场人员上报疑似疾病后，提醒兽医及时给出诊断。", category: "工单任务类", template: "牛号 {牛号} 上报疑似 {疾病名称}，上报人 {上报人}，请及时诊断。", variables: ["牛号", "疾病名称", "上报人"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "wo-abnormal", name: "工单异常提醒", desc: "工单执行中出现异常（如实际用药与处方不符），提醒相关人核查。", category: "工单任务类", template: "工单 {工单号} 出现异常：{异常描述}，牛号 {牛号}。", variables: ["工单号", "异常描述", "牛号"], jump: "牛只档案页", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "drug-pile", name: "药品堆积提醒", desc: "三级库某药品存量超过建议值，提醒及时消耗或调拨。", category: "药品类", template: "{药品名称} 在三级库 {库位} 堆积 {库存数量}，超过建议存量，请及时处理。", variables: ["药品名称", "库位", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "08:30", enabled: true },
+  { id: "drug-near", name: "药品临期提醒", desc: "药品临近有效期，提醒优先使用，减少过期损耗。", category: "药品类", template: "{药品名称}（批号 {批号}）将于 {有效期} 过期，剩余 {库存数量}。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: false, pushMode: "scheduled", pushTime: "08:30", enabled: true },
+  { id: "drug-expired", name: "药品过期提醒", desc: "药品已超过有效期，提醒立即停用并下架处理。", category: "药品类", template: "{药品名称}（批号 {批号}）已于 {有效期} 过期，剩余 {库存数量}，请勿使用。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "sys-role", name: "角色权限变更提醒", desc: "账号在牧场的角色被调整时通知本人，了解当前可用功能。", category: "系统类", template: "您在 {牧场名称} 的角色已变更为 {角色名称}，操作人 {操作人}。", variables: ["牧场名称", "角色名称", "操作人"], jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
+  { id: "lab-result", name: "实验室结果更新提醒", desc: "送检样本的实验室结果回传后，提醒相关人员查看并处理。", category: "其他类", template: "牛号 {牛号} 的 {检测项目} 实验室结果已更新，请查看。", variables: ["牛号", "检测项目"], jump: "牛只档案页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: false },
 ];
 
 const varsOf = (c: Category) => [...new Set(INITIAL.filter((m) => m.category === c).flatMap((m) => m.variables))];
@@ -101,7 +102,7 @@ function Page() {
     toast.success("消息配置已保存");
   };
   const openNew = () =>
-    setEditing({ id: `new-${Date.now()}`, name: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true });
+    setEditing({ id: `new-${Date.now()}`, name: "", desc: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true });
 
   return (
     <>
@@ -194,6 +195,10 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
       <div className="space-y-6 py-4">
         <Section title="提醒名称">
           <Input value={m.name} onChange={(e) => set({ name: e.target.value })} maxLength={20} placeholder="请输入提醒名称" className="h-9 text-body-sm" />
+        </Section>
+
+        <Section title="消息描述">
+          <Textarea value={m.desc ?? ""} onChange={(e) => set({ desc: e.target.value })} rows={2} maxLength={60} placeholder="说明这条消息用于什么场景" className="text-body-sm" />
         </Section>
 
         <Section title="消息类型">
