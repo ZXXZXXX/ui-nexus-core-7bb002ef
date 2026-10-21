@@ -43,9 +43,11 @@ type Msg = {
   variables: string[];
   jump: Jump;
   inApp: boolean;
+  inAppMode: PushMode;
+  inAppTime: string;
   wecom: boolean;
-  pushMode: PushMode;
-  pushTime: string;
+  wecomMode: PushMode;
+  wecomTime: string;
   enabled: boolean;
   recipients?: string[];
 };
@@ -80,7 +82,12 @@ const SAMPLE: Record<string, string> = {
   牧场名称: "奇点一牧", 角色名称: "兽医", 操作人: "张伟", 检测项目: "隐性乳房炎检测",
 };
 const channelText = (m: Msg) => [m.inApp && "站内信", m.wecom && "企微消息"].filter(Boolean).join("、") || "—";
-const timeText = (m: Msg) => (m.pushMode === "realtime" ? "实时推送" : `定时 ${m.pushTime}`);
+const timeText = (m: Msg) => {
+  const parts: string[] = [];
+  if (m.inApp) parts.push(`站内信：${m.inAppMode === "realtime" ? "实时" : `定时 ${m.inAppTime}`}`);
+  if (m.wecom) parts.push(`企微消息：${m.wecomMode === "realtime" ? "实时" : `定时 ${m.wecomTime}`}`);
+  return parts.join(" / ") || "—";
+};
 
 function Page() {
   const [list, setList] = useState(INITIAL);
@@ -249,27 +256,45 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
         </Section>
 
         <Section title="推送渠道">
-          <div className="flex gap-6">
-            <label className="flex items-center gap-2 text-body-sm"><Checkbox checked={m.inApp} onCheckedChange={(c) => set({ inApp: !!c })} /><Bell className="h-3.5 w-3.5 text-primary" />站内信</label>
-            <label className="flex items-center gap-2 text-body-sm"><Checkbox checked={m.wecom} onCheckedChange={(c) => set({ wecom: !!c })} /><Smartphone className="h-3.5 w-3.5 text-primary" />企微消息</label>
-          </div>
-        </Section>
-
-        <Section title="推送时间">
-          <RadioGroup value={m.pushMode} onValueChange={(v) => set({ pushMode: v as PushMode })} className="flex gap-6">
-            {([["realtime", "实时推送"], ["scheduled", "定时推送"]] as const).map(([v, l]) => (
-              <div key={v} className="flex items-center gap-2">
-                <RadioGroupItem value={v} id={`pm-${v}`} />
-                <Label htmlFor={`pm-${v}`} className="text-body-sm font-normal">{l}</Label>
+          <div className="space-y-4">
+            {([["inApp", "站内信", Bell], ["wecom", "企微消息", Smartphone]] as const).map(([ch, label, Icon]) => (
+              <div key={ch} className="flex items-center gap-4 flex-wrap">
+                <label className="flex items-center gap-2 text-body-sm w-28">
+                  <Checkbox checked={m[ch]} onCheckedChange={(c) => set({ [ch]: !!c } as Partial<Msg>)} />
+                  <Icon className="h-3.5 w-3.5 text-primary" />{label}
+                </label>
+                {m[ch] ? (
+                  <>
+                    <RadioGroup
+                      value={m[`${ch}Mode`] as PushMode}
+                      onValueChange={(v) => set({ [`${ch}Mode`]: v } as Partial<Msg>)}
+                      className="flex gap-4"
+                    >
+                      {([["realtime", "实时推送"], ["scheduled", "定时推送"]] as const).map(([v, l]) => (
+                        <div key={v} className="flex items-center gap-2">
+                          <RadioGroupItem value={v} id={`pm-${ch}-${v}`} />
+                          <Label htmlFor={`pm-${ch}-${v}`} className="text-body-sm font-normal">{l}</Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                    {m[`${ch}Mode`] === "scheduled" && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-body-sm text-text-secondary">每日推送时间</span>
+                        <Input
+                          type="time"
+                          value={m[`${ch}Time`] as string}
+                          onChange={(e) => set({ [`${ch}Time`]: e.target.value } as Partial<Msg>)}
+                          className="h-8 w-28"
+                        />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-caption text-text-tertiary">未启用该渠道</span>
+                )}
               </div>
             ))}
-          </RadioGroup>
-          {m.pushMode === "scheduled" && (
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-body-sm text-text-secondary">每日推送时间</span>
-              <Input type="time" value={m.pushTime} onChange={(e) => set({ pushTime: e.target.value })} className="h-9 w-32" />
-            </div>
-          )}
+          </div>
         </Section>
 
         <Section title="启用状态">
