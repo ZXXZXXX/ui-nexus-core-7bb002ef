@@ -122,7 +122,7 @@ function Page() {
     toast.success("消息配置已保存");
   };
   const openNew = () =>
-    setEditing({ id: `new-${Date.now()}`, name: "", desc: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true });
+    setEditing({ id: `new-${Date.now()}`, name: "", desc: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: false });
 
   return (
     <>
