@@ -12,13 +12,14 @@ import { groupDigits, type CodeNode } from "@/lib/inventory";
 
 /* ------------------------------ 分层条码 ------------------------------ */
 
-/** 条码分层展示：外包装码为分组标题，其内层条码直接列出；未成整包的散件只有一层 */
+/** 条码分层展示：外包装码为分组标题，其内层条码直接列出；
+ *  部分整包仅有外包装码（无内码），散件只有一层 */
 export function CodeTree({ nodes }: { nodes: CodeNode[] }) {
   if (!nodes.length) return <div className="py-6 text-center text-body-sm text-text-tertiary">暂无条码</div>;
   return (
     <div className="space-y-3">
       {nodes.map((n) =>
-        n.children.length ? (
+        n.pack && n.children.length ? (
           <div key={n.code} className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2">
               <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
@@ -30,6 +31,12 @@ export function CodeTree({ nodes }: { nodes: CodeNode[] }) {
                 <li key={c} className="font-mono text-body-sm tabular-nums text-text-secondary">{groupDigits(c)}</li>
               ))}
             </ul>
+          </div>
+        ) : n.pack ? (
+          <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
+            <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
+            <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
+            <span className="ml-auto shrink-0 text-caption text-text-tertiary">无内包装码</span>
           </div>
         ) : (
           <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
