@@ -13,13 +13,19 @@ const KINDS = ["工单", "基础事件"];
 const targetTag = (t: string) => (t === "工单" ? "tag-success" : t === "基础事件" ? "tag-info" : "tag-muted");
 
 // 我方可回传的事件 / 处置清单：编辑时只能从这份清单里选，不手填。
-const OUR_EVENTS = [
-  "正常", "复诊", "放弃",
+// 工单类只有复查结论这三种，其余事件都归基础事件。
+const OUR_WO_EVENTS = ["正常", "复诊", "放弃"];
+const OUR_BASE_EVENTS = [
   "怀孕", "空怀",
   "血中酮体", "体温", "尿液PH值", "子宫分泌物",
   "普通转群", "围产转群", "产犊", "死亡", "淘汰", "转场转出",
 ];
-const ourEventOptions = OUR_EVENTS.map((n) => ({ value: n, label: n }));
+const ourEventOptions = [
+  ...OUR_WO_EVENTS.map((n) => ({ value: n, label: n, group: "工单" })),
+  ...OUR_BASE_EVENTS.map((n) => ({ value: n, label: n, group: "基础事件" })),
+];
+// 对应类型选定后，「我方」只列该类型下的事件。
+const ourEventOptionsFor = (target: string) => (target ? ourEventOptions.filter((o) => o.group === target) : ourEventOptions);
 
 type Sub = { id: string; name: string; code: string; extName?: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
@@ -71,6 +77,13 @@ export function PushMapping() {
   const closeAll = () => { setViewCard(null); setDraft(null); };
   const drawerOpen = !!viewCard || !!draft;
   const patchDraft = (p: Partial<Card>) => setDraft((d) => (d ? { ...d, ...p } : d));
+  // 切换对应类型时，清掉不属于该类型的「我方」，避免留下无效映射。
+  const patchTarget = (target: string) =>
+    setDraft((d) =>
+      d
+        ? { ...d, target, subs: d.subs.map((s) => (ourEventOptionsFor(target).some((o) => o.value === s.name) ? s : { ...s, name: "" })) }
+        : d,
+    );
   const patchSub = (sid: string, p: Partial<Sub>) =>
     setDraft((d) => (d ? { ...d, subs: d.subs.map((s) => (s.id === sid ? { ...s, ...p } : s)) } : d));
   const delSub = (sid: string) => setDraft((d) => (d ? { ...d, subs: d.subs.filter((s) => s.id !== sid) } : d));
@@ -191,7 +204,7 @@ export function PushMapping() {
                   </Field>
                 </div>
                 <Field label="对应类型">
-                  <Select value={draft.target} onValueChange={(v) => patchDraft({ target: v })}>
+                  <Select value={draft.target} onValueChange={patchTarget}>
                     <SelectTrigger className="h-9 bg-card text-body-sm"><SelectValue placeholder="请选择" /></SelectTrigger>
                     <SelectContent>{KINDS.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                   </Select>
@@ -216,7 +229,7 @@ export function PushMapping() {
                     <div key={s.id} className="py-2 grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
                       <SearchableSelect
                         value={s.name}
-                        options={ourEventOptions}
+                        options={ourEventOptionsFor(draft.target)}
                         placeholder="选择我方"
                         searchPlaceholder="搜索我方"
                         className="h-9 w-full min-w-0"
