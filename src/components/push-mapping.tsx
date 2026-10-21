@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 // 一行一个回传映射，查看与编辑统一走右侧抽屉。
 const KINDS = ["工单", "任务", "基础事件"];
 // 回传语义：工单=复查任务的结论；任务=检查结果（如孕检的是否怀孕）；基础事件=牧场作业事实
-const targetTag = (t: string) => (t === "工单" ? "tag-success" : t === "任务" ? "tag-info" : "tag-muted");
+const targetTag = (t: string) => (t === "工单" ? "tag-success" : t === "基础事件" ? "tag-info" : "tag-muted");
 
 type Sub = { id: string; name: string; code: string; extName?: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
