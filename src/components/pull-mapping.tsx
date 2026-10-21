@@ -122,7 +122,8 @@ export function PullMapping() {
                   <td className="border-t border-border px-4 py-3 whitespace-nowrap">
                     {ck ? <span className={`tag ${ck === "工单" ? "tag-success" : "tag-info"}`}>{ck}</span> : <span className="text-text-tertiary">未选择</span>}
                   </td>
-                  <td className="border-t border-border px-4 py-3 whitespace-nowrap tabular-nums text-text-primary">{c.subs.length}</td>
+                  {/* 工单类的子类型在疾病管理里维护，本页不统计数目 */}
+                  <td className="border-t border-border px-4 py-3 whitespace-nowrap tabular-nums text-text-primary">{ck === "工单" ? "—" : c.subs.length}</td>
                   <td className="border-t border-border px-4 py-3 whitespace-nowrap"><span className={`tag ${ok ? "tag-success" : "tag-warning"}`}>{ok ? "已配置" : "待配置"}</span></td>
                   <td className="sticky right-0 z-10 border-t border-l border-border bg-card px-4 py-3 whitespace-nowrap group-hover/row:bg-surface-subtle">
                     <Button variant="ghost" size="sm" className={textBtn} onClick={() => openEdit(c)}>编辑</Button>
