@@ -131,7 +131,7 @@ export function PushMapping() {
         <SheetContent side="right" className="w-full sm:w-[560px] sm:max-w-none overflow-y-auto bg-card">
           <SheetHeader className="text-left px-0 pb-4 border-b border-border">
             <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "新建映射卡片" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
-            <SheetDescription className="text-caption text-text-tertiary">本系统处置 / 事件回传第三方系统的编码详情</SheetDescription>
+            <SheetDescription className="text-caption text-text-tertiary">回传内容为我方系统产生的结果数据</SheetDescription>
           </SheetHeader>
 
           {viewCard && !draft && (
