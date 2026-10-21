@@ -214,14 +214,6 @@ function ApiTable() {
                   <KV k="触发方式" v={detail.trigger} />
                   <KV k="接口" v={detail.endpoint} />
                 </div>
-                <div>
-                  <div className="text-caption text-text-tertiary mb-1.5">接收人（{detail.receivers.length} 人）</div>
-                  <div className="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto rounded-md bg-surface-subtle p-3">
-                    {detail.receivers.map((r) => (
-                      <span key={r} className="rounded bg-background px-2 py-0.5 text-body-sm text-foreground border border-border">{r}</span>
-                    ))}
-                  </div>
-                </div>
                 {detail.error && (
                   <div className="callout-danger rounded-md p-3 text-body-sm text-foreground">
                     <div className="text-caption text-text-tertiary mb-1">失败原因</div>
@@ -317,6 +309,14 @@ function PushTable() {
                   <KV k="查看状态" v={detail.readStatus} />
                   <KV k="查看时间" v={detail.readTime} />
                   <KV k="跳转界面" v={detail.jump} />
+                </div>
+                <div>
+                  <div className="text-caption text-text-tertiary mb-1.5">接收人（{detail.receivers.length} 人）</div>
+                  <div className="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto rounded-md bg-surface-subtle p-3">
+                    {detail.receivers.map((r) => (
+                      <span key={r} className="rounded bg-background px-2 py-0.5 text-body-sm text-foreground border border-border">{r}</span>
+                    ))}
+                  </div>
                 </div>
                 {detail.error && (
                   <div className="callout-danger rounded-md p-3 text-body-sm text-foreground">
