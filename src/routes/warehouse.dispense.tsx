@@ -5,7 +5,7 @@ import { ListPage, type ListColumn } from "@/components/list-page";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FlowCodes } from "@/components/barcode-viewer";
-import { baseUnit, pickupCodes, countUnits } from "@/lib/inventory";
+import { baseUnit, buildCodes, countUnits } from "@/lib/inventory";
 
 export const Route = createFileRoute("/warehouse/dispense")({
   head: () => ({
@@ -40,22 +40,17 @@ type DispenseRow = {
   cows: string[]; // 用药牛只耳号
   usage: { user: string; cows: string[] }[]; // 按人员维度：该人员用于哪些牛只
   remark: string; // 备注（仅已退回有值）
-  /** M 端备药时与其他药品组成的组合用药卡片 */
-  combo?: { with: { name: string; qty: number; unit: string }[]; scope: "shared" | "single"; cattle: number };
 };
 
 const initial: DispenseRow[] = [
   { id: "DP-3202", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 3, unit: "支", takenAt: "2026-05-12 10:36", operator: "李雨晴", status: "未使用", usedQty: 0, returnedQty: 0, lostQty: 0, users: ["李雨晴"], cows: ["1042"], usage: [{ user: "李雨晴", cows: ["1042"] }], remark: "" },
-  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", status: "已使用", usedQty: 2, returnedQty: 0, lostQty: 0, users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], usage: [{ user: "李雨晴", cows: ["2087", "2091"] }, { user: "王建国", cows: ["3110", "3122"] }], remark: "", combo: { with: [{ name: "氟尼辛葡甲胺注射液", qty: 2, unit: "瓶" }, { name: "复合维生素 B", qty: 4, unit: "支" }], scope: "shared", cattle: 4 } },
+  { id: "DP-3201", code: "01-00063", name: "乳房炎抗生素 5mg", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-12 09:42", operator: "李雨晴", status: "已使用", usedQty: 2, returnedQty: 0, lostQty: 0, users: ["李雨晴", "王建国"], cows: ["2087", "2091", "3110", "3122"], usage: [{ user: "李雨晴", cows: ["2087", "2091"] }, { user: "王建国", cows: ["3110", "3122"] }], remark: "" },
   { id: "DP-3200", code: "02-00214", name: "口蹄疫疫苗 A 型", spec: "50ml/瓶", qty: 5, unit: "支", takenAt: "2026-05-12 08:15", operator: "陈晓东", status: "已使用", usedQty: 4, returnedQty: 1, lostQty: 0, users: ["陈晓东", "刘敏", "赵强"], cows: ["0431", "0432", "0455", "0478", "0509", "0611"], usage: [{ user: "陈晓东", cows: ["0431", "0432"] }, { user: "刘敏", cows: ["0455", "0478"] }, { user: "赵强", cows: ["0509", "0611"] }], remark: "" },
   { id: "DP-3199", code: "03-00306", name: "驱虫剂 伊维菌素", spec: "100ml（含1g）/瓶", qty: 10, unit: "瓶", takenAt: "2026-05-11 16:38", operator: "李雨晴", status: "有损耗", usedQty: 7, returnedQty: 0, lostQty: 2, users: ["李雨晴"], cows: ["1201", "1202", "1233"], usage: [{ user: "李雨晴", cows: ["1201", "1202", "1233"] }], remark: "" },
   { id: "DP-3198", code: "05-00521", name: "消毒液 戊二醛", spec: "5L/桶", qty: 2, unit: "桶", takenAt: "2026-05-11 14:02", operator: "孙库管", status: "已退回", usedQty: 0, returnedQty: 2, lostQty: 0, users: ["孙库管"], cows: [], usage: [{ user: "孙库管", cows: [] }], remark: "3 号牛舍消毒改期，整桶未拆封退回一级库" },
-  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", usedQty: 1, returnedQty: 0, lostQty: 0, users: ["李雨晴", "周敏"], cows: ["3301", "3315"], usage: [{ user: "李雨晴", cows: ["3301"] }, { user: "周敏", cows: ["3315"] }], remark: "", combo: { with: [{ name: "地塞米松磷酸钠注射液", qty: 1, unit: "支" }], scope: "single", cattle: 1 } },
+  { id: "DP-3197", code: "04-00412", name: "营养补充剂 复合维生素", spec: "10ml/支", qty: 1, unit: "罐", takenAt: "2026-05-11 10:20", operator: "李雨晴", status: "已使用", usedQty: 1, returnedQty: 0, lostQty: 0, users: ["李雨晴", "周敏"], cows: ["3301", "3315"], usage: [{ user: "李雨晴", cows: ["3301"] }, { user: "周敏", cows: ["3315"] }], remark: "" },
   { id: "DP-3196", code: "01-00071", name: "头孢噻呋钠", spec: "100ml（含5g）/瓶", qty: 2, unit: "支", takenAt: "2026-05-11 09:05", operator: "王建国", status: "已退回", usedQty: 1, returnedQty: 1, lostQty: 0, users: ["王建国"], cows: ["2210"], usage: [{ user: "王建国", cows: ["2210"] }], remark: "工单 WO-2350 已终止，未开封退回" },
 ];
-
-/** 最小单位无码、只能按外包装扫码取数的药品（M 端领药情况二） */
-const NON_UNIT_SCANNABLE = new Set(["03-00306", "02-00214", "05-00521"]);
 
 const USE_COLORS = {
   unused: "var(--border-default)",
@@ -150,12 +145,7 @@ function ListCell({ items, mono }: { items: string[]; mono?: boolean }) {
 
 const columns: ListColumn<DispenseRow>[] = [
   { key: "code", label: "商品编码", required: true, render: (r) => <span className="font-mono text-body text-foreground">{r.code}</span> },
-  { key: "name", label: "药品展示名称", required: true, render: (r) => (
-    <span className="flex min-w-0 items-center gap-1.5">
-      {r.combo ? <span className="shrink-0 rounded bg-warning/15 px-1.5 text-caption text-warning">组合</span> : null}
-      <span className="text-body text-foreground truncate">{r.name}</span>
-    </span>
-  ) },
+  { key: "name", label: "药品展示名称", required: true, render: (r) => <span className="text-body text-foreground truncate">{r.name}</span> },
   { key: "spec", label: "规格型号", render: (r) => <span className="text-body-sm text-text-secondary truncate">{r.spec}</span> },
   {
     key: "qty", label: "领取数量", filter: "number", value: (r) => r.qty,
@@ -191,7 +181,7 @@ const columns: ListColumn<DispenseRow>[] = [
 function DispensePage() {
   const [data] = useState<DispenseRow[]>(initial);
   const [detail, setDetail] = useState<DispenseRow | null>(null);
-  const detailNodes = detail ? pickupCodes(`${detail.code}|${detail.id}`, detail.qty, !NON_UNIT_SCANNABLE.has(detail.code)) : [];
+  const detailNodes = detail ? buildCodes(`${detail.code}|${detail.id}`, detail.qty) : [];
 
   return (
     <>
@@ -236,7 +226,6 @@ function DispensePage() {
                 <FlowCodes
                   nodes={detailNodes}
                   title={`取药 ${detail.id} · ${detail.takenAt} · ${detail.operator} · 共 ${countUnits(detailNodes)} 个`}
-                  header={detail.combo ? <ComboCard row={detail} /> : undefined}
                 >
                   {detail.qty}
                 </FlowCodes>
@@ -283,26 +272,6 @@ function DispensePage() {
       </SheetContent>
     </Sheet>
     </>
-  );
-}
-
-/** 组合用药：M 端备药时多个药品组成一张组合卡片，整组领取 */
-function ComboCard({ row }: { row: DispenseRow }) {
-  const c = row.combo!;
-  return (
-    <div className="rounded-md border border-warning/40 bg-warning/5 p-3">
-      <div className="flex items-center gap-2">
-        <span className="shrink-0 rounded bg-warning/15 px-1.5 text-caption text-warning">组合用药</span>
-        <span className="text-body-sm text-foreground">{c.scope === "shared" ? `多头牛共用 · ${c.cattle} 头` : "单头牛使用"}</span>
-      </div>
-      <ul className="mt-2 space-y-1 border-t border-border pt-2 text-body-sm">
-        <li className="flex justify-between text-foreground"><span>{row.name}（本条）</span><span className="tabular-nums">{row.qty} {row.unit}</span></li>
-        {c.with.map((d) => (
-          <li key={d.name} className="flex justify-between text-text-secondary"><span>{d.name}</span><span className="tabular-nums">{d.qty} {d.unit}</span></li>
-        ))}
-      </ul>
-      <div className="mt-2 text-caption text-text-tertiary">以下为本条药品的领取条码</div>
-    </div>
   );
 }
 

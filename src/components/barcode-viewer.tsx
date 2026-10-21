@@ -19,18 +19,7 @@ export function CodeTree({ nodes }: { nodes: CodeNode[] }) {
   return (
     <div className="space-y-3">
       {nodes.map((n) =>
-        n.take != null ? (
-          <div key={n.code} className="rounded-md border border-border p-3">
-            <div className="flex items-center gap-2">
-              <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
-              <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
-              <span className="ml-auto shrink-0 text-caption text-text-tertiary">
-                取用 <span className="text-foreground tabular-nums">{n.take}</span> / 内含 {PACK_SIZE}
-              </span>
-            </div>
-            <div className="mt-2 border-t border-border pt-2 text-center text-body-sm text-text-tertiary">按包扫码领取，暂无内包装码数据</div>
-          </div>
-        ) : n.pack && n.children.length ? (
+        n.pack && n.children.length ? (
           <div key={n.code} className="rounded-md border border-border p-3">
             <div className="flex items-center gap-2">
               <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
@@ -64,7 +53,7 @@ export function CodeTree({ nodes }: { nodes: CodeNode[] }) {
 }
 
 /** 数量数字即条码入口：点击后在弹窗中查看该数量对应的药品条码 */
-export function FlowCodes({ nodes, title, children, header }: { nodes: CodeNode[]; title: string; children: React.ReactNode; header?: React.ReactNode }) {
+export function FlowCodes({ nodes, title, children }: { nodes: CodeNode[]; title: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -78,7 +67,7 @@ export function FlowCodes({ nodes, title, children, header }: { nodes: CodeNode[
             <DialogTitle>药品条码</DialogTitle>
             <DialogDescription>{title}</DialogDescription>
           </DialogHeader>
-          <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1">{header}<CodeTree nodes={nodes} /></div>
+          <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
         </DialogContent>
       </Dialog>
     </>
