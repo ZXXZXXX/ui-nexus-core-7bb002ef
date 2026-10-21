@@ -361,7 +361,6 @@ const PUSH_COLS: Col<PushLog>[] = [
   { key: "receivers", label: "接收人", render: (l) => <ReceiverCell names={l.receivers} /> },
   { key: "channel", label: "推送渠道", render: (l) => <span className="text-text-secondary">{l.channel}</span>, options: ["站内信", "企微消息", "站内信、企微消息"], value: (l) => l.channel },
   { key: "pushStatus", label: "推送状态", render: (l) => <span className={`tag ${pushTag(l.pushStatus)}`}>{l.pushStatus}</span>, options: ["已送达", "发送失败"], value: (l) => l.pushStatus },
-  { key: "readStatus", label: "查看状态", render: (l) => <span className={`tag ${readTag(l.readStatus)}`}>{l.readStatus}</span>, options: ["已读", "未读"], value: (l) => l.readStatus },
 ];
 
 function PushTable() {
