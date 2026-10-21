@@ -13,6 +13,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { categoryTag } from "@/lib/message-category";
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+
+// 模拟后端：已开发触发规则的消息。新增的配置默认没有规则。
+const IMPLEMENTED_RULES = new Set(["wo-due", "wo-overdue", "wo-diagnose", "wo-abnormal", "drug-pile", "drug-near", "drug-expired", "sys-role"]);
+async function checkTriggerRule(id: string): Promise<boolean> {
+  await new Promise((r) => setTimeout(r, 200));
+  return IMPLEMENTED_RULES.has(id);
+}
 
 export const Route = createFileRoute("/operations/message-config")({
   head: () => ({
@@ -94,6 +102,11 @@ function Page() {
   const [kw, setKw] = useState("");
   const [cat, setCat] = useState<string>("全部");
   const [editing, setEditing] = useState<Msg | null>(null);
+  const [blocked, setBlocked] = useState(false);
+  const requestEnable = async (id: string, ok: () => void) => {
+    if (await checkTriggerRule(id)) ok();
+    else setBlocked(true);
+  };
 
   const rows = useMemo(
     () => list.filter((m) => (cat === "全部" || m.category === cat) && (!kw || m.name.includes(kw))),
@@ -109,7 +122,7 @@ function Page() {
     toast.success("消息配置已保存");
   };
   const openNew = () =>
-    setEditing({ id: `new-${Date.now()}`, name: "", desc: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true });
+    setEditing({ id: `new-${Date.now()}`, name: "", desc: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: false });
 
   return (
     <>
@@ -156,7 +169,7 @@ function Page() {
                     <td className="px-4 py-3 whitespace-nowrap text-foreground">{channelText(m)}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{timeText(m)}</td>
                     <td className="px-4 py-3">
-                      <Switch checked={m.enabled} onCheckedChange={(v) => setList((p) => p.map((x) => (x.id === m.id ? { ...x, enabled: v } : x)))} />
+                      <Switch checked={m.enabled} onCheckedChange={(v) => { const apply = () => setList((p) => p.map((x) => (x.id === m.id ? { ...x, enabled: v } : x))); v ? requestEnable(m.id, apply) : apply(); }} />
                     </td>
                     <td className="px-4 py-3">
                       <Button variant="ghost" size="sm" className="h-8 px-0 text-primary hover:bg-transparent hover:text-primary/80" onClick={() => setEditing({ ...m })}>
@@ -176,14 +189,26 @@ function Page() {
 
       <Sheet open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <SheetContent className="w-[560px] sm:max-w-[560px] overflow-y-auto">
-          {editing && <EditForm key={editing.id} value={editing} onChange={setEditing} onSave={save} />}
+          {editing && <EditForm key={editing.id} value={editing} onChange={setEditing} onSave={save} onRequestEnable={requestEnable} />}
         </SheetContent>
       </Sheet>
+
+      <AlertDialog open={blocked} onOpenChange={setBlocked}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>暂无法启用</AlertDialogTitle>
+            <AlertDialogDescription>该消息的触发规则尚未配置。请先联系系统方说明提醒需求，完成规则开发后再启用。</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>好的</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
 
-function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Msg) => void; onSave: (m: Msg) => void }) {
+function EditForm({ value: m, onChange, onSave, onRequestEnable }: { value: Msg; onChange: (m: Msg) => void; onSave: (m: Msg) => void; onRequestEnable: (id: string, ok: () => void) => void }) {
   const ref = useRef<HTMLTextAreaElement>(null);
   const set = (p: Partial<Msg>) => onChange({ ...m, ...p });
   const insertVar = (v: string) => {
@@ -299,7 +324,7 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
 
         <Section title="启用状态">
           <div className="flex items-center gap-2">
-            <Switch checked={m.enabled} onCheckedChange={(v) => set({ enabled: v })} />
+            <Switch checked={m.enabled} onCheckedChange={(v) => (v ? onRequestEnable(m.id, () => set({ enabled: true })) : set({ enabled: false }))} />
             <span className="text-body-sm text-text-secondary">{m.enabled ? "已启用" : "已停用"}</span>
           </div>
         </Section>
