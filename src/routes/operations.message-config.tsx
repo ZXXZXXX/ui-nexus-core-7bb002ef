@@ -43,9 +43,11 @@ type Msg = {
   variables: string[];
   jump: Jump;
   inApp: boolean;
+  inAppMode: PushMode;
+  inAppTime: string;
   wecom: boolean;
-  pushMode: PushMode;
-  pushTime: string;
+  wecomMode: PushMode;
+  wecomTime: string;
   enabled: boolean;
   recipients?: string[];
 };
@@ -60,15 +62,15 @@ const RECIPIENTS_BY_CAT: Record<string, string[]> = {
 
 
 const INITIAL: Msg[] = [
-  { id: "wo-due", name: "工单临期提醒", desc: "工单临近截止时间时提醒责任人尽快处理，避免任务逾期。", category: "工单任务类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "wo-overdue", name: "工单逾期提醒", desc: "工单超过截止时间仍未完成，提醒责任人及管理层跟进。", category: "工单任务类", template: "{工单类型}工单 {工单号} 已逾期 {逾期时长}，执行人：{执行人}，请尽快跟进。", variables: ["工单类型", "工单号", "逾期时长", "执行人"], jump: "工单列表页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "09:00", enabled: true },
-  { id: "wo-diagnose", name: "待诊断提醒", desc: "牧场人员上报疑似疾病后，提醒兽医及时给出诊断。", category: "工单任务类", template: "牛号 {牛号} 上报疑似 {疾病名称}，上报人 {上报人}，请及时诊断。", variables: ["牛号", "疾病名称", "上报人"], jump: "工单详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "wo-abnormal", name: "工单异常提醒", desc: "工单执行中出现异常（如实际用药与处方不符），提醒相关人核查。", category: "工单任务类", template: "工单 {工单号} 出现异常：{异常描述}，牛号 {牛号}。", variables: ["工单号", "异常描述", "牛号"], jump: "牛只档案页", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "drug-pile", name: "药品堆积提醒", desc: "三级库某药品存量超过建议值，提醒及时消耗或调拨。", category: "药品类", template: "{药品名称} 在三级库 {库位} 堆积 {库存数量}，超过建议存量，请及时处理。", variables: ["药品名称", "库位", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "scheduled", pushTime: "08:30", enabled: true },
-  { id: "drug-near", name: "药品临期提醒", desc: "药品临近有效期，提醒优先使用，减少过期损耗。", category: "药品类", template: "{药品名称}（批号 {批号}）将于 {有效期} 过期，剩余 {库存数量}。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: false, pushMode: "scheduled", pushTime: "08:30", enabled: true },
-  { id: "drug-expired", name: "药品过期提醒", desc: "药品已超过有效期，提醒立即停用并下架处理。", category: "药品类", template: "{药品名称}（批号 {批号}）已于 {有效期} 过期，剩余 {库存数量}，请勿使用。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "sys-role", name: "角色权限变更提醒", desc: "账号在牧场的角色被调整时通知本人，了解当前可用功能。", category: "系统类", template: "您在 {牧场名称} 的角色已变更为 {角色名称}，操作人 {操作人}。", variables: ["牧场名称", "角色名称", "操作人"], jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true },
-  { id: "lab-result", name: "实验室结果更新提醒", desc: "送检样本的实验室结果回传后，提醒相关人员查看并处理。", category: "其他类", template: "牛号 {牛号} 的 {检测项目} 实验室结果已更新，请查看。", variables: ["牛号", "检测项目"], jump: "牛只档案页", inApp: true, wecom: true, pushMode: "realtime", pushTime: "08:00", enabled: false },
+  { id: "wo-due", name: "工单临期提醒", desc: "工单临近截止时间时提醒责任人尽快处理，避免任务逾期。", category: "工单任务类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true },
+  { id: "wo-overdue", name: "工单逾期提醒", desc: "工单超过截止时间仍未完成，提醒责任人及管理层跟进。", category: "工单任务类", template: "{工单类型}工单 {工单号} 已逾期 {逾期时长}，执行人：{执行人}，请尽快跟进。", variables: ["工单类型", "工单号", "逾期时长", "执行人"], jump: "工单列表页", inApp: true, wecom: true, inAppMode: "scheduled", inAppTime: "09:00", wecomMode: "scheduled", wecomTime: "09:00", enabled: true },
+  { id: "wo-diagnose", name: "待诊断提醒", desc: "牧场人员上报疑似疾病后，提醒兽医及时给出诊断。", category: "工单任务类", template: "牛号 {牛号} 上报疑似 {疾病名称}，上报人 {上报人}，请及时诊断。", variables: ["牛号", "疾病名称", "上报人"], jump: "工单详情页", inApp: true, wecom: true, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true },
+  { id: "wo-abnormal", name: "工单异常提醒", desc: "工单执行中出现异常（如实际用药与处方不符），提醒相关人核查。", category: "工单任务类", template: "工单 {工单号} 出现异常：{异常描述}，牛号 {牛号}。", variables: ["工单号", "异常描述", "牛号"], jump: "牛只档案页", inApp: true, wecom: false, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true },
+  { id: "drug-pile", name: "药品堆积提醒", desc: "三级库某药品存量超过建议值，提醒及时消耗或调拨。", category: "药品类", template: "{药品名称} 在三级库 {库位} 堆积 {库存数量}，超过建议存量，请及时处理。", variables: ["药品名称", "库位", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, inAppMode: "scheduled", inAppTime: "08:30", wecomMode: "scheduled", wecomTime: "08:30", enabled: true },
+  { id: "drug-near", name: "药品临期提醒", desc: "药品临近有效期，提醒优先使用，减少过期损耗。", category: "药品类", template: "{药品名称}（批号 {批号}）将于 {有效期} 过期，剩余 {库存数量}。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: false, inAppMode: "scheduled", inAppTime: "08:30", wecomMode: "scheduled", wecomTime: "08:30", enabled: true },
+  { id: "drug-expired", name: "药品过期提醒", desc: "药品已超过有效期，提醒立即停用并下架处理。", category: "药品类", template: "{药品名称}（批号 {批号}）已于 {有效期} 过期，剩余 {库存数量}，请勿使用。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true },
+  { id: "sys-role", name: "角色权限变更提醒", desc: "账号在牧场的角色被调整时通知本人，了解当前可用功能。", category: "系统类", template: "您在 {牧场名称} 的角色已变更为 {角色名称}，操作人 {操作人}。", variables: ["牧场名称", "角色名称", "操作人"], jump: "不跳转", inApp: true, wecom: false, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true },
+  { id: "lab-result", name: "实验室结果更新提醒", desc: "送检样本的实验室结果回传后，提醒相关人员查看并处理。", category: "其他类", template: "牛号 {牛号} 的 {检测项目} 实验室结果已更新，请查看。", variables: ["牛号", "检测项目"], jump: "牛只档案页", inApp: true, wecom: true, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: false },
 ];
 
 const varsOf = (c: Category) => [...new Set(INITIAL.filter((m) => m.category === c).flatMap((m) => m.variables))];
@@ -80,7 +82,12 @@ const SAMPLE: Record<string, string> = {
   牧场名称: "奇点一牧", 角色名称: "兽医", 操作人: "张伟", 检测项目: "隐性乳房炎检测",
 };
 const channelText = (m: Msg) => [m.inApp && "站内信", m.wecom && "企微消息"].filter(Boolean).join("、") || "—";
-const timeText = (m: Msg) => (m.pushMode === "realtime" ? "实时推送" : `定时 ${m.pushTime}`);
+const timeText = (m: Msg) => {
+  const parts: string[] = [];
+  if (m.inApp) parts.push(`站内信：${m.inAppMode === "realtime" ? "实时" : `定时 ${m.inAppTime}`}`);
+  if (m.wecom) parts.push(`企微消息：${m.wecomMode === "realtime" ? "实时" : `定时 ${m.wecomTime}`}`);
+  return parts.join(" / ") || "—";
+};
 
 function Page() {
   const [list, setList] = useState(INITIAL);
@@ -102,7 +109,7 @@ function Page() {
     toast.success("消息配置已保存");
   };
   const openNew = () =>
-    setEditing({ id: `new-${Date.now()}`, name: "", desc: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, pushMode: "realtime", pushTime: "08:00", enabled: true });
+    setEditing({ id: `new-${Date.now()}`, name: "", desc: "", category: "工单任务类", template: "", variables: varsOf("工单任务类"), jump: "不跳转", inApp: true, wecom: false, inAppMode: "realtime", inAppTime: "08:00", wecomMode: "realtime", wecomTime: "08:00", enabled: true });
 
   return (
     <>
@@ -249,27 +256,45 @@ function EditForm({ value: m, onChange, onSave }: { value: Msg; onChange: (m: Ms
         </Section>
 
         <Section title="推送渠道">
-          <div className="flex gap-6">
-            <label className="flex items-center gap-2 text-body-sm"><Checkbox checked={m.inApp} onCheckedChange={(c) => set({ inApp: !!c })} /><Bell className="h-3.5 w-3.5 text-primary" />站内信</label>
-            <label className="flex items-center gap-2 text-body-sm"><Checkbox checked={m.wecom} onCheckedChange={(c) => set({ wecom: !!c })} /><Smartphone className="h-3.5 w-3.5 text-primary" />企微消息</label>
-          </div>
-        </Section>
-
-        <Section title="推送时间">
-          <RadioGroup value={m.pushMode} onValueChange={(v) => set({ pushMode: v as PushMode })} className="flex gap-6">
-            {([["realtime", "实时推送"], ["scheduled", "定时推送"]] as const).map(([v, l]) => (
-              <div key={v} className="flex items-center gap-2">
-                <RadioGroupItem value={v} id={`pm-${v}`} />
-                <Label htmlFor={`pm-${v}`} className="text-body-sm font-normal">{l}</Label>
+          <div className="space-y-4">
+            {([["inApp", "站内信", Bell], ["wecom", "企微消息", Smartphone]] as const).map(([ch, label, Icon]) => (
+              <div key={ch} className="flex items-center gap-4 flex-wrap">
+                <label className="flex items-center gap-2 text-body-sm w-28">
+                  <Checkbox checked={m[ch]} onCheckedChange={(c) => set({ [ch]: !!c } as Partial<Msg>)} />
+                  <Icon className="h-3.5 w-3.5 text-primary" />{label}
+                </label>
+                {m[ch] ? (
+                  <>
+                    <RadioGroup
+                      value={m[`${ch}Mode`] as PushMode}
+                      onValueChange={(v) => set({ [`${ch}Mode`]: v } as Partial<Msg>)}
+                      className="flex gap-4"
+                    >
+                      {([["realtime", "实时推送"], ["scheduled", "定时推送"]] as const).map(([v, l]) => (
+                        <div key={v} className="flex items-center gap-2">
+                          <RadioGroupItem value={v} id={`pm-${ch}-${v}`} />
+                          <Label htmlFor={`pm-${ch}-${v}`} className="text-body-sm font-normal">{l}</Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                    {m[`${ch}Mode`] === "scheduled" && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-body-sm text-text-secondary">每日推送时间</span>
+                        <Input
+                          type="time"
+                          value={m[`${ch}Time`] as string}
+                          onChange={(e) => set({ [`${ch}Time`]: e.target.value } as Partial<Msg>)}
+                          className="h-8 w-28"
+                        />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <span className="text-caption text-text-tertiary">未启用该渠道</span>
+                )}
               </div>
             ))}
-          </RadioGroup>
-          {m.pushMode === "scheduled" && (
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-body-sm text-text-secondary">每日推送时间</span>
-              <Input type="time" value={m.pushTime} onChange={(e) => set({ pushTime: e.target.value })} className="h-9 w-32" />
-            </div>
-          )}
+          </div>
         </Section>
 
         <Section title="启用状态">
