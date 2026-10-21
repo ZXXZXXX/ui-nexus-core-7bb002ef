@@ -33,6 +33,7 @@ type ApiLog = {
   direction: "推送" | "拉取";
   event: string;
   bizKey: string;
+  farm: string;
   status: ApiStatus;
   cost: number;
   trigger: string;
@@ -166,7 +167,7 @@ function ApiTable() {
           <table className="w-full text-body-sm">
             <thead className="bg-surface-subtle text-text-secondary">
               <tr className="h-12">
-                {["时间", "对接系统", "方向", "事件类型", "业务标识", "状态", "耗时", "操作"].map((h) => (
+                {["时间", "对接系统", "方向", "事件类型", "业务标识", "关联牧场", "状态", "耗时", "操作"].map((h) => (
                   <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -179,6 +180,7 @@ function ApiTable() {
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${l.direction === "推送" ? "tag-brand" : "tag-info"}`}>{l.direction}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.event}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.bizKey}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.farm}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${statusTag(l.status)}`}>{l.status}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.cost} ms</td>
                   <td className="px-4 py-3 whitespace-nowrap">
@@ -188,7 +190,7 @@ function ApiTable() {
                   </td>
                 </tr>
               ))}
-              {!rows.length && <tr><td colSpan={8} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的交互记录</td></tr>}
+              {!rows.length && <tr><td colSpan={9} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的交互记录</td></tr>}
             </tbody>
           </table>
         </div>
@@ -208,6 +210,7 @@ function ApiTable() {
                   <KV k="方向" v={detail.direction} />
                   <KV k="事件类型" v={detail.event} />
                   <KV k="业务标识" v={detail.bizKey} />
+                  <KV k="关联牧场" v={detail.farm} />
                   <KV k="状态" v={detail.status} />
                   <KV k="耗时" v={`${detail.cost} ms`} />
                   <KV k="重试次数" v={String(detail.retry)} />
