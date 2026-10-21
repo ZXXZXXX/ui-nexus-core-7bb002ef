@@ -159,17 +159,19 @@ export function PullMapping() {
                 <div className="space-y-1">
                   <div className="text-card-title font-medium text-text-primary">事件子类型（{viewCard.subs.length}）</div>
                   {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
+                  {viewCard.subs.length > 0 && (
+                    <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 pb-1 text-caption text-text-tertiary">
+                      <span>第三方事件</span><span>第三方编码</span><span>我方事件</span><span />
+                    </div>
+                  )}
                   <div className="divide-y divide-border">
                     {viewCard.subs.map((s) => {
                       const ok = vk === "工单" ? !!s.diseaseId : vk === "基础事件" ? !!s.item : false;
                       return (
-                        <div key={s.id} className="py-2.5 flex items-center gap-3 text-body-sm">
-                          <div className="w-44 shrink-0 min-w-0 flex items-baseline gap-2">
-                            <span className="text-text-primary truncate">{s.name || "—"}</span>
-                            <span className="font-mono tabular-nums text-caption text-text-tertiary shrink-0">{s.code || "—"}</span>
-                          </div>
-                          <span className="text-text-tertiary shrink-0">→</span>
-                          <div className="flex-1 min-w-0 truncate">
+                        <div key={s.id} className="py-2.5 grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
+                          <div className="min-w-0 truncate text-text-primary">{s.name || "—"}</div>
+                          <div className="min-w-0 font-mono tabular-nums text-text-primary">{s.code || "—"}</div>
+                          <div className="min-w-0 truncate">
                             {vk === "工单" && (s.diseaseId ? (
                               <>
                                 <span className="text-text-primary">{diseaseNameOf(s.diseaseId)}</span>{" "}
@@ -232,11 +234,16 @@ export function PullMapping() {
                   </Button>
                 </div>
                 {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
+                {draft.subs.length > 0 && (
+                  <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
+                    <span>第三方事件</span><span>第三方编码</span><span>我方事件</span><span />
+                  </div>
+                )}
                 <div className="divide-y divide-border">
                   {draft.subs.map((s) => (
-                    <div key={s.id} className="py-2 flex items-center gap-3 text-body-sm">
-                      <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-36 shrink-0 text-body-sm" />
-                      <Input value={s.code} placeholder="子类型编码" className="h-9 w-28 shrink-0 font-mono text-body-sm"
+                    <div key={s.id} className="py-2 grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
+                      <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
+                      <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
                         onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
                       {kind === "工单" && (
                         <SearchableSelect
