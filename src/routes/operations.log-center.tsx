@@ -267,7 +267,7 @@ function PushTable() {
           <table className="w-full text-body-sm">
             <thead className="bg-surface-subtle text-text-secondary">
               <tr className="h-12">
-                {["推送时间", "消息名称", "消息类型", "接收人", "推送渠道", "推送状态", "查看状态", "操作"].map((h) => (
+                {["推送时间", "消息名称", "消息类型", "关联牧场", "接收人", "推送渠道", "推送状态", "查看状态", "操作"].map((h) => (
                   <th key={h} className="px-4 text-left font-medium whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -278,6 +278,7 @@ function PushTable() {
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.time}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground font-medium">{l.name}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${categoryTag(l.category)}`}>{l.category}</span></td>
+                  <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.farm}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground"><ReceiverCell names={l.receivers} /></td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.channel}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${pushTag(l.pushStatus)}`}>{l.pushStatus}</span></td>
@@ -289,7 +290,7 @@ function PushTable() {
                   </td>
                 </tr>
               ))}
-              {!rows.length && <tr><td colSpan={8} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的推送记录</td></tr>}
+              {!rows.length && <tr><td colSpan={9} className="px-4 py-10 text-center text-text-tertiary">暂无匹配的推送记录</td></tr>}
             </tbody>
           </table>
         </div>
@@ -306,7 +307,7 @@ function PushTable() {
                 <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-body-sm">
                   <KV k="消息名称" v={detail.name} />
                   <KV k="消息类型" v={detail.category} />
-                  <KV k="牧场" v={detail.farm} />
+                  <KV k="关联牧场" v={detail.farm} />
                   <KV k="推送渠道" v={detail.channel} />
                   <KV k="推送状态" v={detail.pushStatus} />
                   <KV k="查看状态" v={detail.readStatus} />
