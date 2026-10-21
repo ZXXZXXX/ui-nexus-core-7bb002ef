@@ -305,7 +305,8 @@ export const LEDGER_OPTIONAL: { key: keyof Item; label: string }[] = [
  * 外包装不一定有内包装码：部分供应商只有整箱外码，扫一次外码即整包；
  * （演示数据：每 10 个基础单位组成一个外包装，部分外包装无内码）
  */
-export type CodeNode = { code: string; children: string[]; pack: boolean };
+/** take：仅外包装有码、按包扫码后输入的取用数量（M 端领药情况二） */
+export type CodeNode = { code: string; children: string[]; pack: boolean; take?: number };
 export const PACK_SIZE = 10;
 
 function digits(seed: string, len: number): string {
@@ -352,7 +353,19 @@ export const flowCodes = (f: Flow & { sku?: string }, sku: string) =>
 
 /** 条码总数（最小包装数）：仅有外码的整包按一包 PACK_SIZE 计 */
 export const countUnits = (nodes: CodeNode[]) =>
-  nodes.reduce((a, n) => a + (n.pack ? n.children.length || PACK_SIZE : 1), 0);
+  nodes.reduce((a, n) => a + (n.take ?? (n.pack ? n.children.length || PACK_SIZE : 1)), 0);
+
+/** 领药条码：最小单位可扫码时逐个记录（散件）；仅外包装有码时按包扫码并记录取用数量 */
+export function pickupCodes(seed: string, qty: number, unitScannable: boolean): CodeNode[] {
+  if (unitScannable) return Array.from({ length: qty }, (_, k) => ({ code: unitCode(seed, k), pack: false, children: [] }));
+  const out: CodeNode[] = [];
+  for (let p = 0, left = qty; left > 0; p++) {
+    const take = Math.min(left, PACK_SIZE);
+    out.push({ code: packCode(seed, p), pack: true, children: [], take });
+    left -= take;
+  }
+  return out;
+}
 
 /** 条码按 4 位分组展示，便于肉眼核对 */
 export const groupDigits = (code: string) => code.replace(/(\d{4})(?=\d)/g, "$1 ");
