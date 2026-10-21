@@ -11,6 +11,8 @@ export type KBDisease = {
   symptoms: string[];
   rx: string[];
   status: string;
+  diagCode?: string; // 诊断编码（对应拉取子事件编码）
+  treatCode?: string; // 处置编码（对应回传子事件编码）
 };
 export type KBSymptom = {
   id: string;
@@ -20,7 +22,7 @@ export type KBSymptom = {
   status: string;
 };
 
-export const KB_CATEGORIES: KBCategory[] = [{"code": "DL-01", "name": "子宫炎类"}, {"code": "DL-02", "name": "产后代谢病类"}, {"code": "DL-03", "name": "消化道类"}, {"code": "DL-04", "name": "其他类"}, {"code": "DL-05", "name": "呼吸道类"}, {"code": "DL-06", "name": "肢蹄病类"}];
+export const KB_CATEGORIES: KBCategory[] = [{"code": "DL-01", "name": "子宫炎类"}, {"code": "DL-02", "name": "产后代谢病类"}, {"code": "DL-03", "name": "消化道类"}, {"code": "DL-04", "name": "其他类"}, {"code": "DL-05", "name": "呼吸道类"}, {"code": "DL-06", "name": "肢蹄病类"}, {"code": "DL-07", "name": "预防保健类"}];
 
 export const KB_DISEASES: KBDisease[] = [
   {"id": "DZ-001001", "cat": "DL-01", "type": "产道创伤", "name": "产道创伤", "abbr": "CI", "groups": ["泌乳牛"], "symptoms": ["SY-001", "SY-002", "SY-003", "SY-004", "SY-005", "SY-006", "SY-007", "SY-008", "SY-009", "SY-010", "SY-011", "SY-012", "SY-013", "SY-014", "SY-015", "SY-016", "SY-017", "SY-018", "SY-019", "SY-020", "SY-021", "SY-022", "SY-023", "SY-024", "SY-025", "SY-026", "SY-027", "SY-028", "SY-029", "SY-030", "SY-031", "SY-032"], "rx": ["RX-000003", "RX-000004"], "status": "启用", "catName": "子宫炎类"},
@@ -74,6 +76,26 @@ export const KB_DISEASES: KBDisease[] = [
   {"id": "DZ-035004", "cat": "DL-06", "type": "其他四肢疾病", "name": "蹄叶炎", "abbr": "", "groups": ["青年牛"], "symptoms": ["SY-293", "SY-081", "SY-432", "SY-257", "SY-478", "SY-479", "SY-313", "SY-314", "SY-016", "SY-291", "SY-292", "SY-162", "SY-473", "SY-017", "SY-050", "SY-015", "SY-103", "SY-071", "SY-030", "SY-307", "SY-255", "SY-076", "SY-480", "SY-046"], "rx": [], "status": "启用", "catName": "肢蹄病类"},
   {"id": "DZ-035005", "cat": "DL-06", "type": "其他四肢疾病", "name": "蹄底溃疡", "abbr": "", "groups": ["青年牛"], "symptoms": ["SY-473", "SY-481", "SY-482", "SY-483", "SY-466", "SY-467", "SY-162", "SY-291", "SY-292", "SY-484", "SY-485", "SY-464", "SY-465", "SY-313", "SY-314", "SY-336", "SY-171", "SY-237", "SY-338", "SY-175", "SY-476", "SY-081", "SY-016", "SY-015", "SY-029", "SY-030", "SY-255", "SY-076"], "rx": ["RX-000077"], "status": "启用", "catName": "肢蹄病类"},
   {"id": "DZ-035006", "cat": "DL-06", "type": "其他四肢疾病", "name": "白线病", "abbr": "", "groups": ["青年牛"], "symptoms": ["SY-473", "SY-478", "SY-479", "SY-313", "SY-314", "SY-171", "SY-293", "SY-294", "SY-291", "SY-292", "SY-162", "SY-081", "SY-030"], "rx": ["RX-000078"], "status": "启用", "catName": "肢蹄病类"},
+  {"id": "DZ-036001", "cat": "DL-07", "type": "驱虫", "name": "驱虫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "606001", "treatCode": "617905"},
+  {"id": "DZ-037001", "cat": "DL-07", "type": "干奶", "name": "干奶", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "600601", "treatCode": "617801"},
+  {"id": "DZ-038001", "cat": "DL-07", "type": "修蹄", "name": "修蹄", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "601301", "treatCode": "617010"},
+  {"id": "DZ-039001", "cat": "DL-07", "type": "免疫", "name": "口蹄疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604801", "treatCode": "617601"},
+  {"id": "DZ-039002", "cat": "DL-07", "type": "免疫", "name": "传染性鼻支气管炎", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604802", "treatCode": "617602"},
+  {"id": "DZ-039003", "cat": "DL-07", "type": "免疫", "name": "魏氏梭菌", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604803", "treatCode": "617603"},
+  {"id": "DZ-039004", "cat": "DL-07", "type": "免疫", "name": "布病疫苗", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604804", "treatCode": "617604"},
+  {"id": "DZ-039005", "cat": "DL-07", "type": "免疫", "name": "犊牛腹泻五联苗", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604805", "treatCode": "617605"},
+  {"id": "DZ-039006", "cat": "DL-07", "type": "免疫", "name": "巴氏杆菌免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604806", "treatCode": "617606"},
+  {"id": "DZ-039007", "cat": "DL-07", "type": "免疫", "name": "流行热免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604807", "treatCode": "617607"},
+  {"id": "DZ-039008", "cat": "DL-07", "type": "免疫", "name": "结核免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604808", "treatCode": "617608"},
+  {"id": "DZ-039009", "cat": "DL-07", "type": "免疫", "name": "IBR/BVDV疫苗", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604809", "treatCode": "617609"},
+  {"id": "DZ-039010", "cat": "DL-07", "type": "免疫", "name": "山羊痘活疫苗", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604810", "treatCode": "617610"},
+  {"id": "DZ-039011", "cat": "DL-07", "type": "免疫", "name": "病毒性腹泻", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604811", "treatCode": "617611"},
+  {"id": "DZ-039012", "cat": "DL-07", "type": "免疫", "name": "曼氏杆菌免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604812", "treatCode": "617612"},
+  {"id": "DZ-039013", "cat": "DL-07", "type": "免疫", "name": "副伤寒免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604813", "treatCode": "617613"},
+  {"id": "DZ-039014", "cat": "DL-07", "type": "免疫", "name": "炭疽免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604814", "treatCode": "617614"},
+  {"id": "DZ-039015", "cat": "DL-07", "type": "免疫", "name": "支原体免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604815", "treatCode": "617615"},
+  {"id": "DZ-039016", "cat": "DL-07", "type": "免疫", "name": "大肠杆菌免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604816", "treatCode": "617616"},
+  {"id": "DZ-039017", "cat": "DL-07", "type": "免疫", "name": "乳房炎免疫", "abbr": "", "groups": ["泌乳牛"], "symptoms": [], "rx": [], "status": "启用", "catName": "预防保健类", "diagCode": "604817", "treatCode": ""},
 ];
 
 export const KB_SYMPTOMS: KBSymptom[] = [
