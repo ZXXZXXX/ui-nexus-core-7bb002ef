@@ -9,35 +9,35 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 // 一行一个回传映射，查看与编辑统一走右侧抽屉。
 const KINDS = ["工单", "基础事件"];
 
-type Sub = { id: string; name: string; code: string };
+type Sub = { id: string; name: string; code: string; extName?: string };
 type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
 
 const SEED: Card[] = [
   { id: "p-100", title: "诊断治疗结果回传", typeName: "诊断治疗结果", typeCode: "100", target: "工单", subs: [
-    { id: "s-606101", name: "治愈", code: "606101" },
-    { id: "s-606102", name: "续治", code: "606102" },
-    { id: "s-606103", name: "放弃", code: "606103" },
+    { id: "s-606101", name: "治愈", code: "606101", extName: "治愈" },
+    { id: "s-606102", name: "续治", code: "606102", extName: "续治" },
+    { id: "s-606103", name: "放弃", code: "606103", extName: "放弃" },
   ] },
   { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "基础事件", subs: [
-    { id: "s-600401", name: "空怀", code: "600401" },
-    { id: "s-600402", name: "怀孕", code: "600402" },
+    { id: "s-600401", name: "空怀", code: "600401", extName: "空怀" },
+    { id: "s-600402", name: "怀孕", code: "600402", extName: "怀孕" },
   ] },
   { id: "p-6025", title: "检测检查回传", typeName: "检测检查", typeCode: "6025", target: "基础事件", subs: [
-    { id: "s-602503", name: "血中酮体", code: "" },
-    { id: "s-602518", name: "体温", code: "" },
-    { id: "s-602519", name: "尿液PH值", code: "" },
-    { id: "s-602523", name: "子宫分泌物", code: "" },
+    { id: "s-602503", name: "血中酮体", code: "", extName: "血中酮体" },
+    { id: "s-602518", name: "体温", code: "", extName: "体温" },
+    { id: "s-602519", name: "尿液PH值", code: "", extName: "尿液PH值" },
+    { id: "s-602523", name: "子宫分泌物", code: "", extName: "子宫分泌物" },
   ] },
   { id: "p-6023", title: "转群回传", typeName: "转群", typeCode: "6023", target: "基础事件", subs: [
-    { id: "s-602301", name: "普通转群", code: "602301" },
-    { id: "s-602302", name: "围产转群", code: "" },
+    { id: "s-602301", name: "普通转群", code: "602301", extName: "普通转群" },
+    { id: "s-602302", name: "围产转群", code: "", extName: "围产转群" },
   ] },
-  { id: "p-6003", title: "产犊回传", typeName: "产犊", typeCode: "6003", target: "基础事件", subs: [{ id: "s-600301", name: "产犊", code: "600301" }] },
+  { id: "p-6003", title: "产犊回传", typeName: "产犊", typeCode: "6003", target: "基础事件", subs: [{ id: "s-600301", name: "产犊", code: "600301", extName: "产犊" }] },
   { id: "p-6014", title: "离场回传", typeName: "离场", typeCode: "6014", target: "基础事件", subs: [
-    { id: "s-601401", name: "死亡", code: "601401" },
-    { id: "s-601402", name: "淘汰", code: "601402" },
+    { id: "s-601401", name: "死亡", code: "601401", extName: "死亡" },
+    { id: "s-601402", name: "淘汰", code: "601402", extName: "淘汰" },
   ] },
-  { id: "p-6056", title: "转场回传", typeName: "转场", typeCode: "6056", target: "基础事件", subs: [{ id: "s-605601", name: "转场转出", code: "605601" }] },
+  { id: "p-6056", title: "转场回传", typeName: "转场", typeCode: "6056", target: "基础事件", subs: [{ id: "s-605601", name: "转场转出", code: "605601", extName: "转场转出" }] },
 ];
 
 const textBtn = "h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary";
@@ -51,7 +51,7 @@ export function PushMapping() {
   const [viewCard, setViewCard] = useState<Card | null>(null); // 抽屉查看态
   const [draft, setDraft] = useState<Card | null>(null); // 抽屉编辑态
 
-  const list = useMemo(() => cards.filter((c) => !kw || [c.title, c.typeName, c.typeCode, ...c.subs.flatMap((s) => [s.name, s.code])].some((v) => v.includes(kw))), [cards, kw]);
+  const list = useMemo(() => cards.filter((c) => !kw || [c.title, c.typeName, c.typeCode, ...c.subs.flatMap((s) => [s.name, s.code, s.extName ?? ""])].some((v) => v.includes(kw))), [cards, kw]);
   const isNew = !!draft && !cards.some((x) => x.id === draft.id);
   const openEdit = (c: Card) => { setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) }); setDraft({ ...c, subs: c.subs.map((s) => ({ ...s })) }); };
   const openView = (c: Card) => setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) });
@@ -62,7 +62,7 @@ export function PushMapping() {
   const patchSub = (sid: string, p: Partial<Sub>) =>
     setDraft((d) => (d ? { ...d, subs: d.subs.map((s) => (s.id === sid ? { ...s, ...p } : s)) } : d));
   const delSub = (sid: string) => setDraft((d) => (d ? { ...d, subs: d.subs.filter((s) => s.id !== sid) } : d));
-  const addSub = () => setDraft((d) => (d ? { ...d, subs: [...d.subs, { id: `s-${Date.now()}`, name: "", code: "" }] } : d));
+  const addSub = () => setDraft((d) => (d ? { ...d, subs: [...d.subs, { id: `s-${Date.now()}`, name: "", code: "", extName: "" }] } : d));
 
   const saveDraft = () => {
     if (!draft) return;
@@ -142,22 +142,25 @@ export function PushMapping() {
                   {viewCard.target ? <span className={`tag ${viewCard.target === "工单" ? "tag-success" : "tag-info"}`}>{viewCard.target}</span> : <span className="text-text-tertiary">未选择</span>}
                 </div>
               </div>
-              <div className="space-y-1">
-                <div className="text-card-title font-medium text-text-primary">事件子类型（{viewCard.subs.length}）</div>
-                {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
-                <div className="divide-y divide-border">
-                  {viewCard.subs.map((s) => (
-                    <div key={s.id} className="py-2.5 flex items-center gap-3 text-body-sm">
-                      <div className="w-56 shrink-0 min-w-0 truncate text-text-primary">{s.name || "—"}</div>
-                      <span className="text-text-tertiary shrink-0">→</span>
-                      <div className="flex-1 min-w-0">
-                        {s.code ? <span className="font-mono tabular-nums text-text-primary">{s.code}</span> : <span className="text-text-tertiary">回传编码未配置</span>}
-                      </div>
-                      <span className={`tag ${s.code ? "tag-success" : "tag-warning"} shrink-0`}>{s.code ? "已配置" : "待配置"}</span>
+                <div className="space-y-1">
+                  <div className="text-card-title font-medium text-text-primary">事件子类型（{viewCard.subs.length}）</div>
+                  {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
+                  {viewCard.subs.length > 0 && (
+                    <div className="grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] gap-3 px-1 pb-1 text-caption text-text-tertiary">
+                      <span>我方事件</span><span>第三方编码</span><span>第三方事件</span><span />
                     </div>
-                  ))}
+                  )}
+                  <div className="divide-y divide-border">
+                    {viewCard.subs.map((s) => (
+                      <div key={s.id} className="py-2.5 grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
+                        <div className="min-w-0 truncate text-text-primary">{s.name || "—"}</div>
+                        <div className="min-w-0">{s.code ? <span className="font-mono tabular-nums text-text-primary">{s.code}</span> : <span className="text-text-tertiary">未配置</span>}</div>
+                        <div className="min-w-0 truncate">{s.extName ? <span className="text-text-primary">{s.extName}</span> : <span className="text-text-tertiary">未配置</span>}</div>
+                        <span className={`tag ${s.code ? "tag-success" : "tag-warning"} shrink-0`}>{s.code ? "已配置" : "待配置"}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
             </div>
           )}
 
@@ -191,12 +194,18 @@ export function PushMapping() {
                   </Button>
                 </div>
                 {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
+                {draft.subs.length > 0 && (
+                  <div className="grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
+                    <span>我方事件</span><span>第三方编码</span><span>第三方事件</span><span />
+                  </div>
+                )}
                 <div className="divide-y divide-border">
                   {draft.subs.map((s) => (
-                    <div key={s.id} className="py-2 flex items-center gap-3 text-body-sm">
-                      <Input value={s.name} placeholder="本系统处置 / 事件" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 flex-1 min-w-0 text-body-sm" />
-                      <Input value={s.code} placeholder="回传子类型编码" className="h-9 w-32 shrink-0 font-mono text-body-sm"
+                    <div key={s.id} className="py-2 grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
+                      <Input value={s.name} placeholder="本系统处置 / 事件" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
+                      <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
                         onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
+                      <Input value={s.extName ?? ""} placeholder="第三方事件名称" onChange={(e) => patchSub(s.id, { extName: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
                       <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
                     </div>
                   ))}
