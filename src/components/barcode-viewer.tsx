@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { groupDigits, type CodeNode } from "@/lib/inventory";
+import { groupDigits, PACK_SIZE, type CodeNode } from "@/lib/inventory";
 
 /* ------------------------------ 分层条码 ------------------------------ */
 
@@ -36,7 +36,7 @@ export function CodeTree({ nodes }: { nodes: CodeNode[] }) {
           <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
             <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
             <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
-            <span className="ml-auto shrink-0 text-caption text-text-tertiary">无内包装码</span>
+            <span className="ml-auto shrink-0 text-caption text-text-tertiary">内含 {PACK_SIZE}（无内包装码）</span>
           </div>
         ) : (
           <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
