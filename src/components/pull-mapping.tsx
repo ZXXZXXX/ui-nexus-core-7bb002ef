@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { SearchableSelect } from "@/components/searchable-select";
 import { KB_DISEASES } from "@/lib/disease-kb";
 
 // 拉取映射配置：映射关系以表格呈现，一行一个映射卡片；
@@ -238,18 +239,24 @@ export function PullMapping() {
                       <Input value={s.code} placeholder="子类型编码" className="h-9 w-28 shrink-0 font-mono text-body-sm"
                         onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
                       {kind === "工单" && (
-                        <Select value={s.diseaseId ?? ""} onValueChange={(v) => patchSub(s.id, { diseaseId: v })}>
-                          <SelectTrigger className="h-9 flex-1 min-w-0 text-body-sm"><SelectValue placeholder="选择疾病名称" /></SelectTrigger>
-                          <SelectContent className="max-h-72">
-                            {KB_DISEASES.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
+                        <SearchableSelect
+                          className="flex-1 min-w-0"
+                          value={s.diseaseId ?? ""}
+                          options={KB_DISEASES.map((d) => ({ value: d.id, label: d.name }))}
+                          placeholder="选择疾病名称，可输入关键字搜索"
+                          searchPlaceholder="搜索疾病名称"
+                          onChange={(v) => patchSub(s.id, { diseaseId: v })}
+                        />
                       )}
                       {kind === "基础事件" && (
-                        <Select value={s.item ?? ""} onValueChange={(v) => patchSub(s.id, { item: v })}>
-                          <SelectTrigger className="h-9 flex-1 min-w-0 text-body-sm"><SelectValue placeholder="选择具体检测项目" /></SelectTrigger>
-                          <SelectContent>{(BASE_EVENTS[draft.target] ?? []).map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                        </Select>
+                        <SearchableSelect
+                          className="flex-1 min-w-0"
+                          value={s.item ?? ""}
+                          options={(BASE_EVENTS[draft.target] ?? []).map((t) => ({ value: t, label: t }))}
+                          placeholder="选择具体检测项目"
+                          searchPlaceholder="搜索检测项目"
+                          onChange={(v) => patchSub(s.id, { item: v })}
+                        />
                       )}
                       {!kind && <div className="flex-1 min-w-0 text-text-tertiary">先在上方选择对应工单 / 任务</div>}
                       <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
