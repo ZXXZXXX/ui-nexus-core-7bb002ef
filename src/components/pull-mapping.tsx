@@ -161,7 +161,7 @@ export function PullMapping() {
                   {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
                   {viewCard.subs.length > 0 && (
                     <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 pb-1 text-caption text-text-tertiary">
-                      <span>第三方事件</span><span>第三方编码</span><span>我方事件</span><span />
+                      <span>第三方</span><span>第三方编码</span><span>我方</span><span />
                     </div>
                   )}
                   <div className="divide-y divide-border">
@@ -236,7 +236,7 @@ export function PullMapping() {
                 {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
                 {draft.subs.length > 0 && (
                   <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
-                    <span>第三方事件</span><span>第三方编码</span><span>我方事件</span><span />
+                    <span>第三方</span><span>第三方编码</span><span>我方</span><span />
                   </div>
                 )}
                 <div className="divide-y divide-border">
