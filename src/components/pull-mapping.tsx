@@ -107,8 +107,9 @@ export function PullMapping() {
           <tbody>
             {list.map((c) => {
               const ck = targetKind(c.target);
+              // 工单类的子类型编码在「疾病管理」的诊断编码里维护，本页选到对应工单即算配置完成
               const configured = c.subs.filter((s) => (ck === "工单" ? !!s.diseaseId : ck === "基础事件" ? !!s.item : false)).length;
-              const ok = !!ck && c.subs.length > 0 && configured === c.subs.length;
+              const ok = ck === "工单" ? true : !!ck && c.subs.length > 0 && configured === c.subs.length;
               return (
                 <tr key={c.id} className="group/row h-12">
                   <td className="sticky left-0 z-10 border-t border-r border-border bg-card px-4 py-3 whitespace-nowrap group-hover/row:bg-surface-subtle">
@@ -228,48 +229,48 @@ export function PullMapping() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-card-title font-medium text-text-primary">事件子类型（{draft.subs.length}）</div>
-                  <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
-                    <Plus className="h-3.5 w-3.5" />添加子类型
-                  </Button>
+                  <div className="text-card-title font-medium text-text-primary">事件子类型{kind === "工单" ? "" : `（${draft.subs.length}）`}</div>
+                  {kind !== "工单" && (
+                    <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
+                      <Plus className="h-3.5 w-3.5" />添加子类型
+                    </Button>
+                  )}
                 </div>
-                {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
-                {draft.subs.length > 0 && (
-                  <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
-                    <span>第三方</span><span>第三方编码</span><span>我方</span><span />
+                {kind === "工单" ? (
+                  <div className="rounded-md border border-border bg-surface-subtle px-4 py-3 text-body-sm text-text-secondary">
+                    请前往「诊疗管理 &gt; 疾病管理」中查看/维护对应编码
                   </div>
-                )}
-                <div className="divide-y divide-border">
-                  {draft.subs.map((s) => (
-                    <div key={s.id} className="py-2 grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
-                      <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
-                      <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
-                        onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
-                      {kind === "工单" && (
-                        <SearchableSelect
-                          className="flex-1 min-w-0"
-                          value={s.diseaseId ?? ""}
-                          options={KB_DISEASES.map((d) => ({ value: d.id, label: d.name }))}
-                          placeholder="选择疾病名称，可输入关键字搜索"
-                          searchPlaceholder="搜索疾病名称"
-                          onChange={(v) => patchSub(s.id, { diseaseId: v })}
-                        />
-                      )}
-                      {kind === "基础事件" && (
-                        <SearchableSelect
-                          className="flex-1 min-w-0"
-                          value={s.item ?? ""}
-                          options={(BASE_EVENTS[draft.target] ?? []).map((t) => ({ value: t, label: t }))}
-                          placeholder="选择具体检测项目"
-                          searchPlaceholder="搜索检测项目"
-                          onChange={(v) => patchSub(s.id, { item: v })}
-                        />
-                      )}
-                      {!kind && <div className="flex-1 min-w-0 text-text-tertiary">先在上方选择对应工单 / 任务</div>}
-                      <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
+                ) : (
+                  <>
+                    {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
+                    {draft.subs.length > 0 && (
+                      <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
+                        <span>第三方</span><span>第三方编码</span><span>我方</span><span />
+                      </div>
+                    )}
+                    <div className="divide-y divide-border">
+                      {draft.subs.map((s) => (
+                        <div key={s.id} className="py-2 grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
+                          <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
+                          <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
+                            onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
+                          {kind === "基础事件" && (
+                            <SearchableSelect
+                              className="flex-1 min-w-0"
+                              value={s.item ?? ""}
+                              options={(BASE_EVENTS[draft.target] ?? []).map((t) => ({ value: t, label: t }))}
+                              placeholder="选择具体检测项目"
+                              searchPlaceholder="搜索检测项目"
+                              onChange={(v) => patchSub(s.id, { item: v })}
+                            />
+                          )}
+                          {!kind && <div className="flex-1 min-w-0 text-text-tertiary">先在上方选择对应工单 / 任务</div>}
+                          <Button variant="ghost" size="sm" className={`${textBtn} shrink-0`} onClick={() => delSub(s.id)}>删除</Button>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </>
+                )}
               </div>
             </div>
           )}
