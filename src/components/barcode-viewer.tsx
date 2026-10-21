@@ -33,10 +33,13 @@ export function CodeTree({ nodes }: { nodes: CodeNode[] }) {
             </ul>
           </div>
         ) : n.pack ? (
-          <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
-            <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
-            <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
-            <span className="ml-auto shrink-0 text-caption text-text-tertiary">内含 {PACK_SIZE}（无内包装码）</span>
+          <div key={n.code} className="rounded-md border border-border p-3">
+            <div className="flex items-center gap-2">
+              <span className="shrink-0 rounded bg-primary/10 px-1.5 text-caption text-primary">外包装</span>
+              <span className="font-mono text-body font-medium tabular-nums text-foreground">{groupDigits(n.code)}</span>
+              <span className="ml-auto shrink-0 text-caption text-text-tertiary">内含 {PACK_SIZE}</span>
+            </div>
+            <div className="mt-2 border-t border-border pt-2 text-center text-body-sm text-text-tertiary">暂无内包装码数据</div>
           </div>
         ) : (
           <div key={n.code} className="flex items-center gap-2 px-3 py-0.5">
