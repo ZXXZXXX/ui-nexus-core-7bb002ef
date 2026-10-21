@@ -302,9 +302,10 @@ export const LEDGER_OPTIONAL: { key: keyof Item; label: string }[] = [
 /**
  * 条码层级规则：条码最多两层——一级为外包装码（如整盒），二级为其内含的最小包装码；
  * 未成整包的散件只有一层（最小包装码）。条码值全为数字。
- * （演示数据：每 10 个基础单位组成一个外包装）
+ * 外包装不一定有内包装码：部分供应商只有整箱外码，扫一次外码即整包；
+ * （演示数据：每 10 个基础单位组成一个外包装，部分外包装无内码）
  */
-export type CodeNode = { code: string; children: string[] };
+export type CodeNode = { code: string; children: string[]; pack: boolean };
 export const PACK_SIZE = 10;
 
 function digits(seed: string, len: number): string {
@@ -321,16 +322,24 @@ function digits(seed: string, len: number): string {
 const unitCode = (seed: string, i: number) => `8${digits(`${seed}#u${i}`, 19)}`;
 const packCode = (seed: string, i: number) => `9${digits(`${seed}#p${i}`, 19)}`;
 
-/** 按数量生成分层条码：满 PACK_SIZE 归入一个外包装，余数为散件 */
+/** 该外包装是否有内包装码：视供应商而定，部分整包仅有外包装码 */
+const hasInnerCodes = (seed: string, p: number) =>
+  Number(digits(`${seed}#inner${p}`, 2)) % 3 !== 0;
+
+/** 按数量生成分层条码：满 PACK_SIZE 归入一个外包装，余数为散件；部分外包装仅有外码 */
 export function buildCodes(seed: string, qty: number): CodeNode[] {
   const out: CodeNode[] = [];
   const packs = Math.floor(qty / PACK_SIZE);
   for (let p = 0; p < packs; p++)
     out.push({
       code: packCode(seed, p),
-      children: Array.from({ length: PACK_SIZE }, (_, k) => unitCode(seed, p * PACK_SIZE + k)),
+      pack: true,
+      children: hasInnerCodes(seed, p)
+        ? Array.from({ length: PACK_SIZE }, (_, k) => unitCode(seed, p * PACK_SIZE + k))
+        : [],
     });
-  for (let k = packs * PACK_SIZE; k < qty; k++) out.push({ code: unitCode(seed, k), children: [] });
+  for (let k = packs * PACK_SIZE; k < qty; k++)
+    out.push({ code: unitCode(seed, k), pack: false, children: [] });
   return out;
 }
 
@@ -341,9 +350,9 @@ export const batchCodes = (b: Item) => buildCodes(`${b.sku}|${b.batchNo}|${b.pri
 export const flowCodes = (f: Flow & { sku?: string }, sku: string) =>
   buildCodes(`${sku}|${f.batch}|${f.date}|${f.dir}`, f.qty);
 
-/** 条码总数（最小包装数） */
+/** 条码总数（最小包装数）：仅有外码的整包按一包 PACK_SIZE 计 */
 export const countUnits = (nodes: CodeNode[]) =>
-  nodes.reduce((a, n) => a + (n.children.length || 1), 0);
+  nodes.reduce((a, n) => a + (n.pack ? n.children.length || PACK_SIZE : 1), 0);
 
 /** 条码按 4 位分组展示，便于肉眼核对 */
 export const groupDigits = (code: string) => code.replace(/(\d{4})(?=\d)/g, "$1 ");
