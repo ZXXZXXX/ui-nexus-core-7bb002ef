@@ -164,8 +164,8 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
   return {
     id: d.id.replace("DZ-", "D-"),
     code: d.id,
-    diagCode: `UDX-${d.id.slice(3)}`,
-    treatCode: `UDT-${d.id.slice(3)}`,
+    diagCode: d.diagCode ?? `UDX-${d.id.slice(3)}`,
+    treatCode: d.treatCode ?? `UDT-${d.id.slice(3)}`,
     typeId: type?.id ?? "T-001",
     subSeq: d.id.slice(-3),
     name: d.name,
