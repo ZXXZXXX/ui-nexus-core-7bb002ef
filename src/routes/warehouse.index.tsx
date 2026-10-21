@@ -281,7 +281,7 @@ function ExportDialog({
 
 function BatchCodesDialog({ batch, open, onOpenChange }: { batch: Item; open: boolean; onOpenChange: (v: boolean) => void }) {
   const nodes = batchCodes(batch);
-  const packs = nodes.filter((n) => n.children.length).length;
+  const packs = nodes.filter((n) => n.pack).length;
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[520px]">

@@ -101,12 +101,26 @@ it("同批次不同单价分开展示", () => {
   expect(_merge([_b({}), _b({ price: 12 })])).toHaveLength(2);
 });
 
-import { buildCodes, countUnits } from "./inventory";
+import { PACK_SIZE, buildCodes, countUnits } from "./inventory";
 it("条码最多两层：满 10 个归入外包装，余数为单层散件，且全为数字", () => {
   const n = buildCodes("s", 23);
   expect(n).toHaveLength(5);
-  expect(n.slice(0, 2).every((x) => x.children.length === 10)).toBe(true);
-  expect(n.slice(2).every((x) => x.children.length === 0)).toBe(true);
+  const packs = n.filter((x) => x.pack);
+  const units = n.filter((x) => !x.pack);
+  expect(packs).toHaveLength(2);
+  expect(units).toHaveLength(3);
+  expect(packs.filter((x) => x.children.length).every((x) => x.children.length === PACK_SIZE)).toBe(true);
   expect(countUnits(n)).toBe(23);
   expect(n.flatMap((x) => [x.code, ...x.children]).every((c) => /^\d+$/.test(c))).toBe(true);
+});
+
+it("外包装可能仅有外包装码（无内码），整包按 PACK_SIZE 计数", () => {
+  const nodes = ["a", "b", "c", "d", "e", "f", "g", "h"]
+    .map((s) => buildCodes(s, 40))
+    .find((n) => n.some((x) => x.pack && x.children.length === 0));
+  expect(nodes).toBeTruthy();
+  const bare = nodes.filter((x) => x.pack && x.children.length === 0);
+  expect(bare.length).toBeGreaterThan(0);
+  expect(bare.every((x) => countUnits([x]) === PACK_SIZE)).toBe(true);
+  expect(countUnits(nodes)).toBe(40);
 });
