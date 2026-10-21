@@ -64,7 +64,7 @@ export function CodeTree({ nodes }: { nodes: CodeNode[] }) {
 }
 
 /** 数量数字即条码入口：点击后在弹窗中查看该数量对应的药品条码 */
-export function FlowCodes({ nodes, title, children }: { nodes: CodeNode[]; title: string; children: React.ReactNode }) {
+export function FlowCodes({ nodes, title, children, header }: { nodes: CodeNode[]; title: string; children: React.ReactNode; header?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -78,7 +78,7 @@ export function FlowCodes({ nodes, title, children }: { nodes: CodeNode[]; title
             <DialogTitle>药品条码</DialogTitle>
             <DialogDescription>{title}</DialogDescription>
           </DialogHeader>
-          <div className="max-h-[60vh] overflow-y-auto pr-1"><CodeTree nodes={nodes} /></div>
+          <div className="max-h-[60vh] space-y-3 overflow-y-auto pr-1">{header}<CodeTree nodes={nodes} /></div>
         </DialogContent>
       </Dialog>
     </>
