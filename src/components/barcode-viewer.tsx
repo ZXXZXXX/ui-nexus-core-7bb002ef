@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { groupDigits, type CodeNode } from "@/lib/inventory";
+import { groupDigits, PACK_SIZE, type CodeNode } from "@/lib/inventory";
 
 /* ------------------------------ 分层条码 ------------------------------ */
 
