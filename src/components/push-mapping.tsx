@@ -20,11 +20,11 @@ const SEED: Card[] = [
     { id: "s-606102", name: "续治", code: "606102", extName: "续治" },
     { id: "s-606103", name: "放弃", code: "606103", extName: "放弃" },
   ] },
-  { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "任务", subs: [
+  { id: "p-6004", title: "孕检回传", typeName: "孕检", typeCode: "6004", target: "基础事件", subs: [
     { id: "s-600401", name: "空怀", code: "600401", extName: "空怀" },
     { id: "s-600402", name: "怀孕", code: "600402", extName: "怀孕" },
   ] },
-  { id: "p-6025", title: "检测检查回传", typeName: "检测检查", typeCode: "6025", target: "任务", subs: [
+  { id: "p-6025", title: "检测检查回传", typeName: "检测检查", typeCode: "6025", target: "基础事件", subs: [
     { id: "s-602503", name: "血中酮体", code: "", extName: "血中酮体" },
     { id: "s-602518", name: "体温", code: "", extName: "体温" },
     { id: "s-602519", name: "尿液PH值", code: "", extName: "尿液PH值" },
