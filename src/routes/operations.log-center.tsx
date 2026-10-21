@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { categoryTag } from "@/lib/message-category";
 
 export const Route = createFileRoute("/operations/log-center")({
@@ -61,7 +62,7 @@ type PushLog = {
   time: string;
   name: string;
   category: string;
-  receiver: string;
+  receivers: string[];
   farm: string;
   channel: string;
   pushStatus: "已送达" | "发送失败";
@@ -73,18 +74,18 @@ type PushLog = {
 };
 
 const PUSH_LOGS: PushLog[] = [
-  { id: "MSG-90112", time: "2026-05-19 09:05:31", name: "工单临期提醒", category: "工单任务类", receiver: "李明", farm: "奶牛一场", channel: "企微消息", pushStatus: "发送失败", readStatus: "未读", readTime: "—", content: "疾病治疗工单 WO-2026-0142（牛号 2310）将于 10:00 到期，请尽快处理。", jump: "工单详情页", error: "企微接口频率限制（45009），已自动重试 2 次仍未送达；站内信渠道已送达。" },
-  { id: "MSG-90111", time: "2026-05-19 09:05:31", name: "工单临期提醒", category: "工单任务类", receiver: "李明", farm: "奶牛一场", channel: "站内信", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 09:14:02", content: "疾病治疗工单 WO-2026-0142（牛号 2310）将于 10:00 到期，请尽快处理。", jump: "工单详情页" },
-  { id: "MSG-90110", time: "2026-05-19 08:47:19", name: "待诊断提醒", category: "工单任务类", receiver: "张磊", farm: "奶牛一场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 08:52:40", content: "牛号 1872 上报疑似乳房炎，上报人 赵倩，请及时诊断。", jump: "工单详情页" },
-  { id: "MSG-90109", time: "2026-05-19 08:30:05", name: "药品临期提醒", category: "药品类", receiver: "王芳", farm: "奶牛一场", channel: "站内信", pushStatus: "已送达", readStatus: "未读", readTime: "—", content: "乳房炎抗生素 5mg（批号 B24A0631）将于 2026-06-30 过期，剩余 24。", jump: "三级库详情页" },
-  { id: "MSG-90108", time: "2026-05-19 08:15:20", name: "药品过期提醒", category: "药品类", receiver: "王芳", farm: "奶牛一场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 08:26:11", content: "口蹄疫疫苗 A 型（批号 B23K0518）已于 2026-05-10 过期，剩余 8，请勿使用。", jump: "三级库详情页" },
-  { id: "MSG-90107", time: "2026-05-19 08:00:02", name: "工单逾期提醒", category: "工单任务类", receiver: "赵倩", farm: "奶牛二场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "未读", readTime: "—", content: "修蹄工单 WO-2026-0138 已逾期 3 小时 20 分，执行人：赵倩，请尽快跟进。", jump: "工单列表页" },
-  { id: "MSG-90106", time: "2026-05-19 08:00:02", name: "药品堆积提醒", category: "药品类", receiver: "王芳", farm: "奶牛二场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 08:41:55", content: "戊二醛消毒液（批号 D24B0907）在三级库 B2-3 堆积 30，超过建议存量，请及时处理。", jump: "三级库详情页" },
-  { id: "MSG-90105", time: "2026-05-18 17:22:48", name: "实验室结果更新提醒", category: "其他类", receiver: "张磊", farm: "奶牛一场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-18 17:35:09", content: "牛号 2198 的乳汁体细胞检测实验室结果已更新，请查看。", jump: "牛只档案页" },
-  { id: "MSG-90104", time: "2026-05-18 16:10:33", name: "工单异常提醒", category: "工单任务类", receiver: "李明", farm: "奶牛一场", channel: "站内信", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-18 16:18:27", content: "工单 WO-2026-0131 出现异常：用药剂量超出处方上限，牛号 2198。", jump: "牛只档案页" },
-  { id: "MSG-90103", time: "2026-05-18 15:02:17", name: "角色权限变更提醒", category: "系统类", receiver: "孙悦", farm: "奶牛二场", channel: "站内信", pushStatus: "已送达", readStatus: "未读", readTime: "—", content: "您在 奶牛二场 的角色已变更为 场长，操作人 张磊。", jump: "不跳转" },
-  { id: "MSG-90102", time: "2026-05-18 14:40:06", name: "工单逾期提醒", category: "工单任务类", receiver: "赵倩", farm: "奶牛二场", channel: "企微消息", pushStatus: "发送失败", readStatus: "未读", readTime: "—", content: "驱虫工单 WO-2026-0129 已逾期 1 小时 05 分，执行人：赵倩，请尽快跟进。", jump: "工单列表页", error: "企微账号未绑定（errcode 60011），请让对方在企业微信中完成绑定。" },
-  { id: "MSG-90101", time: "2026-05-18 11:18:52", name: "待诊断提醒", category: "工单任务类", receiver: "张磊", farm: "奶牛二场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-18 11:24:30", content: "牛号 1902 上报疑似口蹄疫，上报人 孙悦，请及时诊断。", jump: "工单详情页" },
+  { id: "MSG-90112", time: "2026-05-19 09:05:31", name: "工单临期提醒", category: "工单任务类", receivers: ["李明"], farm: "奶牛一场", channel: "企微消息", pushStatus: "发送失败", readStatus: "未读", readTime: "—", content: "疾病治疗工单 WO-2026-0142（牛号 2310）将于 10:00 到期，请尽快处理。", jump: "工单详情页", error: "企微接口频率限制（45009），已自动重试 2 次仍未送达；站内信渠道已送达。" },
+  { id: "MSG-90111", time: "2026-05-19 09:05:31", name: "工单临期提醒", category: "工单任务类", receivers: ["李明"], farm: "奶牛一场", channel: "站内信", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 09:14:02", content: "疾病治疗工单 WO-2026-0142（牛号 2310）将于 10:00 到期，请尽快处理。", jump: "工单详情页" },
+  { id: "MSG-90110", time: "2026-05-19 08:47:19", name: "待诊断提醒", category: "工单任务类", receivers: ["张磊", "李明", "王芳", "赵倩", "孙悦", "周强", "陈静"], farm: "奶牛一场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 08:52:40", content: "牛号 1872 上报疑似乳房炎，上报人 赵倩，请及时诊断。", jump: "工单详情页" },
+  { id: "MSG-90109", time: "2026-05-19 08:30:05", name: "药品临期提醒", category: "药品类", receivers: ["王芳"], farm: "奶牛一场", channel: "站内信", pushStatus: "已送达", readStatus: "未读", readTime: "—", content: "乳房炎抗生素 5mg（批号 B24A0631）将于 2026-06-30 过期，剩余 24。", jump: "三级库详情页" },
+  { id: "MSG-90108", time: "2026-05-19 08:15:20", name: "药品过期提醒", category: "药品类", receivers: ["王芳"], farm: "奶牛一场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 08:26:11", content: "口蹄疫疫苗 A 型（批号 B23K0518）已于 2026-05-10 过期，剩余 8，请勿使用。", jump: "三级库详情页" },
+  { id: "MSG-90107", time: "2026-05-19 08:00:02", name: "工单逾期提醒", category: "工单任务类", receivers: ["赵倩", "张磊", "孙悦"], farm: "奶牛二场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "未读", readTime: "—", content: "修蹄工单 WO-2026-0138 已逾期 3 小时 20 分，执行人：赵倩，请尽快跟进。", jump: "工单列表页" },
+  { id: "MSG-90106", time: "2026-05-19 08:00:02", name: "药品堆积提醒", category: "药品类", receivers: ["王芳"], farm: "奶牛二场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-19 08:41:55", content: "戊二醛消毒液（批号 D24B0907）在三级库 B2-3 堆积 30，超过建议存量，请及时处理。", jump: "三级库详情页" },
+  { id: "MSG-90105", time: "2026-05-18 17:22:48", name: "实验室结果更新提醒", category: "其他类", receivers: ["张磊", "李明", "王芳", "赵倩", "孙悦", "周强", "陈静", "刘洋", "吴昊", "郑丽", "黄涛", "林峰"], farm: "奶牛一场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-18 17:35:09", content: "牛号 2198 的乳汁体细胞检测实验室结果已更新，请查看。", jump: "牛只档案页" },
+  { id: "MSG-90104", time: "2026-05-18 16:10:33", name: "工单异常提醒", category: "工单任务类", receivers: ["李明"], farm: "奶牛一场", channel: "站内信", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-18 16:18:27", content: "工单 WO-2026-0131 出现异常：用药剂量超出处方上限，牛号 2198。", jump: "牛只档案页" },
+  { id: "MSG-90103", time: "2026-05-18 15:02:17", name: "角色权限变更提醒", category: "系统类", receivers: ["孙悦"], farm: "奶牛二场", channel: "站内信", pushStatus: "已送达", readStatus: "未读", readTime: "—", content: "您在 奶牛二场 的角色已变更为 场长，操作人 张磊。", jump: "不跳转" },
+  { id: "MSG-90102", time: "2026-05-18 14:40:06", name: "工单逾期提醒", category: "工单任务类", receivers: ["赵倩"], farm: "奶牛二场", channel: "企微消息", pushStatus: "发送失败", readStatus: "未读", readTime: "—", content: "驱虫工单 WO-2026-0129 已逾期 1 小时 05 分，执行人：赵倩，请尽快跟进。", jump: "工单列表页", error: "企微账号未绑定（errcode 60011），请让对方在企业微信中完成绑定。" },
+  { id: "MSG-90101", time: "2026-05-18 11:18:52", name: "待诊断提醒", category: "工单任务类", receivers: ["张磊", "孙悦"], farm: "奶牛二场", channel: "站内信、企微消息", pushStatus: "已送达", readStatus: "已读", readTime: "2026-05-18 11:24:30", content: "牛号 1902 上报疑似口蹄疫，上报人 孙悦，请及时诊断。", jump: "工单详情页" },
 ];
 
 const statusTag = (s: ApiStatus) => (s === "成功" ? "tag-success" : s === "失败" ? "tag-danger" : "tag-warning");
@@ -242,7 +243,7 @@ function PushTable() {
         (l) =>
           (ch === "全部" || l.channel === ch) &&
           (rd === "全部" || l.readStatus === rd) &&
-          (!kw || l.name.includes(kw) || l.receiver.includes(kw) || l.id.includes(kw)),
+          (!kw || l.name.includes(kw) || l.receivers.some((r) => r.includes(kw)) || l.id.includes(kw)),
       ),
     [kw, ch, rd],
   );
@@ -274,7 +275,7 @@ function PushTable() {
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.time}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-foreground font-medium">{l.name}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${categoryTag(l.category)}`}>{l.category}</span></td>
-                  <td className="px-4 py-3 whitespace-nowrap text-foreground">{l.receiver}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-foreground"><ReceiverCell names={l.receivers} /></td>
                   <td className="px-4 py-3 whitespace-nowrap text-text-secondary">{l.channel}</td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${pushTag(l.pushStatus)}`}>{l.pushStatus}</span></td>
                   <td className="px-4 py-3 whitespace-nowrap"><span className={`tag ${readTag(l.readStatus)}`}>{l.readStatus}</span></td>
@@ -302,13 +303,20 @@ function PushTable() {
                 <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-body-sm">
                   <KV k="消息名称" v={detail.name} />
                   <KV k="消息类型" v={detail.category} />
-                  <KV k="接收人" v={detail.receiver} />
                   <KV k="牧场" v={detail.farm} />
                   <KV k="推送渠道" v={detail.channel} />
                   <KV k="推送状态" v={detail.pushStatus} />
                   <KV k="查看状态" v={detail.readStatus} />
                   <KV k="查看时间" v={detail.readTime} />
                   <KV k="跳转界面" v={detail.jump} />
+                </div>
+                <div>
+                  <div className="text-caption text-text-tertiary mb-1.5">接收人（{detail.receivers.length} 人）</div>
+                  <div className="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto rounded-md bg-surface-subtle p-3">
+                    {detail.receivers.map((r) => (
+                      <span key={r} className="rounded bg-background px-2 py-0.5 text-body-sm text-foreground border border-border">{r}</span>
+                    ))}
+                  </div>
                 </div>
                 {detail.error && (
                   <div className="callout-danger rounded-md p-3 text-body-sm text-foreground">
@@ -326,6 +334,21 @@ function PushTable() {
         </SheetContent>
       </Sheet>
     </>
+  );
+}
+
+function ReceiverCell({ names }: { names: string[] }) {
+  const full = names.join("、");
+  if (full.length <= 10) return <span>{full}</span>;
+  return (
+    <TooltipProvider delayDuration={150}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="cursor-default">{full.slice(0, 10)}…</span>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs whitespace-normal">共 {names.length} 人：{full}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
