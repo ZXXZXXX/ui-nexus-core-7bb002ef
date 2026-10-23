@@ -1308,7 +1308,7 @@ function RolePage() {
                                 ))}
                               </div>
                               {m.hint ? (
-                                <div className="mt-auto whitespace-nowrap pt-4 text-right text-caption text-text-tertiary">
+                                <div className="whitespace-nowrap pt-3 text-caption text-text-tertiary">
                                   {m.hint}
                                 </div>
                               ) : null}
