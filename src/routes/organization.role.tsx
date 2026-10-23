@@ -153,7 +153,6 @@ const navSpec: NavGroupDef[] = [
         key: "drug-file",
         name: "药品档案",
         actions: [
-          { key: "create", name: "新建药品" },
           { key: "edit", name: "编辑 / 调价" },
           { key: "delete", name: "删除" },
           { key: "export", name: "导出" },
@@ -163,8 +162,6 @@ const navSpec: NavGroupDef[] = [
         key: "stock",
         name: "药品库存",
         actions: [
-          { key: "inbound", name: "入库登记" },
-          { key: "adjust", name: "库存调整" },
           { key: "export", name: "导出" },
         ],
       },
@@ -172,8 +169,6 @@ const navSpec: NavGroupDef[] = [
         key: "transfer",
         name: "调拨记录",
         actions: [
-          { key: "create", name: "发起调拨" },
-          { key: "audit", name: "审核" },
           { key: "export", name: "导出" },
         ],
       },
@@ -181,7 +176,6 @@ const navSpec: NavGroupDef[] = [
         key: "dispense",
         name: "取药记录",
         actions: [
-          { key: "create", name: "登记取药" },
           { key: "export", name: "导出" },
         ],
       },
@@ -189,8 +183,6 @@ const navSpec: NavGroupDef[] = [
         key: "loss",
         name: "损耗管理",
         actions: [
-          { key: "create", name: "登记损耗" },
-          { key: "audit", name: "判定 / 审核" },
           { key: "export", name: "导出" },
         ],
       },
