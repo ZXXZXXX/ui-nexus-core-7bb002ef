@@ -1,7 +1,7 @@
 import { createFileRoute, useParams, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { MobileShell } from "@/components/mobile-shell";
-import { ArrowRight, ArrowRightLeft, LogOut, MapPin, Search } from "lucide-react";
+import { ArrowRight, ArrowRightLeft, ChevronDown, LogOut, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
@@ -81,95 +81,29 @@ function BatchBanner({ count }: { count: number }) {
 
 
 const TRANSFER_REASONS = [
-  "泌乳阶段调整",
-  "干奶转入",
-  "产前转入产房",
-  "产后转出",
-  "并群优化",
-  "隔离治疗",
-  "康复转出",
-  "淘汰待售",
-  "栏舍维修",
-  "饲养密度调整",
+  "犊牛转群",
+  "后备牛转群",
+  "育成牛转群",
+  "青年牛转群",
+  "围产牛转群",
+  "泌乳牛转群",
+  "干奶牛转群",
+  "病牛隔离转群",
+  "淘汰转群",
+  "并群调整转群",
 ];
-
-function ReasonPicker({
-  open,
-  onOpenChange,
-  value,
-  onChange,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  const [q, setQ] = useState("");
-  const kw = q.trim();
-  const list = kw ? TRANSFER_REASONS.filter((t) => t.includes(kw)) : TRANSFER_REASONS;
-  const canCreate = !!kw && !TRANSFER_REASONS.some((t) => t === kw);
-
-  return (
-    <Sheet open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) setQ(""); }}>
-      <SheetContent side="bottom" className="rounded-t-2xl p-0 max-h-[75vh] flex flex-col">
-        <SheetHeader className="px-4 pt-4 pb-2 text-left">
-          <SheetTitle className="text-section-title">选择转栏原因</SheetTitle>
-        </SheetHeader>
-        <div className="px-4 pb-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary" />
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="输入关键词搜索，未命中可直接新建"
-              className="w-full h-10 pl-9 pr-3 rounded-lg bg-card border border-border text-body-sm placeholder:text-text-tertiary focus:outline-none focus:border-primary"
-            />
-          </div>
-        </div>
-        <div className="px-4 pb-6 flex-1 min-h-0 overflow-y-auto">
-          {list.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => { onChange(t); onOpenChange(false); setQ(""); }}
-              className={`w-full h-12 px-1 flex items-center justify-between text-body border-b border-border/60 last:border-b-0 ${
-                value === t ? "text-primary" : "text-foreground"
-              }`}
-            >
-              <span className="truncate">{t}</span>
-              {value === t && <Check className="h-4 w-4 text-primary shrink-0" />}
-            </button>
-          ))}
-          {list.length === 0 && !canCreate && (
-            <div className="py-6 text-center text-caption text-text-tertiary">无匹配结果</div>
-          )}
-          {canCreate && (
-            <button
-              type="button"
-              onClick={() => { onChange(kw); onOpenChange(false); setQ(""); }}
-              className="mt-3 inline-flex items-center h-10 px-3 rounded-lg border border-dashed border-primary/60 bg-brand-subtle text-primary text-body-sm"
-            >
-              新建「{kw}」
-            </button>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-}
 
 function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () => void; batchCount?: number }) {
   const currentBarn = "3 号牛舍";
   const [to, setTo] = useState("");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [reasons, setReasons] = useState<string[]>([]);
-  const [reasonOpen, setReasonOpen] = useState(false);
   const [media, setMedia] = useState<number[]>([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const submit = () => {
     if (!to) return toast.error("请选择转入栏舍");
-    if (reasons.length === 0) return toast.error("请选择或输入转栏原因");
+    if (reasons.length === 0) return toast.error("请选择转群原因");
     setConfirmOpen(true);
   };
   const confirm = () => {
@@ -242,23 +176,23 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
             onOpenChange={setPickerOpen}
           />
           <Field label="转群原因" required>
-            <button
-              type="button"
-              onClick={() => setReasonOpen(true)}
-              className={`w-full h-11 px-3 inline-flex items-center rounded-lg bg-card border text-body-sm ${
-                reasons[0] ? "border-primary text-foreground" : "border-border text-text-tertiary"
-              }`}
-            >
-              <Search className="h-4 w-4 mr-2 text-text-tertiary" />
-              <span className="flex-1 text-left truncate">{reasons[0] || "搜索或选择转栏原因"}</span>
-            </button>
+            <div className="relative">
+              <select
+                value={reasons[0] ?? ""}
+                onChange={(e) => setReasons(e.target.value ? [e.target.value] : [])}
+                className={`w-full h-11 px-3 pr-9 rounded-lg bg-card border text-body-sm appearance-none cursor-pointer outline-none focus:border-primary ${
+                  reasons[0] ? "border-primary text-foreground" : "border-border text-text-tertiary"
+                }`}
+              >
+                <option value="">请选择转群原因</option>
+                {TRANSFER_REASONS.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-text-tertiary pointer-events-none" />
+            </div>
           </Field>
-          <ReasonPicker
-            open={reasonOpen}
-            onOpenChange={setReasonOpen}
-            value={reasons[0] ?? ""}
-            onChange={(v) => setReasons(v ? [v] : [])}
-          />
+
           <Field label="拍照记录">
             <MediaGrid items={media} setItems={setMedia} max={6} hideVideo caption="照片（选填）" />
           </Field>
