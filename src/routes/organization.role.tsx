@@ -294,28 +294,7 @@ const woModule = (t: string): MiniModuleDef => ({
   ],
 });
 
-/** 基础事件任务类型：与小程序首页任务清单一致 */
-const BASIC_EVENT_TYPES = [
-  "体温检查",
-  "子宫分泌物检查",
-  "酮病检查",
-  "尿液 PH 值检查",
-  "布病 A19 免疫抗体检测",
-  "IBR/BVDV 免疫抗体检测",
-  "孕检",
-  "转群记录",
-];
-
-/** 每类基础事件单独配置：查看 / 执行 */
-const evModule = (t: string): MiniModuleDef => ({
-  key: `ev-${t}`,
-  name: t,
-  group: "基础事件任务",
-  funcs: [
-    { key: "view", name: "查看" },
-    { key: "execute", name: "执行" },
-  ],
-});
+/** 基础事件任务：不按事件类型拆分，统一配置 查看 / 执行（涵盖孕检、转群记录等全部基础事件） */
 
 const miniSpec: MiniModuleDef[] = [
   {
@@ -344,7 +323,14 @@ const miniSpec: MiniModuleDef[] = [
     ],
   },
   ...WO_ORDER_TYPES.map(woModule),
-  ...BASIC_EVENT_TYPES.map(evModule),
+  {
+    key: "event-task",
+    name: "基础事件任务",
+    funcs: [
+      { key: "view", name: "查看" },
+      { key: "execute", name: "执行" },
+    ],
+  },
   {
     key: "cattle",
     name: "牛只档案",
@@ -364,10 +350,8 @@ const woAssistant = Object.fromEntries(
   ]),
 ) as Record<string, string[]>;
 
-/** 兽医助理：基础事件任务各类型可查看 / 执行 */
-const evAssistant = Object.fromEntries(
-  BASIC_EVENT_TYPES.map((t) => [`ev-${t}`, ["view", "execute"]]),
-) as Record<string, string[]>;
+/** 兽医助理：基础事件任务可查看 / 执行 */
+const evAssistant = { "event-task": ["view", "execute"] } as Record<string, string[]>;
 
 /** 工作台可选的 4 套定制化看板视图 */
 export type WorkbenchView = "group" | "region" | "farm-report" | "farm-internal";
