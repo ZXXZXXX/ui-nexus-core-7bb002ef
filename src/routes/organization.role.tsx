@@ -1283,7 +1283,7 @@ function RolePage() {
                                       <span className="text-body-sm text-text-secondary">{f.name}</span>
                                     </label>
                                     {f.views && fs[f.key].on ? (
-                                      <div className="ml-6 flex items-center gap-4">
+                                      <div className="ml-6 flex items-center gap-3">
                                         {f.views.map((v) => (
                                           <label
                                             key={v.key}
@@ -1299,7 +1299,7 @@ function RolePage() {
                                               checked={(fs[f.key].view ?? f.views![0]!.key) === v.key}
                                               onChange={() => setMiniView(m.key, f.key, v.key)}
                                             />
-                                            <span className="text-caption text-text-tertiary">{v.name}</span>
+                                            <span className="text-caption text-text-tertiary whitespace-nowrap">{v.name}</span>
                                           </label>
                                         ))}
                                       </div>
