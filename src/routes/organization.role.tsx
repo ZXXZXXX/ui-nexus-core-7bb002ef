@@ -1265,53 +1265,39 @@ function RolePage() {
                           { key: "abort", name: "终止" },
                         ];
                         return (
-                          <table className="w-full text-body-sm">
-                            <thead>
-                              <tr className="bg-surface-subtle text-text-secondary">
-                                <th className="h-10 px-3 text-left font-medium">工单类型</th>
-                                {cols.map((c) => (
-                                  <th key={c.key} className="h-10 px-3 text-left font-medium">{c.name}</th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {rows.map((r) => {
-                                const fs = cur.mini[r.key];
-                                const rAll = r.funcs.every((f) => fs[f.key].on);
-                                const rAny = r.funcs.some((f) => fs[f.key].on);
-                                return (
-                                  <tr key={r.key} className="border-b border-border">
-                                    <td className="h-12 px-3">
-                                      <label className="inline-flex items-center gap-2">
+                          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+                            {rows.map((r) => {
+                              const fs = cur.mini[r.key];
+                              const rAll = r.funcs.every((f) => fs[f.key].on);
+                              const rAny = r.funcs.some((f) => fs[f.key].on);
+                              return (
+                                <div key={r.key} className="rounded-md border border-border p-3">
+                                  <label className="inline-flex items-center gap-2">
+                                    <Checkbox
+                                      checked={rAll ? true : rAny ? "indeterminate" : false}
+                                      disabled={!editable}
+                                      onCheckedChange={(v) => setMiniModule(r.key, !!v)}
+                                      className="h-[16px] w-[16px]"
+                                    />
+                                    <span className="text-body-sm font-medium text-foreground">{r.name}</span>
+                                  </label>
+                                  <div className="mt-2 ml-6 flex flex-wrap gap-x-4 gap-y-2">
+                                    {cols.filter((c) => fs[c.key]).map((c) => (
+                                      <label key={c.key} className="inline-flex items-center gap-1.5">
                                         <Checkbox
-                                          checked={rAll ? true : rAny ? "indeterminate" : false}
+                                          checked={fs[c.key].on}
                                           disabled={!editable}
-                                          onCheckedChange={(v) => setMiniModule(r.key, !!v)}
-                                          className="h-[16px] w-[16px]"
+                                          onCheckedChange={(v) => setMiniFunc(r.key, c.key, !!v)}
+                                          className="h-[14px] w-[14px]"
                                         />
-                                        <span className="text-foreground">{r.name}</span>
+                                        <span className="text-caption text-text-secondary">{c.name}</span>
                                       </label>
-                                    </td>
-                                    {cols.map((c) => (
-                                      <td key={c.key} className="h-12 px-3">
-                                        {fs[c.key] ? (
-                                          <Checkbox
-                                            checked={fs[c.key].on}
-                                            disabled={!editable}
-                                            onCheckedChange={(v) => setMiniFunc(r.key, c.key, !!v)}
-                                            className="h-[16px] w-[16px]"
-                                            aria-label={`${r.name}-${c.name}`}
-                                          />
-                                        ) : (
-                                          <span className="text-text-tertiary">—</span>
-                                        )}
-                                      </td>
                                     ))}
-                                  </tr>
-                                );
-                              })}
-                            </tbody>
-                          </table>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         );
                       })() : null}
                       {miniSpec
