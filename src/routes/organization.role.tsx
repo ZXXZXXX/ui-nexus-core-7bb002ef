@@ -279,7 +279,7 @@ type MiniModuleDef = {
   funcs: MiniFuncDef[];
 };
 
-/** 每类工单单独配置：查看 / 上报（部分类型无）/ 诊断（仅部分类型）/ 执行 / 终止 / 异常消息接收 */
+/** 每类工单单独配置：查看 / 上报（部分类型无）/ 诊断（仅部分类型）/ 执行 / 终止 / 消息接收 */
 const woModule = (t: string): MiniModuleDef => ({
   key: `wo-${t}`,
   name: `${t}工单`,
