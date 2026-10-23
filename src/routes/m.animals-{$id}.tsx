@@ -475,8 +475,8 @@ function AnimalDetailPage() {
               />
               <RecordOption
                 icon={<ArrowRightLeft className="h-5 w-5" />}
-                title="转栏/转群"
-                desc="调整所在牛舍 / 栏位"
+                title="转群记录"
+                desc="记录牛只转群信息"
                 onClick={() => {
                   setRecordOpen(false);
                   navigate({ to: "/m/events/$type/$id", params: { type: "transfer", id: a.id } });
