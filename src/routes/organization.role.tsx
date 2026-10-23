@@ -1266,6 +1266,11 @@ function RolePage() {
                           const fs = cur.mini[m.key];
                           return (
                             <div key={m.key} className="flex flex-col flex-1 min-h-0">
+                              {m.hint ? (
+                                <div className="whitespace-nowrap pb-2 text-caption text-text-tertiary">
+                                  {m.hint}
+                                </div>
+                              ) : null}
                               <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2">
                                 {m.funcs.map((f) => (
                                   <div key={f.key} className="flex flex-col gap-1.5">
@@ -1307,11 +1312,6 @@ function RolePage() {
                                   </div>
                                 ))}
                               </div>
-                              {m.hint ? (
-                                <div className="whitespace-nowrap pt-3 text-caption text-text-tertiary">
-                                  {m.hint}
-                                </div>
-                              ) : null}
 
                             </div>
                           );
