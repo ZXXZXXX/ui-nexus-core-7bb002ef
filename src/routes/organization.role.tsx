@@ -1218,39 +1218,34 @@ function RolePage() {
                         </div>
                       ) : null}
                       {miniSpec.map((m, i) => {
-                        const fs = cur.mini[m.key];
-                        const rowAll = m.funcs.every((f) => fs[f.key].on);
-                        const rowAny = m.funcs.some((f) => fs[f.key].on);
-                        const active = miniActive === m.key;
-                        const showGroup = !!m.group && miniSpec[i - 1]?.group !== m.group;
+                        if (m.group && miniSpec[i - 1]?.group === m.group) return null;
+                        const members = m.group ? miniSpec.filter((x) => x.group === m.group) : [m];
+                        const entryKey = m.group ? `group:${m.group}` : m.key;
+                        const all = members.every((x) => x.funcs.every((f) => cur.mini[x.key][f.key].on));
+                        const any = members.some((x) => x.funcs.some((f) => cur.mini[x.key][f.key].on));
+                        const active = miniActive === entryKey;
                         return (
-                          <Fragment key={m.key}>
-                            {showGroup ? (
-                              <div className="px-3 pt-2.5 pb-1 text-caption text-text-tertiary">
-                                {m.group}
-                              </div>
-                            ) : null}
+                          <Fragment key={entryKey}>
                           <div
-                            key={m.key}
-                            onClick={() => setMiniActive(m.key)}
+                            onClick={() => setMiniActive(entryKey)}
                             className={`flex items-center gap-2 px-3 py-2 cursor-pointer border-l-2 transition-colors ${
                               active ? "border-primary bg-card" : "border-transparent hover:bg-card/70"
                             }`}
                           >
                             <Checkbox
-                              checked={rowAll ? true : rowAny ? "indeterminate" : false}
+                              checked={all ? true : any ? "indeterminate" : false}
                               disabled={!editable}
-                              onCheckedChange={(v) => setMiniModule(m.key, !!v)}
+                              onCheckedChange={(v) => members.forEach((x) => setMiniModule(x.key, !!v))}
                               onClick={(e) => e.stopPropagation()}
                               className="h-[16px] w-[16px]"
-                              aria-label={`整行：${m.name}`}
+                              aria-label={`整行：${m.group ?? m.name}`}
                             />
                             <span
                               className={`text-body-sm truncate ${
                                 active ? "text-primary font-medium" : "text-foreground"
                               }`}
                             >
-                              {m.name}
+                              {m.group ? "工单" : m.name}
                             </span>
                           </div>
                           </Fragment>
@@ -1260,6 +1255,66 @@ function RolePage() {
 
                     {/* 右：功能权限 */}
                     <div className="flex-1 min-w-0 p-3 flex flex-col">
+                      {miniActive.startsWith("group:") ? (() => {
+                        const g = miniActive.slice(6);
+                        const rows = miniSpec.filter((x) => x.group === g);
+                        const cols = [
+                          { key: "view", name: "查看" },
+                          { key: "report", name: "上报" },
+                          { key: "diagnose", name: "诊断" },
+                          { key: "execute", name: "执行" },
+                          { key: "abort", name: "终止" },
+                        ];
+                        return (
+                          <table className="w-full text-body-sm">
+                            <thead>
+                              <tr className="bg-surface-subtle text-text-secondary">
+                                <th className="h-10 px-3 text-left font-medium">工单类型</th>
+                                {cols.map((c) => (
+                                  <th key={c.key} className="h-10 px-3 text-left font-medium">{c.name}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {rows.map((r) => {
+                                const fs = cur.mini[r.key];
+                                const rAll = r.funcs.every((f) => fs[f.key].on);
+                                const rAny = r.funcs.some((f) => fs[f.key].on);
+                                return (
+                                  <tr key={r.key} className="border-b border-border">
+                                    <td className="h-12 px-3">
+                                      <label className="inline-flex items-center gap-2">
+                                        <Checkbox
+                                          checked={rAll ? true : rAny ? "indeterminate" : false}
+                                          disabled={!editable}
+                                          onCheckedChange={(v) => setMiniModule(r.key, !!v)}
+                                          className="h-[16px] w-[16px]"
+                                        />
+                                        <span className="text-foreground">{r.name}</span>
+                                      </label>
+                                    </td>
+                                    {cols.map((c) => (
+                                      <td key={c.key} className="h-12 px-3">
+                                        {fs[c.key] ? (
+                                          <Checkbox
+                                            checked={fs[c.key].on}
+                                            disabled={!editable}
+                                            onCheckedChange={(v) => setMiniFunc(r.key, c.key, !!v)}
+                                            className="h-[16px] w-[16px]"
+                                            aria-label={`${r.name}-${c.name}`}
+                                          />
+                                        ) : (
+                                          <span className="text-text-tertiary">—</span>
+                                        )}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        );
+                      })() : null}
                       {miniSpec
                         .filter((m) => m.key === miniActive)
                         .map((m) => {
