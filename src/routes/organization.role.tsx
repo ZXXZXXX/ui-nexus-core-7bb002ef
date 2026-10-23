@@ -266,6 +266,8 @@ const navSpec: NavGroupDef[] = [
 const WO_ORDER_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干奶", "驱虫"];
 /** 有诊断环节的工单类型，其余类型上报后无需诊断 */
 const DIAGNOSABLE_WO = ["疾病治疗", "产后护理"];
+/** 无「上报」环节的工单类型（由平台统一下发，现场只需执行） */
+const NO_REPORT_WO = ["疫苗免疫", "驱虫"];
 
 type MiniViewDef = { key: string; name: string };
 type MiniFuncDef = { key: string; name: string; views?: MiniViewDef[] };
@@ -277,17 +279,18 @@ type MiniModuleDef = {
   funcs: MiniFuncDef[];
 };
 
-/** 每类工单单独配置：查看 / 上报 / 诊断（仅部分类型）/ 执行 / 终止 */
+/** 每类工单单独配置：查看 / 上报（部分类型无）/ 诊断（仅部分类型）/ 执行 / 终止 / 异常消息接收 */
 const woModule = (t: string): MiniModuleDef => ({
   key: `wo-${t}`,
   name: `${t}工单`,
   group: "各类工单",
   funcs: [
     { key: "view", name: "查看" },
-    { key: "report", name: "上报" },
+    ...(NO_REPORT_WO.includes(t) ? [] : [{ key: "report", name: "上报" }]),
     ...(DIAGNOSABLE_WO.includes(t) ? [{ key: "diagnose", name: "诊断" }] : []),
     { key: "execute", name: "执行" },
     { key: "abort", name: "终止" },
+    { key: "abnormal", name: "异常消息接收" },
   ],
 });
 
@@ -300,7 +303,7 @@ const BASIC_EVENT_TYPES = [
   "布病 A19 免疫抗体检测",
   "IBR/BVDV 免疫抗体检测",
   "孕检",
-  "转群/转栏",
+  "转群记录",
 ];
 
 /** 每类基础事件单独配置：查看 / 执行 */
@@ -353,9 +356,12 @@ const miniSpec: MiniModuleDef[] = [
   },
 ];
 
-/** 兽医助理：各工单仅查看 / 上报 / 执行 */
+/** 兽医助理：各工单仅查看 / 上报（部分类型无）/ 执行 */
 const woAssistant = Object.fromEntries(
-  WO_ORDER_TYPES.map((t) => [`wo-${t}`, ["view", "report", "execute"]]),
+  WO_ORDER_TYPES.map((t) => [
+    `wo-${t}`,
+    NO_REPORT_WO.includes(t) ? ["view", "execute"] : ["view", "report", "execute"],
+  ]),
 ) as Record<string, string[]>;
 
 /** 兽医助理：基础事件任务各类型可查看 / 执行 */
