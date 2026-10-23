@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppHeader } from "@/components/app-header";
 import { Card } from "@/components/ui/card";
@@ -262,27 +262,44 @@ const navSpec: NavGroupDef[] = [
 
 
 /** 小程序模块与功能权限 */
-const WO_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干奶", "驱虫", "普修"];
-const EVENT_TYPES = ["产犊", "基础检查", "转栏 / 转群", "离场"];
+/** 6 类工单，逐类列出 */
+const WO_ORDER_TYPES = ["疾病治疗", "疫苗免疫", "产后护理", "修蹄", "干奶", "驱虫"];
+/** 有诊断环节的工单类型，其余类型上报后无需诊断 */
+const DIAGNOSABLE_WO = ["疾病治疗", "产后护理"];
 
-type MiniScope = "wo" | "event";
 type MiniViewDef = { key: string; name: string };
-type MiniFuncDef = { key: string; name: string; scope?: MiniScope; views?: MiniViewDef[] };
-type MiniModuleDef = { key: string; name: string; funcs: MiniFuncDef[] };
+type MiniFuncDef = { key: string; name: string; views?: MiniViewDef[] };
+type MiniModuleDef = {
+  key: string;
+  name: string;
+  group?: string;
+  hint?: string;
+  funcs: MiniFuncDef[];
+};
 
-const scopeOptions = (s: MiniScope) => (s === "wo" ? WO_TYPES : EVENT_TYPES);
-const scopeLabel = (s: MiniScope) =>
-  s === "wo" ? "选择对该角色开放的工单类型" : "选择对该角色开放的基础事件类型";
+/** 每类工单单独配置：查看 / 上报 / 诊断（仅部分类型）/ 执行 / 终止 */
+const woModule = (t: string): MiniModuleDef => ({
+  key: `wo-${t}`,
+  name: `${t}工单`,
+  group: "各类工单",
+  funcs: [
+    { key: "view", name: "查看" },
+    { key: "report", name: "上报" },
+    ...(DIAGNOSABLE_WO.includes(t) ? [{ key: "diagnose", name: "诊断" }] : []),
+    { key: "execute", name: "执行" },
+    { key: "abort", name: "终止" },
+  ],
+});
 
 const miniSpec: MiniModuleDef[] = [
   {
     key: "home",
-    name: "首页",
+    name: "首页概览",
+    hint: "运营概览 / 工作概览 二选一",
     funcs: [
-      { key: "work-status", name: "签到卡片" },
       {
-        key: "ops",
-        name: "查看运营概览",
+        key: "overview",
+        name: "查看概览",
         views: [
           { key: "ops", name: "运营概览" },
           { key: "work", name: "工作概览" },
@@ -290,76 +307,40 @@ const miniSpec: MiniModuleDef[] = [
       },
     ],
   },
-  {
-    key: "report",
-    name: "现场上报",
-    funcs: [
-      { key: "health", name: "健康上报" },
-      { key: "loss", name: "药品损耗上报" },
-      { key: "return", name: "药品退料上报" },
-    ],
-  },
+  { key: "drug-report", name: "药品上报", funcs: [{ key: "report", name: "上报药品" }] },
   {
     key: "prep",
     name: "备药",
+    hint: "可多选",
     funcs: [
-      { key: "prep-done", name: "完成备药" },
-      { key: "level3", name: "查询三级库" },
+      { key: "prep", name: "取药备药登记" },
+      { key: "level3", name: "三级库查看" },
     ],
   },
+  ...WO_ORDER_TYPES.map(woModule),
   {
-    key: "task",
-    name: "任务处理",
+    key: "event-task",
+    name: "基础事件任务",
     funcs: [
-      { key: "view", name: "查看任务" },
-      { key: "diagnose", name: "工单任务 - 诊断", scope: "wo" },
-      { key: "execute-wo", name: "工单任务 - 执行", scope: "wo" },
-      { key: "review", name: "工单任务 - 复查" },
-      { key: "execute-event", name: "基础事件任务", scope: "event" },
-      { key: "abnormal", name: "异常排查任务" },
-      { key: "assign", name: "指定任务责任人" },
-      { key: "batch", name: "批量执行任务" },
-    ],
-  },
-  {
-    key: "workorder",
-    name: "工单管理",
-    funcs: [
-      { key: "view", name: "查看工单", scope: "wo" },
-      { key: "abort", name: "终止工单", scope: "wo" },
-    ],
-  },
-  {
-    key: "kb",
-    name: "知识查询",
-    funcs: [
-      { key: "symptom", name: "查询症状" },
-      { key: "disease", name: "查询疾病" },
-      { key: "drug", name: "查询药品" },
+      { key: "view", name: "查看" },
+      { key: "execute", name: "执行" },
     ],
   },
   {
     key: "cattle",
     name: "牛只档案",
     funcs: [
-      { key: "view", name: "查看牛只档案" },
-      { key: "alert", name: "处理异常预警" },
-      { key: "calving", name: "记录产犊" },
-      { key: "exam", name: "记录基础检查" },
-      { key: "transfer", name: "记录转栏 / 转群" },
-      { key: "leave", name: "记录离场" },
-    ],
-  },
-  { key: "message", name: "消息中心", funcs: [{ key: "view", name: "查看消息" }] },
-  {
-    key: "me",
-    name: "个人中心",
-    funcs: [
-      { key: "drafts", name: "管理健康上报草稿" },
-      { key: "feedback", name: "提交帮助与反馈" },
+      { key: "view", name: "查看" },
+      { key: "calving", name: "产犊记录" },
+      { key: "leave", name: "离场记录" },
     ],
   },
 ];
+
+/** 兽医助理：各工单仅查看 / 上报 / 执行 */
+const woAssistant = Object.fromEntries(
+  WO_ORDER_TYPES.map((t) => [`wo-${t}`, ["view", "report", "execute"]]),
+) as Record<string, string[]>;
 
 /** 工作台可选的 4 套定制化看板视图 */
 export type WorkbenchView = "group" | "region" | "farm-report" | "farm-internal";
@@ -375,7 +356,7 @@ type LeafPerm = { view: boolean; actions: Record<string, boolean> };
 type GroupPerm = { view: boolean; leaves: Record<string, LeafPerm>; actions: Record<string, boolean> };
 type NavPerms = Record<string, GroupPerm>;
 type PcPerms = { allowLogin: boolean; nav: NavPerms; workbenchView: WorkbenchView };
-type MiniFuncPerm = { on: boolean; scope: string[]; view?: string };
+type MiniFuncPerm = { on: boolean; view?: string };
 type MiniPerms = Record<string, Record<string, MiniFuncPerm>>;
 type RolePerms = Record<RoleKey, { pc: PcPerms; mini: MiniPerms }>;
 
@@ -411,7 +392,6 @@ function buildMini(pick?: (mKey: string, fKey: string) => boolean): MiniPerms {
     acc[m.key] = m.funcs.reduce((a, f) => {
       a[f.key] = {
         on: pick ? pick(m.key, f.key) : false,
-        scope: f.scope ? [...scopeOptions(f.scope)] : [],
         ...(f.views ? { view: f.views[0]!.key } : {}),
       };
       return a;
@@ -443,30 +423,17 @@ const defaultPerms: RolePerms = {
   },
   vet: {
     pc: partialPc(["workorder", "drug", "diagnosis", "archive"]),
-    mini: partialMini({
-      home: true,
-      report: true,
-      prep: true,
-      task: true,
-      workorder: true,
-      kb: true,
-      cattle: true,
-      message: true,
-      me: true,
-    }),
+    mini: fullMini(true),
   },
   assistant: {
     pc: { allowLogin: false, workbenchView: "farm-internal", nav: buildNav(false) },
     mini: partialMini({
-      home: ["work-status"],
-      report: ["health", "loss", "return"],
+      home: ["overview"],
+      "drug-report": true,
       prep: true,
-      task: ["view", "execute-wo", "execute-event", "batch"],
-      workorder: ["view"],
-      kb: true,
-      cattle: ["view", "exam", "transfer"],
-      message: true,
-      me: true,
+      ...woAssistant,
+      "event-task": ["view", "execute"],
+      cattle: ["view"],
     }),
   },
 };
@@ -671,7 +638,6 @@ function RolePage() {
       },
     }));
   };
-  const [batchNoticeOpen, setBatchNoticeOpen] = useState(false);
   const mutateMini = (fn: (m: MiniPerms) => MiniPerms) => {
     if (!drawerRole || !editable) return;
     setPerms((prev) => ({
@@ -681,7 +647,6 @@ function RolePage() {
   };
   /** 单个功能开关 */
   const setMiniFunc = (mKey: string, fKey: string, v: boolean) => {
-    if (v && mKey === "task" && fKey === "batch") setBatchNoticeOpen(true);
     mutateMini((m) => ({
       ...m,
       [mKey]: { ...m[mKey], [fKey]: { ...m[mKey][fKey], on: v } },
@@ -710,38 +675,6 @@ function RolePage() {
         ]),
       ),
     );
-  /** 全局可选范围（工单类型 / 基础事件类型）——所有功能通用，仅需选择一次 */
-  const globalScope = (kind: MiniScope): string[] => {
-    for (const m of miniSpec) {
-      for (const f of m.funcs) {
-        if (f.scope === kind) return cur?.mini[m.key][f.key].scope ?? [];
-      }
-    }
-    return [];
-  };
-  const toggleGlobalScope = (kind: MiniScope, t: string) =>
-    mutateMini((m) => {
-      const curList = (() => {
-        for (const mod of miniSpec) {
-          for (const f of mod.funcs) {
-            if (f.scope === kind) return m[mod.key][f.key].scope;
-          }
-        }
-        return [] as string[];
-      })();
-      const next = curList.includes(t) ? curList.filter((x) => x !== t) : [...curList, t];
-      return Object.fromEntries(
-        miniSpec.map((mod) => [
-          mod.key,
-          Object.fromEntries(
-            mod.funcs.map((f) => [
-              f.key,
-              f.scope === kind ? { ...m[mod.key][f.key], scope: next } : m[mod.key][f.key],
-            ]),
-          ),
-        ]),
-      ) as MiniPerms;
-    });
 
 
   const handleConfirmToggle = () => {
@@ -1261,7 +1194,7 @@ function RolePage() {
                   </div>
                   <p className="text-caption text-text-tertiary flex items-start gap-1.5 -mt-1">
                     <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                    请按模块配置功能权限；涉及工单任务的功能可进一步限定可选范围。
+                    请按模块配置该角色在小程序中的功能权限。
                   </p>
 
                   <div className="rounded-md border border-border bg-card overflow-hidden flex">
@@ -1284,12 +1217,19 @@ function RolePage() {
                           <span className="text-caption text-text-tertiary">全选模块</span>
                         </div>
                       ) : null}
-                      {miniSpec.map((m) => {
+                      {miniSpec.map((m, i) => {
                         const fs = cur.mini[m.key];
                         const rowAll = m.funcs.every((f) => fs[f.key].on);
                         const rowAny = m.funcs.some((f) => fs[f.key].on);
                         const active = miniActive === m.key;
+                        const showGroup = !!m.group && miniSpec[i - 1]?.group !== m.group;
                         return (
+                          <Fragment key={m.key}>
+                            {showGroup ? (
+                              <div className="px-3 pt-2.5 pb-1 text-caption text-text-tertiary">
+                                {m.group}
+                              </div>
+                            ) : null}
                           <div
                             key={m.key}
                             onClick={() => setMiniActive(m.key)}
@@ -1313,6 +1253,7 @@ function RolePage() {
                               {m.name}
                             </span>
                           </div>
+                          </Fragment>
                         );
                       })}
                     </div>
@@ -1325,6 +1266,11 @@ function RolePage() {
                           const fs = cur.mini[m.key];
                           return (
                             <div key={m.key} className="flex flex-col flex-1 min-h-0">
+                              {m.hint ? (
+                                <div className="whitespace-nowrap pb-2 text-caption text-text-tertiary">
+                                  {m.hint}
+                                </div>
+                              ) : null}
                               <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-5 gap-y-2">
                                 {m.funcs.map((f) => (
                                   <div key={f.key} className="flex flex-col gap-1.5">
@@ -1342,7 +1288,7 @@ function RolePage() {
                                       <span className="text-body-sm text-text-secondary">{f.name}</span>
                                     </label>
                                     {f.views && fs[f.key].on ? (
-                                      <div className="ml-6 flex items-center gap-4">
+                                      <div className="ml-6 flex items-center gap-3">
                                         {f.views.map((v) => (
                                           <label
                                             key={v.key}
@@ -1358,7 +1304,7 @@ function RolePage() {
                                               checked={(fs[f.key].view ?? f.views![0]!.key) === v.key}
                                               onChange={() => setMiniView(m.key, f.key, v.key)}
                                             />
-                                            <span className="text-caption text-text-tertiary">{v.name}</span>
+                                            <span className="text-caption text-text-tertiary whitespace-nowrap">{v.name}</span>
                                           </label>
                                         ))}
                                       </div>
@@ -1366,15 +1312,6 @@ function RolePage() {
                                   </div>
                                 ))}
                               </div>
-                              {m.key === "workorder" ? (
-                                <div className="mt-auto whitespace-nowrap pt-4 text-right text-caption text-text-tertiary">
-                                  可查看、操作的工单范围仅限于：开放的工单类型
-                                </div>
-                              ) : m.key === "task" ? (
-                                <div className="mt-auto whitespace-nowrap pt-4 text-right text-caption text-text-tertiary">
-                                  可查看、操作的任务范围仅限于：开放的工单类型
-                                </div>
-                              ) : null}
 
                             </div>
                           );
@@ -1384,43 +1321,6 @@ function RolePage() {
 
                   </div>
 
-                  {/* 通用范围：工单类型 / 基础事件类型，全局仅需选择一次 */}
-                  <div className="grid grid-cols-1 gap-3">
-                    {(["wo"] as MiniScope[]).map((kind) => {
-                      const opts = scopeOptions(kind);
-                      const sel = globalScope(kind);
-                      return (
-                        <div key={kind} className="rounded-md border border-border bg-card px-3 py-2.5">
-                          <div className="text-caption text-text-tertiary mb-2">
-                            {scopeLabel(kind)}
-                            <span className="ml-1">
-                              （已选 {sel.length}/{opts.length}）
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {opts.map((t) => {
-                              const on = sel.includes(t);
-                              return (
-                                <button
-                                  key={t}
-                                  type="button"
-                                  disabled={!editable}
-                                  onClick={() => toggleGlobalScope(kind, t)}
-                                  className={`px-2 py-0.5 rounded-md border text-caption transition-colors ${
-                                    on
-                                      ? "border-primary text-primary bg-primary/5"
-                                      : "border-border text-text-tertiary bg-card"
-                                  } ${editable ? "cursor-pointer" : "cursor-default"}`}
-                                >
-                                  {t}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
 
 
 
@@ -1522,22 +1422,6 @@ function RolePage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* 批量执行任务提示 */}
-      <AlertDialog open={batchNoticeOpen} onOpenChange={setBatchNoticeOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>批量执行说明</AlertDialogTitle>
-            <AlertDialogDescription>
-              仅免疫、驱虫类型工单，基础事件任务允许批量执行
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setBatchNoticeOpen(false)}>
-              知道了
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
