@@ -291,6 +291,29 @@ const woModule = (t: string): MiniModuleDef => ({
   ],
 });
 
+/** 基础事件任务类型：与小程序首页任务清单一致 */
+const BASIC_EVENT_TYPES = [
+  "体温检查",
+  "子宫分泌物检查",
+  "酮病检查",
+  "尿液 PH 值检查",
+  "布病 A19 免疫抗体检测",
+  "IBR/BVDV 免疫抗体检测",
+  "孕检",
+  "转群/转栏",
+];
+
+/** 每类基础事件单独配置：查看 / 执行 */
+const evModule = (t: string): MiniModuleDef => ({
+  key: `ev-${t}`,
+  name: t,
+  group: "基础事件任务",
+  funcs: [
+    { key: "view", name: "查看" },
+    { key: "execute", name: "执行" },
+  ],
+});
+
 const miniSpec: MiniModuleDef[] = [
   {
     key: "home",
@@ -318,14 +341,7 @@ const miniSpec: MiniModuleDef[] = [
     ],
   },
   ...WO_ORDER_TYPES.map(woModule),
-  {
-    key: "event-task",
-    name: "基础事件任务",
-    funcs: [
-      { key: "view", name: "查看" },
-      { key: "execute", name: "执行" },
-    ],
-  },
+  ...BASIC_EVENT_TYPES.map(evModule),
   {
     key: "cattle",
     name: "牛只档案",
@@ -340,6 +356,11 @@ const miniSpec: MiniModuleDef[] = [
 /** 兽医助理：各工单仅查看 / 上报 / 执行 */
 const woAssistant = Object.fromEntries(
   WO_ORDER_TYPES.map((t) => [`wo-${t}`, ["view", "report", "execute"]]),
+) as Record<string, string[]>;
+
+/** 兽医助理：基础事件任务各类型可查看 / 执行 */
+const evAssistant = Object.fromEntries(
+  BASIC_EVENT_TYPES.map((t) => [`ev-${t}`, ["view", "execute"]]),
 ) as Record<string, string[]>;
 
 /** 工作台可选的 4 套定制化看板视图 */
@@ -431,7 +452,7 @@ const defaultPerms: RolePerms = {
       home: ["overview"],
       drug: true,
       ...woAssistant,
-      "event-task": ["view", "execute"],
+      ...evAssistant,
       cattle: ["view"],
     }),
   },
@@ -1244,7 +1265,7 @@ function RolePage() {
                                 active ? "text-primary font-medium" : "text-foreground"
                               }`}
                             >
-                              {m.group ? "工单" : m.name}
+                              {m.group ? (m.group === "各类工单" ? "工单" : m.group) : m.name}
                             </span>
                           </div>
                           </Fragment>
