@@ -179,7 +179,7 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
   };
 
   return (
-    <MobileShell title={batchCount ? "批量转栏/转群" : `#${id} · 转栏/转群`} back hideTabBar>
+    <MobileShell title={batchCount ? "批量转栏/转群" : `#${id} · 转群记录`} back hideTabBar>
       <div className="pb-24">
         {batchCount > 0 && <BatchBanner count={batchCount} />}
         <div className="px-4 pt-4">
@@ -188,7 +188,7 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
               <ArrowRightLeft className="h-5 w-5" />
             </span>
             <div>
-              <div className="text-card-title">转栏 / 转群</div>
+              <div className="text-card-title">转群记录</div>
               <div className="text-caption opacity-85">
                 {batchCount ? `${batchCount} 头牛只` : `牛只 #${id}`}
               </div>
@@ -241,7 +241,7 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
             open={pickerOpen}
             onOpenChange={setPickerOpen}
           />
-          <Field label="转栏原因" required>
+          <Field label="转群原因" required>
             <button
               type="button"
               onClick={() => setReasonOpen(true)}
@@ -272,7 +272,7 @@ function TransferForm({ id, onDone, batchCount = 0 }: { id: string; onDone: () =
           onClick={submit}
           className="w-full h-12 rounded-2xl bg-primary text-primary-foreground text-body font-semibold inline-flex items-center justify-center gap-1.5"
         >
-          <ArrowRightLeft className="h-4 w-4" /> 提交转栏
+          <ArrowRightLeft className="h-4 w-4" /> 提交转群 
         </button>
       </div>
       <ConfirmTransferDialog
