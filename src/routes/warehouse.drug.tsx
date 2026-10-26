@@ -446,6 +446,7 @@ function DrugForm({
       <Section first title="基础信息">
         <Grid>
           <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
+          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
           <F label="商品编码" value={d.code} readOnly onChange={(v) => patch({ code: v })} mono />
           <F
             label="规格型号"
@@ -456,7 +457,7 @@ function DrugForm({
               patch({ spec: v, doseUnit: u.doseUnit || d.doseUnit, specUnit: u.specUnit || d.specUnit });
             }}
           />
-          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
+
           <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
           <F label="最小扫码单位" value={d.scanUnit ?? ""} readOnly onChange={(v) => patch({ scanUnit: v })} />
 
