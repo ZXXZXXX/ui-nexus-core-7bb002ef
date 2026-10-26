@@ -275,13 +275,13 @@ function DrugArchivePage() {
     );
   }, [list, kw]);
 
-  const save = (d: Drug) => {
+  const save = (d: Drug, keepOpen?: boolean) => {
     if (mode === "create") {
       setList((prev) => [{ ...d, id: d.id || `DR-${Date.now().toString().slice(-4)}` }, ...prev]);
     } else {
       setList((prev) => prev.map((x) => (x.id === d.id ? d : x)));
     }
-    setDetail(null);
+    if (keepOpen) setDetail(d); else setDetail(null);
   };
 
   const columns: ListColumn<Drug>[] = [
@@ -418,7 +418,7 @@ function DrugForm({
   value: Drug;
   mode: "view" | "edit" | "create";
   onCancel: () => void;
-  onSave: (d: Drug) => void;
+  onSave: (d: Drug, keepOpen?: boolean) => void;
 }) {
   const readOnly = mode === "view";
   const [d, setD] = useState<Drug>(value);
@@ -431,12 +431,6 @@ function DrugForm({
 
   return (
     <div className="px-6 py-5 space-y-6">
-      {/* 顶部摘要条 */}
-      <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1 -mt-1">
-        <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(4)}`} />
-        <SummaryItem label="规格型号" value={d.spec || "—"} />
-        <SummaryItem label="休药期" value={d.withdraw || "—"} />
-      </div>
 
 
       {/* Section 1: ERP 基础信息（只读） */}
@@ -517,7 +511,13 @@ function DrugForm({
             current={value.price}
             pending={value.pendingPrice}
             history={value.priceHistory ?? []}
-            onCancelPending={readOnly ? undefined : () => patch({ pendingPrice: undefined })}
+            onCancelPending={
+              readOnly
+                ? () => {
+                    if (window.confirm("确定撤销这次未生效的调价吗？")) { const next = { ...value, pendingPrice: undefined }; setD((s) => ({ ...s, pendingPrice: undefined })); onSave(next, true); }
+                  }
+                : () => patch({ pendingPrice: undefined })
+            }
             pendingCleared={!!value.pendingPrice && !d.pendingPrice}
           />
           <SubHead title="给药方式与单位" />
