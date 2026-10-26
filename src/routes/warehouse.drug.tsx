@@ -971,7 +971,7 @@ function F({
           onChange={(e) => onChange?.(e.target.value)}
           onBlur={onBlur}
           placeholder={placeholder}
-          className={`h-9 mt-1 text-body-sm ${mono ? "font-mono" : ""}`}
+          className={`h-9 mt-1 max-w-sm text-body-sm ${mono ? "font-mono" : ""}`}
         />
         </>
       )}
@@ -1046,7 +1046,7 @@ function FSelect({
         <>
         <Lbl label={label} required={required} />
         <Select value={value} onValueChange={(v) => onChange?.(v)}>
-          <SelectTrigger className="h-9 mt-1 text-body-sm">
+          <SelectTrigger className="h-9 mt-1 max-w-sm text-body-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
