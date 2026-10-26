@@ -430,7 +430,7 @@ function DrugForm({
   const patch = (p: Partial<Drug>) => setD((s) => ({ ...s, ...p }));
 
   return (
-    <div className="px-6 py-5 space-y-8">
+    <div className="px-6 py-5 space-y-6">
       {/* 顶部摘要条 */}
       <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1 -mt-1">
         <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(4)}`} />
