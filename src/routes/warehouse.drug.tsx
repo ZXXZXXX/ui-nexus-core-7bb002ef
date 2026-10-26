@@ -1210,3 +1210,13 @@ function FBool({
     </div>
   );
 }
+
+/** 兽医业务配置内的小分区标题 */
+function SubHead({ title, first }: { title: string; first?: boolean }) {
+  return (
+    <div className={`col-span-2 flex items-center gap-2 ${first ? "" : "mt-3 pt-4 border-t border-border"}`}>
+      <span className="h-3.5 w-0.5 rounded-full bg-primary" />
+      <span className="text-body-sm font-medium text-foreground">{title}</span>
+    </div>
+  );
+}
