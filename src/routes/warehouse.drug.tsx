@@ -803,37 +803,27 @@ function PriceInfo({
 }) {
   const [showAll, setShowAll] = useState(false);
   const last = history[0];
-  const fmt = (n: number) => `¥${n.toFixed(4)}`;
+  const fmt = (n: number) => `${n.toFixed(4)}元`;
   if (!pending && !last) {
     return (
       <div className="col-span-full -mt-1 mb-1 text-caption text-text-tertiary">暂无调价记录</div>
     );
   }
-  const entry = (
-    tag: React.ReactNode,
-    price: React.ReactNode,
-    meta: string,
-    action?: React.ReactNode,
-  ) => (
-    <div className="flex items-start gap-3">
-      <div className="w-[72px] shrink-0">{tag}</div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-4">
-          <div className="text-body-sm tabular-nums text-foreground">{price}</div>
-          {action}
-        </div>
-        <div className="mt-1 text-caption tabular-nums text-text-tertiary">{meta}</div>
-      </div>
+  const line = (label: string, change: React.ReactNode, date: string, action?: React.ReactNode) => (
+    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-body-sm tabular-nums">
+      <span className="shrink-0 text-text-tertiary">{label}</span>
+      <span className="text-foreground">{change}</span>
+      <span className="text-text-tertiary">{date}</span>
+      {action}
     </div>
   );
   return (
-    <div className="col-span-full max-w-xl space-y-3">
-      <div className="text-caption text-text-tertiary">调价记录</div>
+    <div className="col-span-full max-w-xl space-y-2">
       {pending && !pendingCleared &&
-        entry(
-          <span className="tag tag-warning">待生效</span>,
+        line(
+          "即将生效：",
           <>{fmt(current)} → <span className="font-medium">{fmt(pending.price)}</span></>,
-          `${pending.from} 生效 · ${pending.by} 设定于 ${pending.at}`,
+          pending.from,
           onCancelPending && (
             <button
               type="button"
@@ -848,10 +838,10 @@ function PriceInfo({
         <div className="text-caption leading-5 text-text-tertiary">待生效的调价已撤销，保存后生效</div>
       )}
       {last &&
-        entry(
-          <span className="tag tag-muted">上次调价</span>,
+        line(
+          "上次修改：",
           <>{fmt(last.from)} → {fmt(last.to)}</>,
-          `${last.effectiveFrom} 生效 · ${last.by} 修改于 ${last.at}`,
+          last.effectiveFrom,
           history.length > 1 && (
             <button
               type="button"
@@ -863,17 +853,15 @@ function PriceInfo({
           ),
         )}
       {showAll && (
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {history.slice(1).map((h, i) => (
             <div
               key={i}
-              className="flex items-baseline gap-3 text-caption tabular-nums text-text-tertiary"
+              className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-caption tabular-nums text-text-tertiary"
             >
-              <span className="w-[72px] shrink-0" />
-              <div className="flex items-baseline gap-4">
-                <span>{fmt(h.from)} → {fmt(h.to)}</span>
-                <span className="shrink-0">{h.effectiveFrom} 生效 · {h.by}</span>
-              </div>
+              <span className="shrink-0">修改记录：</span>
+              <span>{fmt(h.from)} → {fmt(h.to)}</span>
+              <span>{h.effectiveFrom}</span>
             </div>
           ))}
         </div>
