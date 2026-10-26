@@ -802,7 +802,6 @@ function PriceInfo({
   onCancelPending?: () => void;
   pendingCleared?: boolean;
 }) {
-  const [showAll, setShowAll] = useState(false);
   const last = history[0];
   const fmt = (n: number) => `${n.toFixed(4)}元`;
   if (!pending && !last) {
@@ -843,30 +842,7 @@ function PriceInfo({
           "上次修改：",
           <>{fmt(last.from)} → {fmt(last.to)}</>,
           last.effectiveFrom,
-          history.length > 1 && (
-            <button
-              type="button"
-              onClick={() => setShowAll((v) => !v)}
-              className="shrink-0 text-caption text-primary hover:underline"
-            >
-              {showAll ? "收起" : `更早记录（${history.length - 1}）`}
-            </button>
-          ),
         )}
-      {showAll && (
-        <div className="space-y-1.5">
-          {history.slice(1).map((h, i) => (
-            <div
-              key={i}
-              className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-caption tabular-nums text-text-tertiary"
-            >
-              <span className="shrink-0">修改记录：</span>
-              <span>{fmt(h.from)} → {fmt(h.to)}</span>
-              <span>{h.effectiveFrom}</span>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
