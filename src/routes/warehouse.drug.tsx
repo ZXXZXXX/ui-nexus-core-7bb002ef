@@ -573,7 +573,7 @@ function DrugForm({
             placeholder="如：5"
           />
           <SubHead title="剂量设置" />
-          <div className="col-span-2 space-y-2">
+          <div className="col-span-full space-y-2">
             <div className="flex items-center gap-4">
 
               <span className="text-body-sm font-medium text-foreground">按变量计算剂量</span>
@@ -795,11 +795,11 @@ function PriceInfo({
   const fmt = (n: number) => `¥${n.toFixed(4)}`;
   if (!pending && !last) {
     return (
-      <div className="col-span-2 -mt-1 mb-1 text-caption text-text-tertiary">暂无调价记录</div>
+      <div className="col-span-full -mt-1 mb-1 text-caption text-text-tertiary">暂无调价记录</div>
     );
   }
   return (
-    <div className="col-span-2 -mt-1 mb-1 space-y-1">
+    <div className="col-span-full -mt-1 mb-1 space-y-1">
       {pending && !pendingCleared && (
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-caption leading-5">
           <span className="tag tag-warning">待生效</span>
@@ -883,7 +883,7 @@ function Section({
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-6 gap-y-2">{children}</div>;
+  return <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4">{children}</div>;
 }
 
 
@@ -920,8 +920,8 @@ function F({
   return (
     <div className={span2 ? "col-span-2" : ""}>
       {readOnly ? (
-        <div className="flex items-center gap-3 py-1.5">
-          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+        <div className="flex flex-col gap-1 py-0.5">
+          <span className="text-caption text-text-tertiary">{label}</span>
           <span className={`text-body-sm text-foreground truncate ${mono ? "font-mono" : ""}`}>
             {value || <span className="text-text-tertiary">—</span>}
           </span>
@@ -958,10 +958,10 @@ function FLong({
   placeholder?: string;
 }) {
   return (
-    <div className="col-span-2">
+    <div className="col-span-full">
       {readOnly ? (
-        <div className="flex items-start gap-3 py-1.5">
-          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+        <div className="flex flex-col gap-1 py-0.5">
+          <span className="text-caption text-text-tertiary">{label}</span>
           <span className="text-body-sm text-foreground whitespace-pre-wrap">
             {value || <span className="text-text-tertiary">—</span>}
           </span>
@@ -999,8 +999,8 @@ function FSelect({
   return (
     <div>
       {readOnly ? (
-        <div className="flex items-center gap-3 py-1.5">
-          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+        <div className="flex flex-col gap-1 py-0.5">
+          <span className="text-caption text-text-tertiary">{label}</span>
           <span className="text-body-sm text-foreground truncate">
             {value || <span className="text-text-tertiary">—</span>}
           </span>
@@ -1048,7 +1048,7 @@ function FMulti({
     onChange?.(values.includes(o) ? values.filter((v) => v !== o) : [...values, o]);
   };
   return (
-    <div className={span2 ? "col-span-2" : ""}>
+    <div className={span2 ? "col-span-full" : ""}>
       <Lbl label={label} required={required} />
       <div className="mt-1 flex flex-wrap gap-1.5">
         {options.map((o) => {
@@ -1247,8 +1247,8 @@ function FrequencyEditor({
   return (
     <div>
       {readOnly ? (
-        <div className="flex items-center gap-3 py-1.5">
-          <span className="text-caption text-text-tertiary shrink-0 w-28">{label}</span>
+        <div className="flex flex-col gap-1 py-0.5">
+          <span className="text-caption text-text-tertiary">{label}</span>
           <span className="text-body-sm text-foreground truncate">
             {value || <span className="text-text-tertiary">—</span>}
           </span>
@@ -1329,7 +1329,7 @@ function FBool({
 /** 兽医业务配置内的小分区标题 */
 function SubHead({ title, first }: { title: string; first?: boolean }) {
   return (
-    <div className={`col-span-2 ${first ? "" : "mt-4"}`}>
+    <div className={`col-span-full ${first ? "" : "mt-3 -mb-1"}`}>
       <span className="text-body-sm font-medium text-foreground">{title}</span>
     </div>
 
