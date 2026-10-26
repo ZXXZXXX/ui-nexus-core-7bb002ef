@@ -792,65 +792,50 @@ function PriceInfo({
   const fmt = (n: number) => `¥${n.toFixed(4)}`;
   if (!pending && !last) {
     return (
-      <div className="col-span-2 mt-1 mb-2 text-caption text-text-tertiary">暂无调价记录</div>
+      <div className="col-span-2 -mt-1 mb-1 text-caption text-text-tertiary">暂无调价记录</div>
     );
   }
   return (
-    <div className="col-span-2 mt-1 mb-2 rounded-lg border border-border bg-surface-subtle px-3.5 py-3 space-y-2">
+    <div className="col-span-2 -mt-1 mb-1 space-y-1">
       {pending && !pendingCleared && (
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 text-body-sm">
-            <span className="tag tag-warning mr-2">待生效</span>
-            <span className="text-foreground">
-              {fmt(current)} → <span className="font-medium">{fmt(pending.price)}</span>
-            </span>
-            <span className="ml-2 text-text-secondary">将于 {pending.from} 生效</span>
-            <div className="mt-0.5 text-caption text-text-tertiary">
-              {pending.by} 设定于 {pending.at}
-            </div>
-          </div>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-caption leading-5">
+          <span className="tag tag-warning">待生效</span>
+          <span className="text-foreground tabular-nums">
+            {fmt(current)} → <span className="font-medium">{fmt(pending.price)}</span>
+          </span>
+          <span className="text-text-secondary">将于 {pending.from} 生效 · {pending.by} 设定于 {pending.at}</span>
           {onCancelPending && (
-            <button type="button" onClick={onCancelPending} className="shrink-0 text-caption text-primary hover:underline">
+            <button type="button" onClick={onCancelPending} className="text-primary hover:underline">
               撤销
             </button>
           )}
         </div>
       )}
       {pendingCleared && (
-        <div className="text-caption text-text-tertiary">待生效的调价已撤销，保存后生效</div>
+        <div className="text-caption leading-5 text-text-tertiary">待生效的调价已撤销，保存后生效</div>
       )}
       {last && (
-        <div className={pending ? "pt-2 border-t border-border" : ""}>
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 text-body-sm">
-              <span className="tag tag-muted mr-2">上次调价</span>
-              <span className="text-foreground">
-                {fmt(last.from)} → {fmt(last.to)}
-              </span>
-              <span className="ml-2 text-text-secondary">{last.effectiveFrom} 生效</span>
-              <div className="mt-0.5 text-caption text-text-tertiary">
-                {last.by} 修改于 {last.at}
-              </div>
-            </div>
-            {history.length > 1 && (
-              <button type="button" onClick={() => setShowAll((v) => !v)} className="shrink-0 text-caption text-primary hover:underline">
-                {showAll ? "收起" : `全部记录（${history.length}）`}
-              </button>
-            )}
-          </div>
-          {showAll && (
-            <div className="mt-2 divide-y divide-border rounded-md border border-border bg-card">
-              {history.map((h, i) => (
-                <div key={i} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 px-3 py-2 text-caption">
-                  <span className="text-foreground tabular-nums">
-                    {fmt(h.from)} → {fmt(h.to)}
-                    <span className="ml-2 text-text-tertiary">{h.by} · {h.at}</span>
-                  </span>
-                  <span className="text-text-secondary">{h.effectiveFrom} 生效</span>
-                </div>
-              ))}
-            </div>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-caption leading-5">
+          <span className="tag tag-muted">上次调价</span>
+          <span className="text-text-secondary tabular-nums">
+            {fmt(last.from)} → {fmt(last.to)} · {last.effectiveFrom} 生效 · {last.by} 修改于 {last.at}
+          </span>
+          {history.length > 1 && (
+            <button type="button" onClick={() => setShowAll((v) => !v)} className="text-primary hover:underline">
+              {showAll ? "收起" : `全部记录（${history.length}）`}
+            </button>
           )}
+        </div>
+      )}
+      {showAll && (
+        <div className="space-y-0.5 text-caption leading-5">
+          {history.map((h, i) => (
+            <div key={i} className="flex flex-wrap items-baseline gap-x-2 text-text-tertiary tabular-nums">
+              <span>
+                {fmt(h.from)} → {fmt(h.to)} · {h.effectiveFrom} 生效 · {h.by} 修改于 {h.at}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
