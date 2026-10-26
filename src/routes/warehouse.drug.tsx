@@ -506,6 +506,7 @@ function DrugForm({
             placeholder="如：186.0000"
           />
           <PriceInfo
+            current={value.price}
             pending={value.pendingPrice}
             history={value.priceHistory ?? []}
             onCancelPending={
