@@ -456,6 +456,11 @@ function DrugForm({
               patch({ spec: v, doseUnit: u.doseUnit || d.doseUnit, specUnit: u.specUnit || d.specUnit });
             }}
           />
+          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
+          <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
+          <F label="最小扫码单位" value={d.scanUnit ?? ""} readOnly onChange={(v) => patch({ scanUnit: v })} />
+
+          <SubHead title="状态与价格" />
           <FSwitch
             label="药品状态"
             required
@@ -513,9 +518,6 @@ function DrugForm({
             }
             pendingCleared={!!value.pendingPrice && !d.pendingPrice}
           />
-          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
-          <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
-          <F label="最小扫码单位" value={d.scanUnit ?? ""} readOnly onChange={(v) => patch({ scanUnit: v })} />
         </Grid>
       </Section>
 
