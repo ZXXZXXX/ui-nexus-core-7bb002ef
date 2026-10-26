@@ -237,7 +237,7 @@ function EditForm({ value: m, onChange, onSave, onRequestEnable }: { value: Msg;
             <div className="flex items-center gap-2 text-body-sm">
               <Checkbox checked disabled />
               <Bell className="h-3.5 w-3.5 text-primary" />站内信
-              <span className="text-caption text-text-tertiary">必选渠道，不可取消</span>
+              <span className="text-caption text-text-tertiary">必选，不可取消</span>
             </div>
             <label className="flex items-center gap-2 text-body-sm">
               <Checkbox checked={m.wecom} onCheckedChange={(c) => set({ wecom: !!c })} />
