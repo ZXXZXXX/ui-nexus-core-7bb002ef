@@ -383,6 +383,9 @@ function DrugArchivePage() {
                 <span className="truncate">
                   {mode === "edit" ? "编辑药品" : mode === "create" ? "新建药品" : detail?.name || "药品详情"}
                 </span>
+                {detail?.code && mode !== "create" && (
+                  <span className="font-mono text-caption text-text-tertiary shrink-0">{detail.code}</span>
+                )}
                 {detail && mode === "view" && (
                   <span className={detail.status === "启用" ? "tag tag-success" : "tag tag-muted"}>
                     {detail.status}
@@ -443,6 +446,7 @@ function DrugForm({
       <Section first title="基础信息">
         <Grid>
           <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
+          <F label="商品编码" value={d.code} readOnly onChange={(v) => patch({ code: v })} mono />
           <F
             label="规格型号"
             value={d.spec}
