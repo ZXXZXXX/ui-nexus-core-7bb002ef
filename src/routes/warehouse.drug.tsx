@@ -650,7 +650,7 @@ function DrugForm({
             )}
           </div>
           <F
-            label="PC单位用药剂量上限"
+            label="用药剂量上限"
             value={d.pcDoseMax ?? ""}
             readOnly={readOnly}
             onChange={(v) => patch({ pcDoseMax: v })}
