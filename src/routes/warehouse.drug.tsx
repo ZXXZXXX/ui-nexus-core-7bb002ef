@@ -666,7 +666,7 @@ function DrugForm({
 
       {/* Section 4: 第三方回传 */}
       <Section title="第三方系统回传规则">
-        <Grid>
+        <Grid stack>
           <FBool
             label="回传至第三方系统"
             required
@@ -706,9 +706,7 @@ function DrugForm({
                 单位：{doseUnit}
               </div>
             </div>
-          ) : (
-            <div />
-          )}
+          ) : null}
         </Grid>
       </Section>
 
@@ -918,8 +916,18 @@ function Section({
   );
 }
 
-function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-col gap-4">{children}</div>;
+function Grid({ children, stack }: { children: React.ReactNode; stack?: boolean }) {
+  return (
+    <div
+      className={
+        stack
+          ? "flex flex-col gap-4"
+          : "grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4"
+      }
+    >
+      {children}
+    </div>
+  );
 }
 
 
