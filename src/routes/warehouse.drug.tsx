@@ -555,12 +555,14 @@ function DrugForm({
           <F label="默认用药单位" value={doseUnit} readOnly />
           <F label="规格单位" value={specUnit} readOnly />
           <SubHead title="用药周期" />
-          <FrequencyEditor
-            label="用药频次规则"
-            value={d.freqRule ?? ""}
-            readOnly={readOnly}
-            onChange={(v: string) => patch({ freqRule: v })}
-          />
+          <div className="col-span-2">
+            <FrequencyEditor
+              label="用药频次规则"
+              value={d.freqRule ?? ""}
+              readOnly={readOnly}
+              onChange={(v: string) => patch({ freqRule: v })}
+            />
+          </div>
           <F
             label="最少用药天数"
             value={d.minDays != null ? String(d.minDays) : ""}
@@ -1290,24 +1292,24 @@ function FrequencyEditor({
       ) : (
         <>
         <Lbl label={label} required={required} />
-        <div className="mt-1 h-9 flex items-center gap-2">
-          <span className="text-body-sm text-text-secondary">每</span>
+        <div className="mt-1 h-9 flex items-center gap-1.5 min-w-0">
+          <span className="text-body-sm text-text-secondary shrink-0">每</span>
           <Input
             type="text"
             inputMode="numeric"
             value={days}
             onChange={(e) => update(sanitizeFreqValue(e.target.value), times)}
-            className="h-9 w-20 text-body-sm text-center"
+            className="h-9 w-16 text-body-sm text-center"
           />
-          <span className="text-body-sm text-text-secondary">天</span>
+          <span className="text-body-sm text-text-secondary shrink-0">天</span>
           <Input
             type="text"
             inputMode="numeric"
             value={times}
             onChange={(e) => update(days, sanitizeFreqValue(e.target.value))}
-            className="h-9 w-20 text-body-sm text-center"
+            className="h-9 w-16 text-body-sm text-center"
           />
-          <span className="text-body-sm text-text-secondary">次</span>
+          <span className="text-body-sm text-text-secondary shrink-0">次</span>
         </div>
         </>
       )}
