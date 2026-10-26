@@ -885,7 +885,7 @@ function SummaryItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
       <div className="text-caption text-text-tertiary">{label}</div>
-      <div className="text-body-sm text-foreground truncate mt-0.5">{value}</div>
+      <div className="text-body-sm text-foreground break-words mt-0.5">{value}</div>
     </div>
   );
 }
@@ -956,7 +956,7 @@ function F({
       {readOnly ? (
         <div className="flex flex-col gap-1 py-0.5">
           <span className="text-caption text-text-tertiary">{label}</span>
-          <span className={`text-body-sm text-foreground truncate ${mono ? "font-mono" : ""}`}>
+          <span className={`text-body-sm text-foreground break-words ${mono ? "font-mono" : ""}`}>
             {value || <span className="text-text-tertiary">—</span>}
           </span>
         </div>
@@ -1035,7 +1035,7 @@ function FSelect({
       {readOnly ? (
         <div className="flex flex-col gap-1 py-0.5">
           <span className="text-caption text-text-tertiary">{label}</span>
-          <span className="text-body-sm text-foreground truncate">
+          <span className="text-body-sm text-foreground break-words">
             {value || <span className="text-text-tertiary">—</span>}
           </span>
         </div>
@@ -1283,7 +1283,7 @@ function FrequencyEditor({
       {readOnly ? (
         <div className="flex flex-col gap-1 py-0.5">
           <span className="text-caption text-text-tertiary">{label}</span>
-          <span className="text-body-sm text-foreground truncate">
+          <span className="text-body-sm text-foreground break-words">
             {value || <span className="text-text-tertiary">—</span>}
           </span>
         </div>
