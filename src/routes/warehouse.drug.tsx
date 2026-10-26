@@ -281,7 +281,7 @@ function DrugArchivePage() {
     } else {
       setList((prev) => prev.map((x) => (x.id === d.id ? d : x)));
     }
-    if (keepOpen) setDetail((cur) => (cur ? { ...cur, drug: d } : cur)); else setDetail(null);
+    if (keepOpen) setDetail(d); else setDetail(null);
   };
 
   const columns: ListColumn<Drug>[] = [
