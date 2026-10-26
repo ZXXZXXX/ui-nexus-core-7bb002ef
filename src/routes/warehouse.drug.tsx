@@ -919,8 +919,9 @@ function Section({
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4">{children}</div>;
+  return <div className="flex flex-col gap-4">{children}</div>;
 }
+
 
 
 function Lbl({ label, required }: { label: string; required?: boolean }) {
