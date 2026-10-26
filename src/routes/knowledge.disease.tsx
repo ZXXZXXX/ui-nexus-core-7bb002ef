@@ -128,8 +128,6 @@ type Disease = {
   typeId: string;            // 所属疾病类型
   subSeq: string;            // 子类型 3 位序号
   name: string;              // 疾病子类型名称
-  alias?: string;            // 英文/缩写
-  aliases: string[];         // 别名
   presentation: string;      // 典型表现
   treatable: boolean;        // 是否治疗
   groups: CattleGroup[];     // 适用牛群
@@ -169,8 +167,6 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
     typeId: type?.id ?? "T-001",
     subSeq: d.id.slice(-3),
     name: d.name,
-    alias: d.abbr,
-    aliases: [],
     presentation: `${d.catName} · ${d.type}，常见症状 ${d.symptoms.length} 项，易感牛群：${d.groups.join("、") || "未标注"}。`,
     // 无关联处方 = 不治疗（走放弃治疗兜底）
     treatable: rxCodes.length > 0,
@@ -267,7 +263,6 @@ function DiseaseKBPage() {
       typeId: TYPES[0]?.id ?? "T-001",
       subSeq: nextTypeSeq,
       name: "",
-      aliases: [],
       presentation: "",
       treatable: true,
       groups: [],
@@ -404,7 +399,7 @@ function DiseaseKBPage() {
                     variant="ghost"
                     size="sm"
                     className="h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary"
-                    onClick={() => setEditing({ ...d, aliases: [...d.aliases], groups: [...d.groups], symptoms: d.symptoms.map((s) => ({ ...s })), prescriptions: d.prescriptions.map((p) => ({ ...p })) })}
+                    onClick={() => setEditing({ ...d, groups: [...d.groups], symptoms: d.symptoms.map((s) => ({ ...s })), prescriptions: d.prescriptions.map((p) => ({ ...p })) })}
                   >
                     编辑
                   </Button>
@@ -459,7 +454,7 @@ function DiseaseKBPage() {
                 className="shrink-0 mr-8"
                 onClick={() => {
                   if (viewing) {
-                    setEditing({ ...viewing, aliases: [...viewing.aliases], groups: [...viewing.groups], symptoms: viewing.symptoms.map((s) => ({ ...s })), prescriptions: viewing.prescriptions.map((p) => ({ ...p })) });
+                    setEditing({ ...viewing, groups: [...viewing.groups], symptoms: viewing.symptoms.map((s) => ({ ...s })), prescriptions: viewing.prescriptions.map((p) => ({ ...p })) });
                     setViewing(null);
                   }
                 }}
@@ -588,14 +583,6 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
           </Field>
           <Field label="处置编码" tip="回传UD处置事件时所用编码">
             <Input value={value.treatCode} onChange={(e) => onChange({ ...value, treatCode: e.target.value })} placeholder="如: UDT-001001" className="font-mono" />
-          </Field>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="疾病英文/缩写">
-            <Input value={value.alias ?? ""} onChange={(e) => onChange({ ...value, alias: e.target.value })} placeholder="如: LDA" />
-          </Field>
-          <Field label="疾病别名">
-            <TagInput value={value.aliases} onChange={(v) => onChange({ ...value, aliases: v })} placeholder="输入后回车" />
           </Field>
         </div>
         <div className="grid grid-cols-3 gap-3">
@@ -805,17 +792,6 @@ function DetailView({ value }: { value: Disease }) {
         <KV label="疾病分类" value={cat?.name ?? "—"} />
         <KV label="诊断编码" tip="回传UD诊断事件时所用编码" value={value.diagCode} mono />
         <KV label="处置编码" tip="回传UD处置事件时所用编码" value={value.treatCode} mono />
-        {value.alias && <KV label="英文/缩写" value={value.alias} />}
-        {value.aliases.length > 0 && (
-          <KV
-            label="别名"
-            valueNode={
-              <div className="flex flex-wrap gap-1">
-                {value.aliases.map((a) => <span key={a} className="tag tag-muted">{a}</span>)}
-              </div>
-            }
-          />
-        )}
         <KV label="是否治疗" value={value.treatable ? "是" : "否"} />
         <KV
           label="状态"
@@ -907,36 +883,3 @@ function KV({ label, value, valueNode, mono, tip }: { label: string; value?: str
   );
 }
 
-function TagInput({ value, onChange, placeholder }: { value: string[]; onChange: (next: string[]) => void; placeholder?: string }) {
-  const [draft, setDraft] = useState("");
-  const add = () => {
-    const v = draft.trim();
-    if (!v || value.includes(v)) { setDraft(""); return; }
-    onChange([...value, v]);
-    setDraft("");
-  };
-  const remove = (s: string) => onChange(value.filter((x) => x !== s));
-  return (
-    <div className="rounded-md border border-input bg-background px-2 py-1.5 min-h-[38px] flex flex-wrap gap-1.5 items-center focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
-      {value.map((s) => (
-        <span key={s} className="inline-flex items-center gap-1 rounded-md bg-brand-subtle text-primary text-body-sm px-2 py-0.5">
-          {s}
-          <button type="button" onClick={() => remove(s)} className="hover:text-[var(--state-danger)]" aria-label={`移除 ${s}`}>
-            <X className="h-3 w-3" />
-          </button>
-        </span>
-      ))}
-      <input
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(); }
-          else if (e.key === "Backspace" && !draft && value.length) { onChange(value.slice(0, -1)); }
-        }}
-        onBlur={add}
-        placeholder={value.length ? "" : placeholder ?? "输入后回车添加"}
-        className="flex-1 min-w-[100px] bg-transparent outline-none text-body-sm placeholder:text-text-tertiary"
-      />
-    </div>
-  );
-}
