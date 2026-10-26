@@ -453,6 +453,7 @@ function DrugForm({
       {/* Section 2: 兽医业务配置 */}
       <Section title="兽医业务配置" hint={<span className="text-caption text-text-tertiary">由本系统维护</span>}>
         <Grid>
+          <SubHead title="基础属性" first />
           <FSelect
             label="药品状态"
             required
@@ -468,15 +469,6 @@ function DrugForm({
             options={["处方药", "非处方药"]}
             readOnly={readOnly}
             onChange={(v) => patch({ drugType: v as DrugType })}
-          />
-          <FMulti
-            label="默认给药方式"
-            required
-            values={d.routes}
-            options={ROUTE_OPTIONS}
-            readOnly={readOnly}
-            onChange={(vs) => patch({ routes: vs })}
-            span2
           />
           <F
             label="休药期"
@@ -505,6 +497,16 @@ function DrugForm({
             }}
             placeholder="如：186.0000"
           />
+          <SubHead title="给药方式与单位" />
+          <FMulti
+            label="默认给药方式"
+            required
+            values={d.routes}
+            options={ROUTE_OPTIONS}
+            readOnly={readOnly}
+            onChange={(vs) => patch({ routes: vs })}
+            span2
+          />
           <FSelect
             label="默认用药单位"
             required
@@ -520,6 +522,7 @@ function DrugForm({
             readOnly={readOnly}
             onChange={(v) => patch({ specUnit: v })}
           />
+          <SubHead title="用药周期" />
           <FrequencyEditor
             label="用药频次规则"
             value={d.freqRule ?? ""}
@@ -546,6 +549,7 @@ function DrugForm({
             }}
             placeholder="如：5"
           />
+          <SubHead title="剂量设置" />
           <div className="col-span-2 rounded-lg border border-border p-4 space-y-3">
             <div className="flex items-center justify-between gap-3">
               <span className="text-body font-medium text-foreground">按变量计算剂量</span>
@@ -1203,6 +1207,16 @@ function FBool({
         <Switch checked={value} onCheckedChange={(v) => onChange?.(v)} disabled={readOnly} />
         <span className="text-body-sm text-text-secondary">{value ? "是" : "否"}</span>
       </div>
+    </div>
+  );
+}
+
+/** 兽医业务配置内的小分区标题 */
+function SubHead({ title, first }: { title: string; first?: boolean }) {
+  return (
+    <div className={`col-span-2 flex items-center gap-2 ${first ? "" : "mt-3 pt-4 border-t border-border"}`}>
+      <span className="h-3.5 w-0.5 rounded-full bg-primary" />
+      <span className="text-body-sm font-medium text-foreground">{title}</span>
     </div>
   );
 }
