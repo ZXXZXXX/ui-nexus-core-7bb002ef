@@ -439,13 +439,14 @@ function DrugForm({
           <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
           <F label="商品编码" value={d.code} readOnly onChange={(v) => patch({ code: v })} mono />
           <F label="规格型号" value={d.spec} readOnly={mode !== "create"} onChange={(v) => patch({ spec: v })} />
-          <FSelect
+          <FSwitch
             label="药品状态"
             required
-            value={d.status}
-            options={["启用", "停用"]}
+            checked={d.status === "启用"}
+            onText="启用"
+            offText="停用"
             readOnly={readOnly}
-            onChange={(v) => patch({ status: v as DrugStatus })}
+            onChange={(v) => patch({ status: (v ? "启用" : "停用") as DrugStatus })}
           />
           <FSelect
             label="药品类型"
@@ -1349,6 +1350,34 @@ function FBool({
       <div className="mt-1 h-9 flex items-center gap-2">
         <Switch checked={value} onCheckedChange={(v) => onChange?.(v)} disabled={readOnly} />
         <span className="text-body-sm text-text-secondary">{value ? "是" : "否"}</span>
+      </div>
+    </div>
+  );
+}
+
+function FSwitch({
+  label,
+  checked,
+  onChange,
+  readOnly,
+  required,
+  onText = "是",
+  offText = "否",
+}: {
+  label: string;
+  checked: boolean;
+  onChange?: (v: boolean) => void;
+  readOnly?: boolean;
+  required?: boolean;
+  onText?: string;
+  offText?: string;
+}) {
+  return (
+    <div>
+      <Lbl label={label} required={required} />
+      <div className="mt-1 h-9 flex items-center gap-2">
+        <Switch checked={checked} onCheckedChange={(v) => onChange?.(v)} disabled={readOnly} />
+        <span className="text-body-sm text-text-secondary">{checked ? onText : offText}</span>
       </div>
     </div>
   );
