@@ -525,6 +525,7 @@ function DrugForm({
       <Section title="兽医业务配置" hint={<span className="text-caption text-text-tertiary">由本系统维护</span>}>
         <Grid>
           <SubHead title="给药方式与单位" first />
+          <div className="col-span-full -mt-1 text-caption text-text-tertiary">用药单位与规格单位由「规格型号」自动解析，无需填写</div>
           <FMulti
             label="默认给药方式"
             required
@@ -534,21 +535,8 @@ function DrugForm({
             onChange={(vs) => patch({ routes: vs })}
             span2
           />
-          <FSelect
-            label="默认用药单位"
-            required
-            value={d.doseUnit}
-            options={UNIT_OPTIONS}
-            readOnly={readOnly}
-            onChange={(v) => patch({ doseUnit: v })}
-          />
-          <FSelect
-            label="规格单位"
-            value={d.specUnit ?? ""}
-            options={SPEC_UNIT_OPTIONS}
-            readOnly={readOnly}
-            onChange={(v) => patch({ specUnit: v })}
-          />
+          <F label="默认用药单位" value={doseUnit} readOnly />
+          <F label="规格单位" value={specUnit} readOnly />
           <SubHead title="用药周期" />
           <FrequencyEditor
             label="用药频次规则"
@@ -617,7 +605,7 @@ function DrugForm({
               <>
                 <VariableDoseEditor
                   value={d.defaultDose}
-                  unit={d.doseUnit}
+                  unit={doseUnit}
                   variable={d.variable || "体重区间"}
                   readOnly={readOnly}
                   onChange={(v) => patch({ defaultDose: v })}
@@ -637,7 +625,7 @@ function DrugForm({
                   className="h-9 w-28 text-body-sm"
                 />
                 <span className="h-9 inline-flex items-center px-2 rounded-md text-body-sm text-text-tertiary border border-border">
-                  {d.doseUnit}/次
+                  {doseUnit}/次
                 </span>
               </div>
             )}
@@ -696,7 +684,7 @@ function DrugForm({
                 placeholder="数字，如 5"
               />
               <div className="pb-2 text-body-sm text-text-tertiary">
-                单位：{d.doseUnit}
+                单位：{doseUnit}
               </div>
             </div>
           ) : (
