@@ -275,13 +275,13 @@ function DrugArchivePage() {
     );
   }, [list, kw]);
 
-  const save = (d: Drug) => {
+  const save = (d: Drug, keepOpen?: boolean) => {
     if (mode === "create") {
       setList((prev) => [{ ...d, id: d.id || `DR-${Date.now().toString().slice(-4)}` }, ...prev]);
     } else {
       setList((prev) => prev.map((x) => (x.id === d.id ? d : x)));
     }
-    setDetail(null);
+    if (keepOpen) setDetail((cur) => (cur ? { ...cur, drug: d } : cur)); else setDetail(null);
   };
 
   const columns: ListColumn<Drug>[] = [
@@ -418,7 +418,7 @@ function DrugForm({
   value: Drug;
   mode: "view" | "edit" | "create";
   onCancel: () => void;
-  onSave: (d: Drug) => void;
+  onSave: (d: Drug, keepOpen?: boolean) => void;
 }) {
   const readOnly = mode === "view";
   const [d, setD] = useState<Drug>(value);
@@ -514,7 +514,7 @@ function DrugForm({
             onCancelPending={
               readOnly
                 ? () => {
-                    if (window.confirm("确定撤销这次未生效的调价吗？")) onSave({ ...value, pendingPrice: undefined });
+                    if (window.confirm("确定撤销这次未生效的调价吗？")) { const next = { ...value, pendingPrice: undefined }; setD((s) => ({ ...s, pendingPrice: undefined })); onSave(next, true); }
                   }
                 : () => patch({ pendingPrice: undefined })
             }
