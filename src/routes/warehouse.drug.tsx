@@ -919,8 +919,9 @@ function Section({
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4">{children}</div>;
+  return <div className="flex flex-col gap-4">{children}</div>;
 }
+
 
 
 function Lbl({ label, required }: { label: string; required?: boolean }) {
@@ -970,7 +971,7 @@ function F({
           onChange={(e) => onChange?.(e.target.value)}
           onBlur={onBlur}
           placeholder={placeholder}
-          className={`h-9 mt-1 text-body-sm ${mono ? "font-mono" : ""}`}
+          className={`h-9 mt-1 max-w-sm text-body-sm ${mono ? "font-mono" : ""}`}
         />
         </>
       )}
@@ -1045,7 +1046,7 @@ function FSelect({
         <>
         <Lbl label={label} required={required} />
         <Select value={value} onValueChange={(v) => onChange?.(v)}>
-          <SelectTrigger className="h-9 mt-1 text-body-sm">
+          <SelectTrigger className="h-9 mt-1 max-w-sm text-body-sm">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
