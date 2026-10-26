@@ -801,45 +801,70 @@ function PriceInfo({
       <div className="col-span-full -mt-1 mb-1 text-caption text-text-tertiary">暂无调价记录</div>
     );
   }
+  const entry = (
+    tag: React.ReactNode,
+    price: React.ReactNode,
+    meta: string,
+    action?: React.ReactNode,
+  ) => (
+    <div className="grid grid-cols-4 items-start gap-x-3">
+      <div className="pt-0.5">{tag}</div>
+      <div className="col-span-3 min-w-0">
+        <div className="flex items-baseline justify-between gap-3">
+          <div className="text-body-sm tabular-nums text-foreground">{price}</div>
+          {action}
+        </div>
+        <div className="mt-1 text-caption tabular-nums text-text-tertiary">{meta}</div>
+      </div>
+    </div>
+  );
   return (
-    <div className="col-span-full -mt-1 mb-1 space-y-1">
-      {pending && !pendingCleared && (
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-caption leading-5">
-          <span className="tag tag-warning">待生效</span>
-          <span className="text-foreground tabular-nums">
-            {fmt(current)} → <span className="font-medium">{fmt(pending.price)}</span>
-          </span>
-          <span className="text-text-secondary">将于 {pending.from} 生效 · {pending.by} 设定于 {pending.at}</span>
-          {onCancelPending && (
-            <button type="button" onClick={onCancelPending} className="text-primary hover:underline">
+    <div className="col-span-full -mt-1 mb-1 space-y-3">
+      {pending && !pendingCleared &&
+        entry(
+          <span className="tag tag-warning">待生效</span>,
+          <>{fmt(current)} → <span className="font-medium">{fmt(pending.price)}</span></>,
+          `${pending.from} 生效 · ${pending.by} 设定于 ${pending.at}`,
+          onCancelPending && (
+            <button
+              type="button"
+              onClick={onCancelPending}
+              className="shrink-0 text-caption text-primary hover:underline"
+            >
               撤销
             </button>
-          )}
-        </div>
-      )}
+          ),
+        )}
       {pendingCleared && (
         <div className="text-caption leading-5 text-text-tertiary">待生效的调价已撤销，保存后生效</div>
       )}
-      {last && (
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-caption leading-5">
-          <span className="tag tag-muted">上次调价</span>
-          <span className="text-text-secondary tabular-nums">
-            {fmt(last.from)} → {fmt(last.to)} · {last.effectiveFrom} 生效 · {last.by} 修改于 {last.at}
-          </span>
-          {history.length > 1 && (
-            <button type="button" onClick={() => setShowAll((v) => !v)} className="text-primary hover:underline">
-              {showAll ? "收起" : `全部记录（${history.length}）`}
+      {last &&
+        entry(
+          <span className="tag tag-muted">上次调价</span>,
+          <>{fmt(last.from)} → {fmt(last.to)}</>,
+          `${last.effectiveFrom} 生效 · ${last.by} 修改于 ${last.at}`,
+          history.length > 1 && (
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              className="shrink-0 text-caption text-primary hover:underline"
+            >
+              {showAll ? "收起" : `更早记录（${history.length - 1}）`}
             </button>
-          )}
-        </div>
-      )}
+          ),
+        )}
       {showAll && (
-        <div className="space-y-0.5 text-caption leading-5">
-          {history.map((h, i) => (
-            <div key={i} className="flex flex-wrap items-baseline gap-x-2 text-text-tertiary tabular-nums">
-              <span>
-                {fmt(h.from)} → {fmt(h.to)} · {h.effectiveFrom} 生效 · {h.by} 修改于 {h.at}
-              </span>
+        <div className="space-y-2">
+          {history.slice(1).map((h, i) => (
+            <div
+              key={i}
+              className="grid grid-cols-4 items-baseline gap-x-3 text-caption tabular-nums text-text-tertiary"
+            >
+              <span />
+              <div className="col-span-3 flex items-baseline justify-between gap-3">
+                <span>{fmt(h.from)} → {fmt(h.to)}</span>
+                <span className="shrink-0">{h.effectiveFrom} 生效 · {h.by}</span>
+              </div>
             </div>
           ))}
         </div>
