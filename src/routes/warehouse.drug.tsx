@@ -441,7 +441,9 @@ function DrugForm({
 
       {/* Section 1: ERP 基础信息（只读） */}
       <Section
+        first
         title="ERP 同步基础信息"
+
         hint={
           <span className="inline-flex items-center gap-1 text-caption text-text-tertiary">
             <Lock className="h-3 w-3" /> 由 ERP 同步，只读
@@ -493,7 +495,7 @@ function DrugForm({
             placeholder="如：7天"
           />
           <F
-            label="单价（元，精确到厘）"
+            label="单价（元）"
             required
             value={priceText}
             readOnly={readOnly}
@@ -857,13 +859,16 @@ function Section({
   title,
   hint,
   children,
+  first,
 }: {
   title: string;
   hint?: React.ReactNode;
   children: React.ReactNode;
+  first?: boolean;
 }) {
   return (
-    <section>
+    <section className={first ? "" : "border-t border-border pt-6"}>
+
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-card-title text-foreground flex items-center gap-2">
           <span className="h-3.5 w-1 rounded-full bg-primary inline-block" />
