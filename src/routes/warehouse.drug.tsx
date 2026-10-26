@@ -815,10 +815,10 @@ function PriceInfo({
     meta: string,
     action?: React.ReactNode,
   ) => (
-    <div className="grid grid-cols-4 items-start gap-x-3">
-      <div className="pt-0.5">{tag}</div>
-      <div className="col-span-3 min-w-0">
-        <div className="flex items-baseline justify-between gap-3">
+    <div className="flex items-start gap-3">
+      <div className="w-[72px] shrink-0">{tag}</div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline gap-4">
           <div className="text-body-sm tabular-nums text-foreground">{price}</div>
           {action}
         </div>
@@ -827,7 +827,8 @@ function PriceInfo({
     </div>
   );
   return (
-    <div className="col-span-full -mt-1 mb-1 space-y-3">
+    <div className="col-span-full max-w-xl space-y-3">
+      <div className="text-caption text-text-tertiary">调价记录</div>
       {pending && !pendingCleared &&
         entry(
           <span className="tag tag-warning">待生效</span>,
@@ -866,10 +867,10 @@ function PriceInfo({
           {history.slice(1).map((h, i) => (
             <div
               key={i}
-              className="grid grid-cols-4 items-baseline gap-x-3 text-caption tabular-nums text-text-tertiary"
+              className="flex items-baseline gap-3 text-caption tabular-nums text-text-tertiary"
             >
-              <span />
-              <div className="col-span-3 flex items-baseline justify-between gap-3">
+              <span className="w-[72px] shrink-0" />
+              <div className="flex items-baseline gap-4">
                 <span>{fmt(h.from)} → {fmt(h.to)}</span>
                 <span className="shrink-0">{h.effectiveFrom} 生效 · {h.by}</span>
               </div>
