@@ -433,37 +433,12 @@ function DrugForm({
     <div className="px-6 py-5 space-y-6">
 
 
-      {/* Section 1: ERP 基础信息（只读） */}
-      <Section
-        first
-        title="ERP 同步基础信息"
-
-        hint={
-          <span className="inline-flex items-center gap-1 text-caption text-text-tertiary">
-            <Lock className="h-3 w-3" /> 由 ERP 同步，只读
-          </span>
-        }
-      >
+      {/* Section 1: 基础信息 */}
+      <Section first title="基础信息">
         <Grid>
-          <F label="商品编码" value={d.code} readOnly onChange={(v) => patch({ code: v })} mono />
-          
           <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
-          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
-          <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
+          <F label="商品编码" value={d.code} readOnly onChange={(v) => patch({ code: v })} mono />
           <F label="规格型号" value={d.spec} readOnly={mode !== "create"} onChange={(v) => patch({ spec: v })} />
-          <F label="最小扫码单位" value={d.scanUnit ?? ""} readOnly onChange={(v) => patch({ scanUnit: v })} />
-          <F label="供应商" value={d.supplier ?? ""} readOnly onChange={(v) => patch({ supplier: v })} />
-          <F label="生产厂家" value={d.maker} readOnly onChange={(v) => patch({ maker: v })} />
-          <F label="批准文号" value={d.reg ?? ""} readOnly onChange={(v) => patch({ reg: v })} />
-          <F label="保质期" value={d.shelfLife ?? ""} readOnly onChange={(v) => patch({ shelfLife: v })} />
-          <FLong label="主要成分" value={d.ingredient ?? ""} readOnly onChange={(v) => patch({ ingredient: v })} />
-        </Grid>
-      </Section>
-
-      {/* Section 2: 兽医业务配置 */}
-      <Section title="兽医业务配置" hint={<span className="text-caption text-text-tertiary">由本系统维护</span>}>
-        <Grid>
-          <SubHead title="基础属性" first />
           <FSelect
             label="药品状态"
             required
@@ -520,7 +495,35 @@ function DrugForm({
             }
             pendingCleared={!!value.pendingPrice && !d.pendingPrice}
           />
-          <SubHead title="给药方式与单位" />
+          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
+          <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
+          <F label="最小扫码单位" value={d.scanUnit ?? ""} readOnly onChange={(v) => patch({ scanUnit: v })} />
+        </Grid>
+      </Section>
+
+      {/* Section 2: ERP 同步信息（只读） */}
+      <Section
+        title="ERP 同步信息"
+        hint={
+          <span className="inline-flex items-center gap-1 text-caption text-text-tertiary">
+            <Lock className="h-3 w-3" /> 由 ERP 同步，只读
+          </span>
+        }
+      >
+        <Grid>
+          <F label="供应商" value={d.supplier ?? ""} readOnly onChange={(v) => patch({ supplier: v })} />
+          <F label="生产厂家" value={d.maker} readOnly onChange={(v) => patch({ maker: v })} />
+          <F label="批准文号" value={d.reg ?? ""} readOnly onChange={(v) => patch({ reg: v })} />
+          <F label="保质期" value={d.shelfLife ?? ""} readOnly onChange={(v) => patch({ shelfLife: v })} />
+          <FLong label="主要成分" value={d.ingredient ?? ""} readOnly onChange={(v) => patch({ ingredient: v })} />
+        </Grid>
+      </Section>
+
+
+      {/* Section 3: 兽医业务配置 */}
+      <Section title="兽医业务配置" hint={<span className="text-caption text-text-tertiary">由本系统维护</span>}>
+        <Grid>
+          <SubHead title="给药方式与单位" first />
           <FMulti
             label="默认给药方式"
             required
@@ -653,7 +656,7 @@ function DrugForm({
         </Grid>
       </Section>
 
-      {/* Section 3: 第三方回传 */}
+      {/* Section 4: 第三方回传 */}
       <Section title="第三方系统回传规则">
         <Grid>
           <FBool
