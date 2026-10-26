@@ -430,7 +430,7 @@ function DrugForm({
   const patch = (p: Partial<Drug>) => setD((s) => ({ ...s, ...p }));
 
   return (
-    <div className="px-6 py-5 space-y-6">
+    <div className="px-6 py-5 space-y-8">
       {/* 顶部摘要条 */}
       <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1 -mt-1">
         <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(4)}`} />
@@ -573,7 +573,7 @@ function DrugForm({
           <SubHead title="剂量设置" />
           <div className="col-span-2 space-y-2">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-body font-medium text-foreground">按变量计算剂量</span>
+              <span className="text-body-sm font-medium text-foreground">按变量计算剂量</span>
               <div className="flex items-center gap-2">
                 {d.variableDose && (
                   <>
