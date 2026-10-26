@@ -55,6 +55,8 @@ type Drug = {
   spec: string; // 规格型号
   price: number; // 单价（元）
   priceEffectiveFrom?: string; // 新单价生效时间（该日期后采购生效）
+  pendingPrice?: { price: number; from: string; by: string; at: string }; // 已设定、尚未生效的新单价
+  priceHistory?: PriceChange[]; // 历史调价记录（新→旧）
   scanUnit?: string; // 最小扫码单位
   supplier?: string; // 供应商
   maker: string; // 生产厂家
@@ -84,6 +86,10 @@ type Drug = {
   reportDose?: string; // 指定回传剂量
 };
 
+type PriceChange = { from: number; to: number; effectiveFrom: string; by: string; at: string };
+
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
 const ROUTE_OPTIONS = ["肌肉注射", "静脉注射", "皮下注射", "乳注", "口服", "局部用药"];
 const UNIT_OPTIONS = ["ml", "g", "kg", "支", "头份", "片"];
 const SPEC_UNIT_OPTIONS = ["瓶", "盒", "支", "罐", "桶", "袋", "板", "箱"];
@@ -93,6 +99,11 @@ const initialDrugs: Drug[] = [
   {
     id: "DR-0108",
     price: 186.00,
+    priceHistory: [
+      { from: 172.0, to: 186.0, effectiveFrom: "2026-08-01", by: "王仓管", at: "2026-07-28 10:12" },
+      { from: 165.5, to: 172.0, effectiveFrom: "2026-03-01", by: "李主管", at: "2026-02-25 15:40" },
+    ],
+    pendingPrice: { price: 196.0, from: "2026-11-15", by: "王仓管", at: "2026-10-20 09:30" },
     code: "01-00063",
     name: "5%盐酸头孢噻呋注射液（畜可健）",
     generic: "盐酸头孢噻呋注射液",
@@ -126,6 +137,9 @@ const initialDrugs: Drug[] = [
   {
     id: "DR-0214",
     price: 42.50,
+    priceHistory: [
+      { from: 45.0, to: 42.5, effectiveFrom: "2026-09-10", by: "李主管", at: "2026-09-05 14:02" },
+    ],
     code: "02-00215",
     name: "口蹄疫疫苗 A 型",
     generic: "口蹄疫 A 型灭活疫苗",
@@ -497,6 +511,13 @@ function DrugForm({
             }}
             placeholder="如：186.0000"
           />
+          <PriceInfo
+            current={value.price}
+            pending={value.pendingPrice}
+            history={value.priceHistory ?? []}
+            onCancelPending={readOnly ? undefined : () => patch({ pendingPrice: undefined })}
+            pendingCleared={!!value.pendingPrice && !d.pendingPrice}
+          />
           <SubHead title="给药方式与单位" />
           <FMulti
             label="默认给药方式"
@@ -721,7 +742,25 @@ function DrugForm({
               className="bg-primary hover:bg-[var(--brand-hover)] text-primary-foreground"
               onClick={() => {
                 setConfirmPrice(false);
-                onSave({ ...d, priceEffectiveFrom });
+                const at = new Date().toISOString().slice(0, 16).replace("T", " ");
+                if (priceEffectiveFrom > todayStr()) {
+                  // 未来生效：当前单价不变，登记为待生效
+                  onSave({
+                    ...d,
+                    price: value.price,
+                    pendingPrice: { price: d.price, from: priceEffectiveFrom, by: "当前用户", at },
+                  });
+                } else {
+                  onSave({
+                    ...d,
+                    priceEffectiveFrom,
+                    pendingPrice: undefined,
+                    priceHistory: [
+                      { from: value.price, to: d.price, effectiveFrom: priceEffectiveFrom, by: "当前用户", at },
+                      ...(value.priceHistory ?? []),
+                    ],
+                  });
+                }
               }}
             >
               确认保存
@@ -729,6 +768,91 @@ function DrugForm({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+/* ---------- 单价变更信息 ---------- */
+
+function PriceInfo({
+  current,
+  pending,
+  history,
+  onCancelPending,
+  pendingCleared,
+}: {
+  current: number;
+  pending?: Drug["pendingPrice"];
+  history: PriceChange[];
+  onCancelPending?: () => void;
+  pendingCleared?: boolean;
+}) {
+  const [showAll, setShowAll] = useState(false);
+  const last = history[0];
+  const fmt = (n: number) => `¥${n.toFixed(4)}`;
+  if (!pending && !last) {
+    return (
+      <div className="col-span-2 mt-1 mb-2 text-caption text-text-tertiary">暂无调价记录</div>
+    );
+  }
+  return (
+    <div className="col-span-2 mt-1 mb-2 rounded-lg border border-border bg-surface-subtle px-3.5 py-3 space-y-2">
+      {pending && !pendingCleared && (
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 text-body-sm">
+            <span className="tag tag-warning mr-2">待生效</span>
+            <span className="text-foreground">
+              {fmt(current)} → <span className="font-medium">{fmt(pending.price)}</span>
+            </span>
+            <span className="ml-2 text-text-secondary">将于 {pending.from} 生效</span>
+            <div className="mt-0.5 text-caption text-text-tertiary">
+              {pending.by} 设定于 {pending.at}
+            </div>
+          </div>
+          {onCancelPending && (
+            <button type="button" onClick={onCancelPending} className="shrink-0 text-caption text-primary hover:underline">
+              撤销
+            </button>
+          )}
+        </div>
+      )}
+      {pendingCleared && (
+        <div className="text-caption text-text-tertiary">待生效的调价已撤销，保存后生效</div>
+      )}
+      {last && (
+        <div className={pending ? "pt-2 border-t border-border" : ""}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 text-body-sm">
+              <span className="tag tag-muted mr-2">上次调价</span>
+              <span className="text-foreground">
+                {fmt(last.from)} → {fmt(last.to)}
+              </span>
+              <span className="ml-2 text-text-secondary">{last.effectiveFrom} 生效</span>
+              <div className="mt-0.5 text-caption text-text-tertiary">
+                {last.by} 修改于 {last.at}
+              </div>
+            </div>
+            {history.length > 1 && (
+              <button type="button" onClick={() => setShowAll((v) => !v)} className="shrink-0 text-caption text-primary hover:underline">
+                {showAll ? "收起" : `全部记录（${history.length}）`}
+              </button>
+            )}
+          </div>
+          {showAll && (
+            <div className="mt-2 divide-y divide-border rounded-md border border-border bg-card">
+              {history.map((h, i) => (
+                <div key={i} className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 px-3 py-2 text-caption">
+                  <span className="text-foreground tabular-nums">
+                    {fmt(h.from)} → {fmt(h.to)}
+                    <span className="ml-2 text-text-tertiary">{h.by} · {h.at}</span>
+                  </span>
+                  <span className="text-text-secondary">{h.effectiveFrom} 生效</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
