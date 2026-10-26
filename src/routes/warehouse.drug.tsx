@@ -574,7 +574,8 @@ function DrugForm({
           />
           <SubHead title="剂量设置" />
           <div className="col-span-2 space-y-2">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-4">
+
               <span className="text-body-sm font-medium text-foreground">按变量计算剂量</span>
               <div className="flex items-center gap-2">
                 {d.variableDose && (
@@ -1328,9 +1329,9 @@ function FBool({
 /** 兽医业务配置内的小分区标题 */
 function SubHead({ title, first }: { title: string; first?: boolean }) {
   return (
-    <div className={`col-span-2 flex items-center gap-2 ${first ? "" : "mt-4"}`}>
-      <span className="h-3.5 w-0.5 rounded-full bg-primary" />
+    <div className={`col-span-2 ${first ? "" : "mt-4"}`}>
       <span className="text-body-sm font-medium text-foreground">{title}</span>
     </div>
+
   );
 }
