@@ -432,7 +432,7 @@ function DrugForm({
   return (
     <div className="px-6 py-5 space-y-6">
       {/* 顶部摘要条 */}
-      <div className="rounded-xl border border-border bg-surface-subtle px-4 py-3 grid grid-cols-3 gap-3">
+      <div className="flex flex-wrap items-baseline gap-x-8 gap-y-1 -mt-1">
         <SummaryItem label="单价" value={`¥${(d.price ?? 0).toFixed(4)}`} />
         <SummaryItem label="规格型号" value={d.spec || "—"} />
         <SummaryItem label="休药期" value={d.withdraw || "—"} />
@@ -441,7 +441,9 @@ function DrugForm({
 
       {/* Section 1: ERP 基础信息（只读） */}
       <Section
+        first
         title="ERP 同步基础信息"
+
         hint={
           <span className="inline-flex items-center gap-1 text-caption text-text-tertiary">
             <Lock className="h-3 w-3" /> 由 ERP 同步，只读
@@ -493,7 +495,7 @@ function DrugForm({
             placeholder="如：7天"
           />
           <F
-            label="单价（元，精确到厘）"
+            label="单价（元）"
             required
             value={priceText}
             readOnly={readOnly}
@@ -571,9 +573,10 @@ function DrugForm({
             placeholder="如：5"
           />
           <SubHead title="剂量设置" />
-          <div className="col-span-2 rounded-lg border border-border p-4 space-y-3">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-body font-medium text-foreground">按变量计算剂量</span>
+          <div className="col-span-2 space-y-2">
+            <div className="flex items-center gap-4">
+
+              <span className="text-body-sm font-medium text-foreground">按变量计算剂量</span>
               <div className="flex items-center gap-2">
                 {d.variableDose && (
                   <>
@@ -857,13 +860,16 @@ function Section({
   title,
   hint,
   children,
+  first,
 }: {
   title: string;
   hint?: React.ReactNode;
   children: React.ReactNode;
+  first?: boolean;
 }) {
   return (
-    <section>
+    <section className={first ? "" : "border-t border-border pt-6"}>
+
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-card-title text-foreground flex items-center gap-2">
           <span className="h-3.5 w-1 rounded-full bg-primary inline-block" />
@@ -871,13 +877,13 @@ function Section({
         </h3>
         {hint}
       </div>
-      <div className="rounded-xl border border-border px-4 py-2">{children}</div>
+      {children}
     </section>
   );
 }
 
 function Grid({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-x-6 gap-y-0.5">{children}</div>;
+  return <div className="grid grid-cols-2 gap-x-6 gap-y-2">{children}</div>;
 }
 
 
@@ -1323,9 +1329,9 @@ function FBool({
 /** 兽医业务配置内的小分区标题 */
 function SubHead({ title, first }: { title: string; first?: boolean }) {
   return (
-    <div className={`col-span-2 flex items-center gap-2 ${first ? "" : "mt-3 pt-4 border-t border-border"}`}>
-      <span className="h-3.5 w-0.5 rounded-full bg-primary" />
+    <div className={`col-span-2 ${first ? "" : "mt-4"}`}>
       <span className="text-body-sm font-medium text-foreground">{title}</span>
     </div>
+
   );
 }
