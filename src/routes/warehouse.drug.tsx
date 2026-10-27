@@ -809,11 +809,13 @@ function PriceInfo({
     );
   }
   const line = (label: string, change: React.ReactNode, date: string, action?: React.ReactNode) => (
-    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-caption tabular-nums">
-      <span className="w-16 shrink-0 text-text-tertiary">{label}</span>
-      <span className="text-text-secondary">{change}</span>
-      <span className="text-text-tertiary">{date}</span>
-      {action}
+    <div className="flex items-baseline gap-x-3 text-caption tabular-nums">
+      <span className="w-14 shrink-0 text-text-tertiary">{label}</span>
+      <span className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="text-text-secondary">{change}</span>
+        <span className="text-text-tertiary">{date}</span>
+        {action}
+      </span>
     </div>
   );
   return (
