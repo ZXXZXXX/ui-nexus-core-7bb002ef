@@ -809,19 +809,19 @@ function PriceInfo({
     );
   }
   const line = (label: string, change: React.ReactNode, date: string, action?: React.ReactNode) => (
-    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-body-sm tabular-nums">
-      <span className="shrink-0 text-text-tertiary">{label}</span>
-      <span className="text-foreground">{change}</span>
+    <div className="flex items-baseline gap-x-4 text-caption tabular-nums">
+      <span className="w-16 shrink-0 text-text-tertiary">{label}</span>
+      <span className="text-text-secondary">{change}</span>
       <span className="text-text-tertiary">{date}</span>
       {action}
     </div>
   );
   return (
-    <div className="col-span-full max-w-xl space-y-2">
+    <div className="col-span-full max-w-xl space-y-1.5 pt-1">
       {pending && !pendingCleared &&
         line(
-          "即将生效：",
-          <>{fmt(current)} → <span className="font-medium">{fmt(pending.price)}</span></>,
+          "即将生效",
+          <>{fmt(current)} <span className="text-text-tertiary">→</span> <span className="font-medium text-foreground">{fmt(pending.price)}</span></>,
           pending.from,
           onCancelPending && (
             <button
@@ -838,8 +838,8 @@ function PriceInfo({
       )}
       {last &&
         line(
-          "上次修改：",
-          <>{fmt(last.from)} → {fmt(last.to)}</>,
+          "上次修改",
+          <>{fmt(last.from)} <span className="text-text-tertiary">→</span> {fmt(last.to)}</>,
           last.effectiveFrom,
         )}
     </div>
