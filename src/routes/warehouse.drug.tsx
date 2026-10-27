@@ -805,7 +805,7 @@ function PriceInfo({
   const fmt = (n: number) => `${n.toFixed(4)}元`;
   if (!pending && !last) {
     return (
-      <div className="lg:col-start-4 -mt-1 mb-1 text-caption text-text-tertiary">暂无调价记录</div>
+      <div className="lg:col-start-3 lg:col-span-2 -mt-1 mb-1 text-caption text-text-tertiary">暂无调价记录</div>
     );
   }
   const line = (label: string, change: React.ReactNode, date: string, action?: React.ReactNode) => (
@@ -817,7 +817,7 @@ function PriceInfo({
     </div>
   );
   return (
-    <div className="lg:col-start-4 space-y-1.5 rounded-md border border-border px-3 py-2.5">
+    <div className="lg:col-start-3 lg:col-span-2 space-y-1.5 rounded-md border border-border px-3 py-2.5">
       {pending && !pendingCleared &&
         line(
           "即将生效",
