@@ -654,6 +654,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
             placeholder="如: UDX-001001"
             value={value.diagCode}
             unset={value.diagCodeUnset}
+            warn="若不配置诊断编码，该疾病在诊断后将不会回传「诊断事件」或「诊疗结果事件」给第三方牛群信息系统。"
             onChange={(v) => onChange({ ...value, diagCode: v })}
             onUnsetChange={(v) => onChange({ ...value, diagCodeUnset: v })}
           />
@@ -663,6 +664,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
             placeholder="如: UDT-001001"
             value={value.treatCode}
             unset={value.treatCodeUnset}
+            warn="若不配置处置编码，该疾病在依据处方治疗时，将不会回传「处置事件」或用药信息给第三方牛群信息系统。"
             onChange={(v) => onChange({ ...value, treatCode: v })}
             onUnsetChange={(v) => onChange({ ...value, treatCodeUnset: v })}
           />
