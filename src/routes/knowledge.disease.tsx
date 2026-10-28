@@ -125,6 +125,8 @@ type Disease = {
   code: string;              // DZ-xxxxxx
   diagCode: string;          // 诊断编码：回传 UD 诊断事件时所用编码
   treatCode: string;         // 处置编码：回传 UD 处置事件时所用编码
+  diagCodeUnset: boolean;    // 诊断编码暂不配置
+  treatCodeUnset: boolean;   // 处置编码暂不配置
   typeId: string;            // 所属疾病类型
   subSeq: string;            // 子类型 3 位序号
   name: string;              // 疾病子类型名称
@@ -164,6 +166,8 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
     code: d.id,
     diagCode: d.diagCode ?? `UDX-${d.id.slice(3)}`,
     treatCode: d.treatCode ?? `UDT-${d.id.slice(3)}`,
+    diagCodeUnset: d.diagCode === "",
+    treatCodeUnset: d.treatCode === "",
     typeId: type?.id ?? "T-001",
     subSeq: d.id.slice(-3),
     name: d.name,
@@ -260,6 +264,8 @@ function DiseaseKBPage() {
       code: "DZ-—",
       diagCode: "",
       treatCode: "",
+      diagCodeUnset: true,
+      treatCodeUnset: true,
       typeId: TYPES[0]?.id ?? "T-001",
       subSeq: nextTypeSeq,
       name: "",
@@ -548,6 +554,42 @@ function Field({ label, required, tip, children, hint }: { label: string; requir
   );
 }
 
+function CodeField({
+  label,
+  tip,
+  placeholder,
+  value,
+  unset,
+  onChange,
+  onUnsetChange,
+}: {
+  label: string;
+  tip: string;
+  placeholder: string;
+  value: string;
+  unset: boolean;
+  onChange: (v: string) => void;
+  onUnsetChange: (v: boolean) => void;
+}) {
+  return (
+    <Field label={label} tip={tip}>
+      <div className="flex items-center gap-3">
+        <Input
+          value={unset ? "" : value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={unset ? "暂不配置" : placeholder}
+          disabled={unset}
+          className="font-mono"
+        />
+        <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-caption text-text-secondary">
+          <Checkbox checked={unset} onCheckedChange={(c) => onUnsetChange(c === true)} />
+          暂不配置
+        </label>
+      </div>
+    </Field>
+  );
+}
+
 function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) => void }) {
   const cat = categoryOfType(value.typeId);
 
@@ -578,12 +620,24 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <Field label="诊断编码" tip="回传UD诊断事件时所用编码">
-            <Input value={value.diagCode} onChange={(e) => onChange({ ...value, diagCode: e.target.value })} placeholder="如: UDX-001001" className="font-mono" />
-          </Field>
-          <Field label="处置编码" tip="回传UD处置事件时所用编码">
-            <Input value={value.treatCode} onChange={(e) => onChange({ ...value, treatCode: e.target.value })} placeholder="如: UDT-001001" className="font-mono" />
-          </Field>
+          <CodeField
+            label="诊断编码"
+            tip="回传UD诊断事件时所用编码"
+            placeholder="如: UDX-001001"
+            value={value.diagCode}
+            unset={value.diagCodeUnset}
+            onChange={(v) => onChange({ ...value, diagCode: v })}
+            onUnsetChange={(v) => onChange({ ...value, diagCodeUnset: v })}
+          />
+          <CodeField
+            label="处置编码"
+            tip="回传UD处置事件时所用编码"
+            placeholder="如: UDT-001001"
+            value={value.treatCode}
+            unset={value.treatCodeUnset}
+            onChange={(v) => onChange({ ...value, treatCode: v })}
+            onUnsetChange={(v) => onChange({ ...value, treatCodeUnset: v })}
+          />
         </div>
         <div className="grid grid-cols-3 gap-3">
           <Field label="状态" required>
@@ -790,8 +844,20 @@ function DetailView({ value }: { value: Disease }) {
       <SectionCard title="基础信息" icon={<FileText className="h-4 w-4 text-primary" />}>
         <KV label="疾病类型" value={t?.name ?? "—"} />
         <KV label="疾病分类" value={cat?.name ?? "—"} />
-        <KV label="诊断编码" tip="回传UD诊断事件时所用编码" value={value.diagCode} mono />
-        <KV label="处置编码" tip="回传UD处置事件时所用编码" value={value.treatCode} mono />
+        <KV
+          label="诊断编码"
+          tip="回传UD诊断事件时所用编码"
+          value={value.diagCode}
+          mono={!value.diagCodeUnset}
+          valueNode={value.diagCodeUnset ? <span className="text-text-tertiary">暂不配置</span> : undefined}
+        />
+        <KV
+          label="处置编码"
+          tip="回传UD处置事件时所用编码"
+          value={value.treatCode}
+          mono={!value.treatCodeUnset}
+          valueNode={value.treatCodeUnset ? <span className="text-text-tertiary">暂不配置</span> : undefined}
+        />
         <KV label="是否治疗" value={value.treatable ? "是" : "否"} />
         <KV
           label="状态"
