@@ -560,6 +560,7 @@ function CodeField({
   placeholder,
   value,
   unset,
+  warn,
   onChange,
   onUnsetChange,
 }: {
@@ -568,9 +569,11 @@ function CodeField({
   placeholder: string;
   value: string;
   unset: boolean;
+  warn: string;
   onChange: (v: string) => void;
   onUnsetChange: (v: boolean) => void;
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
   return (
     <Field label={label} tip={tip}>
       <div className="flex items-center gap-3">
@@ -582,10 +585,35 @@ function CodeField({
           className="font-mono"
         />
         <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-caption text-text-secondary">
-          <Checkbox checked={unset} onCheckedChange={(c) => onUnsetChange(c === true)} />
+          <Checkbox
+            checked={unset}
+            onCheckedChange={(c) => {
+              if (c === true) setConfirmOpen(true);
+              else onUnsetChange(false);
+            }}
+          />
           暂不配置
         </label>
       </div>
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>暂不配置{label}</AlertDialogTitle>
+            <AlertDialogDescription>{warn}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>返回填写</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                onUnsetChange(true);
+                setConfirmOpen(false);
+              }}
+            >
+              确认暂不配置
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Field>
   );
 }
@@ -626,6 +654,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
             placeholder="如: UDX-001001"
             value={value.diagCode}
             unset={value.diagCodeUnset}
+            warn="若不配置诊断编码，该疾病在诊断后将不会回传「诊断事件」或「诊疗结果事件」给第三方牛群信息系统。"
             onChange={(v) => onChange({ ...value, diagCode: v })}
             onUnsetChange={(v) => onChange({ ...value, diagCodeUnset: v })}
           />
@@ -635,6 +664,7 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
             placeholder="如: UDT-001001"
             value={value.treatCode}
             unset={value.treatCodeUnset}
+            warn="若不配置处置编码，该疾病在依据处方治疗时，将不会回传「处置事件」或用药信息给第三方牛群信息系统。"
             onChange={(v) => onChange({ ...value, treatCode: v })}
             onUnsetChange={(v) => onChange({ ...value, treatCodeUnset: v })}
           />
