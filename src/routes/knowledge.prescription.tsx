@@ -43,12 +43,26 @@ import {
   ClipboardList,
   Stethoscope,
   RefreshCw,
+  CalendarDays,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { maxDaysFor, drugDayLimit } from "@/data/drug-days";
+import { maxDaysFor } from "@/data/drug-days";
 import { StatScopeCard, prescriptionStats } from "@/components/stat-scope-card";
 import { PRESCRIPTION_SEED, RX_DRUG_CATALOG } from "@/lib/prescription-kb";
+import {
+  type DayPlan,
+  type PlanKind,
+  MAX_COURSE_DAYS,
+  clampCourse,
+  copyPrevDay,
+  dayList,
+  defaultPlan,
+  dropItem,
+  resizePlan,
+  scheduledDays,
+  toggleDay,
+} from "@/lib/rx-plan";
 
 export const Route = createFileRoute("/knowledge/prescription")({
   head: () => ({ meta: [{ title: "处方管理 — 奇点智牧" }] }),
@@ -188,7 +202,38 @@ type Rx = {
   updated: string;
   diseaseCode?: string;
   enabled?: boolean;
+  /** 按天编排：长度 = 疗程天数，每天安排的用药/非用药/复查 */
+  plan?: DayPlan[];
 };
+
+/** 写入编排，并同步疗程与各明细的天数统计 */
+function withPlan(v: Rx, plan: DayPlan[]): Rx {
+  return {
+    ...v,
+    plan,
+    duration: plan.length,
+    drugs: v.drugs.map((d) => ({ ...d, days: scheduledDays(plan, "drugs", d.id) })),
+    tasks: v.tasks.map((t) => ({ ...t, days: scheduledDays(plan, "tasks", t.id) })),
+    review: { ...v.review, days: scheduledDays(plan, "review") },
+  };
+}
+
+/** 第1、2、3天 → 第1-3天 */
+function fmtDays(days: number[]): string {
+  if (!days.length) return "未编排";
+  const parts: string[] = [];
+  let s = days[0];
+  let p = days[0];
+  for (const d of [...days.slice(1), Infinity]) {
+    if (d === p + 1) {
+      p = d;
+      continue;
+    }
+    parts.push(s === p ? `${s}` : `${s}-${p}`);
+    s = p = d;
+  }
+  return `第${parts.join("、")}天`;
+}
 
 // ---------- catalog ----------
 
@@ -242,7 +287,15 @@ function newTask(): TaskDetail {
 
 // ---------- 种子 ----------
 
-const seed: Rx[] = PRESCRIPTION_SEED as unknown as Rx[];
+/** 旧处方（连续天数 + 每 n 天 m 次）转为按天编排；之后频次只表示当天次数 */
+function normalizeRx(r: Rx): Rx {
+  if (r.plan) return r;
+  const one = <T extends { freq: Freq }>(x: T): T => ({ ...x, freq: { n: 1, m: x.freq.m } });
+  const next = withPlan(r, defaultPlan(r));
+  return { ...next, drugs: next.drugs.map(one), tasks: next.tasks.map(one), review: one(next.review) };
+}
+
+const seed: Rx[] = (PRESCRIPTION_SEED as unknown as Rx[]).map(normalizeRx);
 
 
 // ---------- 摘要拼接 ----------
@@ -258,12 +311,12 @@ function drugSummary(d: DrugDetail): string {
       : "按自定义变量计算"
     : d.fixedDose || "";
   const route = d.routes.join("/") || "";
-  const freq = `${d.freq.n}天${d.freq.m}次`;
-  return [name, dose, route, freq, `连续${d.days}天`].filter(Boolean).join("，");
+  const freq = `每天${d.freq.m}次`;
+  return [name, dose, route, freq, `共${d.days}天`].filter(Boolean).join("，");
 }
 
 function taskSummary(t: TaskDetail): string {
-  return [t.name, t.action, `${t.freq.n}天${t.freq.m}次`, `连续${t.days}天`].filter(Boolean).join("，");
+  return [t.name, t.action, `每天${t.freq.m}次`, `共${t.days}天`].filter(Boolean).join("，");
 }
 
 function buildSummary(r: Rx): string {
@@ -350,6 +403,7 @@ function PrescriptionPage() {
       drugs: [newDrug()],
       tasks: [],
       review: defaultReview(kind),
+      plan: resizePlan([], 5),
       author: "当前用户",
       updated: new Date().toISOString().slice(0, 10),
     });
@@ -669,32 +723,29 @@ function sanitizePositive(v: string) {
 function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) => void }) {
   const patch = (p: Partial<Rx>) => onChange({ ...value, ...p });
 
-  const computedDuration = useMemo(() => {
-    const dMax = value.drugs.reduce((m, d) => Math.max(m, Number(d.days) || 0), 0);
-    const tMax = value.tasks.reduce((m, t) => Math.max(m, Number(t.days) || 0), 0);
-    return Math.max(dMax, tMax);
-  }, [value.drugs, value.tasks]);
-
+  // 旧处方没有按天编排时，按原“连续天数/频次”推出默认编排
   useEffect(() => {
-    if (computedDuration !== value.duration) {
-      onChange({ ...value, duration: computedDuration });
-    }
+    if (!value.plan) onChange(normalizeRx(value));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [computedDuration]);
+  }, [value.id]);
+  const plan = value.plan ?? [];
+  const setPlan = (next: DayPlan[]) => onChange(withPlan(value, next));
 
   const addDrug = () => patch({ drugs: [...value.drugs, newDrug()] });
   const updateDrug = (id: string, p: Partial<DrugDetail>) =>
     patch({ drugs: value.drugs.map((d) => (d.id === id ? { ...d, ...p } : d)) });
-  const removeDrug = (id: string) => patch({ drugs: value.drugs.filter((d) => d.id !== id) });
+  const removeDrug = (id: string) =>
+    onChange(withPlan({ ...value, drugs: value.drugs.filter((d) => d.id !== id) }, dropItem(plan, "drugs", id)));
 
   const addTask = () => patch({ tasks: [...value.tasks, newTask()] });
   const updateTask = (id: string, p: Partial<TaskDetail>) =>
     patch({ tasks: value.tasks.map((t) => (t.id === id ? { ...t, ...p } : t)) });
-  const removeTask = (id: string) => patch({ tasks: value.tasks.filter((t) => t.id !== id) });
+  const removeTask = (id: string) =>
+    onChange(withPlan({ ...value, tasks: value.tasks.filter((t) => t.id !== id) }, dropItem(plan, "tasks", id)));
 
   return (
     <Tabs defaultValue="basic" className="mt-4">
-      <TabsList className="grid w-full grid-cols-4 h-9">
+      <TabsList className="grid w-full grid-cols-5 h-9">
         <TabsTrigger value="basic" className="text-body-sm">基础信息</TabsTrigger>
         <TabsTrigger value="drugs" className="text-body-sm">
           用药 <span className="ml-1 text-text-tertiary">{value.drugs.length}</span>
@@ -703,6 +754,9 @@ function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) =>
           非用药 <span className="ml-1 text-text-tertiary">{value.tasks.length}</span>
         </TabsTrigger>
         <TabsTrigger value="review" className="text-body-sm">复查</TabsTrigger>
+        <TabsTrigger value="plan" className="text-body-sm">
+          每日编排 <span className="ml-1 text-text-tertiary">{plan.length}天</span>
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="basic" className="mt-4 space-y-4">
@@ -750,21 +804,14 @@ function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) =>
                 placeholder="适用场景简述，用于列表选择"
               />
             </Field>
-            <Field label="处方疗程">
-              <div className="relative">
-                <Input
-                  value={String(value.duration || 0)}
-                  readOnly
-                  tabIndex={-1}
-                  className="h-9 pr-8 text-body-sm bg-surface-subtle/60 cursor-not-allowed"
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-text-tertiary pointer-events-none">
-                  天
-                </span>
-              </div>
-              <div className="mt-1 text-caption text-text-tertiary">
-                根据用药与非用药最大天数自动计算
-              </div>
+            <Field label="处方疗程" required hint={`1-${MAX_COURSE_DAYS} 天，输入后在「每日编排」里逐天安排任务`}>
+              <NumberInput
+                value={value.duration}
+                onChange={(n) => setPlan(resizePlan(plan, clampCourse(n)))}
+                suffix="天"
+                max={MAX_COURSE_DAYS}
+                maxMessage={`处方疗程最多 ${MAX_COURSE_DAYS} 天`}
+              />
             </Field>
           </div>
           <div className="flex items-center justify-between rounded-md bg-surface-subtle/60 px-3 py-2">
@@ -873,6 +920,12 @@ function PrescriptionForm({ value, onChange }: { value: Rx; onChange: (v: Rx) =>
           <ReviewEditor value={value.review} onChange={(review) => patch({ review })} />
         </SectionCard>
       </TabsContent>
+
+      <TabsContent value="plan" className="mt-4 space-y-4">
+        <SectionCard bare title={`每日编排 · 疗程 ${plan.length} 天`} icon={<CalendarDays className="h-4 w-4 text-primary" />}>
+          <DayPlanEditor rx={value} plan={plan} onChange={setPlan} />
+        </SectionCard>
+      </TabsContent>
     </Tabs>
   );
 }
@@ -945,13 +998,8 @@ function DrugDetailRow({
             </Field>
           </div>
           <div className="w-28">
-            <Field label="用药天数" required>
-              <NumberInput
-                value={value.days}
-                onChange={(days) => onChange({ days })}
-                suffix="天"
-                max={maxDaysFor(value.drugs.map((d) => d.name))}
-              />
+            <Field label="用药天数">
+              <PlanCount days={value.days} />
             </Field>
           </div>
           <div className="w-48">
@@ -1075,7 +1123,6 @@ function AltDrugEditor({
   onChange: (p: Partial<DrugRef>) => void;
 }) {
   const route = drug.route ?? base.routes[0] ?? "";
-  const days = drug.days ?? base.days;
   const freq = drug.freq ?? base.freq;
   const variable = drug.variable ?? base.variable;
   const variableKind = drug.variableKind ?? base.variableKind;
@@ -1104,16 +1151,6 @@ function AltDrugEditor({
                 ))}
               </SelectContent>
             </Select>
-          </Field>
-        </div>
-        <div className="w-28">
-          <Field label="用药天数" required>
-            <NumberInput
-              value={days}
-              onChange={(v) => onChange({ days: v })}
-              suffix="天"
-              max={drugDayLimit(drug.name).maxDays}
-            />
           </Field>
         </div>
         <div className="w-48">
@@ -1276,8 +1313,8 @@ function TaskDetailRow({
             </SelectContent>
           </Select>
         </Field>
-        <Field label="执行天数" required>
-          <NumberInput value={value.days} onChange={(days) => onChange({ days })} suffix="天" />
+        <Field label="执行天数">
+          <PlanCount days={value.days} />
         </Field>
       </div>
 
@@ -1315,12 +1352,8 @@ function ReviewEditor({ value, onChange }: { value: ReviewCfg; onChange: (v: Rev
       {value.on && (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="复查天数" required hint="1-9 天">
-              <NumberInput
-                value={value.days}
-                onChange={(days) => patch({ days: Math.min(9, Math.max(1, days || 1)) })}
-                suffix="天"
-              />
+            <Field label="复查天数" hint="最多 9 天">
+              <PlanCount days={value.days} />
             </Field>
             <Field label="复查频次" required>
               <FrequencyInput
@@ -1415,23 +1448,14 @@ function NumberInput({
 function FrequencyInput({ value, onChange }: { value: Freq; onChange: (v: Freq) => void }) {
   return (
     <div className="flex items-center gap-1 h-9 rounded-md border border-input bg-white px-2 text-body">
-      <span className="text-text-tertiary">每</span>
-      <Input
-        value={String(value.n || "")}
-        inputMode="numeric"
-        onChange={(e) => {
-          const s = sanitizePositive(e.target.value);
-          onChange({ ...value, n: s ? Number(s) : 1 });
-        }}
-        className="h-7 w-12 text-center border-0 shadow-none focus-visible:ring-0 p-0"
-      />
-      <span className="text-text-tertiary">天</span>
+      <span className="text-text-tertiary">当天</span>
       <Input
         value={String(value.m || "")}
         inputMode="numeric"
         onChange={(e) => {
           const s = sanitizePositive(e.target.value);
-          onChange({ ...value, m: s ? Number(s) : 1 });
+          // 哪几天执行由每日编排决定，这里只设当天次数
+          onChange({ n: 1, m: s ? Number(s) : 1 });
         }}
         className="h-7 w-12 text-center border-0 shadow-none focus-visible:ring-0 p-0"
       />
@@ -1807,8 +1831,8 @@ function PrescriptionView({ r }: { r: Rx }) {
               <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
                 {d.drugType && <KV k="药品类型" v={d.drugType} />}
                 <KV k="给药方式" v={d.routes.join("、") || "—"} />
-                <KV k="用药天数" v={`${d.days} 天`} />
-                <KV k="用药频次" v={`${d.freq.n}天${d.freq.m}次`} />
+                <KV k="用药天数" v={`${d.days} 天（${fmtDays(dayList(r.plan ?? [], "drugs", d.id))}）`} />
+                <KV k="用药频次" v={`当天${d.freq.m}次`} />
                 <KV k="区分时段" v={d.slotOn ? "是" : "否"} />
                 {d.slotOn && (
                   <KV
@@ -1847,8 +1871,8 @@ function PrescriptionView({ r }: { r: Rx }) {
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1">
                     <KV k="任务类型" v={t.type} />
                     <KV k="记录方式" v={t.record} />
-                    <KV k="执行天数" v={`${t.days} 天`} />
-                    <KV k="执行频次" v={`${t.freq.n}天${t.freq.m}次`} />
+                    <KV k="执行天数" v={`${t.days} 天（${fmtDays(dayList(r.plan ?? [], "tasks", t.id))}）`} />
+                    <KV k="执行频次" v={`当天${t.freq.m}次`} />
                     <KV k="区分时段" v={t.slotOn ? "是" : "否"} />
                     {t.slotOn && (
                       <KV
@@ -1871,12 +1895,13 @@ function PrescriptionView({ r }: { r: Rx }) {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1.5">
             <KV k="复查天数" v={`${r.review.days} 天`} />
-            <KV k="复查频次" v={`${r.review.freq.n}天${r.review.freq.m}次`} />
+            <KV k="复查频次" v={`当天${r.review.freq.m}次`} />
             <KV k="区分时段" v={r.review.slotOn ? "是" : "否"} />
             <KV
               k="每日时段"
               v={`早 ${r.review.slot.morning} / 中 ${r.review.slot.noon} / 晚 ${r.review.slot.evening}`}
             />
+            <KV k="复查安排" v={fmtDays(dayList(r.plan ?? [], "review"))} />
             <KV k="转栏填写" v={r.review.transferOn ? "是" : "否"} />
             <KV k="任务时限" v={r.review.deadline === "24h" ? "24 小时" : "48 小时"} />
             <div className="col-span-2 md:col-span-3">
@@ -1884,6 +1909,10 @@ function PrescriptionView({ r }: { r: Rx }) {
             </div>
           </div>
         )}
+      </ViewGroup>
+
+      <ViewGroup label={`每日编排（疗程 ${r.duration} 天）`}>
+        <DayPlanView rx={r} />
       </ViewGroup>
 
       <div className="flex items-center gap-4 text-caption text-text-tertiary pt-2 border-t border-border">
@@ -1920,4 +1949,123 @@ function ViewRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 
+}
+
+// ---------- 每日编排 ----------
+
+type PlanChip = { kind: PlanKind; id?: string; label: string; limit?: number };
+
+function planChips(rx: Rx): PlanChip[] {
+  return [
+    ...rx.drugs.map((d, i) => ({
+      kind: "drugs" as const,
+      id: d.id,
+      label: d.drugs[0]?.name || `用药明细 ${String(i + 1).padStart(2, "0")}`,
+      limit: maxDaysFor(d.drugs.map((x) => x.name)),
+    })),
+    ...rx.tasks.map((t, i) => ({ kind: "tasks" as const, id: t.id, label: t.name || `任务 ${i + 1}` })),
+    ...(rx.review.on ? [{ kind: "review" as const, label: rx.review.desc || "复查" }] : []),
+  ];
+}
+
+const CHIP_ICON: Record<PlanKind, typeof Pill> = { drugs: Pill, tasks: ClipboardList, review: RefreshCw };
+const KIND_NAME: Record<PlanKind, string> = { drugs: "用药", tasks: "非用药", review: "复查" };
+
+const isOn = (day: DayPlan, c: PlanChip) => (c.kind === "review" ? day.review : day[c.kind].includes(c.id ?? ""));
+
+function PlanCount({ days }: { days: number }) {
+  return (
+    <div className="h-9 flex items-center text-body-sm">
+      <span className="font-medium text-foreground tabular-nums">{days}</span>
+      <span className="ml-1 text-text-tertiary">天 · 在「每日编排」中安排</span>
+    </div>
+  );
+}
+
+function DayPlanEditor({ rx, plan, onChange }: { rx: Rx; plan: DayPlan[]; onChange: (p: DayPlan[]) => void }) {
+  const chips = planChips(rx);
+  if (!chips.length) {
+    return (
+      <div className="rounded-md border border-dashed border-border p-4 text-center text-body-sm text-text-tertiary">
+        先在「用药」「非用药」「复查」中添加明细，再回到这里按天安排
+      </div>
+    );
+  }
+  const toggle = (i: number, c: PlanChip) => {
+    const r = toggleDay(plan, i, c.kind, c.id, c.limit);
+    if (r.blocked) toast.warning(r.blocked);
+    else onChange(r.plan);
+  };
+  return (
+    <div className="space-y-3">
+      <div className="text-caption text-text-tertiary">
+        点选每天要执行的项目；用药天数、执行天数、复查天数会按这里的安排自动统计。
+      </div>
+      <div className="divide-y divide-border rounded-md border border-border">
+        {plan.map((day, i) => {
+          const empty = !day.drugs.length && !day.tasks.length && !day.review;
+          return (
+            <div key={i} className="flex items-start gap-3 px-3 py-2.5">
+              <div className="w-14 shrink-0 pt-1">
+                <div className="text-body-sm font-medium text-foreground">第 {i + 1} 天</div>
+                {empty && <div className="text-caption text-text-tertiary">休息</div>}
+              </div>
+              <div className="flex-1 min-w-0 flex flex-wrap gap-1.5">
+                {chips.map((c) => {
+                  const on = isOn(day, c);
+                  const Icon = CHIP_ICON[c.kind];
+                  return (
+                    <button
+                      key={`${c.kind}-${c.id ?? ""}`}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggle(i, c)}
+                      title={`${KIND_NAME[c.kind]}：${c.label}`}
+                      className={cn(
+                        "inline-flex max-w-[220px] items-center gap-1 rounded-md border px-2 h-7 text-body-sm transition-colors",
+                        on
+                          ? "border-primary bg-[var(--brand-subtle)] text-primary"
+                          : "border-border text-text-tertiary hover:border-primary/50 hover:text-text-secondary",
+                      )}
+                    >
+                      <Icon className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{c.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                type="button"
+                onClick={() => onChange(copyPrevDay(plan, i))}
+                className={cn("shrink-0 h-7 text-caption text-primary hover:underline", i === 0 && "invisible")}
+              >
+                同前一天
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function DayPlanView({ rx }: { rx: Rx }) {
+  const plan = rx.plan ?? [];
+  const chips = planChips(rx);
+  if (!plan.length) return <div className="text-text-tertiary">—</div>;
+  return (
+    <div className="space-y-1">
+      {plan.map((day, i) => {
+        const on = chips.filter((c) => isOn(day, c));
+        return (
+          <div key={i} className="flex items-baseline gap-3">
+            <span className="w-14 shrink-0 text-text-tertiary">第 {i + 1} 天</span>
+            <span className={on.length ? "text-text-secondary" : "text-text-tertiary"}>
+              {on.length ? on.map((c) => `${KIND_NAME[c.kind]}·${c.label}`).join("；") : "休息"}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
