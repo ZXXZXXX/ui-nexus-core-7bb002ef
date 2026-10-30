@@ -2034,15 +2034,13 @@ function DayPlanEditor({ rx, plan, onChange }: { rx: Rx; plan: DayPlan[]; onChan
                   );
                 })}
               </div>
-              {i > 0 && (
-                <button
-                  type="button"
-                  onClick={() => onChange(copyPrevDay(plan, i))}
-                  className="shrink-0 h-7 text-caption text-primary hover:underline"
-                >
-                  同前一天
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => onChange(copyPrevDay(plan, i))}
+                className={cn("shrink-0 h-7 text-caption text-primary hover:underline", i === 0 && "invisible")}
+              >
+                同前一天
+              </button>
             </div>
           );
         })}
