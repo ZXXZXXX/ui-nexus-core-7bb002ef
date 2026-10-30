@@ -56,7 +56,7 @@ const INITIAL: Msg[] = [
   { id: "wo-due", name: "工单临期提醒", desc: "工单临近截止时间时提醒责任人尽快处理，避免任务逾期。", category: "工单任务类", template: "{工单类型}工单 {工单号}（牛号 {牛号}）将于 {截止时间} 到期，请尽快处理。", variables: ["工单类型", "工单号", "牛号", "截止时间"], jump: "工单详情页", inApp: true, wecom: true, enabled: true },
   { id: "wo-overdue", name: "工单逾期提醒", desc: "工单超过截止时间仍未完成，提醒责任人及管理层跟进。", category: "工单任务类", template: "{工单类型}工单 {工单号} 已逾期 {逾期时长}，执行人：{执行人}，请尽快跟进。", variables: ["工单类型", "工单号", "逾期时长", "执行人"], jump: "工单列表页", inApp: true, wecom: true, enabled: true },
   { id: "wo-diagnose", name: "待诊断提醒", desc: "牧场人员上报疑似疾病后，提醒兽医及时给出诊断。", category: "工单任务类", template: "牛号 {牛号} 上报疑似 {疾病名称}，上报人 {上报人}，请及时诊断。", variables: ["牛号", "疾病名称", "上报人"], jump: "工单详情页", inApp: true, wecom: true, enabled: true },
-  { id: "wo-abnormal", name: "工单异常提醒", desc: "UD 下发的工单因本牧场缺少处方所需药品库存，未能成功匹配处方，提醒兽医补充库存或调整处方后再执行。", category: "工单任务类", template: "UD 下发的{工单类型}工单 {工单号}（牛号 {牛号}）因本场缺少 {缺失药品} 库存，未能匹配处方，请补充库存或调整处方。", variables: ["工单类型", "工单号", "牛号", "缺失药品"], jump: "工单详情页", inApp: true, wecom: false, enabled: true },
+  { id: "wo-abnormal", name: "工单异常提醒", desc: "UD 下发的工单因本牧场缺少处方所需药品库存，未能成功匹配处方，提醒兽医补充库存或调整处方后再执行。", category: "工单任务类", template: "{n}项{工单类型}工单尚未匹配到满足库存要求的处方，请及时处理。", variables: ["n", "工单类型"], jump: "工单列表页", inApp: true, wecom: false, enabled: true },
   { id: "drug-pile", name: "药品堆积提醒", desc: "三级库某药品存量超过建议值，提醒及时消耗或调拨。", category: "药品类", template: "{药品名称} 在三级库 {库位} 堆积 {库存数量}，超过建议存量，请及时处理。", variables: ["药品名称", "库位", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, enabled: true },
   { id: "drug-near", name: "药品临期提醒", desc: "药品临近有效期，提醒优先使用，减少过期损耗。", category: "药品类", template: "{药品名称}（批号 {批号}）将于 {有效期} 过期，剩余 {库存数量}。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: false, enabled: true },
   { id: "drug-expired", name: "药品过期提醒", desc: "药品已超过有效期，提醒立即停用并下架处理。", category: "药品类", template: "{药品名称}（批号 {批号}）已于 {有效期} 过期，剩余 {库存数量}，请勿使用。", variables: ["药品名称", "批号", "有效期", "库存数量"], jump: "三级库详情页", inApp: true, wecom: true, enabled: true },
@@ -68,7 +68,7 @@ const varsOf = (c: Category) => [...new Set(INITIAL.filter((m) => m.category ===
 // 预览用示例值（模拟真实数据）
 const SAMPLE: Record<string, string> = {
   工单类型: "疾病治疗", 工单号: "GD20261020-0137", 牛号: "#01-23-0412", 截止时间: "10月21日 18:00",
-  逾期时长: "6小时", 执行人: "王建国", 疾病名称: "乳房炎", 上报人: "李明", 缺失药品: "头孢噻呋钠注射液",
+  逾期时长: "6小时", 执行人: "王建国", 疾病名称: "乳房炎", 上报人: "李明", n: "3",
   药品名称: "头孢噻呋钠", 库位: "3号舍药品柜", 库存数量: "48支", 批号: "B240815", 有效期: "2026-11-30",
   牧场名称: "奇点一牧", 角色名称: "兽医", 操作人: "张伟", 检测项目: "隐性乳房炎检测",
 };
