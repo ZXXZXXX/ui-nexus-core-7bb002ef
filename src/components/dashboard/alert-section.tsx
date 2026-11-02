@@ -20,7 +20,6 @@ const groups: { key: string; icon: typeof AlertTriangle; items: Item[] }[] = [
     items: [
       { title: "#01-24-2381", desc: "诊疗期已达 18 天，超出牧场平均诊疗天数 2.4 倍，超出标准处方疗程 10 天", tag: "诊疗期长", tone: "var(--state-danger)" },
       { title: "#01-24-2105", desc: "近一年报病 6 次，建议评估淘汰", tag: "发病次数多", tone: "var(--state-warning)" },
-      { title: "#01-23-1876", desc: "累计诊疗费用 1,860 元，居全场首位", tag: "费用高", tone: "var(--effect-ai-purple)" },
     ],
   },
   {
