@@ -36,11 +36,10 @@ const herdByMonth: Record<string, number> = {
 
 // 各类药品费用占比（按月份微调）
 const COMP_WEIGHTS: { name: string; base: number }[] = [
-  { name: "抗生素", base: 0.42 },
-  { name: "激素类", base: 0.16 },
-  { name: "消炎镇痛", base: 0.13 },
-  { name: "促生殖", base: 0.11 },
-  { name: "其他", base: 0.18 },
+  { name: "治疗用药", base: 0.52 },
+  { name: "免疫用药", base: 0.24 },
+  { name: "保健用药", base: 0.16 },
+  { name: "修蹄用药", base: 0.08 },
 ];
 
 function compositionFor(label: string, total: number) {
