@@ -509,13 +509,7 @@ function DrugForm({
             current={value.price}
             pending={value.pendingPrice}
             history={value.priceHistory ?? []}
-            onCancelPending={
-              readOnly
-                ? () => {
-                    if (window.confirm("确定撤销这次未生效的调价吗？")) { const next = { ...value, pendingPrice: undefined }; setD((s) => ({ ...s, pendingPrice: undefined })); onSave(next, true); }
-                  }
-                : () => patch({ pendingPrice: undefined })
-            }
+            onCancelPending={readOnly ? undefined : () => patch({ pendingPrice: undefined })}
             pendingCleared={!!value.pendingPrice && !d.pendingPrice}
           />
         </Grid>
