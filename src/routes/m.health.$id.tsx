@@ -49,6 +49,7 @@ import {
 import { TransferBarnControl } from "@/components/m/transfer-barn-control";
 import { ConfirmTransferDialog } from "@/components/m/confirm-transfer-dialog";
 import { getOrderEarTagLabel } from "@/lib/work-order-cattle";
+import { parseVitals, fmtTemp, fmtKetone, isTempHigh, isKetoneHigh, type Vitals } from "@/lib/wo-vitals";
 import { getWoPlan, buildActionText, computeSessions, actualDoseText, totalDoseText, type WoPlan, type PlanTask } from "@/lib/wo-plan";
 
 
@@ -875,6 +876,22 @@ function EmptyTab({ label }: { label: string }) {
   );
 }
 
+// === 体征数据（体温 / 血酮）回显 ===
+function VitalsSection({ vitals }: { vitals: Vitals }) {
+  const val = (text: string, filled: boolean, high: boolean) => (
+    <span className={`inline-flex items-center gap-1.5 tabular-nums ${filled ? "" : "text-text-tertiary"}`}>
+      {text}
+      {high && <span className="tag tag-warning">偏高</span>}
+    </span>
+  );
+  return (
+    <Section title="体征数据">
+      <Field label="体温" value={val(fmtTemp(vitals.temperature), vitals.temperature !== undefined, isTempHigh(vitals.temperature))} />
+      <Field label="血酮" value={val(fmtKetone(vitals.ketone), vitals.ketone !== undefined, isKetoneHigh(vitals.ketone))} />
+    </Section>
+  );
+}
+
 // === 上报记录 ===
 function ReportTab({ isLoss }: { isLoss: boolean }) {
   return (
@@ -910,6 +927,7 @@ function ReportTab({ isLoss }: { isLoss: boolean }) {
         )}
       </Section>
 
+      {!isLoss && <VitalsSection vitals={{ temperature: 39.6 }} />}
 
       <Section title="具体描述">
         <p className="text-body-sm text-text-secondary leading-relaxed">
@@ -1000,6 +1018,8 @@ function ReviewTab({ isLoss, status, plan }: { isLoss: boolean; status: StatusKe
             />
             <Field label="诊断结论" value={conclusion} />
           </Section>
+
+          {!isLoss && <VitalsSection vitals={parseVitals(plan.description)} />}
 
 
 
