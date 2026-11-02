@@ -542,8 +542,7 @@ function DrugForm({
       {/* Section 3: 兽医业务配置 */}
       <Section title="兽医业务配置" hint={<span className="text-caption text-text-tertiary">由本系统维护</span>}>
         <Grid>
-          <SubHead title="给药方式与单位" first hint="用药单位与规格单位由「规格型号」自动解析，无需填写" />
-          <FMulti
+                    <FMulti
             label="默认给药方式"
             required
             values={d.routes}
@@ -554,7 +553,7 @@ function DrugForm({
           />
           <F label="默认用药单位" value={doseUnit} readOnly />
           <F label="规格单位" value={specUnit} readOnly />
-          <SubHead title="用药周期" />
+          <GroupGap />
           <div className="col-span-2">
             <FrequencyEditor
               label="用药频次规则"
@@ -583,7 +582,7 @@ function DrugForm({
             }}
             placeholder="如：5"
           />
-          <SubHead title="剂量设置" />
+          <GroupGap />
           <div className="col-span-full space-y-2">
             <div className="flex items-center gap-4">
 
@@ -1374,4 +1373,9 @@ function SubHead({ title, first, hint }: { title: string; first?: boolean; hint?
       {hint && <span className="text-caption text-text-tertiary">{hint}</span>}
     </div>
   );
+}
+
+/** 小分区之间仅用留白 + 细线分隔，不加小标题 */
+function GroupGap() {
+  return <div className="col-span-full my-2 border-t border-border/60" />;
 }
