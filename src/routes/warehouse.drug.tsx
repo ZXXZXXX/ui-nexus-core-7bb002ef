@@ -486,7 +486,6 @@ function DrugForm({
       {/* Section 1: 基础信息 */}
       <Section first title="药品信息">
         <Grid>
-          <SubHead title="基础信息" first />
           <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
           <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
           <F
