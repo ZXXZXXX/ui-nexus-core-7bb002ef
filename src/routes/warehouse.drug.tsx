@@ -1,3 +1,4 @@
+import { CornerDownRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppHeader } from "@/components/app-header";
@@ -582,7 +583,13 @@ function DrugForm({
             }}
             placeholder="如：5"
           />
-          <GroupGap />
+          <div className="col-span-full -mt-1 flex gap-2">
+            <CornerDownRight className="mt-2 h-4 w-4 shrink-0 text-primary" aria-hidden />
+            <div className="flex-1 rounded-lg border border-border bg-muted/30 px-4 py-3">
+              <div className="mb-3 text-caption text-text-tertiary">
+                每次用药剂量 <span className="text-text-tertiary">· 用药频次规则中每「次」的剂量定义</span>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-4">
           <div className="col-span-full space-y-2">
             <div className="flex items-center gap-4">
 
@@ -665,6 +672,9 @@ function DrugForm({
                 </span>
               </div>
             )}
+          </div>
+              </div>
+            </div>
           </div>
           <FLong
             label="备注"
