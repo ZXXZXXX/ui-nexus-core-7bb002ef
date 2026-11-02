@@ -442,26 +442,9 @@ function DrugForm({
     <div className="px-6 py-5 space-y-6">
 
 
-      {/* Section 1: 基础信息 */}
-      <Section first title="药品信息">
+      {/* 顶部信息栏：状态与价格 */}
+      <div className="rounded-lg bg-muted/40 px-4 py-4">
         <Grid>
-          <SubHead title="基础信息" first />
-          <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
-          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
-          <F
-            label="规格型号"
-            value={d.spec}
-            readOnly={mode !== "create"}
-            onChange={(v) => {
-              const u = parseSpec(v);
-              patch({ spec: v, doseUnit: u.doseUnit || d.doseUnit, specUnit: u.specUnit || d.specUnit });
-            }}
-          />
-
-          <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
-          <F label="最小扫码单位" value={d.scanUnit ?? ""} readOnly onChange={(v) => patch({ scanUnit: v })} />
-
-          <SubHead title="状态与价格" />
           <FSwitch
             label="药品状态"
             required
@@ -470,22 +453,6 @@ function DrugForm({
             offText="停用"
             readOnly={readOnly}
             onChange={(v) => patch({ status: (v ? "启用" : "停用") as DrugStatus })}
-          />
-          <FSelect
-            label="药品类型"
-            required
-            value={d.drugType}
-            options={["处方药", "非处方药"]}
-            readOnly={readOnly}
-            onChange={(v) => patch({ drugType: v as DrugType })}
-          />
-          <F
-            label="休药期"
-            required
-            value={d.withdraw}
-            readOnly={readOnly}
-            onChange={(v) => patch({ withdraw: v })}
-            placeholder="如：7天"
           />
           <F
             label="单价（元）"
@@ -512,6 +479,44 @@ function DrugForm({
             history={value.priceHistory ?? []}
             onCancelPending={readOnly ? undefined : () => patch({ pendingPrice: undefined })}
             pendingCleared={!!value.pendingPrice && !d.pendingPrice}
+          />
+        </Grid>
+      </div>
+
+      {/* Section 1: 基础信息 */}
+      <Section first title="药品信息">
+        <Grid>
+          <SubHead title="基础信息" first />
+          <F label="药品展示名称" value={d.name} readOnly={mode !== "create"} onChange={(v) => patch({ name: v })} span2 />
+          <F label="通用名" value={d.generic ?? ""} readOnly onChange={(v) => patch({ generic: v })} />
+          <F
+            label="规格型号"
+            value={d.spec}
+            readOnly={mode !== "create"}
+            onChange={(v) => {
+              const u = parseSpec(v);
+              patch({ spec: v, doseUnit: u.doseUnit || d.doseUnit, specUnit: u.specUnit || d.specUnit });
+            }}
+          />
+
+          <F label="商品名/品牌名" value={d.brand ?? ""} readOnly onChange={(v) => patch({ brand: v })} />
+          <F label="最小扫码单位" value={d.scanUnit ?? ""} readOnly onChange={(v) => patch({ scanUnit: v })} />
+
+          <FSelect
+            label="药品类型"
+            required
+            value={d.drugType}
+            options={["处方药", "非处方药"]}
+            readOnly={readOnly}
+            onChange={(v) => patch({ drugType: v as DrugType })}
+          />
+          <F
+            label="休药期"
+            required
+            value={d.withdraw}
+            readOnly={readOnly}
+            onChange={(v) => patch({ withdraw: v })}
+            placeholder="如：7天"
           />
         </Grid>
       </Section>
