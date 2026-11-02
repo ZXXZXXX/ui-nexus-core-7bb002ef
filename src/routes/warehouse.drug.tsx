@@ -555,7 +555,7 @@ function DrugForm({
           <F label="默认用药单位" value={doseUnit} readOnly />
           <F label="计量单位" value={specUnit} readOnly />
           <GroupGap />
-          <div className="col-span-2">
+          <div>
             <FrequencyEditor
               label="用药频次规则"
               value={d.freqRule ?? ""}
@@ -583,6 +583,24 @@ function DrugForm({
             }}
             placeholder="如：5"
           />
+          <div>
+            <div className="text-caption text-text-tertiary">用药剂量上限</div>
+            {readOnly ? (
+              <div className="mt-1 text-body-sm text-foreground">{d.pcDoseMax ? `${d.pcDoseMax} ${doseUnit}` : "—"}</div>
+            ) : (
+              <div className="mt-1 flex items-center gap-2">
+                <Input
+                  value={d.pcDoseMax ?? ""}
+                  onChange={(e) => patch({ pcDoseMax: e.target.value.replace(/[^\d.]/g, "") })}
+                  placeholder="如 30"
+                  className="h-9 w-28 text-body-sm"
+                />
+                <span className="h-9 inline-flex items-center px-2 rounded-md text-body-sm text-text-tertiary border border-border">
+                  {doseUnit}
+                </span>
+              </div>
+            )}
+          </div>
           <div className="col-span-full -mt-1 flex gap-2">
             <CornerDownRight className="mt-2 h-4 w-4 shrink-0 text-primary" aria-hidden />
             <div className="flex-1 rounded-lg border border-border bg-muted/30 px-4 py-3">
@@ -651,24 +669,6 @@ function DrugForm({
                 />
                 <span className="h-9 inline-flex items-center px-2 rounded-md text-body-sm text-text-tertiary border border-border">
                   {doseUnit}/次
-                </span>
-              </div>
-            )}
-          </div>
-          <div>
-            <div className="text-caption text-text-tertiary">用药剂量上限</div>
-            {readOnly ? (
-              <div className="mt-1 text-body-sm text-foreground">{d.pcDoseMax ? `${d.pcDoseMax} ${doseUnit}` : "—"}</div>
-            ) : (
-              <div className="mt-1 flex items-center gap-2">
-                <Input
-                  value={d.pcDoseMax ?? ""}
-                  onChange={(e) => patch({ pcDoseMax: e.target.value.replace(/[^\d.]/g, "") })}
-                  placeholder="如 30"
-                  className="h-9 w-28 text-body-sm"
-                />
-                <span className="h-9 inline-flex items-center px-2 rounded-md text-body-sm text-text-tertiary border border-border">
-                  {doseUnit}
                 </span>
               </div>
             )}
