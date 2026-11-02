@@ -543,8 +543,7 @@ function DrugForm({
       {/* Section 3: 兽医业务配置 */}
       <Section title="兽医业务配置" hint={<span className="text-caption text-text-tertiary">由本系统维护</span>}>
         <Grid>
-          <SubHead title="给药方式与单位" first />
-          <div className="col-span-full -mt-1 text-caption text-text-tertiary">用药单位与规格单位由「规格型号」自动解析，无需填写</div>
+          <SubHead title="给药方式与单位" first hint="用药单位与规格单位由「规格型号」自动解析，无需填写" />
           <FMulti
             label="默认给药方式"
             required
@@ -589,7 +588,7 @@ function DrugForm({
           <div className="col-span-full space-y-2">
             <div className="flex items-center gap-4">
 
-              <span className="text-body-sm font-medium text-foreground">按变量计算剂量</span>
+              <span className="text-caption text-text-tertiary">按变量计算剂量</span>
               <div className="flex items-center gap-2">
                 {d.variableDose && (
                   <>
@@ -903,10 +902,10 @@ function Grid({ children, stack }: { children: React.ReactNode; stack?: boolean 
 
 function Lbl({ label, required }: { label: string; required?: boolean }) {
   return (
-    <Label className="text-caption text-text-tertiary">
+    <span className="block text-caption text-text-tertiary">
       {label}
       {required && <span className="text-[var(--state-danger)] ml-0.5">*</span>}
-    </Label>
+    </span>
   );
 }
 
@@ -1368,12 +1367,12 @@ function FSwitch({
   );
 }
 
-/** 兽医业务配置内的小分区标题 */
-function SubHead({ title, first }: { title: string; first?: boolean }) {
+/** 分区内的小分区标题：所有小分区同一格式（加粗标题 + 可选灰色说明同一行） */
+function SubHead({ title, first, hint }: { title: string; first?: boolean; hint?: string }) {
   return (
-    <div className={`col-span-full ${first ? "" : "mt-3 -mb-1"}`}>
-      <span className="text-body-sm font-medium text-foreground">{title}</span>
+    <div className={`col-span-full flex items-baseline gap-3 ${first ? "" : "mt-4"}`}>
+      <span className="text-body font-semibold text-foreground">{title}</span>
+      {hint && <span className="text-caption text-text-tertiary">{hint}</span>}
     </div>
-
   );
 }
