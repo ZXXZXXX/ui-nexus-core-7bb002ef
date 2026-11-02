@@ -1377,5 +1377,5 @@ function SubHead({ title, first, hint }: { title: string; first?: boolean; hint?
 
 /** 小分区之间仅用留白 + 细线分隔，不加小标题 */
 function GroupGap() {
-  return <div className="col-span-full my-2 border-t border-border/60" />;
+  return <div className="col-span-full h-4" aria-hidden />;
 }
