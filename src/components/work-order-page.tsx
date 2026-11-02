@@ -82,6 +82,7 @@ import {
   Mic,
 } from "lucide-react";
 import { getWoPlan, buildActionText, computeSessions } from "@/lib/wo-plan";
+import { parseVitals, fmtTemp, fmtKetone, isTempHigh, isKetoneHigh, type Vitals } from "@/lib/wo-vitals";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -1205,6 +1206,8 @@ export function WorkOrderPage({
               return { day: i + 1, date: execDate(s.day, s.slot), action: execAction, phase };
             });
             const diagSymptoms = isLoss ? ["冷链异常"] : woPlan.symptoms;
+            const reportVitals = parseVitals(detail.event, detail.desc);
+            const diagVitals = parseVitals(woPlan.description);
             const diagConclusion = isLoss
               ? "疫苗失效，作损耗处理"
               : woPlan.subType
@@ -1286,6 +1289,8 @@ export function WorkOrderPage({
                     </div>
                   </div>
                 )}
+
+                {!isLoss && <VitalsBlock vitals={reportVitals} />}
 
                 {/* 事项说明 —— 干奶 / 疫苗 / 驱虫 */}
                 {!isLoss && typeConfig.showNote && (
@@ -1603,6 +1608,8 @@ export function WorkOrderPage({
                         </div>
                         <Field label="诊断结论" value={diagConclusion || "—"} />
                       </div>
+
+                      {!isLoss && <VitalsBlock vitals={diagVitals} />}
 
                       {/* 具体描述 */}
                       <div className="rounded-md border border-border p-4">
@@ -2501,6 +2508,28 @@ function Field({ label, value }: { label: string; value: string }) {
     <div className="leading-tight">
       <div className="text-caption text-text-tertiary">{label}</div>
       <div className="text-body-sm text-foreground mt-0.5">{value}</div>
+    </div>
+  );
+}
+
+/** 体征数据（体温 / 血酮）回显：未填写显示灰字，超阈值加「偏高」提示 */
+function VitalsBlock({ vitals }: { vitals: Vitals }) {
+  const item = (label: string, text: string, filled: boolean, high: boolean) => (
+    <div className="leading-tight">
+      <div className="text-caption text-text-tertiary">{label}</div>
+      <div className={`mt-0.5 text-body-sm tabular-nums inline-flex items-center gap-1.5 ${filled ? "text-foreground" : "text-text-tertiary"}`}>
+        {text}
+        {high && <span className="tag tag-warning">偏高</span>}
+      </div>
+    </div>
+  );
+  return (
+    <div className="rounded-md border border-border p-4">
+      <div className="text-caption text-text-tertiary mb-2">体征数据</div>
+      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+        {item("体温", fmtTemp(vitals.temperature), vitals.temperature !== undefined, isTempHigh(vitals.temperature))}
+        {item("血酮", fmtKetone(vitals.ketone), vitals.ketone !== undefined, isKetoneHigh(vitals.ketone))}
+      </div>
     </div>
   );
 }
