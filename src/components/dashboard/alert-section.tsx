@@ -10,7 +10,6 @@ const groups: { key: string; icon: typeof AlertTriangle; items: Item[] }[] = [
     items: [
       { title: "疫苗 A", desc: "余量 12 支，低于安全库存 40 支", tag: "紧急", tone: "var(--state-danger)" },
       { title: "头孢噻呋注射液", desc: "已于今日用完，当前库存量为 0 支", tag: "紧急", tone: "var(--state-danger)" },
-      { title: "消毒液", desc: "余量 3 桶，低于安全库存", tag: "预警", tone: "var(--state-warning)" },
       { title: "采血管", desc: "库存临期（30 天内）500 支", tag: "临期", tone: "var(--state-warning)" },
     ],
   },
