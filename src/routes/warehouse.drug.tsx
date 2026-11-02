@@ -1371,7 +1371,7 @@ function FSwitch({
 function SubHead({ title, first, hint }: { title: string; first?: boolean; hint?: string }) {
   return (
     <div className={`col-span-full flex items-baseline gap-3 ${first ? "" : "mt-4"}`}>
-      <span className="text-[14px] leading-6 font-semibold text-foreground">{title}</span>
+      <span className="text-[14px] leading-6 text-foreground" style={{ fontWeight: 600 }}>{title}</span>
       {hint && <span className="text-caption text-text-tertiary">{hint}</span>}
     </div>
   );
