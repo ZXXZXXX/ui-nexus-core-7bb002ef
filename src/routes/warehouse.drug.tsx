@@ -1129,7 +1129,7 @@ function VariableDoseEditor({
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col items-start gap-2">
       {rows.map((row, i) => {
         const { min, max } = parseRange(row.range);
         return (
