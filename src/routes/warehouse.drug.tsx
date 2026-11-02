@@ -838,7 +838,13 @@ function PriceInfo({
     </div>
   );
   return (
-    <div className="lg:col-start-3 lg:col-span-2 space-y-1.5 rounded-md border border-border px-3 py-2.5">
+    <div className="relative lg:col-start-3 lg:col-span-2 space-y-1.5 rounded-md border border-border px-3 py-2.5">
+      {/* 视觉指引：连接左侧单价输入框与调价记录 */}
+      <span aria-hidden className="pointer-events-none absolute right-full top-1/2 hidden lg:flex w-8 -translate-y-1/2 items-center">
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+        <span className="h-px flex-1 border-t border-dashed border-primary/50" />
+        <span className="h-0 w-0 border-y-[4px] border-l-[5px] border-y-transparent border-l-primary/60" />
+      </span>
       {pending && !pendingCleared &&
         line(
           "即将生效",
