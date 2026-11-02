@@ -9,7 +9,7 @@ const groups: { key: string; icon: typeof AlertTriangle; items: Item[] }[] = [
     icon: PackageMinus,
     items: [
       { title: "疫苗 A", desc: "余量 12 支，低于安全库存 40 支", tag: "紧急", tone: "var(--state-danger)" },
-      { title: "头孢噻呋注射液", desc: "余量 6 瓶，预计 2 天内耗尽", tag: "紧急", tone: "var(--state-danger)" },
+      { title: "头孢噻呋注射液", desc: "已于今日用完，当前库存量为 0 支", tag: "紧急", tone: "var(--state-danger)" },
       { title: "消毒液", desc: "余量 3 桶，低于安全库存", tag: "预警", tone: "var(--state-warning)" },
       { title: "采血管", desc: "库存临期（30 天内）500 支", tag: "临期", tone: "var(--state-warning)" },
     ],
@@ -18,7 +18,7 @@ const groups: { key: string; icon: typeof AlertTriangle; items: Item[] }[] = [
     key: "牛只预警",
     icon: Beef,
     items: [
-      { title: "#01-24-2381", desc: "诊疗期已达 18 天，超出平均 2.4 倍", tag: "诊疗期长", tone: "var(--state-danger)" },
+      { title: "#01-24-2381", desc: "诊疗期已达 18 天，超出牧场平均诊疗天数 2.4 倍，超出标准处方疗程 10 天", tag: "诊疗期长", tone: "var(--state-danger)" },
       { title: "#01-24-2105", desc: "近一年报病 6 次，建议评估淘汰", tag: "发病次数多", tone: "var(--state-warning)" },
       { title: "#01-23-1876", desc: "累计诊疗费用 1,860 元，居全场首位", tag: "费用高", tone: "var(--effect-ai-purple)" },
     ],
