@@ -552,7 +552,7 @@ function DrugForm({
             span2
           />
           <F label="默认用药单位" value={doseUnit} readOnly />
-          <F label="规格单位" value={specUnit} readOnly />
+          <F label="计量单位" value={specUnit} readOnly />
           <GroupGap />
           <div className="col-span-2">
             <FrequencyEditor
@@ -648,12 +648,24 @@ function DrugForm({
               </div>
             )}
           </div>
-          <F
-            label="用药剂量上限"
-            value={d.pcDoseMax ?? ""}
-            readOnly={readOnly}
-            onChange={(v) => patch({ pcDoseMax: v })}
-          />
+          <div>
+            <div className="text-caption text-text-tertiary">用药剂量上限</div>
+            {readOnly ? (
+              <div className="mt-1 text-body-sm text-foreground">{d.pcDoseMax ? `${d.pcDoseMax} ${doseUnit}` : "—"}</div>
+            ) : (
+              <div className="mt-1 flex items-center gap-2">
+                <Input
+                  value={d.pcDoseMax ?? ""}
+                  onChange={(e) => patch({ pcDoseMax: e.target.value.replace(/[^\d.]/g, "") })}
+                  placeholder="如 30"
+                  className="h-9 w-28 text-body-sm"
+                />
+                <span className="h-9 inline-flex items-center px-2 rounded-md text-body-sm text-text-tertiary border border-border">
+                  {doseUnit}
+                </span>
+              </div>
+            )}
+          </div>
           <FLong
             label="备注"
             value={d.remark ?? ""}
@@ -1059,7 +1071,7 @@ function FMulti({
     onChange?.(values.includes(o) ? values.filter((v) => v !== o) : [...values, o]);
   };
   return (
-    <div className={span2 ? "col-span-full" : ""}>
+    <div className={span2 ? "col-span-2" : ""}>
       <Lbl label={label} required={required} />
       <div className="mt-1 flex flex-wrap gap-1.5">
         {options.map((o) => {
