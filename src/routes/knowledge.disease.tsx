@@ -44,25 +44,40 @@ import { toast } from "sonner";
 import { StatScopeCard, diseaseStats } from "@/components/stat-scope-card";
 import { KB_CATEGORIES, KB_DISEASES, symptomName } from "@/lib/disease-kb";
 import { PRESCRIPTION_SEED } from "@/lib/prescription-kb";
+import {
+  DISEASE_WO_TYPES,
+  type DiseaseWoType,
+  kbDiseaseWoType,
+  prescriptionsForWoType,
+  pruneForWoType,
+  symptomsForWoType,
+  woTypeLabel,
+} from "@/lib/disease-wo-type";
 
-function RxSearchSelect({
+type RefOption = { code: string; name: string; sub?: string };
+
+function RefSearchSelect({
+  options,
   selected,
   onAdd,
+  placeholder,
+  emptyText,
 }: {
-  selected: PrescriptionRef[];
-  onAdd: (rx: { code: string; name: string }) => void;
+  options: RefOption[];
+  selected: { code: string }[];
+  onAdd: (o: RefOption) => void;
+  placeholder: string;
+  emptyText: string;
 }) {
   const [kw, setKw] = useState("");
   const picked = new Set(selected.map((s) => s.code));
   const results = useMemo(() => {
     const q = kw.trim().toLowerCase();
     if (!q) return [];
-    return PRESCRIPTION_SEED.filter((r) => r.enabled !== false)
-      .filter((r) =>
-        `${r.name} ${r.code} ${r.category}`.toLowerCase().includes(q),
-      )
+    return options
+      .filter((r) => `${r.name} ${r.code} ${r.sub ?? ""}`.toLowerCase().includes(q))
       .slice(0, 20);
-  }, [kw]);
+  }, [kw, options]);
 
   return (
     <div className="space-y-2">
@@ -71,27 +86,27 @@ function RxSearchSelect({
         <Input
           value={kw}
           onChange={(e) => setKw(e.target.value)}
-          placeholder="搜索处方名称 / 编号 / 分类，点击添加"
+          placeholder={placeholder}
           className="h-8 pl-8 text-body-sm"
         />
       </div>
       {kw.trim() && (
         <div className="rounded-md border border-border divide-y divide-border max-h-56 overflow-auto">
           {results.length === 0 && (
-            <div className="px-3 py-2 text-body-sm text-text-tertiary">未找到匹配的处方</div>
+            <div className="px-3 py-2 text-body-sm text-text-tertiary">{emptyText}</div>
           )}
           {results.map((o) => (
             <div key={o.code} className="flex items-center gap-2 px-3 py-2">
               <span className="font-mono text-caption text-text-tertiary w-24 shrink-0">{o.code}</span>
               <span className="flex-1 min-w-0 truncate text-body-sm text-foreground">{o.name}</span>
-              <span className="text-caption text-text-tertiary truncate max-w-[96px]">{o.category}</span>
+              {o.sub && <span className="text-caption text-text-tertiary truncate max-w-[96px]">{o.sub}</span>}
               <Button
                 variant="outline"
                 size="sm"
                 className="h-7 px-2 text-body-sm shrink-0"
                 disabled={picked.has(o.code)}
                 onClick={() => {
-                  onAdd({ code: o.code, name: o.name });
+                  onAdd(o);
                   setKw("");
                 }}
               >
@@ -123,6 +138,7 @@ type CattleGroup = "泌乳牛" | "青年牛" | "干奶牛" | "围产牛" | "犊�
 type Disease = {
   id: string;
   code: string;              // DZ-xxxxxx
+  woType: DiseaseWoType | ""; // 所属工单类型：决定可关联的症状、处方范围
   diagCode: string;          // 诊断编码：回传 UD 诊断事件时所用编码
   treatCode: string;         // 处置编码：回传 UD 处置事件时所用编码
   diagCodeUnset: boolean;    // 诊断编码暂不配置
@@ -164,6 +180,7 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
   return {
     id: d.id.replace("DZ-", "D-"),
     code: d.id,
+    woType: kbDiseaseWoType(d),
     diagCode: d.diagCode ?? `UDX-${d.id.slice(3)}`,
     treatCode: d.treatCode ?? `UDT-${d.id.slice(3)}`,
     diagCodeUnset: d.diagCode === "",
