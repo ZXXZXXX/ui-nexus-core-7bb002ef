@@ -44,25 +44,40 @@ import { toast } from "sonner";
 import { StatScopeCard, diseaseStats } from "@/components/stat-scope-card";
 import { KB_CATEGORIES, KB_DISEASES, symptomName } from "@/lib/disease-kb";
 import { PRESCRIPTION_SEED } from "@/lib/prescription-kb";
+import {
+  DISEASE_WO_TYPES,
+  type DiseaseWoType,
+  kbDiseaseWoType,
+  prescriptionsForWoType,
+  pruneForWoType,
+  symptomsForWoType,
+  woTypeLabel,
+} from "@/lib/disease-wo-type";
 
-function RxSearchSelect({
+type RefOption = { code: string; name: string; sub?: string };
+
+function RefSearchSelect({
+  options,
   selected,
   onAdd,
+  placeholder,
+  emptyText,
 }: {
-  selected: PrescriptionRef[];
-  onAdd: (rx: { code: string; name: string }) => void;
+  options: RefOption[];
+  selected: { code: string }[];
+  onAdd: (o: RefOption) => void;
+  placeholder: string;
+  emptyText: string;
 }) {
   const [kw, setKw] = useState("");
   const picked = new Set(selected.map((s) => s.code));
   const results = useMemo(() => {
     const q = kw.trim().toLowerCase();
     if (!q) return [];
-    return PRESCRIPTION_SEED.filter((r) => r.enabled !== false)
-      .filter((r) =>
-        `${r.name} ${r.code} ${r.category}`.toLowerCase().includes(q),
-      )
+    return options
+      .filter((r) => `${r.name} ${r.code} ${r.sub ?? ""}`.toLowerCase().includes(q))
       .slice(0, 20);
-  }, [kw]);
+  }, [kw, options]);
 
   return (
     <div className="space-y-2">
@@ -71,27 +86,27 @@ function RxSearchSelect({
         <Input
           value={kw}
           onChange={(e) => setKw(e.target.value)}
-          placeholder="搜索处方名称 / 编号 / 分类，点击添加"
+          placeholder={placeholder}
           className="h-8 pl-8 text-body-sm"
         />
       </div>
       {kw.trim() && (
         <div className="rounded-md border border-border divide-y divide-border max-h-56 overflow-auto">
           {results.length === 0 && (
-            <div className="px-3 py-2 text-body-sm text-text-tertiary">未找到匹配的处方</div>
+            <div className="px-3 py-2 text-body-sm text-text-tertiary">{emptyText}</div>
           )}
           {results.map((o) => (
             <div key={o.code} className="flex items-center gap-2 px-3 py-2">
               <span className="font-mono text-caption text-text-tertiary w-24 shrink-0">{o.code}</span>
               <span className="flex-1 min-w-0 truncate text-body-sm text-foreground">{o.name}</span>
-              <span className="text-caption text-text-tertiary truncate max-w-[96px]">{o.category}</span>
+              {o.sub && <span className="text-caption text-text-tertiary truncate max-w-[96px]">{o.sub}</span>}
               <Button
                 variant="outline"
                 size="sm"
                 className="h-7 px-2 text-body-sm shrink-0"
                 disabled={picked.has(o.code)}
                 onClick={() => {
-                  onAdd({ code: o.code, name: o.name });
+                  onAdd(o);
                   setKw("");
                 }}
               >
@@ -123,6 +138,7 @@ type CattleGroup = "泌乳牛" | "青年牛" | "干奶牛" | "围产牛" | "犊�
 type Disease = {
   id: string;
   code: string;              // DZ-xxxxxx
+  woType: DiseaseWoType | ""; // 所属工单类型：决定可关联的症状、处方范围
   diagCode: string;          // 诊断编码：回传 UD 诊断事件时所用编码
   treatCode: string;         // 处置编码：回传 UD 处置事件时所用编码
   diagCodeUnset: boolean;    // 诊断编码暂不配置
@@ -164,6 +180,7 @@ const seed: Disease[] = KB_DISEASES.map((d) => {
   return {
     id: d.id.replace("DZ-", "D-"),
     code: d.id,
+    woType: kbDiseaseWoType(d),
     diagCode: d.diagCode ?? `UDX-${d.id.slice(3)}`,
     treatCode: d.treatCode ?? `UDT-${d.id.slice(3)}`,
     diagCodeUnset: d.diagCode === "",
@@ -252,7 +269,15 @@ function DiseaseKBPage() {
 
   const saveEdit = () => {
     if (!editing) return;
-    setList((prev) => prev.map((d) => (d.id === editing.id ? editing : d)));
+    if (!editing.woType) {
+      toast.error("请先选择所属工单类型");
+      return;
+    }
+    setList((prev) =>
+      prev.some((d) => d.id === editing.id)
+        ? prev.map((d) => (d.id === editing.id ? editing : d))
+        : [editing, ...prev],
+    );
     toast.success("已保存");
     setEditing(null);
   };
@@ -262,6 +287,7 @@ function DiseaseKBPage() {
     const draft: Disease = {
       id: `D-new-${Date.now()}`,
       code: "DZ-—",
+      woType: "",
       diagCode: "",
       treatCode: "",
       diagCodeUnset: true,
@@ -618,16 +644,51 @@ function CodeField({
   );
 }
 
+function WoTypeFirstHint() {
+  return (
+    <div className="rounded-md bg-surface-subtle px-3 py-3 text-body-sm text-text-secondary">
+      请先在「基础信息」中选择所属工单类型，再关联该工单类型下的内容。
+    </div>
+  );
+}
+
 function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) => void }) {
   const cat = categoryOfType(value.typeId);
+  const symptomOptions = useMemo(
+    () => symptomsForWoType(value.woType).map((s) => ({ code: s.id, name: s.name })),
+    [value.woType],
+  );
+  const rxOptions = useMemo(
+    () => prescriptionsForWoType(value.woType).map((r) => ({ code: r.code, name: r.name, sub: r.category })),
+    [value.woType],
+  );
+
+  const changeWoType = (t: string) => {
+    if (t === value.woType) return;
+    const r = pruneForWoType(value, t);
+    onChange({ ...value, woType: t as DiseaseWoType, symptoms: r.symptoms, prescriptions: r.prescriptions });
+    if (r.removed > 0) toast.info(`已移除 ${r.removed} 项不属于${woTypeLabel(t)}的症状/处方`);
+  };
 
   return (
     <>
       <SectionCard title="基础信息" icon={<FileText className="h-4 w-4 text-primary" />}>
         <div className="grid grid-cols-2 gap-3">
+          <Field label="所属工单类型" required hint="决定可关联的症状与处方范围">
+            <Select value={value.woType || undefined} onValueChange={changeWoType}>
+              <SelectTrigger><SelectValue placeholder="请先选择所属工单类型" /></SelectTrigger>
+              <SelectContent>
+                {DISEASE_WO_TYPES.map((t) => (
+                  <SelectItem key={t} value={t}>{woTypeLabel(t)}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
           <Field label="疾病编码" hint="系统自动生成,不可修改">
             <Input value={value.code} readOnly className="font-mono bg-surface-subtle" />
           </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
           <Field label="所属疾病类型" required>
             <Select value={value.typeId} onValueChange={(v) => onChange({ ...value, typeId: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -638,13 +699,13 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
               </SelectContent>
             </Select>
           </Field>
+          <Field label="疾病分类" hint="由所属疾病类型带出">
+            <Input value={cat?.name ?? "—"} readOnly className="bg-surface-subtle" />
+          </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Field label="疾病名称" required>
             <Input value={value.name} onChange={(e) => onChange({ ...value, name: e.target.value })} placeholder="如:乳房炎一级" />
-          </Field>
-          <Field label="疾病分类" hint="由所属疾病类型带出">
-            <Input value={cat?.name ?? "—"} readOnly className="bg-surface-subtle" />
           </Field>
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -729,124 +790,120 @@ function EditForm({ value, onChange }: { value: Disease; onChange: (v: Disease) 
       </SectionCard>
 
       <SectionCard title="常见症状" icon={<Tag className="h-4 w-4 text-primary" />}>
-        <div className="space-y-2">
-          {value.symptoms.length === 0 && (
-            <div className="text-body-sm text-text-tertiary py-2">暂未关联症状</div>
-          )}
-          {value.symptoms.map((s, idx) => (
-            <div key={s.code + idx} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
-              <span className="font-mono text-body-sm text-text-secondary w-20 shrink-0">{s.code}</span>
-              <Input
-                value={s.name}
-                onChange={(e) => {
-                  const next = [...value.symptoms];
-                  next[idx] = { ...s, name: e.target.value };
-                  onChange({ ...value, symptoms: next });
-                }}
-                className="h-8"
-              />
-              <label className="flex items-center gap-1.5 text-body-sm text-text-secondary shrink-0">
-                <Checkbox
-                  checked={!!s.core}
-                  onCheckedChange={(c) => {
-                    const next = [...value.symptoms];
-                    next[idx] = { ...s, core: !!c };
-                    onChange({ ...value, symptoms: next });
-                  }}
-                />
-                核心症状
-              </label>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
-                onClick={() => onChange({ ...value, symptoms: value.symptoms.filter((_, i) => i !== idx) })}
-                aria-label="移除症状"
-              >
-                移除
-              </Button>
-            </div>
-          ))}
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-8 gap-1.5 text-body-sm font-normal"
-            onClick={() =>
-              onChange({
-                ...value,
-                symptoms: [...value.symptoms, { code: `SY-${String(100 + value.symptoms.length).padStart(3, "0")}`, name: "" }],
-              })
-            }
-          >
-            关联症状
-          </Button>
-        </div>
-      </SectionCard>
-
-      {value.treatable ? (
-        <SectionCard title="适用处方" icon={<Pill className="h-4 w-4 text-primary" />}>
+        {!value.woType ? (
+          <WoTypeFirstHint />
+        ) : (
           <div className="space-y-2">
-            <RxSearchSelect
-              selected={value.prescriptions}
-              onAdd={(rx) =>
-                onChange({
-                  ...value,
-                  prescriptions: [...value.prescriptions, { code: rx.code, name: rx.name, level: "备选" }],
-                })
-              }
+            <RefSearchSelect
+              placeholder={`搜索${woTypeLabel(value.woType)}下的症状名称 / 编号，点击添加`}
+              emptyText="该工单类型下未找到匹配的症状"
+              options={symptomOptions}
+              selected={value.symptoms}
+              onAdd={(o) => onChange({ ...value, symptoms: [...value.symptoms, { code: o.code, name: o.name }] })}
             />
-            {value.prescriptions.length === 0 && (
-              <div className="text-body-sm text-text-tertiary py-2">暂未配置处方</div>
+            {value.symptoms.length === 0 && (
+              <div className="text-body-sm text-text-tertiary py-2">暂未关联症状</div>
             )}
-
-            {value.prescriptions.map((p, idx) => (
-              <div key={p.code + idx} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
-                <span className="font-mono text-body-sm text-text-secondary w-24 shrink-0">{p.code}</span>
-                <span className="flex-1 min-w-0 truncate text-body-sm text-foreground">{p.name || "—"}</span>
-                <Select
-                  value={p.level}
-                  onValueChange={(v) => {
-                    const next = [...value.prescriptions];
-                    next[idx] = { ...p, level: v as PrescriptionRef["level"] };
-                    onChange({ ...value, prescriptions: next });
-                  }}
-                >
-                  <SelectTrigger className="h-8 w-28 shrink-0"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="首选">首选</SelectItem>
-                    <SelectItem value="备选">备选</SelectItem>
-                    <SelectItem value="特殊处方">特殊处方</SelectItem>
-                  </SelectContent>
-                </Select>
+            {value.symptoms.map((s, idx) => (
+              <div key={s.code + idx} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
+                <span className="font-mono text-body-sm text-text-secondary w-20 shrink-0">{s.code}</span>
+                <span className="flex-1 min-w-0 truncate text-body-sm text-foreground">{s.name || "—"}</span>
                 <label className="flex items-center gap-1.5 text-body-sm text-text-secondary shrink-0">
                   <Checkbox
-                    checked={!!p.defaultRx}
+                    checked={!!s.core}
                     onCheckedChange={(c) => {
-                      const next = value.prescriptions.map((x, i) => ({ ...x, defaultRx: i === idx ? !!c : false }));
-                      onChange({ ...value, prescriptions: next });
+                      const next = [...value.symptoms];
+                      next[idx] = { ...s, core: !!c };
+                      onChange({ ...value, symptoms: next });
                     }}
                   />
-                  默认
+                  核心症状
                 </label>
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-7 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
-                  onClick={() => onChange({ ...value, prescriptions: value.prescriptions.filter((_, i) => i !== idx) })}
-                  aria-label="移除处方"
+                  onClick={() => onChange({ ...value, symptoms: value.symptoms.filter((_, i) => i !== idx) })}
+                  aria-label="移除症状"
                 >
                   移除
                 </Button>
               </div>
             ))}
-
           </div>
-        </SectionCard>
-      ) : (
+        )}
+      </SectionCard>
+
+      {!value.treatable ? (
         <SectionCard title="适用处方" icon={<Pill className="h-4 w-4 text-primary" />}>
           <div className="rounded-md bg-surface-subtle px-3 py-3 text-body-sm text-text-secondary">
             该疾病「是否治疗」= 否,mobile 端诊断时将展示:放弃治疗,请登记"死亡/淘汰"。
           </div>
+        </SectionCard>
+      ) : (
+        <SectionCard title="适用处方" icon={<Pill className="h-4 w-4 text-primary" />}>
+          {!value.woType ? (
+            <WoTypeFirstHint />
+          ) : (
+            <div className="space-y-2">
+              <RefSearchSelect
+                placeholder={`搜索${woTypeLabel(value.woType)}下的处方名称 / 编号 / 分类，点击添加`}
+                emptyText="该工单类型下未找到匹配的处方"
+                options={rxOptions}
+                selected={value.prescriptions}
+                onAdd={(rx) =>
+                  onChange({
+                    ...value,
+                    prescriptions: [...value.prescriptions, { code: rx.code, name: rx.name, level: "备选" }],
+                  })
+                }
+              />
+              {value.prescriptions.length === 0 && (
+                <div className="text-body-sm text-text-tertiary py-2">暂未配置处方</div>
+              )}
+
+              {value.prescriptions.map((p, idx) => (
+                <div key={p.code + idx} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
+                  <span className="font-mono text-body-sm text-text-secondary w-24 shrink-0">{p.code}</span>
+                  <span className="flex-1 min-w-0 truncate text-body-sm text-foreground">{p.name || "—"}</span>
+                  <Select
+                    value={p.level}
+                    onValueChange={(v) => {
+                      const next = [...value.prescriptions];
+                      next[idx] = { ...p, level: v as PrescriptionRef["level"] };
+                      onChange({ ...value, prescriptions: next });
+                    }}
+                  >
+                    <SelectTrigger className="h-8 w-28 shrink-0"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="首选">首选</SelectItem>
+                      <SelectItem value="备选">备选</SelectItem>
+                      <SelectItem value="特殊处方">特殊处方</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <label className="flex items-center gap-1.5 text-body-sm text-text-secondary shrink-0">
+                    <Checkbox
+                      checked={!!p.defaultRx}
+                      onCheckedChange={(c) => {
+                        const next = value.prescriptions.map((x, i) => ({ ...x, defaultRx: i === idx ? !!c : false }));
+                        onChange({ ...value, prescriptions: next });
+                      }}
+                    />
+                    默认
+                  </label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 px-2 text-body-sm font-normal text-text-tertiary hover:text-[var(--state-danger)]"
+                    onClick={() => onChange({ ...value, prescriptions: value.prescriptions.filter((_, i) => i !== idx) })}
+                    aria-label="移除处方"
+                  >
+                    移除
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </SectionCard>
       )}
 
@@ -872,6 +929,7 @@ function DetailView({ value }: { value: Disease }) {
       <StatScopeCard metrics={diseaseStats(value.code)} />
 
       <SectionCard title="基础信息" icon={<FileText className="h-4 w-4 text-primary" />}>
+        <KV label="所属工单类型" value={woTypeLabel(value.woType)} />
         <KV label="疾病类型" value={t?.name ?? "—"} />
         <KV label="疾病分类" value={cat?.name ?? "—"} />
         <KV
