@@ -929,6 +929,7 @@ function DetailView({ value }: { value: Disease }) {
       <StatScopeCard metrics={diseaseStats(value.code)} />
 
       <SectionCard title="基础信息" icon={<FileText className="h-4 w-4 text-primary" />}>
+        <KV label="所属工单类型" value={woTypeLabel(value.woType)} />
         <KV label="疾病类型" value={t?.name ?? "—"} />
         <KV label="疾病分类" value={cat?.name ?? "—"} />
         <KV
