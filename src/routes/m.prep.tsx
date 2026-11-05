@@ -1114,7 +1114,7 @@ function AggregateDrawer({
         </div>
 
         {/* 牛舍筛选 */}
-        <div className="px-4 pt-3 pb-3 border-b border-border shrink-0">
+        <div className="px-4 pt-3 pb-3 shrink-0">
           <button
             type="button"
             onClick={() => setBarnDropdownOpen(true)}
@@ -1128,7 +1128,7 @@ function AggregateDrawer({
         </div>
 
         {/* 全选 / 已选计数 */}
-        <div className="px-4 h-11 flex items-center justify-between shrink-0 border-b border-border">
+        <div className="px-4 h-11 flex items-center justify-between shrink-0">
           <button
             onClick={toggleAll}
             disabled={tasks.length === 0}
