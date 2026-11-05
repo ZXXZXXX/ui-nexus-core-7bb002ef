@@ -1128,7 +1128,7 @@ function AggregateDrawer({
         </div>
 
         {/* 全选 / 已选计数 */}
-        <div className="px-4 h-11 flex items-center justify-between shrink-0 bg-surface-subtle">
+        <div className="px-4 h-11 flex items-center justify-between shrink-0 border-b border-border">
           <button
             onClick={toggleAll}
             disabled={tasks.length === 0}
