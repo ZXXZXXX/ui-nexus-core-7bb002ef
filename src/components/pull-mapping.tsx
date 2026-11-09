@@ -212,9 +212,13 @@ export function PullMapping() {
           })()}
           {draft && (
             <div className="space-y-6 py-5">
-              <div className="grid gap-4">
-                <Field label="卡片名称">
+              <div className="space-y-4">
+                <div className="text-card-title font-medium text-text-primary">业务类型识别</div>
+                <Field label="映射名称">
                   <Input value={draft.title} placeholder="如：驱虫工单拉取" onChange={(e) => patchDraft({ title: e.target.value })} />
+                </Field>
+                <Field label="第三方对应接口">
+                  <Input value={draft.api} placeholder="如：事件同步接口 /open/api/event/list" className="font-mono" onChange={(e) => patchDraft({ api: e.target.value })} />
                 </Field>
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="第三方事件类型名称">
@@ -224,6 +228,25 @@ export function PullMapping() {
                     <Input value={draft.typeCode} className="font-mono" onChange={(e) => patchDraft({ typeCode: e.target.value.replace(/\D/g, "") })} />
                   </Field>
                 </div>
+                <Field label="识别方式">
+                  <Select value={draft.matchByField ? "yes" : "no"} onValueChange={(v) => patchDraft({ matchByField: v === "yes" })}>
+                    <SelectTrigger className="h-9 bg-card text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">按字段值匹配</SelectItem>
+                      <SelectItem value="no">不按字段值匹配</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                {draft.matchByField && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field label="类型识别字段">
+                      <Input value={draft.typeField} placeholder="如：eventType" className="font-mono" onChange={(e) => patchDraft({ typeField: e.target.value })} />
+                    </Field>
+                    <Field label="字段匹配值">
+                      <Input value={draft.typeValue} placeholder="如：6060" className="font-mono" onChange={(e) => patchDraft({ typeValue: e.target.value })} />
+                    </Field>
+                  </div>
+                )}
                 <Field label="对应工单 / 基础事件">
                   <Select
                     value={draft.target}
