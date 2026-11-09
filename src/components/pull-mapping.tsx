@@ -93,7 +93,7 @@ export function PullMapping() {
           <Input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="搜索卡片名称 / 事件类型 / 子类型 / 编码" className="h-9 pl-8 text-body-sm" />
         </div>
         <Button className="ml-auto h-9" onClick={openNew}>
-          <Plus className="h-4 w-4" />新建映射卡片
+          <Plus className="h-4 w-4" />添加映射
         </Button>
       </div>
 
@@ -105,7 +105,7 @@ export function PullMapping() {
               <th className="px-4 text-left font-medium whitespace-nowrap w-[140px] grow">（第三方）事件类型名称</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[150px]">（第三方）事件类型编号</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[110px]">（我方）对应类型</th>
-              <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">子类型映射数目</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">项目映射数量</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[100px]">状态</th>
               <th className="sticky right-0 z-20 border-l border-border bg-surface-subtle px-4 text-left font-medium whitespace-nowrap w-[80px]">操作</th>
             </tr>
@@ -136,7 +136,7 @@ export function PullMapping() {
               );
             })}
             {list.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-body-sm text-text-tertiary">暂无映射卡片，点击右上角「新建映射卡片」新增</td></tr>
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-body-sm text-text-tertiary">暂无映射，点击右上角「添加映射」新增</td></tr>
             )}
           </tbody>
         </table>
@@ -145,8 +145,8 @@ export function PullMapping() {
       <Sheet open={drawerOpen} onOpenChange={(o) => !o && closeAll()}>
         <SheetContent side="right" className="w-full sm:w-[560px] sm:max-w-none overflow-y-auto bg-card">
           <SheetHeader className="text-left px-0 pb-4 border-b border-border">
-            <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "新建映射卡片" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
-            <SheetDescription className="text-caption text-text-tertiary">事件子类型的映射编码与配置详情</SheetDescription>
+            <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "添加映射" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
+            <SheetDescription className="text-caption text-text-tertiary">业务类型识别与业务项目映射配置</SheetDescription>
           </SheetHeader>
 
           {viewCard && !draft && (() => {
