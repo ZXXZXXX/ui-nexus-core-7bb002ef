@@ -271,17 +271,20 @@ export function PullMapping() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-card-title font-medium text-text-primary">事件子类型（{draft.subs.length}）</div>
+                  <div className="text-card-title font-medium text-text-primary">业务项目映射（{draft.subs.length}）</div>
                   <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
-                    <Plus className="h-3.5 w-3.5" />添加子类型
+                    <Plus className="h-3.5 w-3.5" />添加映射
                   </Button>
                 </div>
+                <Field label="项目识别字段">
+                  <Input value={draft.itemField} placeholder="如：subType" className="font-mono" onChange={(e) => patchDraft({ itemField: e.target.value })} />
+                </Field>
                 {(
                   <>
-                    {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
+                    {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无项目映射，点击「添加映射」新增</div>}
                     {draft.subs.length > 0 && (
                       <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
-                        <span>第三方</span><span>第三方编码</span><span>我方</span><span />
+                        <span>第三方项目名称</span><span>第三方匹配值</span><span>本系统对应项目</span><span />
                       </div>
                     )}
                     <div className="divide-y divide-border">
