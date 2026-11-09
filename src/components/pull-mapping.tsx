@@ -21,7 +21,13 @@ const targetLabel = (t: string) => (WO_TYPES.includes(t) ? `${t}工单` : t);
 const diseaseNameOf = (id: string) => KB_DISEASES.find((d) => d.id === id)?.name ?? id;
 
 type Sub = { id: string; name: string; code: string; diseaseId?: string; item?: string };
-type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
+type Card = {
+  id: string; title: string; typeName: string; typeCode: string; target: string;
+  api: string; matchByField: boolean; typeField: string; typeValue: string; itemField: string;
+  subs: Sub[];
+};
+// 种子卡片的识别配置：按字段值匹配，类型字段 eventType、项目字段 subType
+const recog = (typeCode: string) => ({ api: "事件同步接口 /open/api/event/list", matchByField: true, typeField: "eventType", typeValue: typeCode, itemField: "subType" });
 
 const VACCINES = [
   "口蹄疫", "传染性鼻支气管炎", "魏氏梭菌", "布病疫苗", "犊牛腹泻五联苗", "巴氏杆菌免疫", "流行热免疫", "结核免疫",
@@ -30,22 +36,22 @@ const VACCINES = [
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 
 const SEED: Card[] = [
-  { id: "c-6060", title: "驱虫工单拉取", typeName: "驱虫", typeCode: "6060", target: "驱虫", subs: [{ id: "s-606001", name: "驱虫", code: "606001", diseaseId: "DZ-036001" }] },
-  { id: "c-6006", title: "干奶工单拉取", typeName: "干奶", typeCode: "6006", target: "干奶", subs: [{ id: "s-600601", name: "干奶", code: "600601", diseaseId: "DZ-037001" }] },
-  { id: "c-6013", title: "修蹄工单拉取", typeName: "修蹄", typeCode: "6013", target: "修蹄", subs: [{ id: "s-601301", name: "修蹄", code: "601301", diseaseId: "DZ-038001" }] },
-  { id: "c-6048", title: "免疫工单拉取", typeName: "免疫", typeCode: "6048", target: "免疫", subs: VACCINES.map((n, i) => ({ id: `s-6048${pad(i)}`, name: n, code: `6048${pad(i)}`, diseaseId: `DZ-039${String(i + 1).padStart(3, "0")}` })) },
-  { id: "c-6004", title: "孕检任务拉取", typeName: "孕检", typeCode: "6004", target: "孕检", subs: [
+  { id: "c-6060", title: "驱虫工单拉取", typeName: "驱虫", typeCode: "6060", target: "驱虫", ...recog("6060"), subs: [{ id: "s-606001", name: "驱虫", code: "606001", diseaseId: "DZ-036001" }] },
+  { id: "c-6006", title: "干奶工单拉取", typeName: "干奶", typeCode: "6006", target: "干奶", ...recog("6006"), subs: [{ id: "s-600601", name: "干奶", code: "600601", diseaseId: "DZ-037001" }] },
+  { id: "c-6013", title: "修蹄工单拉取", typeName: "修蹄", typeCode: "6013", target: "修蹄", ...recog("6013"), subs: [{ id: "s-601301", name: "修蹄", code: "601301", diseaseId: "DZ-038001" }] },
+  { id: "c-6048", title: "免疫工单拉取", typeName: "免疫", typeCode: "6048", target: "免疫", ...recog("6048"), subs: VACCINES.map((n, i) => ({ id: `s-6048${pad(i)}`, name: n, code: `6048${pad(i)}`, diseaseId: `DZ-039${String(i + 1).padStart(3, "0")}` })) },
+  { id: "c-6004", title: "孕检任务拉取", typeName: "孕检", typeCode: "6004", target: "孕检", ...recog("6004"), subs: [
     { id: "s-600401", name: "空怀", code: "600401", item: "空怀判定" },
     { id: "s-600402", name: "怀孕", code: "600402", item: "怀孕判定" },
   ] },
-  { id: "c-6025", title: "检测检查任务拉取", typeName: "检测检查", typeCode: "6025", target: "检测检查", subs: [
+  { id: "c-6025", title: "检测检查任务拉取", typeName: "检测检查", typeCode: "6025", target: "检测检查", ...recog("6025"), subs: [
     { id: "s-602503", name: "血中酮体", code: "602503", item: "血中酮体检测" },
     { id: "s-602518", name: "体温", code: "602518", item: "体温检测" },
     { id: "s-602519", name: "尿液PH值", code: "602519", item: "尿液 pH 检测" },
     { id: "s-602523", name: "子宫分泌物", code: "602523", item: "子宫分泌物检查" },
   ] },
-  { id: "c-6023", title: "围产转群任务拉取", typeName: "转群", typeCode: "6023", target: "转群", subs: [{ id: "s-602302", name: "围产转群", code: "602302", item: "围产转群" }] },
-  { id: "c-6056", title: "转场任务拉取", typeName: "转场", typeCode: "6056", target: "转场", subs: [{ id: "s-605601", name: "转场转出", code: "605601", item: "转场转出" }] },
+  { id: "c-6023", title: "围产转群任务拉取", typeName: "转群", typeCode: "6023", target: "转群", ...recog("6023"), subs: [{ id: "s-602302", name: "围产转群", code: "602302", item: "围产转群" }] },
+  { id: "c-6056", title: "转场任务拉取", typeName: "转场", typeCode: "6056", target: "转场", ...recog("6056"), subs: [{ id: "s-605601", name: "转场转出", code: "605601", item: "转场转出" }] },
 ];
 
 const textBtn = "h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary";
@@ -60,7 +66,7 @@ export function PullMapping() {
   const isNew = !!draft && !cards.some((x) => x.id === draft.id);
   const openEdit = (c: Card) => { setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) }); setDraft({ ...c, subs: c.subs.map((s) => ({ ...s })) }); };
   const openView = (c: Card) => setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) });
-  const openNew = () => { setViewCard(null); setDraft({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", subs: [] }); };
+  const openNew = () => { setViewCard(null); setDraft({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", api: "", matchByField: true, typeField: "", typeValue: "", itemField: "", subs: [] }); };
   const closeAll = () => { setViewCard(null); setDraft(null); };
   const drawerOpen = !!viewCard || !!draft;
   const patchDraft = (p: Partial<Card>) => setDraft((d) => (d ? { ...d, ...p } : d));
@@ -87,7 +93,7 @@ export function PullMapping() {
           <Input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="搜索卡片名称 / 事件类型 / 子类型 / 编码" className="h-9 pl-8 text-body-sm" />
         </div>
         <Button className="ml-auto h-9" onClick={openNew}>
-          <Plus className="h-4 w-4" />新建映射卡片
+          <Plus className="h-4 w-4" />添加映射
         </Button>
       </div>
 
@@ -99,7 +105,7 @@ export function PullMapping() {
               <th className="px-4 text-left font-medium whitespace-nowrap w-[140px] grow">（第三方）事件类型名称</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[150px]">（第三方）事件类型编号</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[110px]">（我方）对应类型</th>
-              <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">子类型映射数目</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">项目映射数量</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[100px]">状态</th>
               <th className="sticky right-0 z-20 border-l border-border bg-surface-subtle px-4 text-left font-medium whitespace-nowrap w-[80px]">操作</th>
             </tr>
@@ -130,7 +136,7 @@ export function PullMapping() {
               );
             })}
             {list.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-body-sm text-text-tertiary">暂无映射卡片，点击右上角「新建映射卡片」新增</td></tr>
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-body-sm text-text-tertiary">暂无映射，点击右上角「添加映射」新增</td></tr>
             )}
           </tbody>
         </table>
@@ -139,29 +145,43 @@ export function PullMapping() {
       <Sheet open={drawerOpen} onOpenChange={(o) => !o && closeAll()}>
         <SheetContent side="right" className="w-full sm:w-[560px] sm:max-w-none overflow-y-auto bg-card">
           <SheetHeader className="text-left px-0 pb-4 border-b border-border">
-            <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "新建映射卡片" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
-            <SheetDescription className="text-caption text-text-tertiary">事件子类型的映射编码与配置详情</SheetDescription>
+            <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "添加映射" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
+            <SheetDescription className="text-caption text-text-tertiary">业务类型识别与业务项目映射配置</SheetDescription>
           </SheetHeader>
 
           {viewCard && !draft && (() => {
             const vk = targetKind(viewCard.target);
             return (
               <div className="space-y-6 py-5">
-                <div className="grid gap-3 text-body-sm">
-                  <Row label="卡片名称" value={viewCard.title || "未命名卡片"} />
-                  <Row label="拉取事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
-                  <div className="flex items-center gap-3">
-                    <span className="text-text-secondary shrink-0 w-24">对应工单 / 基础事件</span>
-                    {viewCard.target ? <span className="text-text-primary">{targetLabel(viewCard.target)}</span> : <span className="text-text-tertiary">未选择</span>}
-                    {vk && <span className={`tag ${vk === "工单" ? "tag-success" : "tag-info"}`}>{vk}</span>}
+                <div className="space-y-3">
+                  <div className="text-card-title font-medium text-text-primary">业务类型识别</div>
+                  <div className="grid gap-3 text-body-sm">
+                    <Row label="映射名称" value={viewCard.title || "未命名卡片"} />
+                    <Row label="第三方对应接口" value={viewCard.api || "—"} mono />
+                    <Row label="识别方式" value={viewCard.matchByField ? "按字段值匹配" : "不按字段值匹配"} />
+                    {viewCard.matchByField && (
+                      <>
+                        <Row label="类型识别字段" value={viewCard.typeField || "—"} mono />
+                        <Row label="字段匹配值" value={viewCard.typeValue || "—"} mono />
+                      </>
+                    )}
+                    <Row label="拉取事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
+                    <div className="flex items-center gap-3">
+                      <span className="text-text-secondary shrink-0 w-24">对应工单 / 基础事件</span>
+                      {viewCard.target ? <span className="text-text-primary">{targetLabel(viewCard.target)}</span> : <span className="text-text-tertiary">未选择</span>}
+                      {vk && <span className={`tag ${vk === "工单" ? "tag-success" : "tag-info"}`}>{vk}</span>}
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-card-title font-medium text-text-primary">事件子类型（{viewCard.subs.length}）</div>
-                  {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
+                  <div className="text-card-title font-medium text-text-primary">业务项目映射（{viewCard.subs.length}）</div>
+                  <div className="grid gap-3 text-body-sm pb-2">
+                    <Row label="项目识别字段" value={viewCard.itemField || "—"} mono />
+                  </div>
+                  {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无项目映射</div>}
                   {viewCard.subs.length > 0 && (
                     <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 pb-1 text-caption text-text-tertiary">
-                      <span>第三方</span><span>第三方编码</span><span>我方</span><span />
+                      <span>第三方项目名称</span><span>第三方匹配值</span><span>本系统对应项目</span><span />
                     </div>
                   )}
                   <div className="divide-y divide-border">
@@ -192,9 +212,13 @@ export function PullMapping() {
           })()}
           {draft && (
             <div className="space-y-6 py-5">
-              <div className="grid gap-4">
-                <Field label="卡片名称">
+              <div className="space-y-4">
+                <div className="text-card-title font-medium text-text-primary">业务类型识别</div>
+                <Field label="映射名称">
                   <Input value={draft.title} placeholder="如：驱虫工单拉取" onChange={(e) => patchDraft({ title: e.target.value })} />
+                </Field>
+                <Field label="第三方对应接口">
+                  <Input value={draft.api} placeholder="如：事件同步接口 /open/api/event/list" className="font-mono" onChange={(e) => patchDraft({ api: e.target.value })} />
                 </Field>
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="第三方事件类型名称">
@@ -204,6 +228,25 @@ export function PullMapping() {
                     <Input value={draft.typeCode} className="font-mono" onChange={(e) => patchDraft({ typeCode: e.target.value.replace(/\D/g, "") })} />
                   </Field>
                 </div>
+                <Field label="识别方式">
+                  <Select value={draft.matchByField ? "yes" : "no"} onValueChange={(v) => patchDraft({ matchByField: v === "yes" })}>
+                    <SelectTrigger className="h-9 bg-card text-body-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="yes">按字段值匹配</SelectItem>
+                      <SelectItem value="no">不按字段值匹配</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </Field>
+                {draft.matchByField && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <Field label="类型识别字段">
+                      <Input value={draft.typeField} placeholder="如：eventType" className="font-mono" onChange={(e) => patchDraft({ typeField: e.target.value })} />
+                    </Field>
+                    <Field label="字段匹配值">
+                      <Input value={draft.typeValue} placeholder="如：6060" className="font-mono" onChange={(e) => patchDraft({ typeValue: e.target.value })} />
+                    </Field>
+                  </div>
+                )}
                 <Field label="对应工单 / 基础事件">
                   <Select
                     value={draft.target}
@@ -228,24 +271,27 @@ export function PullMapping() {
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="text-card-title font-medium text-text-primary">事件子类型（{draft.subs.length}）</div>
+                  <div className="text-card-title font-medium text-text-primary">业务项目映射（{draft.subs.length}）</div>
                   <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
-                    <Plus className="h-3.5 w-3.5" />添加子类型
+                    <Plus className="h-3.5 w-3.5" />添加映射
                   </Button>
                 </div>
+                <Field label="项目识别字段">
+                  <Input value={draft.itemField} placeholder="如：subType" className="font-mono" onChange={(e) => patchDraft({ itemField: e.target.value })} />
+                </Field>
                 {(
                   <>
-                    {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
+                    {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无项目映射，点击「添加映射」新增</div>}
                     {draft.subs.length > 0 && (
                       <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
-                        <span>第三方</span><span>第三方编码</span><span>我方</span><span />
+                        <span>第三方项目名称</span><span>第三方匹配值</span><span>本系统对应项目</span><span />
                       </div>
                     )}
                     <div className="divide-y divide-border">
                       {draft.subs.map((s) => (
                         <div key={s.id} className="py-2 grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
-                          <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
-                          <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
+                          <Input value={s.name} placeholder="项目名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
+                          <Input value={s.code} placeholder="匹配值" className="h-9 w-full min-w-0 font-mono text-body-sm"
                             onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
                           {kind === "工单" && (
                             <SearchableSelect

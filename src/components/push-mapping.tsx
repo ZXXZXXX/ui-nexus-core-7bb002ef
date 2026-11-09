@@ -103,7 +103,7 @@ export function PushMapping() {
           <Input value={kw} onChange={(e) => setKw(e.target.value)} placeholder="搜索映射名称 / 事件类型 / 处置 / 编码" className="h-9 pl-8 text-body-sm" />
         </div>
         <Button className="ml-auto h-9" onClick={openNew}>
-          <Plus className="h-4 w-4" />新建映射卡片
+          <Plus className="h-4 w-4" />添加映射
         </Button>
       </div>
 
@@ -115,7 +115,7 @@ export function PushMapping() {
               <th className="px-4 text-left font-medium whitespace-nowrap w-[140px] grow">（第三方）事件类型名称</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[150px]">（第三方）事件类型编号</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[110px]">（我方）对应类型</th>
-              <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">子类型映射数目</th>
+              <th className="px-4 text-left font-medium whitespace-nowrap w-[120px]">项目映射数量</th>
               <th className="px-4 text-left font-medium whitespace-nowrap w-[100px]">状态</th>
               <th className="sticky right-0 z-20 border-l border-border bg-surface-subtle px-4 text-left font-medium whitespace-nowrap w-[80px]">操作</th>
             </tr>
@@ -144,7 +144,7 @@ export function PushMapping() {
               );
             })}
             {list.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-body-sm text-text-tertiary">暂无映射卡片，点击右上角「新建映射卡片」新增</td></tr>
+              <tr><td colSpan={7} className="px-4 py-10 text-center text-body-sm text-text-tertiary">暂无映射，点击右上角「添加映射」新增</td></tr>
             )}
           </tbody>
         </table>
@@ -153,7 +153,7 @@ export function PushMapping() {
       <Sheet open={drawerOpen} onOpenChange={(o) => !o && closeAll()}>
         <SheetContent side="right" className="w-full sm:w-[560px] sm:max-w-none overflow-y-auto bg-card">
           <SheetHeader className="text-left px-0 pb-4 border-b border-border">
-            <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "新建映射卡片" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
+            <SheetTitle className="text-section text-foreground">{draft ? (isNew ? "添加映射" : "编辑映射卡片") : "映射卡片详情"}</SheetTitle>
             <SheetDescription className="text-caption text-text-tertiary">回传内容为我方系统产生的结果数据</SheetDescription>
           </SheetHeader>
 
@@ -215,10 +215,10 @@ export function PushMapping() {
                 <div className="flex items-center justify-between">
                   <div className="text-card-title font-medium text-text-primary">事件子类型（{draft.subs.length}）</div>
                   <Button variant="ghost" size="sm" className={textBtn} onClick={addSub}>
-                    <Plus className="h-3.5 w-3.5" />添加子类型
+                    <Plus className="h-3.5 w-3.5" />添加映射
                   </Button>
                 </div>
-                {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型，点击「添加子类型」新增</div>}
+                {draft.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无项目映射，点击「添加映射」新增</div>}
                 {draft.subs.length > 0 && (
                   <div className="grid grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto] gap-3 px-1 text-caption text-text-tertiary">
                     <span>我方</span><span>第三方编码</span><span>第三方</span><span />
