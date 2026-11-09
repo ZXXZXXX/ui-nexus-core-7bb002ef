@@ -21,7 +21,13 @@ const targetLabel = (t: string) => (WO_TYPES.includes(t) ? `${t}工单` : t);
 const diseaseNameOf = (id: string) => KB_DISEASES.find((d) => d.id === id)?.name ?? id;
 
 type Sub = { id: string; name: string; code: string; diseaseId?: string; item?: string };
-type Card = { id: string; title: string; typeName: string; typeCode: string; target: string; subs: Sub[] };
+type Card = {
+  id: string; title: string; typeName: string; typeCode: string; target: string;
+  api: string; matchByField: boolean; typeField: string; typeValue: string; itemField: string;
+  subs: Sub[];
+};
+// 种子卡片的识别配置：按字段值匹配，类型字段 eventType、项目字段 subType
+const recog = (typeCode: string) => ({ api: "事件同步接口 /open/api/event/list", matchByField: true, typeField: "eventType", typeValue: typeCode, itemField: "subType" });
 
 const VACCINES = [
   "口蹄疫", "传染性鼻支气管炎", "魏氏梭菌", "布病疫苗", "犊牛腹泻五联苗", "巴氏杆菌免疫", "流行热免疫", "结核免疫",
@@ -30,22 +36,22 @@ const VACCINES = [
 const pad = (i: number) => String(i + 1).padStart(2, "0");
 
 const SEED: Card[] = [
-  { id: "c-6060", title: "驱虫工单拉取", typeName: "驱虫", typeCode: "6060", target: "驱虫", subs: [{ id: "s-606001", name: "驱虫", code: "606001", diseaseId: "DZ-036001" }] },
-  { id: "c-6006", title: "干奶工单拉取", typeName: "干奶", typeCode: "6006", target: "干奶", subs: [{ id: "s-600601", name: "干奶", code: "600601", diseaseId: "DZ-037001" }] },
-  { id: "c-6013", title: "修蹄工单拉取", typeName: "修蹄", typeCode: "6013", target: "修蹄", subs: [{ id: "s-601301", name: "修蹄", code: "601301", diseaseId: "DZ-038001" }] },
-  { id: "c-6048", title: "免疫工单拉取", typeName: "免疫", typeCode: "6048", target: "免疫", subs: VACCINES.map((n, i) => ({ id: `s-6048${pad(i)}`, name: n, code: `6048${pad(i)}`, diseaseId: `DZ-039${String(i + 1).padStart(3, "0")}` })) },
-  { id: "c-6004", title: "孕检任务拉取", typeName: "孕检", typeCode: "6004", target: "孕检", subs: [
+  { id: "c-6060", title: "驱虫工单拉取", typeName: "驱虫", typeCode: "6060", target: "驱虫", ...recog("6060"), subs: [{ id: "s-606001", name: "驱虫", code: "606001", diseaseId: "DZ-036001" }] },
+  { id: "c-6006", title: "干奶工单拉取", typeName: "干奶", typeCode: "6006", target: "干奶", ...recog("6006"), subs: [{ id: "s-600601", name: "干奶", code: "600601", diseaseId: "DZ-037001" }] },
+  { id: "c-6013", title: "修蹄工单拉取", typeName: "修蹄", typeCode: "6013", target: "修蹄", ...recog("6013"), subs: [{ id: "s-601301", name: "修蹄", code: "601301", diseaseId: "DZ-038001" }] },
+  { id: "c-6048", title: "免疫工单拉取", typeName: "免疫", typeCode: "6048", target: "免疫", ...recog("6048"), subs: VACCINES.map((n, i) => ({ id: `s-6048${pad(i)}`, name: n, code: `6048${pad(i)}`, diseaseId: `DZ-039${String(i + 1).padStart(3, "0")}` })) },
+  { id: "c-6004", title: "孕检任务拉取", typeName: "孕检", typeCode: "6004", target: "孕检", ...recog("6004"), subs: [
     { id: "s-600401", name: "空怀", code: "600401", item: "空怀判定" },
     { id: "s-600402", name: "怀孕", code: "600402", item: "怀孕判定" },
   ] },
-  { id: "c-6025", title: "检测检查任务拉取", typeName: "检测检查", typeCode: "6025", target: "检测检查", subs: [
+  { id: "c-6025", title: "检测检查任务拉取", typeName: "检测检查", typeCode: "6025", target: "检测检查", ...recog("6025"), subs: [
     { id: "s-602503", name: "血中酮体", code: "602503", item: "血中酮体检测" },
     { id: "s-602518", name: "体温", code: "602518", item: "体温检测" },
     { id: "s-602519", name: "尿液PH值", code: "602519", item: "尿液 pH 检测" },
     { id: "s-602523", name: "子宫分泌物", code: "602523", item: "子宫分泌物检查" },
   ] },
-  { id: "c-6023", title: "围产转群任务拉取", typeName: "转群", typeCode: "6023", target: "转群", subs: [{ id: "s-602302", name: "围产转群", code: "602302", item: "围产转群" }] },
-  { id: "c-6056", title: "转场任务拉取", typeName: "转场", typeCode: "6056", target: "转场", subs: [{ id: "s-605601", name: "转场转出", code: "605601", item: "转场转出" }] },
+  { id: "c-6023", title: "围产转群任务拉取", typeName: "转群", typeCode: "6023", target: "转群", ...recog("6023"), subs: [{ id: "s-602302", name: "围产转群", code: "602302", item: "围产转群" }] },
+  { id: "c-6056", title: "转场任务拉取", typeName: "转场", typeCode: "6056", target: "转场", ...recog("6056"), subs: [{ id: "s-605601", name: "转场转出", code: "605601", item: "转场转出" }] },
 ];
 
 const textBtn = "h-7 px-2 text-body-sm font-normal text-primary hover:bg-brand-subtle hover:text-primary";
@@ -60,7 +66,7 @@ export function PullMapping() {
   const isNew = !!draft && !cards.some((x) => x.id === draft.id);
   const openEdit = (c: Card) => { setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) }); setDraft({ ...c, subs: c.subs.map((s) => ({ ...s })) }); };
   const openView = (c: Card) => setViewCard({ ...c, subs: c.subs.map((s) => ({ ...s })) });
-  const openNew = () => { setViewCard(null); setDraft({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", subs: [] }); };
+  const openNew = () => { setViewCard(null); setDraft({ id: `c-${Date.now()}`, title: "", typeName: "", typeCode: "", target: "", api: "", matchByField: true, typeField: "", typeValue: "", itemField: "", subs: [] }); };
   const closeAll = () => { setViewCard(null); setDraft(null); };
   const drawerOpen = !!viewCard || !!draft;
   const patchDraft = (p: Partial<Card>) => setDraft((d) => (d ? { ...d, ...p } : d));
