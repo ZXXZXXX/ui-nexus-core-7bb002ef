@@ -290,8 +290,8 @@ export function PullMapping() {
                     <div className="divide-y divide-border">
                       {draft.subs.map((s) => (
                         <div key={s.id} className="py-2 grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] items-center gap-3 text-body-sm">
-                          <Input value={s.name} placeholder="子类型名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
-                          <Input value={s.code} placeholder="编码" className="h-9 w-full min-w-0 font-mono text-body-sm"
+                          <Input value={s.name} placeholder="项目名称" onChange={(e) => patchSub(s.id, { name: e.target.value })} className="h-9 w-full min-w-0 text-body-sm" />
+                          <Input value={s.code} placeholder="匹配值" className="h-9 w-full min-w-0 font-mono text-body-sm"
                             onChange={(e) => patchSub(s.id, { code: e.target.value.replace(/\D/g, "") })} />
                           {kind === "工单" && (
                             <SearchableSelect
