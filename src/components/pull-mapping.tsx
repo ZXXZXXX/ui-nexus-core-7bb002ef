@@ -153,21 +153,35 @@ export function PullMapping() {
             const vk = targetKind(viewCard.target);
             return (
               <div className="space-y-6 py-5">
-                <div className="grid gap-3 text-body-sm">
-                  <Row label="卡片名称" value={viewCard.title || "未命名卡片"} />
-                  <Row label="拉取事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
-                  <div className="flex items-center gap-3">
-                    <span className="text-text-secondary shrink-0 w-24">对应工单 / 基础事件</span>
-                    {viewCard.target ? <span className="text-text-primary">{targetLabel(viewCard.target)}</span> : <span className="text-text-tertiary">未选择</span>}
-                    {vk && <span className={`tag ${vk === "工单" ? "tag-success" : "tag-info"}`}>{vk}</span>}
+                <div className="space-y-3">
+                  <div className="text-card-title font-medium text-text-primary">业务类型识别</div>
+                  <div className="grid gap-3 text-body-sm">
+                    <Row label="映射名称" value={viewCard.title || "未命名卡片"} />
+                    <Row label="第三方对应接口" value={viewCard.api || "—"} mono />
+                    <Row label="识别方式" value={viewCard.matchByField ? "按字段值匹配" : "不按字段值匹配"} />
+                    {viewCard.matchByField && (
+                      <>
+                        <Row label="类型识别字段" value={viewCard.typeField || "—"} mono />
+                        <Row label="字段匹配值" value={viewCard.typeValue || "—"} mono />
+                      </>
+                    )}
+                    <Row label="拉取事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
+                    <div className="flex items-center gap-3">
+                      <span className="text-text-secondary shrink-0 w-24">对应工单 / 基础事件</span>
+                      {viewCard.target ? <span className="text-text-primary">{targetLabel(viewCard.target)}</span> : <span className="text-text-tertiary">未选择</span>}
+                      {vk && <span className={`tag ${vk === "工单" ? "tag-success" : "tag-info"}`}>{vk}</span>}
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <div className="text-card-title font-medium text-text-primary">事件子类型（{viewCard.subs.length}）</div>
-                  {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无子类型</div>}
+                  <div className="text-card-title font-medium text-text-primary">业务项目映射（{viewCard.subs.length}）</div>
+                  <div className="grid gap-3 text-body-sm pb-2">
+                    <Row label="项目识别字段" value={viewCard.itemField || "—"} mono />
+                  </div>
+                  {viewCard.subs.length === 0 && <div className="py-6 text-center text-body-sm text-text-tertiary">暂无项目映射</div>}
                   {viewCard.subs.length > 0 && (
                     <div className="grid grid-cols-[9rem_7rem_minmax(0,1fr)_auto] gap-3 px-1 pb-1 text-caption text-text-tertiary">
-                      <span>第三方</span><span>第三方编码</span><span>我方</span><span />
+                      <span>第三方项目名称</span><span>第三方匹配值</span><span>本系统对应项目</span><span />
                     </div>
                   )}
                   <div className="divide-y divide-border">
