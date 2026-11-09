@@ -165,7 +165,6 @@ export function PullMapping() {
                         <Row label="字段匹配值" value={viewCard.typeValue || "—"} mono />
                       </>
                     )}
-                    <Row label="拉取事件类型" value={`${viewCard.typeName}（${viewCard.typeCode}）`} mono />
                     <div className="flex items-center gap-3">
                       <span className="text-text-secondary shrink-0 w-24">对应工单 / 基础事件</span>
                       {viewCard.target ? <span className="text-text-primary">{targetLabel(viewCard.target)}</span> : <span className="text-text-tertiary">未选择</span>}
@@ -220,14 +219,6 @@ export function PullMapping() {
                 <Field label="第三方对应接口">
                   <Input value={draft.api} placeholder="如：事件同步接口 /open/api/event/list" className="font-mono" onChange={(e) => patchDraft({ api: e.target.value })} />
                 </Field>
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label="第三方事件类型名称">
-                    <Input value={draft.typeName} onChange={(e) => patchDraft({ typeName: e.target.value })} />
-                  </Field>
-                  <Field label="第三方事件类型编码">
-                    <Input value={draft.typeCode} className="font-mono" onChange={(e) => patchDraft({ typeCode: e.target.value.replace(/\D/g, "") })} />
-                  </Field>
-                </div>
                 <Field label="识别方式">
                   <Select value={draft.matchByField ? "yes" : "no"} onValueChange={(v) => patchDraft({ matchByField: v === "yes" })}>
                     <SelectTrigger className="h-9 bg-card text-body-sm"><SelectValue /></SelectTrigger>
@@ -327,7 +318,7 @@ export function PullMapping() {
           {draft && (
             <div className="sticky bottom-0 -mx-6 mt-4 flex justify-end gap-3 border-t border-border bg-card px-6 py-4">
               <Button variant="outline" onClick={closeAll}>取消</Button>
-              <Button disabled={!draft.title || !draft.typeName || !draft.typeCode} onClick={saveDraft}>保存</Button>
+              <Button disabled={!draft.title} onClick={saveDraft}>保存</Button>
             </div>
           )}
         </SheetContent>
